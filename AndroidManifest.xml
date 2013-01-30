@@ -19,5 +19,6 @@
 		</activity>
 		<activity android:name=".VideoDetectPoints" android:screenOrientation="landscape"/>
 		<activity android:name=".CameraInfoActivity"/>
+		<activity android:name=".PreferenceActivity" android:label="PreferenceActivity"/>
 	</application>
 </manifest>

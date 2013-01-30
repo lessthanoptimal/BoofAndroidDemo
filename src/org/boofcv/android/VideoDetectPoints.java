@@ -19,21 +19,25 @@ public class VideoDetectPoints extends Activity {
 	private CameraPreview2 mPreview;
 	BoofImageProcessing processing;
 
+	public static DemoPreference preference;
+
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Log.d(TAG, "onCreate ENTER");
 
+		preference = DemoMain.preference;
+
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.video);
 
 		// Create an instance of Camera
-		mCamera = UtilVarious.getCameraInstance();
+		mCamera = Camera.open(preference.cameraId);
 
 		Camera.Parameters param = mCamera.getParameters();
-		Camera.Size sizePreview = UtilVarious.closest(param.getSupportedPreviewSizes(),320,240);
+		Camera.Size sizePreview = param.getSupportedPreviewSizes().get(preference.preview);
 		param.setPreviewSize(sizePreview.width,sizePreview.height);
-		Camera.Size sizePicture = UtilVarious.closest(param.getSupportedPictureSizes(),640,480);
+		Camera.Size sizePicture = param.getSupportedPictureSizes().get(preference.picture);
 		param.setPictureSize(sizePicture.width, sizePicture.height);
 		mCamera.setParameters(param);
 

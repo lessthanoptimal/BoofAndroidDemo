@@ -5,8 +5,15 @@ import android.graphics.Canvas;
 import android.hardware.Camera;
 import android.util.Log;
 import android.view.View;
+import boofcv.abst.filter.blur.BlurFilter;
+import boofcv.abst.filter.blur.MedianImageFilter;
+import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.ConvertNV21;
+import boofcv.android.VisualizeImageData;
+import boofcv.factory.filter.blur.FactoryBlurFilter;
+import boofcv.factory.filter.derivative.FactoryDerivative;
+import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt8;
 
 /**
@@ -22,6 +29,12 @@ public class BoofImageProcessing extends Thread implements BoofProcessing {
 	volatile boolean requestStop = false;
 	volatile boolean running = false;
 
+	ImageUInt8 blurred;
+	ImageSInt16 derivX;
+	ImageSInt16 derivY;
+	BlurFilter<ImageUInt8> blur = FactoryBlurFilter.gaussian(ImageUInt8.class,-1,2);
+	ImageGradient<ImageUInt8,ImageSInt16> gradient = FactoryDerivative.three(ImageUInt8.class,ImageSInt16.class);
+
 	View view;
 	Thread thread;
 
@@ -32,6 +45,10 @@ public class BoofImageProcessing extends Thread implements BoofProcessing {
 		gray2 = new ImageUInt8(size.width,size.height);
 		binary = new ImageUInt8(size.width,size.height);
 		storage = ConvertBitmap.declareStorage(output, null);
+
+		blurred = new ImageUInt8(size.width,size.height);
+		derivX = new ImageSInt16(size.width,size.height);
+		derivY = new ImageSInt16(size.width,size.height);
 	}
 
 	@Override
@@ -69,6 +86,10 @@ public class BoofImageProcessing extends Thread implements BoofProcessing {
 			gray2.reshape(size.width,size.height);
 			binary.reshape(size.width,size.height);
 			storage = ConvertBitmap.declareStorage(output,storage);
+
+			blurred.reshape(size.width,size.height);
+			derivX.reshape(size.width,size.height);
+			derivY.reshape(size.width,size.height);
 		}
 		synchronized ( gray ) {
 			ConvertNV21.nv21ToGray(bytes, gray.width, gray.height, gray);
@@ -115,7 +136,11 @@ public class BoofImageProcessing extends Thread implements BoofProcessing {
 			}
 
 			synchronized ( storage ) {
-				ConvertBitmap.grayToBitmap(gray2,output,storage);
+//				blur.process(gray2,blurred);
+//				ConvertBitmap.grayToBitmap(blurred,output,storage);
+				gradient.process(gray2, derivX, derivY);
+				int maxValue = -1;//(int)(255*gradient.getMaxValueMultiplier());
+				VisualizeImageData.colorizeGradient(derivX,derivY,maxValue,output,storage);
 			}
 			view.postInvalidate();
 		}

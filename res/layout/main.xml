@@ -6,7 +6,7 @@
 			  android:paddingRight="16dp"
 			  android:orientation="vertical" >
 
-	<ListView
+	<ExpandableListView
 			android:layout_width="fill_parent"
 			android:layout_height="fill_parent"
 			android:id="@+id/DemoListView" android:layout_gravity="center"/>

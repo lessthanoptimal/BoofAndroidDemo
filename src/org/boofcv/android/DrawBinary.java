@@ -24,6 +24,9 @@ public class DrawBinary extends SurfaceView implements Camera.PreviewCallback {
 
 	private Paint textPaint = new Paint();
 
+	double history[] = new double[10];
+	int historyNum = 0;
+
 	BoofProcessing processing;
 	Activity activity;
 
@@ -52,9 +55,17 @@ public class DrawBinary extends SurfaceView implements Camera.PreviewCallback {
 		long current = System.currentTimeMillis();
 		long elapsed = current - previous;
 		previous = current;
-		double fps = 1000.0/elapsed;
+		history[historyNum++] = 1000.0/elapsed;
+		historyNum %= history.length;
+
+		double meanFps = 0;
+		for( int i = 0; i < history.length; i++ ) {
+			meanFps += history[i];
+		}
+		meanFps /= history.length;
+
 		canvas.restore();
-		canvas.drawText(String.format("FPS = %5.2f",fps), 50, 50, textPaint);
+		canvas.drawText(String.format("FPS = %5.2f",meanFps), 50, 50, textPaint);
 	}
 
 	@Override
