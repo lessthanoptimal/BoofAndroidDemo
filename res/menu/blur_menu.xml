@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	<item android:id="@+id/blur_mean"
+		  android:title="Mean" />
+	<item android:id="@+id/blur_gaussian"
+		  android:title="Gaussian"/>
+	<item android:id="@+id/blur_median"
+		  android:title="Median"/>
+</menu>

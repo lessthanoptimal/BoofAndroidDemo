@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	<item android:id="@+id/gradient_three"
+		  android:title="Three" />
+	<item android:id="@+id/gradient_sobel"
+		  android:title="Sobel"/>
+	<item android:id="@+id/gradient_prewitt"
+		  android:title="Prewitt"/>
+</menu>

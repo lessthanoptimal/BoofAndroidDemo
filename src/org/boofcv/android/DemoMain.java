@@ -65,12 +65,12 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		Group track = new Group("Tracking");
 		Group sfm = new Group("Structure From Motion");
 
-		ip.addChild("Blur",null);
-		ip.addChild("Gradient",VideoDetectPoints.class);
-		ip.addChild("Binary",null);
+		ip.addChild("Blur",BlurDisplayActivity.class);
+		ip.addChild("Gradient",GradientDisplayActivity.class);
+		ip.addChild("Binary Ops",BinaryDisplayActivity.class);
 
-		detect.addChild("Corner/Blob",null);
-		detect.addChild("Scale Space",null);
+		detect.addChild("Corner/Blob",PointDisplayActivity.class);
+		detect.addChild("Scale Space",ScalePointDisplayActivity.class);
 		detect.addChild("Lines",null);
 
 		assoc.addChild("Associate",null);

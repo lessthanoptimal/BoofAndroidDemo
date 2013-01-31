@@ -17,8 +17,13 @@
 				<category android:name="android.intent.category.LAUNCHER"/>
 			</intent-filter>
 		</activity>
-		<activity android:name=".VideoDetectPoints" android:screenOrientation="landscape"/>
+		<activity android:name=".VideoDisplayActivity" android:screenOrientation="landscape"/>
 		<activity android:name=".CameraInfoActivity"/>
-		<activity android:name=".PreferenceActivity" android:label="PreferenceActivity"/>
+		<activity android:name=".PreferenceActivity"/>
+		<activity android:name=".BlurDisplayActivity" android:screenOrientation="landscape"/>
+		<activity android:name=".GradientDisplayActivity" android:screenOrientation="landscape"/>
+		<activity android:name=".BinaryDisplayActivity" android:screenOrientation="landscape"/>
+		<activity android:name=".PointDisplayActivity" android:screenOrientation="landscape"/>
+		<activity android:name=".ScalePointDisplayActivity" android:screenOrientation="landscape"/>
 	</application>
 </manifest>

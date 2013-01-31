@@ -9,7 +9,7 @@ import android.view.View;
  */
 public interface BoofProcessing{
 
-	public void init( View view );
+	public void init( View view , Camera camera );
 
 	/**
 	 * Called inside the GUI thread

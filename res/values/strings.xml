@@ -1,4 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<string name="app_name">BoofDemo</string>
+	<string-array name="binary_filters">
+		<item>None</item>
+		<item>Dilate-4</item>
+		<item>Dilate-8</item>
+		<item>Erode-4</item>
+		<item>Erode-8</item>
+		<item>Edge-4</item>
+		<item>Edge-8</item>
+		<item>Denoise</item>
+	</string-array>
+	<string-array name="point_features">
+		<item>Shi-Tomasi</item>
+		<item>Harris</item>
+		<item>FAST</item>
+		<item>KitRos</item>
+		<item>Hessian Det</item>
+		<item>Hessian Trace</item>
+	</string-array>
+	<string-array name="scale_features">
+		<item>SURF</item>
+		<item>SIFT</item>
+	</string-array>
 </resources>
