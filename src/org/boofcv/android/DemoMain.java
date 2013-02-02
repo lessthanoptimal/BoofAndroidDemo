@@ -71,17 +71,17 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 
 		detect.addChild("Corner/Blob",PointDisplayActivity.class);
 		detect.addChild("Scale Space",ScalePointDisplayActivity.class);
-		detect.addChild("Lines",null);
+		detect.addChild("Lines",LineDisplayActivity.class);
 
 		assoc.addChild("Associate",null);
 
-		track.addChild("KLT",null);
+		track.addChild("KLT",KltDisplayActivity.class);
 		track.addChild("DDA",null);
 		track.addChild("Combined",null);
 
 		sfm.addChild("Calibration",null);
 		sfm.addChild("Stereo",null);
-		sfm.addChild("Stabilization",null);
+		sfm.addChild("Stabilization",StabilizeDisplayActivity.class);
 		sfm.addChild("Mosaic",null);
 
 		groups.add(ip);

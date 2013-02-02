@@ -17,7 +17,7 @@ import android.widget.FrameLayout;
  */
 public class VideoDisplayActivity extends Activity implements Camera.PreviewCallback {
 
-	private Camera mCamera;
+	protected Camera mCamera;
 	private Visualization mDraw;
 	private CameraPreview mPreview;
 	protected BoofProcessing processing;

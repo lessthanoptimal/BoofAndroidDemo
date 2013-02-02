@@ -25,5 +25,8 @@
 		<activity android:name=".BinaryDisplayActivity" android:screenOrientation="landscape"/>
 		<activity android:name=".PointDisplayActivity" android:screenOrientation="landscape"/>
 		<activity android:name=".ScalePointDisplayActivity" android:screenOrientation="landscape"/>
+		<activity android:name=".LineDisplayActivity" android:screenOrientation="landscape"/>
+		<activity android:name=".KltDisplayActivity" android:screenOrientation="landscape"/>
+		<activity android:name=".StabilizeDisplayActivity" android:screenOrientation="landscape"/>
 	</application>
 </manifest>

@@ -15,6 +15,7 @@
 		<item>Shi-Tomasi</item>
 		<item>Harris</item>
 		<item>FAST</item>
+		<item>Laplacian</item>
 		<item>KitRos</item>
 		<item>Hessian Det</item>
 		<item>Hessian Trace</item>
@@ -22,5 +23,9 @@
 	<string-array name="scale_features">
 		<item>SURF</item>
 		<item>SIFT</item>
+	</string-array>
+	<string-array name="line_features">
+		<item>Hough Foot</item>
+		<item>Hough Polar</item>
 	</string-array>
 </resources>

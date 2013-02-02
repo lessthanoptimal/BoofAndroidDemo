@@ -96,14 +96,19 @@ public class PointDisplayActivity extends VideoDisplayActivity
 				break;
 
 			case 3:
-				intensity = FactoryIntensityPoint.kitros(ImageSInt16.class);
+				intensity = (GeneralFeatureIntensity)FactoryIntensityPoint.laplacian();
+				nonmax = nonmaxMinMax;
 				break;
 
 			case 4:
-				intensity = FactoryIntensityPoint.hessian(HessianBlobIntensity.Type.DETERMINANT,ImageSInt16.class);
+				intensity = FactoryIntensityPoint.kitros(ImageSInt16.class);
 				break;
 
 			case 5:
+				intensity = FactoryIntensityPoint.hessian(HessianBlobIntensity.Type.DETERMINANT,ImageSInt16.class);
+				break;
+
+			case 6:
 				intensity = FactoryIntensityPoint.hessian(HessianBlobIntensity.Type.TRACE,ImageSInt16.class);
 				nonmax = nonmaxMinMax;
 				break;
