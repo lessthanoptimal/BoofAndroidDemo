@@ -78,13 +78,5 @@ public class GradientDisplayActivity extends VideoDisplayActivity  {
 			gradient.process(gray,derivX,derivY);
 			VisualizeImageData.colorizeGradient(derivX,derivY,-1,output,storage);
 		}
-
-		@Override
-		protected void resizeImages(int width, int height) {
-			super.resizeImages(width, height);
-
-			derivX.reshape(width,height);
-			derivY.reshape(width,height);
-		}
 	}
 }

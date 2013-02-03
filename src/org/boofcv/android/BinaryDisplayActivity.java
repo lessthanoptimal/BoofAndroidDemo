@@ -128,13 +128,5 @@ public class BinaryDisplayActivity extends VideoDisplayActivity
 
 			VisualizeImageData.binaryToBitmap(afterOps, output, storage);
 		}
-
-		@Override
-		protected void resizeImages(int width, int height) {
-			super.resizeImages(width, height);
-
-			binary.reshape(width,height);
-			afterOps.reshape(width,height);
-		}
 	}
 }

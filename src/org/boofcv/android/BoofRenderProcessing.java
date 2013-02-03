@@ -19,6 +19,9 @@ public abstract class BoofRenderProcessing extends Thread implements BoofProcess
 	volatile boolean requestStop = false;
 	volatile boolean running = false;
 
+	// size of the area being down for output.  defaults to image size
+	int outputWidth;
+	int outputHeight;
 
 	View view;
 	Thread thread;
@@ -36,6 +39,8 @@ public abstract class BoofRenderProcessing extends Thread implements BoofProcess
 			this.view = view;
 
 			Camera.Size size = camera.getParameters().getPreviewSize();
+			outputWidth = size.width;
+			outputHeight = size.height;
 			declareImages(size.width,size.height);
 		}
 
@@ -54,11 +59,11 @@ public abstract class BoofRenderProcessing extends Thread implements BoofProcess
 			int h = canvas.getHeight();
 
 			// fill the window and center it
-			double scaleX = w/(double)gray.getWidth();
-			double scaleY = h/(double)gray.getHeight();
+			double scaleX = w/(double)outputWidth;
+			double scaleY = h/(double)outputHeight;
 
 			float scale = (float)Math.min(scaleX,scaleY);
-			canvas.translate((w-scale*gray.getWidth())/2, (h-scale*gray.getHeight())/2);
+			canvas.translate((w-scale*outputWidth)/2, (h-scale*outputHeight)/2);
 			canvas.scale(scale,scale);
 
 			render(canvas, scale);
@@ -71,10 +76,6 @@ public abstract class BoofRenderProcessing extends Thread implements BoofProcess
 			return;
 
 		synchronized ( lockConvert ) {
-			Camera.Size size = camera.getParameters().getPreviewSize();
-			if( size.width != gray.width || size.height != gray.height ) {
-				resizeImages(size.width,size.height);
-			}
 			ConvertNV21.nv21ToGray(bytes, gray.width, gray.height, gray);
 		}
 		// wake up the thread and tell it to do some processing
@@ -142,10 +143,5 @@ public abstract class BoofRenderProcessing extends Thread implements BoofProcess
 	protected void declareImages( int width , int height ) {
 		gray = new ImageUInt8(width,height);
 		gray2 = new ImageUInt8(width,height);
-	}
-
-	protected void resizeImages( int width , int height ) {
-		gray.reshape(width,height);
-		gray2.reshape(width,height);
 	}
 }

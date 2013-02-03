@@ -32,13 +32,6 @@ public abstract class BoofImageProcessing extends BoofRenderProcessing {
 	}
 
 	@Override
-	protected void resizeImages( int width , int height ) {
-		super.resizeImages(width,height);
-		output = Bitmap.createBitmap(width,height,Bitmap.Config.ARGB_8888 );
-		storage = ConvertBitmap.declareStorage(output,storage);
-	}
-
-	@Override
 	protected void process(ImageUInt8 gray) {
 		process(gray,output,storage);
 	}

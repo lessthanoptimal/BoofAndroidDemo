@@ -7,6 +7,7 @@ import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.Looper;
 import android.view.SurfaceView;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.FrameLayout;
 
@@ -23,6 +24,15 @@ public class VideoDisplayActivity extends Activity implements Camera.PreviewCall
 	protected BoofProcessing processing;
 
 	public static DemoPreference preference;
+
+	boolean hidePreview = true;
+
+	public VideoDisplayActivity() {
+	}
+
+	public VideoDisplayActivity(boolean hidePreview) {
+		this.hidePreview = hidePreview;
+	}
 
 	/**
 	 * Changes the CV algorithm running.  Should only be called from a GUI thread
@@ -65,11 +75,19 @@ public class VideoDisplayActivity extends Activity implements Camera.PreviewCall
 		mDraw = new Visualization(this);
 
 		// Create our Preview view and set it as the content of our activity.
-		mPreview = new CameraPreview(this,this);
+		mPreview = new CameraPreview(this,this,hidePreview);
 		mPreview.setCamera(mCamera);
+
+
 		FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
 
-		preview.addView(mPreview);
+		if( hidePreview ) {
+			ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(1,1);
+			preview.addView(mPreview,params);
+		} else {
+			preview.addView(mPreview);
+		}
+
 		preview.addView(mDraw);
 	}
 

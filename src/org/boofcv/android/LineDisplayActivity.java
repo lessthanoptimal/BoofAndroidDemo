@@ -121,13 +121,6 @@ public class LineDisplayActivity extends VideoDisplayActivity
 		}
 
 		@Override
-		protected void resizeImages(int width, int height) {
-			super.resizeImages(width, height);
-			bitmap = Bitmap.createBitmap(width,height,Bitmap.Config.ARGB_8888);
-			storage = ConvertBitmap.declareStorage(bitmap, storage);
-		}
-
-		@Override
 		protected void process(ImageUInt8 gray) {
 			ConvertBitmap.grayToBitmap(gray,bitmap,storage);
 

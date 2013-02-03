@@ -164,13 +164,6 @@ public class PointDisplayActivity extends VideoDisplayActivity
 		}
 
 		@Override
-		protected void resizeImages(int width, int height) {
-			super.resizeImages(width, height);
-			bitmap = Bitmap.createBitmap(width,height,Bitmap.Config.ARGB_8888);
-			storage = ConvertBitmap.declareStorage(bitmap, storage);
-		}
-
-		@Override
 		protected void process(ImageUInt8 gray) {
 			// adjust the non-max region based on image size
 			nonmax.setSearchRadius( 3*gray.width/320 );

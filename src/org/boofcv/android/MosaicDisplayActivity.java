@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.hardware.Camera;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,15 +13,11 @@ import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.abst.sfm.AccessPointTracks;
 import boofcv.abst.sfm.d2.ImageMotion2D;
-import boofcv.alg.distort.ImageDistort;
-import boofcv.alg.interpolate.InterpolatePixel;
-import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.sfm.d2.StitchingFromMotion2D;
 import boofcv.android.ConvertBitmap;
-import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
-import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.factory.sfm.FactoryMotion2D;
+import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.affine.Affine2D_F64;
@@ -33,7 +30,7 @@ import java.util.List;
 /**
  * @author Peter Abeles
  */
-public class StabilizeDisplayActivity extends VideoDisplayActivity
+public class MosaicDisplayActivity extends VideoDisplayActivity
 implements CompoundButton.OnCheckedChangeListener
 {
 
@@ -42,6 +39,7 @@ implements CompoundButton.OnCheckedChangeListener
 
 	boolean showFeatures;
 	boolean resetRequested;
+	boolean paused = false;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -57,7 +55,7 @@ implements CompoundButton.OnCheckedChangeListener
 		resetRequested = false;
 
 		LayoutInflater inflater = getLayoutInflater();
-		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.stabilization_controls,null);
+		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.mosaic_controls,null);
 
 		LinearLayout parent = (LinearLayout)findViewById(R.id.camera_preview_parent);
 		parent.addView(controls);
@@ -65,6 +63,7 @@ implements CompoundButton.OnCheckedChangeListener
 		CheckBox seek = (CheckBox)controls.findViewById(R.id.check_features);
 		seek.setOnCheckedChangeListener(this);
 
+		ToggleButton toggle = (ToggleButton)controls.findViewById(R.id.toggle_pause);
 
 		StitchingFromMotion2D<ImageUInt8,Affine2D_F64> distortAlg = createStabilization();
 
@@ -73,6 +72,10 @@ implements CompoundButton.OnCheckedChangeListener
 
 	public void resetPressed( View view ) {
 		resetRequested = true;
+	}
+
+	public void pausedPressed( View view ) {
+		paused = !((ToggleButton)view).isChecked();
 	}
 
 	private StitchingFromMotion2D<ImageUInt8,Affine2D_F64> createStabilization() {
@@ -114,16 +117,41 @@ implements CompoundButton.OnCheckedChangeListener
 		@Override
 		protected void declareImages(int width, int height) {
 			super.declareImages(width, height);
-			alg.configure(width,height,null);
-			bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+
+			outputWidth = width*2;
+			outputHeight = height;
+
+			int tx = outputWidth/2 - width/4;
+			int ty = outputHeight/2 - height/4;
+
+			Affine2D_F64 init = new Affine2D_F64(0.5,0,0,0.5,tx,ty);
+			init = init.invert(null);
+
+			alg.configure(outputWidth,outputHeight,init);
+			bitmap = Bitmap.createBitmap(outputWidth, outputHeight, Bitmap.Config.ARGB_8888);
 			storage = ConvertBitmap.declareStorage(bitmap, storage);
 		}
 
 		@Override
 		protected void process(ImageUInt8 gray) {
+			if(paused)
+				return;
+
 			if( !resetRequested && alg.process(gray) ) {
-				ConvertBitmap.grayToBitmap(alg.getStitchedImage(),bitmap,storage);
+				ImageUInt8 stitched = alg.getStitchedImage();
+				ConvertBitmap.grayToBitmap(stitched,bitmap,storage);
 				alg.getImageCorners(gray.width,gray.height,corners);
+
+				boolean inside = true;
+				inside &= BoofMiscOps.checkInside(stitched,corners.p0.x,corners.p0.y,5);
+				inside &= BoofMiscOps.checkInside(stitched,corners.p1.x,corners.p1.y,5);
+				inside &= BoofMiscOps.checkInside(stitched,corners.p2.x,corners.p2.y,5);
+				inside &= BoofMiscOps.checkInside(stitched,corners.p3.x,corners.p3.y,5);
+
+				if( !inside ) {
+					alg.setOriginToCurrent();
+				}
+
 			} else {
 				resetRequested = false;
 				alg.reset();

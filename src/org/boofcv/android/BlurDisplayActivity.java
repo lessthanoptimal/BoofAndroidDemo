@@ -73,12 +73,5 @@ public class BlurDisplayActivity extends VideoDisplayActivity  {
 			filter.process(gray,blurred);
 			ConvertBitmap.grayToBitmap(blurred,output,storage);
 		}
-
-		@Override
-		protected void resizeImages(int width, int height) {
-			super.resizeImages(width, height);
-
-			blurred.reshape(width,height);
-		}
 	}
 }

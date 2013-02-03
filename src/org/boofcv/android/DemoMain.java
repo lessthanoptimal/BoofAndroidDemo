@@ -82,7 +82,7 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		sfm.addChild("Calibration",null);
 		sfm.addChild("Stereo",null);
 		sfm.addChild("Stabilization",StabilizeDisplayActivity.class);
-		sfm.addChild("Mosaic",null);
+		sfm.addChild("Mosaic",MosaicDisplayActivity.class);
 
 		groups.add(ip);
 		groups.add(detect);

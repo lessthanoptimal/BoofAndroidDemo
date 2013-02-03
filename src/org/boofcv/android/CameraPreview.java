@@ -23,10 +23,12 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 	SurfaceHolder mHolder;
 	Camera mCamera;
 	Camera.PreviewCallback previewCallback;
+	boolean hidden;
 
-	CameraPreview(Context context, Camera.PreviewCallback previewCallback) {
+	CameraPreview(Context context, Camera.PreviewCallback previewCallback, boolean hidden ) {
 		super(context);
 		this.previewCallback = previewCallback;
+		this.hidden = hidden;
 
 		mSurfaceView = new SurfaceView(context);
 		addView(mSurfaceView);
@@ -39,34 +41,24 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 	}
 
 	public void setCamera(Camera camera) {
-		Log.d(TAG,"setCamera");
-
 		mCamera = camera;
 		if (mCamera != null) {
 			requestLayout();
 		}
 	}
 
-	public void switchCamera(Camera camera) {
-		setCamera(camera);
-		try {
-			camera.setPreviewDisplay(mHolder);
-		} catch (IOException exception) {
-			Log.e(TAG, "IOException caused by setPreviewDisplay()", exception);
-		}
-		requestLayout();
-	}
-
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		Log.d(TAG,"onMeasure");
-
-		// We purposely disregard child measurements because act as a
-		// wrapper to a SurfaceView that centers the camera preview instead
-		// of stretching it.
-		final int width = resolveSize(getSuggestedMinimumWidth(), widthMeasureSpec);
-		final int height = resolveSize(getSuggestedMinimumHeight(), heightMeasureSpec);
-		setMeasuredDimension(width, height);
+		if( hidden ) {
+			this.setMeasuredDimension(2, 2);
+		} else {
+			// We purposely disregard child measurements because act as a
+			// wrapper to a SurfaceView that centers the camera preview instead
+			// of stretching it.
+			final int width = resolveSize(getSuggestedMinimumWidth(), widthMeasureSpec);
+			final int height = resolveSize(getSuggestedMinimumHeight(), heightMeasureSpec);
+			setMeasuredDimension(width, height);
+		}
 
 	}
 
@@ -74,8 +66,6 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 	protected void onLayout(boolean changed, int l, int t, int r, int b) {
 		if( mCamera == null )
 			return;
-
-		Log.d(TAG,"onLayout");
 
 		if (changed && getChildCount() > 0) {
 			final View child = getChildAt(0);
@@ -107,7 +97,6 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
-		Log.d(TAG,"surfaceCreated");
 
 		// The Surface has been created, acquire the camera and tell it where
 		// to draw.
@@ -122,8 +111,6 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
-		Log.d(TAG,"surfaceDestroyed");
-
 		// Surface will be destroyed when we return, so stop the preview.
 		if (mCamera != null) {
 			mCamera.stopPreview();
@@ -132,7 +119,6 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
-		Log.d(TAG,"surfaceChanged");
 		if( mCamera == null )
 			return;
 
