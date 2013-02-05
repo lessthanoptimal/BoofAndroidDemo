@@ -4,11 +4,13 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.hardware.Camera;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.*;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.LinearLayout;
+import android.widget.ToggleButton;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.abst.sfm.AccessPointTracks;
@@ -62,8 +64,6 @@ implements CompoundButton.OnCheckedChangeListener
 
 		CheckBox seek = (CheckBox)controls.findViewById(R.id.check_features);
 		seek.setOnCheckedChangeListener(this);
-
-		ToggleButton toggle = (ToggleButton)controls.findViewById(R.id.toggle_pause);
 
 		StitchingFromMotion2D<ImageUInt8,Affine2D_F64> distortAlg = createStabilization();
 

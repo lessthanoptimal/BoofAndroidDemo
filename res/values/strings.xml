@@ -11,6 +11,14 @@
 		<item>Edge-8</item>
 		<item>Denoise</item>
 	</string-array>
+
+	<string-array name="gradients">
+		<item>Three</item>
+		<item>Sobel</item>
+		<item>Prewitt</item>
+	</string-array>
+
+
 	<string-array name="point_features">
 		<item>Shi-Tomasi</item>
 		<item>Harris</item>
@@ -27,5 +35,20 @@
 	<string-array name="line_features">
 		<item>Hough Foot</item>
 		<item>Hough Polar</item>
+	</string-array>
+
+	<string-array name="detectors">
+		<item>Fast-Hessian</item>
+		<item>SIFT</item>
+		<item>Shi-Tomasi</item>
+		<item>Harris</item>
+		<item>FAST</item>
+	</string-array>
+
+	<string-array name="descriptors">
+		<item>SURF</item>
+		<item>SIFT</item>
+		<item>BRIEF</item>
+		<item>NCC</item>
 	</string-array>
 </resources>

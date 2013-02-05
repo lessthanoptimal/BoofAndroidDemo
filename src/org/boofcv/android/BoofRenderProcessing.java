@@ -1,12 +1,12 @@
 package org.boofcv.android;
 
-import android.graphics.*;
+import android.graphics.Canvas;
 import android.hardware.Camera;
 import android.util.Log;
 import android.view.View;
-import boofcv.android.ConvertBitmap;
 import boofcv.android.ConvertNV21;
 import boofcv.struct.image.ImageUInt8;
+import georegression.struct.point.Point2D_F64;
 
 /**
  * @author Peter Abeles
@@ -28,6 +28,10 @@ public abstract class BoofRenderProcessing extends Thread implements BoofProcess
 
 	Object lockGui = new Object();
 	Object lockConvert = new Object();
+
+	// scale and translation applied to the canvas
+	double scale;
+	double tranX,tranY;
 
 	// It is possible for this class to have been inserted between process() and render() operations
 	// this variable is used to make sure it won't try to render before processing
@@ -62,13 +66,25 @@ public abstract class BoofRenderProcessing extends Thread implements BoofProcess
 			double scaleX = w/(double)outputWidth;
 			double scaleY = h/(double)outputHeight;
 
-			float scale = (float)Math.min(scaleX,scaleY);
-			canvas.translate((w-scale*outputWidth)/2, (h-scale*outputHeight)/2);
-			canvas.scale(scale,scale);
+			scale = Math.min(scaleX,scaleY);
+			tranX = (w-scale*outputWidth)/2;
+			tranY = (h-scale*outputHeight)/2;
+
+			canvas.translate((float)tranX,(float)tranY);
+			canvas.scale((float)scale,(float)scale);
 
 			render(canvas, scale);
 		}
 	}
+
+	/**
+	 * Converts a coordinate from pixel to the output image coordinates
+	 */
+	protected void imageToOutput( double x , double y , Point2D_F64 pt ) {
+		pt.x = x/scale - tranX/scale;
+		pt.y = y/scale - tranY/scale;
+	}
+
 
 	@Override
 	public void convertPreview(byte[] bytes, Camera camera) {
@@ -96,7 +112,7 @@ public abstract class BoofRenderProcessing extends Thread implements BoofProcess
 				Thread.sleep(10);
 			} catch (InterruptedException e) {}
 		}
-		Log.d("stopProcessin()","EXIT");
+		Log.d("stopProcessin()", "EXIT");
 	}
 
 	@Override

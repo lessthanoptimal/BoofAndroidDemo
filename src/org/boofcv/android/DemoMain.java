@@ -8,7 +8,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.*;
+import android.widget.ExpandableListView;
+import android.widget.SimpleExpandableListAdapter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -73,7 +74,7 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		detect.addChild("Scale Space",ScalePointDisplayActivity.class);
 		detect.addChild("Lines",LineDisplayActivity.class);
 
-		assoc.addChild("Associate",null);
+		assoc.addChild("Two Pictures",AssociationActivity.class);
 
 		track.addChild("KLT",KltDisplayActivity.class);
 		track.addChild("DDA",null);

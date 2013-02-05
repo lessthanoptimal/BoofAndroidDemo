@@ -29,5 +29,6 @@
 		<activity android:name=".KltDisplayActivity" android:screenOrientation="landscape"/>
 		<activity android:name=".StabilizeDisplayActivity" android:screenOrientation="landscape"/>
 		<activity android:name=".MosaicDisplayActivity" android:screenOrientation="landscape"/>
+		<activity android:name=".AssociationActivity" android:screenOrientation="landscape"/>
 	</application>
 </manifest>

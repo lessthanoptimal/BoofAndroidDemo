@@ -7,7 +7,6 @@ import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.Looper;
 import android.view.SurfaceView;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.FrameLayout;
 
@@ -81,13 +80,7 @@ public class VideoDisplayActivity extends Activity implements Camera.PreviewCall
 
 		FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
 
-		if( hidePreview ) {
-			ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(1,1);
-			preview.addView(mPreview,params);
-		} else {
-			preview.addView(mPreview);
-		}
-
+		preview.addView(mPreview);
 		preview.addView(mDraw);
 	}
 
