@@ -35,7 +35,6 @@ public class CreateDetectorDescriptor {
 	public static final int DESC_BRIEF = 2;
 	public static final int DESC_NCC = 3;
 
-
 	public static DetectDescribePoint create( int detect , int describe , Class imageType ) {
 		if( detect == DETECT_FAST && describe == DESC_SURF ) {
 			return FactoryDetectDescribe.surfFast(confDetectFH(), null, null, imageType);
@@ -87,7 +86,7 @@ public class CreateDetectorDescriptor {
 				break;
 
 			case DETECT_FAST:
-				general = FactoryDetectPoint.createFast(3, 9, 20, -1, imageType);
+				general = FactoryDetectPoint.createFast(3, 9, 20, 150, imageType);
 				break;
 
 			default:
@@ -122,20 +121,24 @@ public class CreateDetectorDescriptor {
 	private static ConfigGeneralDetector confCorner() {
 		ConfigGeneralDetector conf = new ConfigGeneralDetector();
 		conf.radius = 3;
+		conf.threshold = 20;
+		conf.maxFeatures = 150;
 		return conf;
 	}
 
 	private static  ConfigFastHessian confDetectFH() {
 		ConfigFastHessian conf = new ConfigFastHessian();
 		conf.initialSampleSize = 2;
-		conf.extractRadius = 3;
+		conf.extractRadius = 2;
+		conf.maxFeaturesPerScale = 120;
 		return conf;
 	}
 
 	private static  ConfigSiftDetector confDetectSift() {
 		ConfigSiftDetector conf = new ConfigSiftDetector();
 		conf.extractRadius = 3;
-		conf.detectThreshold = 10;
+		conf.detectThreshold = 2;
+		conf.maxFeaturesPerScale = 120;
 		return conf;
 	}
 

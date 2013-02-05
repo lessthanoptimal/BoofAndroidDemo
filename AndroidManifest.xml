@@ -30,5 +30,7 @@
 		<activity android:name=".StabilizeDisplayActivity" android:screenOrientation="landscape"/>
 		<activity android:name=".MosaicDisplayActivity" android:screenOrientation="landscape"/>
 		<activity android:name=".AssociationActivity" android:screenOrientation="landscape"/>
+		<activity android:name=".DdaTrackerDisplayActivity" android:screenOrientation="landscape"/>
+		<activity android:name=".CombinedTrackerDisplayActivity" android:screenOrientation="landscape"/>
 	</application>
 </manifest>

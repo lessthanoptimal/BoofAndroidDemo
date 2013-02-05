@@ -77,8 +77,8 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		assoc.addChild("Two Pictures",AssociationActivity.class);
 
 		track.addChild("KLT",KltDisplayActivity.class);
-		track.addChild("DDA",null);
-		track.addChild("Combined",null);
+		track.addChild("Det-Desc-Assoc",DdaTrackerDisplayActivity.class);
+		track.addChild("Combined",CombinedTrackerDisplayActivity.class);
 
 		sfm.addChild("Calibration",null);
 		sfm.addChild("Stereo",null);

@@ -18,7 +18,6 @@
 		<item>Prewitt</item>
 	</string-array>
 
-
 	<string-array name="point_features">
 		<item>Shi-Tomasi</item>
 		<item>Harris</item>
@@ -28,6 +27,7 @@
 		<item>Hessian Det</item>
 		<item>Hessian Trace</item>
 	</string-array>
+
 	<string-array name="scale_features">
 		<item>SURF</item>
 		<item>SIFT</item>
