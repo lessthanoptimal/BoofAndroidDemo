@@ -5,16 +5,18 @@ import android.hardware.Camera;
 import android.util.Log;
 import android.view.View;
 import boofcv.android.ConvertNV21;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
 
 /**
  * @author Peter Abeles
  */
-public abstract class BoofRenderProcessing extends Thread implements BoofProcessing {
+public abstract class BoofRenderProcessing<T extends ImageSingleBand> extends Thread implements BoofProcessing {
 
-	ImageUInt8 gray;
-	ImageUInt8 gray2;
+	Class<T> imageType;
+	T gray;
+	T gray2;
 
 	volatile boolean requestStop = false;
 	volatile boolean running = false;
@@ -36,6 +38,10 @@ public abstract class BoofRenderProcessing extends Thread implements BoofProcess
 	// It is possible for this class to have been inserted between process() and render() operations
 	// this variable is used to make sure it won't try to render before processing
 	boolean hasProcessedImage = false;
+
+	protected BoofRenderProcessing(Class<T> imageType) {
+		this.imageType = imageType;
+	}
 
 	@Override
 	public void init(View view, Camera camera ) {
@@ -92,7 +98,7 @@ public abstract class BoofRenderProcessing extends Thread implements BoofProcess
 			return;
 
 		synchronized ( lockConvert ) {
-			ConvertNV21.nv21ToGray(bytes, gray.width, gray.height, gray);
+			ConvertNV21.nv21ToGray(bytes, gray.width, gray.height, gray,imageType);
 		}
 		// wake up the thread and tell it to do some processing
 		thread.interrupt();
@@ -130,7 +136,7 @@ public abstract class BoofRenderProcessing extends Thread implements BoofProcess
 
 			// swap gray buffers so that convertPreview is modifying the copy which is not in use
 			synchronized ( lockConvert ) {
-				ImageUInt8 tmp = gray;
+				T tmp = gray;
 				gray = gray2;
 				gray2 = tmp;
 			}
@@ -149,7 +155,7 @@ public abstract class BoofRenderProcessing extends Thread implements BoofProcess
 	 * Image processing should be done here.  process and render will not be called at the same time, but won't
 	 * be called from the same threads.
 	 */
-	protected abstract void process( ImageUInt8 gray );
+	protected abstract void process( T gray );
 
 	/**
 	 * Visualize results here.
@@ -157,7 +163,7 @@ public abstract class BoofRenderProcessing extends Thread implements BoofProcess
 	protected abstract void render(  Canvas canvas , double imageToOutput );
 
 	protected void declareImages( int width , int height ) {
-		gray = new ImageUInt8(width,height);
-		gray2 = new ImageUInt8(width,height);
+		gray = GeneralizedImageOps.createSingleBand(imageType,width,height);
+		gray2 = GeneralizedImageOps.createSingleBand(imageType,width,height);
 	}
 }

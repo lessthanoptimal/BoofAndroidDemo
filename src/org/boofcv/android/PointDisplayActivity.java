@@ -139,7 +139,7 @@ public class PointDisplayActivity extends VideoDisplayActivity
 	@Override
 	public void onStopTrackingTouch(SeekBar seekBar) {}
 
-	protected class PointProcessing extends BoofRenderProcessing {
+	protected class PointProcessing extends BoofRenderProcessing<ImageUInt8> {
 		EasyGeneralFeatureDetector<ImageUInt8,ImageSInt16> detector;
 
 		NonMaxSuppression nonmax;
@@ -149,6 +149,7 @@ public class PointDisplayActivity extends VideoDisplayActivity
 
 		public PointProcessing(GeneralFeatureIntensity<ImageUInt8, ImageSInt16> intensity,
 							   NonMaxSuppression nonmax) {
+			super(ImageUInt8.class);
 			GeneralFeatureDetector<ImageUInt8,ImageSInt16> general =
 			new GeneralFeatureDetector<ImageUInt8, ImageSInt16>(intensity,nonmax);
 

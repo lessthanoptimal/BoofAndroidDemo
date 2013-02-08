@@ -7,7 +7,10 @@ import android.graphics.Paint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.*;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
 import boofcv.abst.feature.detect.line.DetectLine;
 import boofcv.abst.feature.detect.line.DetectLineSegment;
 import boofcv.alg.feature.detect.line.LineImageOps;
@@ -96,7 +99,7 @@ public class LineDisplayActivity extends VideoDisplayActivity
 	public void onNothingSelected(AdapterView<?> adapterView) {}
 
 
-	protected class LineProcessing extends BoofRenderProcessing {
+	protected class LineProcessing extends BoofRenderProcessing<ImageUInt8> {
 		DetectLine<ImageUInt8> detector;
 		DetectLineSegment<ImageUInt8> detectorSegment = null;
 
@@ -106,10 +109,12 @@ public class LineDisplayActivity extends VideoDisplayActivity
 		byte[] storage;
 
 		public LineProcessing(DetectLine<ImageUInt8> detector) {
+			super(ImageUInt8.class);
 			this.detector = detector;
 		}
 
 		public LineProcessing(DetectLineSegment<ImageUInt8> detectorSegment) {
+			super(ImageUInt8.class);
 			this.detectorSegment = detectorSegment;
 		}
 

@@ -80,7 +80,7 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		track.addChild("Det-Desc-Assoc",DdaTrackerDisplayActivity.class);
 		track.addChild("Combined",CombinedTrackerDisplayActivity.class);
 
-		sfm.addChild("Calibration",null);
+		sfm.addChild("Calibration",ConfigureCalibrationActivity.class);
 		sfm.addChild("Stereo",null);
 		sfm.addChild("Stabilization",StabilizeDisplayActivity.class);
 		sfm.addChild("Mosaic",MosaicDisplayActivity.class);

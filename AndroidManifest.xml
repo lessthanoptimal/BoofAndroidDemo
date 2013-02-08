@@ -32,5 +32,7 @@
 		<activity android:name=".AssociationActivity" android:screenOrientation="landscape"/>
 		<activity android:name=".DdaTrackerDisplayActivity" android:screenOrientation="landscape"/>
 		<activity android:name=".CombinedTrackerDisplayActivity" android:screenOrientation="landscape"/>
+		<activity android:name=".CalibrationActivity" android:screenOrientation="landscape"/>
+		<activity android:name=".ConfigureCalibrationActivity"/>
 	</application>
 </manifest>

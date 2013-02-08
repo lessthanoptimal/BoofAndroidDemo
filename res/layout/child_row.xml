@@ -8,7 +8,7 @@
 			  android:paddingLeft="10mm"
 			  android:focusable="false"
 			  android:textStyle="normal"
-			  android:textSize="20sp"
+			  android:textSize="24sp"
 			  android:layout_width="fill_parent"
 			  android:layout_height="wrap_content"/>
 

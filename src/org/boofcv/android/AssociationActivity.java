@@ -196,7 +196,7 @@ implements AdapterView.OnItemSelectedListener
 	}
 
 
-	protected class AssociationProcessing<Desc extends TupleDesc> extends BoofRenderProcessing {
+	protected class AssociationProcessing<Desc extends TupleDesc> extends BoofRenderProcessing<ImageUInt8> {
 		DetectDescribePoint<ImageFloat32,Desc> detDesc;
 		AssociateDescription<Desc> associate;
 
@@ -211,6 +211,7 @@ implements AdapterView.OnItemSelectedListener
 
 		public AssociationProcessing( DetectDescribePoint<ImageFloat32,Desc> detDesc ,
 									  AssociateDescription<Desc> associate  ) {
+			super(ImageUInt8.class);
 			this.detDesc = detDesc;
 			this.associate = associate;
 

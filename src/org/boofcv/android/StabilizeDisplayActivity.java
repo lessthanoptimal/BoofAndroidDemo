@@ -7,19 +7,16 @@ import android.graphics.Paint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.*;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.abst.sfm.AccessPointTracks;
 import boofcv.abst.sfm.d2.ImageMotion2D;
-import boofcv.alg.distort.ImageDistort;
-import boofcv.alg.interpolate.InterpolatePixel;
-import boofcv.alg.interpolate.TypeInterpolate;
 import boofcv.alg.sfm.d2.StitchingFromMotion2D;
 import boofcv.android.ConvertBitmap;
-import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
-import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.factory.sfm.FactoryMotion2D;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt8;
@@ -86,7 +83,7 @@ implements CompoundButton.OnCheckedChangeListener
 				klt(new int[]{1, 2,4}, config, 3, ImageUInt8.class, ImageSInt16.class);
 
 		ImageMotion2D<ImageUInt8,Affine2D_F64> motion = FactoryMotion2D.createMotion2D(100, 1.5, 2, 40,
-				0.5, 0.6, tracker, new Affine2D_F64());
+				0.5, 0.6, false, tracker, new Affine2D_F64());
 
 		return FactoryMotion2D.createVideoStitch(0.2,motion,ImageUInt8.class);
 	}
@@ -96,7 +93,7 @@ implements CompoundButton.OnCheckedChangeListener
 		showFeatures = b;
 	}
 
-	protected class PointProcessing extends BoofRenderProcessing {
+	protected class PointProcessing extends BoofRenderProcessing<ImageUInt8> {
 		StitchingFromMotion2D<ImageUInt8,Affine2D_F64> alg;
 		Homography2D_F64 imageToDistorted = new Homography2D_F64();
 		Homography2D_F64 distortedToImage = new Homography2D_F64();
@@ -108,6 +105,7 @@ implements CompoundButton.OnCheckedChangeListener
 		Point2D_F64 distPt = new Point2D_F64();
 
 		public PointProcessing( StitchingFromMotion2D<ImageUInt8,Affine2D_F64> alg  ) {
+			super(ImageUInt8.class);
 			this.alg = alg;
 		}
 

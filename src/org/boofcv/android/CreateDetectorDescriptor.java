@@ -36,7 +36,7 @@ public class CreateDetectorDescriptor {
 	public static final int DESC_NCC = 3;
 
 	public static DetectDescribePoint create( int detect , int describe , Class imageType ) {
-		if( detect == DETECT_FAST && describe == DESC_SURF ) {
+		if( detect == DETECT_FH && describe == DESC_SURF ) {
 			return FactoryDetectDescribe.surfFast(confDetectFH(), null, null, imageType);
 		} else if( detect == DETECT_SIFT && describe == DESC_SIFT ) {
 			return FactoryDetectDescribe.sift(null, confDetectSift(), null, null );

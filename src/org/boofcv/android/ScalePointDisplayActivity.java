@@ -8,28 +8,15 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.*;
-import boofcv.abst.feature.detect.extract.ConfigExtract;
-import boofcv.abst.feature.detect.extract.NonMaxSuppression;
-import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.ConfigSiftDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
-import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
-import boofcv.alg.feature.detect.interest.EasyGeneralFeatureDetector;
-import boofcv.alg.feature.detect.interest.FeatureLaplacePyramid;
-import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.android.ConvertBitmap;
 import boofcv.core.image.ConvertImage;
-import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
-import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
-import boofcv.factory.feature.detect.interest.FactoryInterestPointAlgs;
-import boofcv.struct.QueueCorner;
 import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point2D_I16;
 
 /**
  * @author Peter Abeles
@@ -112,13 +99,14 @@ public class ScalePointDisplayActivity extends VideoDisplayActivity
 	@Override
 	public void onStopTrackingTouch(SeekBar seekBar) {}
 
-	protected class PointProcessing extends BoofRenderProcessing {
+	protected class PointProcessing extends BoofRenderProcessing<ImageUInt8> {
 		InterestPointDetector<ImageUInt8> detector;
 
 		Bitmap bitmap;
 		byte[] storage;
 
 		public PointProcessing(InterestPointDetector<ImageUInt8> detector) {
+			super(ImageUInt8.class);
 			this.detector = detector;
 		}
 

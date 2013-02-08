@@ -2,27 +2,20 @@ package org.boofcv.android;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.hardware.Camera;
-import android.util.Log;
-import android.view.View;
-import boofcv.abst.filter.blur.BlurFilter;
-import boofcv.abst.filter.blur.MedianImageFilter;
-import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.android.ConvertBitmap;
-import boofcv.android.ConvertNV21;
-import boofcv.android.VisualizeImageData;
-import boofcv.factory.filter.blur.FactoryBlurFilter;
-import boofcv.factory.filter.derivative.FactoryDerivative;
-import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt8;
 
 /**
  * @author Peter Abeles
  */
-public abstract class BoofImageProcessing extends BoofRenderProcessing {
+public abstract class BoofImageProcessing extends BoofRenderProcessing<ImageUInt8> {
 
 	Bitmap output;
 	byte[] storage;
+
+	protected BoofImageProcessing() {
+		super(ImageUInt8.class);
+	}
 
 	@Override
 	protected void declareImages( int width , int height ) {

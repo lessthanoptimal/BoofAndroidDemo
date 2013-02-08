@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+			  android:orientation="horizontal"
+			  android:layout_width="match_parent"
+			  android:layout_height="match_parent">
+
+	<CheckBox
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Continuous"
+			android:id="@+id/checkBox_continuous" android:layout_gravity="left|center_vertical"/>
+
+	<TextView
+			android:layout_width="70dip"
+			android:layout_height="wrap_content"
+			android:gravity="center"
+			android:editable="false"
+			android:textSize="18dip"
+			android:text="Total"/>
+
+	<TextView
+			android:layout_width="50dip"
+			android:layout_height="wrap_content"
+			android:gravity="center"
+			android:editable="false"
+			android:text="0"
+			android:textSize="18dip"
+			android:textColor="#000000"
+			android:background="@drawable/border"
+			android:id="@+id/text_total"/>
+
+	<Button
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="30dip"
+			android:text="OK"
+			android:onClick="pressedOK"
+			android:layout_gravity="center"/>
+
+</LinearLayout>

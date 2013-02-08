@@ -32,7 +32,7 @@ public class PointTrackerDisplayActivity extends VideoDisplayActivity {
 		paintBlue.setStyle(Paint.Style.FILL);
 	}
 
-	protected class PointProcessing extends BoofRenderProcessing {
+	protected class PointProcessing extends BoofRenderProcessing<ImageUInt8> {
 		PointTracker<ImageUInt8> tracker;
 
 		long tick;
@@ -45,6 +45,7 @@ public class PointTrackerDisplayActivity extends VideoDisplayActivity {
 		List<PointTrack> inactive = new ArrayList<PointTrack>();
 
 		public PointProcessing( PointTracker<ImageUInt8> tracker ) {
+			super(ImageUInt8.class);
 			this.tracker = tracker;
 		}
 

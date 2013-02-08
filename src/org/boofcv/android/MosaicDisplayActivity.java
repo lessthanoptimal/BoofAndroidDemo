@@ -89,7 +89,7 @@ implements CompoundButton.OnCheckedChangeListener
 				klt(new int[]{1, 2,4}, config, 3, ImageUInt8.class, ImageSInt16.class);
 
 		ImageMotion2D<ImageUInt8,Affine2D_F64> motion = FactoryMotion2D.createMotion2D(100, 1.5, 2, 40,
-				0.5, 0.6, tracker, new Affine2D_F64());
+				0.5, 0.6, false,tracker, new Affine2D_F64());
 
 		return FactoryMotion2D.createVideoStitch(0.2,motion,ImageUInt8.class);
 	}
@@ -99,7 +99,7 @@ implements CompoundButton.OnCheckedChangeListener
 		showFeatures = b;
 	}
 
-	protected class PointProcessing extends BoofRenderProcessing {
+	protected class PointProcessing extends BoofRenderProcessing<ImageUInt8> {
 		StitchingFromMotion2D<ImageUInt8,Affine2D_F64> alg;
 		Homography2D_F64 imageToDistorted = new Homography2D_F64();
 		Homography2D_F64 distortedToImage = new Homography2D_F64();
@@ -111,6 +111,7 @@ implements CompoundButton.OnCheckedChangeListener
 		Point2D_F64 distPt = new Point2D_F64();
 
 		public PointProcessing( StitchingFromMotion2D<ImageUInt8,Affine2D_F64> alg  ) {
+			super(ImageUInt8.class);
 			this.alg = alg;
 		}
 
