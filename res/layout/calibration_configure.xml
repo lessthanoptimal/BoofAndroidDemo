@@ -12,21 +12,6 @@
 				 android:layout_gravity="center_horizontal" >
 
 		<TableRow
-				android:id="@+id/tableRow1"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:padding="5dip" >
-			<TextView
-					android:id="@+id/textView1"
-					android:text="Camera"
-					android:textAppearance="?android:attr/textAppearanceLarge" />
-			<Spinner
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:id="@+id/spinner_camera" android:layout_gravity="center"/>
-		</TableRow>
-
-		<TableRow
 				android:id="@+id/tableRow2"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
@@ -83,11 +68,4 @@
 		</TableRow>
 
 	</TableLayout>
-	<Button
-			android:layout_width="100dip"
-			android:layout_height="wrap_content"
-			android:text="OK"
-			android:id="@+id/button_ok"
-			android:layout_gravity="center_horizontal"
-			android:onClick="pressedOK"/>
 </LinearLayout>

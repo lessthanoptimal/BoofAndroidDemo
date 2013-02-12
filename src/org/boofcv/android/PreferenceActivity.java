@@ -5,9 +5,10 @@ import android.hardware.Camera;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.*;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -61,7 +62,6 @@ public class PreferenceActivity extends Activity implements AdapterView.OnItemSe
 		spinnerCamera.setOnItemSelectedListener(this);
 		spinnerVideo.setOnItemSelectedListener(this);
 		spinnerPicture.setOnItemSelectedListener(this);
-
 	}
 
 
@@ -151,6 +151,7 @@ public class PreferenceActivity extends Activity implements AdapterView.OnItemSe
 //			Toast.makeText(this,"spinner unknown",2).show();
 			Log.d("PreferenceActivity","onItemSelected unknown");
 		}
+		DemoMain.changedPreferences = true;
 	}
 
 	@Override

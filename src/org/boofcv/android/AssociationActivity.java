@@ -78,9 +78,6 @@ implements AdapterView.OnItemSelectedListener
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		Camera.Size size = mCamera.getParameters().getPreviewSize();
-		initializeImages( size.width, size.height );
-
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.associate_controls,null);
 
@@ -110,6 +107,13 @@ implements AdapterView.OnItemSelectedListener
 				mDetector.onTouchEvent(event);
 				return true;
 			}});
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		Camera.Size size = mCamera.getParameters().getPreviewSize();
+		initializeImages( size.width, size.height );
 	}
 
 	private void initializeImages( int width , int height ) {

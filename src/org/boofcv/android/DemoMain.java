@@ -10,7 +10,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
+import android.widget.Toast;
+import boofcv.android.BoofAndroidFiles;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +23,11 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 
 	// contains information on all the cameras.  less error prone and easier to deal with
 	public static List<CameraSpecs> specs = new ArrayList<CameraSpecs>();
+	// specifies which camera to use an image size
 	public static DemoPreference preference = new DemoPreference();
+	// If another activity modifies the demo preferences this needs to be set to true so that it knows to reload
+	// camera parameters.
+	public static boolean changedPreferences = false;
 
 	List<Group> groups = new ArrayList<Group>();
 
@@ -58,6 +65,14 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		listView.setOnChildClickListener(this);
 	}
 
+	@Override
+	protected void onResume() {
+		super.onResume();
+		if( changedPreferences ) {
+			loadIntrinsic();
+		}
+	}
+
 
 	private void createGroups() {
 		Group ip = new Group("Image Processing");
@@ -80,7 +95,7 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		track.addChild("Det-Desc-Assoc",DdaTrackerDisplayActivity.class);
 		track.addChild("Combined",CombinedTrackerDisplayActivity.class);
 
-		sfm.addChild("Calibration",ConfigureCalibrationActivity.class);
+		sfm.addChild("Calibration",CalibrationActivity.class);
 		sfm.addChild("Stereo",null);
 		sfm.addChild("Stabilization",StabilizeDisplayActivity.class);
 		sfm.addChild("Mosaic",MosaicDisplayActivity.class);
@@ -106,8 +121,13 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 			case R.id.preferences: {
 				Intent intent = new Intent(this, PreferenceActivity.class);
 				startActivity(intent);
-			}
 				return true;
+			}
+			case R.id.info: {
+				Intent intent = new Intent(this, CameraInformationActivity.class);
+				startActivity(intent);
+				return true;
+			}
 			case R.id.about:
 				return true;
 			default:
@@ -145,6 +165,26 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		CameraSpecs camera = specs.get(preference.cameraId);
 		preference.preview = UtilVarious.closest(camera.sizePreview,320,240);
 		preference.picture = UtilVarious.closest(camera.sizePicture,640,480);
+
+		// see if there are any intrinsic parameters to load
+		loadIntrinsic();
+	}
+
+	private void loadIntrinsic() {
+		preference.intrinsic = null;
+		File f = new File("cam"+preference.cameraId+".txt");
+		if( f.exists() ) {
+			try {
+				FileInputStream fos = openFileInput(f.getName());
+				Reader reader = new InputStreamReader(fos);
+				preference.intrinsic = BoofAndroidFiles.readIntrinsic(reader);
+			} catch (FileNotFoundException e) {
+
+			} catch (IOException e) {
+				Toast toast = Toast.makeText(this, "Failed to load intrinsic parameters", 2000);
+				toast.show();
+			}
+		}
 	}
 
 	/* Creating the Hashmap for the row */

@@ -33,6 +33,8 @@
 		<activity android:name=".DdaTrackerDisplayActivity" android:screenOrientation="landscape"/>
 		<activity android:name=".CombinedTrackerDisplayActivity" android:screenOrientation="landscape"/>
 		<activity android:name=".CalibrationActivity" android:screenOrientation="landscape"/>
-		<activity android:name=".ConfigureCalibrationActivity"/>
+		<activity android:name=".CalibrationComputeActivity"
+				  android:configChanges="orientation|keyboardHidden|screenSize" />
+		<activity android:name=".CameraInformationActivity"/>
 	</application>
 </manifest>

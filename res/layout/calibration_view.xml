@@ -14,6 +14,7 @@
 	<TextView
 			android:layout_width="70dip"
 			android:layout_height="wrap_content"
+			android:layout_gravity="center"
 			android:gravity="center"
 			android:editable="false"
 			android:textSize="18dip"
@@ -22,6 +23,7 @@
 	<TextView
 			android:layout_width="50dip"
 			android:layout_height="wrap_content"
+			android:layout_gravity="center"
 			android:gravity="center"
 			android:editable="false"
 			android:text="0"
@@ -33,8 +35,16 @@
 	<Button
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:layout_marginLeft="30dip"
-			android:text="OK"
+			android:layout_marginLeft="10dip"
+			android:text="Remove"
+			android:onClick="pressedRemove"
+			android:layout_gravity="center"/>
+
+	<Button
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="10dip"
+			android:text="Compute"
 			android:onClick="pressedOK"
 			android:layout_gravity="center"/>
 

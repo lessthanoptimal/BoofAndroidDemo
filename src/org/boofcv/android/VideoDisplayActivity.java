@@ -47,7 +47,8 @@ public class VideoDisplayActivity extends Activity implements Camera.PreviewCall
 		}
 
 		this.processing = processing;
-		if( processing != null ) {
+		// if the camera is null then it will be initialized when the camera is initialized
+		if( processing != null && mCamera != null ) {
 			processing.init(mDraw,mCamera);
 		}
 	}
@@ -61,7 +62,50 @@ public class VideoDisplayActivity extends Activity implements Camera.PreviewCall
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.video);
 
-		// Create an instance of Camera
+		mDraw = new Visualization(this);
+
+		// Create our Preview view and set it as the content of our activity.
+		mPreview = new CameraPreview(this,this,hidePreview);
+
+		FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
+
+		preview.addView(mPreview);
+		preview.addView(mDraw);
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+
+		if( mCamera != null )
+			throw new RuntimeException("Bug, camera should not be initialized already");
+
+		setUpAndConfigureCamera();
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+
+		if( processing != null ) {
+			processing.stopProcessing();
+			processing = null;
+		}
+
+		if (mCamera != null){
+			mPreview.setCamera(null);
+			mCamera.setPreviewCallback(null);
+			mCamera.stopPreview();
+			mCamera.release();
+			mCamera = null;
+		}
+	}
+
+	/**
+	 * Sets up the camera if it is not already setup.
+	 */
+	private void setUpAndConfigureCamera() {
+		// Open and configure the camera
 		mCamera = Camera.open(preference.cameraId);
 
 		Camera.Parameters param = mCamera.getParameters();
@@ -71,32 +115,11 @@ public class VideoDisplayActivity extends Activity implements Camera.PreviewCall
 		param.setPictureSize(sizePicture.width, sizePicture.height);
 		mCamera.setParameters(param);
 
-		mDraw = new Visualization(this);
-
-		// Create our Preview view and set it as the content of our activity.
-		mPreview = new CameraPreview(this,this,hidePreview);
+		// Create an instance of Camera
 		mPreview.setCamera(mCamera);
 
-
-		FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
-
-		preview.addView(mPreview);
-		preview.addView(mDraw);
-	}
-
-	@Override
-	protected void onPause() {
-		super.onPause();
-
-		if( processing != null )
-			processing.stopProcessing();
-
-		if (mCamera != null){
-			mPreview.setCamera(null);
-			mCamera.setPreviewCallback(null);
-			mCamera.stopPreview();
-			mCamera.release();
-			mCamera = null;
+		if( processing != null ) {
+			processing.init(mDraw,mCamera);
 		}
 	}
 

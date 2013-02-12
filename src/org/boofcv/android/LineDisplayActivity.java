@@ -30,7 +30,6 @@ import java.util.List;
 public class LineDisplayActivity extends VideoDisplayActivity
 		implements AdapterView.OnItemSelectedListener  {
 
-	int width;
 	Paint paint;
 
 	int active = -1;
@@ -42,8 +41,6 @@ public class LineDisplayActivity extends VideoDisplayActivity
 		paint.setColor(Color.RED);
 		paint.setStyle(Paint.Style.STROKE);
 		paint.setStrokeWidth(2.0f);
-
-		width = mCamera.getParameters().getPreviewSize().width;
 
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.select_algorithm,null);
@@ -57,8 +54,6 @@ public class LineDisplayActivity extends VideoDisplayActivity
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinner.setAdapter(adapter);
 		spinner.setOnItemSelectedListener(this);
-
-		setSelection( spinner.getSelectedItemPosition() );
 	}
 
 	private void setSelection( int which ) {
