@@ -1,6 +1,7 @@
 package org.boofcv.android;
 
 import android.app.Activity;
+import android.graphics.ImageFormat;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
@@ -40,13 +41,38 @@ public class CameraInformationActivity extends Activity {
 			Camera c = Camera.open(i);
 			Camera.Parameters param = c.getParameters();
 			write(" Local Length: "+param.getFocalLength()+" (mm)");
-			write(" Supported Preview:");
+			write(" Focus Mode "+param.getFocusMode());
+			write(" Horiz view angle "+param.getHorizontalViewAngle());
+			write(" * Preview Sizes");
 			List<Camera.Size> supported = param.getSupportedPreviewSizes();
 			for( Camera.Size size : supported ) {
 				write("  "+s(size));
 			}
+			List<Integer> formats = param.getSupportedPreviewFormats();
+			write(" * Preview Formats");
+			for( Integer f : formats )
+				write("   "+format(f));
 
 			c.release();
+		}
+	}
+
+	private String format( int value ) {
+		switch( value ) {
+			case ImageFormat.JPEG:
+				return "JPEG";
+			case ImageFormat.NV16:
+				return "NV16";
+			case ImageFormat.NV21:
+				return "NV21";
+			case ImageFormat.RGB_565:
+				return "RGB_565";
+			case ImageFormat.YUY2:
+				return "YUY2";
+			case ImageFormat.YV12:
+				return "YV12";
+			default:
+				return "Unknown "+value;
 		}
 	}
 

@@ -51,4 +51,9 @@
 		<item>BRIEF</item>
 		<item>NCC</item>
 	</string-array>
+
+	<string-array name="disparity_views">
+		<item>Association</item>
+		<item>Disparity</item>
+	</string-array>
 </resources>

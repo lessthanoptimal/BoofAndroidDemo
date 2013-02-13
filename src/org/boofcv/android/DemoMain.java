@@ -24,7 +24,7 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 	// contains information on all the cameras.  less error prone and easier to deal with
 	public static List<CameraSpecs> specs = new ArrayList<CameraSpecs>();
 	// specifies which camera to use an image size
-	public static DemoPreference preference = new DemoPreference();
+	public static DemoPreference preference;
 	// If another activity modifies the demo preferences this needs to be set to true so that it knows to reload
 	// camera parameters.
 	public static boolean changedPreferences = false;
@@ -33,7 +33,6 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 
 	public DemoMain() {
 		loadCameraSpecs();
-		setDefaultPreferences();
 	}
 
 	/**
@@ -68,7 +67,10 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if( changedPreferences ) {
+		if( preference == null ) {
+			preference = new DemoPreference();
+			setDefaultPreferences();
+		} else if( changedPreferences ) {
 			loadIntrinsic();
 		}
 	}
@@ -96,7 +98,7 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		track.addChild("Combined",CombinedTrackerDisplayActivity.class);
 
 		sfm.addChild("Calibration",CalibrationActivity.class);
-		sfm.addChild("Stereo",null);
+		sfm.addChild("Stereo",DisparityActivity.class);
 		sfm.addChild("Stabilization",StabilizeDisplayActivity.class);
 		sfm.addChild("Mosaic",MosaicDisplayActivity.class);
 
@@ -172,18 +174,15 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 
 	private void loadIntrinsic() {
 		preference.intrinsic = null;
-		File f = new File("cam"+preference.cameraId+".txt");
-		if( f.exists() ) {
-			try {
-				FileInputStream fos = openFileInput(f.getName());
-				Reader reader = new InputStreamReader(fos);
-				preference.intrinsic = BoofAndroidFiles.readIntrinsic(reader);
-			} catch (FileNotFoundException e) {
+		try {
+			FileInputStream fos = openFileInput("cam"+preference.cameraId+".txt");
+			Reader reader = new InputStreamReader(fos);
+			preference.intrinsic = BoofAndroidFiles.readIntrinsic(reader);
+		} catch (FileNotFoundException e) {
 
-			} catch (IOException e) {
-				Toast toast = Toast.makeText(this, "Failed to load intrinsic parameters", 2000);
-				toast.show();
-			}
+		} catch (IOException e) {
+			Toast toast = Toast.makeText(this, "Failed to load intrinsic parameters", 2000);
+			toast.show();
 		}
 	}
 

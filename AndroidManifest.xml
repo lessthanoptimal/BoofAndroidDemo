@@ -18,7 +18,6 @@
 			</intent-filter>
 		</activity>
 		<activity android:name=".VideoDisplayActivity" android:screenOrientation="landscape"/>
-		<activity android:name=".CameraInfoActivity"/>
 		<activity android:name=".PreferenceActivity"/>
 		<activity android:name=".BlurDisplayActivity" android:screenOrientation="landscape"/>
 		<activity android:name=".GradientDisplayActivity" android:screenOrientation="landscape"/>
@@ -36,5 +35,6 @@
 		<activity android:name=".CalibrationComputeActivity"
 				  android:configChanges="orientation|keyboardHidden|screenSize" />
 		<activity android:name=".CameraInformationActivity"/>
+		<activity android:name=".DisparityActivity" android:screenOrientation="landscape"/>
 	</application>
 </manifest>

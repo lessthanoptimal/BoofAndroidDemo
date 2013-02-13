@@ -5,12 +5,11 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
-import android.widget.Spinner;
+import android.view.inputmethod.EditorInfo;
+import android.widget.*;
 import boofcv.abst.feature.detect.line.DetectLine;
 import boofcv.abst.feature.detect.line.DetectLineSegment;
 import boofcv.alg.feature.detect.line.LineImageOps;
@@ -28,11 +27,16 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class LineDisplayActivity extends VideoDisplayActivity
-		implements AdapterView.OnItemSelectedListener  {
+		implements AdapterView.OnItemSelectedListener {
 
 	Paint paint;
 
+	EditText editLines;
+
+	// which algorithm is processing the image
 	int active = -1;
+	// the number of lines its configured to detect
+	int numLines = 3;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -43,7 +47,7 @@ public class LineDisplayActivity extends VideoDisplayActivity
 		paint.setStrokeWidth(2.0f);
 
 		LayoutInflater inflater = getLayoutInflater();
-		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.select_algorithm,null);
+		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.detect_line_controls,null);
 
 		LinearLayout parent = (LinearLayout)findViewById(R.id.camera_preview_parent);
 		parent.addView(controls);
@@ -54,6 +58,20 @@ public class LineDisplayActivity extends VideoDisplayActivity
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinner.setAdapter(adapter);
 		spinner.setOnItemSelectedListener(this);
+
+		editLines = (EditText) controls.findViewById(R.id.num_lines);
+		editLines.setText("" + numLines);
+		editLines.setOnEditorActionListener(
+				new EditText.OnEditorActionListener() {
+					@Override
+					public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+						if ( actionId == EditorInfo.IME_ACTION_DONE ) {
+							checkUpdateLines();
+						}
+						return false; // pass on to other listeners.
+					}
+				});
+		// TODO This doesn't cover the back where the user dismisses the keyboard with the back button
 	}
 
 	private void setSelection( int which ) {
@@ -61,17 +79,20 @@ public class LineDisplayActivity extends VideoDisplayActivity
 			return;
 		active = which;
 
+		createLineDetector();
+	}
+
+	private void createLineDetector() {
 		DetectLine<ImageUInt8> detector = null;
 		DetectLineSegment<ImageUInt8> detectorSegment = null;
 
-
-		switch( which ) {
+		switch( active ) {
 			case 0:
-				detector = FactoryDetectLineAlgs.houghFoot(5,6,5,40,10,ImageUInt8.class,ImageSInt16.class);
+				detector = FactoryDetectLineAlgs.houghFoot(5,6,5,40,numLines,ImageUInt8.class,ImageSInt16.class);
 				break;
 
 			case 1:
-				detector = FactoryDetectLineAlgs.houghPolar(5,6,2,Math.PI/120.0,40,10,ImageUInt8.class,ImageSInt16.class);
+				detector = FactoryDetectLineAlgs.houghPolar(5,6,2,Math.PI/120.0,40,numLines,ImageUInt8.class,ImageSInt16.class);
 				break;
 
 			default:
@@ -85,6 +106,24 @@ public class LineDisplayActivity extends VideoDisplayActivity
 		}
 	}
 
+	private void checkUpdateLines() {
+		try {
+			int num = Integer.parseInt(editLines.getText().toString());
+			if( numLines == num )
+				return;
+
+			if( num > 0 && num <= 30  ) {
+				numLines = num;
+				createLineDetector();
+				return;
+			}
+		} catch( RuntimeException e ) {
+
+		}
+		// undo the bad change
+		editLines.setText(""+numLines);
+	}
+
 	@Override
 	public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id) {
 		setSelection( pos );
@@ -92,7 +131,6 @@ public class LineDisplayActivity extends VideoDisplayActivity
 
 	@Override
 	public void onNothingSelected(AdapterView<?> adapterView) {}
-
 
 	protected class LineProcessing extends BoofRenderProcessing<ImageUInt8> {
 		DetectLine<ImageUInt8> detector;
