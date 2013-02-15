@@ -26,8 +26,6 @@ public class BinaryDisplayActivity extends VideoDisplayActivity
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		setProcessing(new ThresholdProcessing() );
-
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.binary_controls,null);
 
@@ -50,6 +48,12 @@ public class BinaryDisplayActivity extends VideoDisplayActivity
 		down = toggle.isChecked();
 		threshold = seek.getProgress();
 		action = spinner.getSelectedItemPosition();
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		setProcessing(new ThresholdProcessing() );
 	}
 
 	@Override

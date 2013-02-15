@@ -12,10 +12,14 @@ import android.widget.*;
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
+import boofcv.abst.feature.disparity.StereoDisparity;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
+import boofcv.factory.feature.disparity.DisparityAlgorithms;
+import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.image.ImageFloat32;
 
@@ -26,6 +30,7 @@ public class DisparityActivity extends VideoDisplayActivity
 		implements AdapterView.OnItemSelectedListener
 {
 	Spinner spinnerView;
+	Spinner spinnerAlgs;
 
 	AssociationVisualize visualize;
 
@@ -35,6 +40,9 @@ public class DisparityActivity extends VideoDisplayActivity
 	volatile int touchY;
 
 	private GestureDetector mDetector;
+
+	// used to notify processor that the disparity algorithms need to be changed
+	int changeDisparityAlg = -1;
 
 	DView activeView = DView.ASSOCIATION;
 
@@ -47,17 +55,24 @@ public class DisparityActivity extends VideoDisplayActivity
 		super.onCreate(savedInstanceState);
 
 		LayoutInflater inflater = getLayoutInflater();
-		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.select_algorithm,null);
+		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.disparity_controls,null);
 
 		LinearLayout parent = (LinearLayout)findViewById(R.id.camera_preview_parent);
 		parent.addView(controls);
 
-		spinnerView = (Spinner)controls.findViewById(R.id.spinner_algs);
+		spinnerView = (Spinner)controls.findViewById(R.id.spinner_view);
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
 				R.array.disparity_views, android.R.layout.simple_spinner_item);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinnerView.setAdapter(adapter);
 		spinnerView.setOnItemSelectedListener(this);
+
+		spinnerAlgs = (Spinner)controls.findViewById(R.id.spinner_algs);
+		adapter = ArrayAdapter.createFromResource(this,
+				R.array.disparity_algs, android.R.layout.simple_spinner_item);
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		spinnerAlgs.setAdapter(adapter);
+		spinnerAlgs.setOnItemSelectedListener(this);
 
 		FrameLayout iv = (FrameLayout)findViewById(R.id.camera_preview);
 		mDetector = new GestureDetector(this, new MyGestureDetector(iv));
@@ -74,19 +89,26 @@ public class DisparityActivity extends VideoDisplayActivity
 	protected void onResume() {
 		super.onResume();
 		setProcessing(new DisparityProcessing());
+		visualize.setSource(null);
+		visualize.setDestination(null);
+		changeDisparityAlg = spinnerAlgs.getSelectedItemPosition();
 	}
 
 
 
 	@Override
 	public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id ) {
-		if( pos == 0 ) {
-			activeView = DView.ASSOCIATION;
-		} else if( pos == 1 ) {
-			touchY = -1;
-			activeView = DView.RECTIFICATION;
-		} else {
-			activeView = DView.DISPARITY;
+		if( adapterView == spinnerView ) {
+			if( pos == 0 ) {
+				activeView = DView.ASSOCIATION;
+			} else if( pos == 1 ) {
+				touchY = -1;
+				activeView = DView.RECTIFICATION;
+			} else {
+				activeView = DView.DISPARITY;
+			}
+		} else if( adapterView == spinnerAlgs ) {
+			changeDisparityAlg = pos;
 		}
 	}
 
@@ -153,6 +175,9 @@ public class DisparityActivity extends VideoDisplayActivity
 
 		DisparityCalculation<SurfFeature> disparity;
 
+		ImageFloat32 disparityImage;
+		int disparityMin,disparityMax;
+
 		public DisparityProcessing() {
 			super(ImageFloat32.class);
 
@@ -170,6 +195,8 @@ public class DisparityActivity extends VideoDisplayActivity
 		protected void declareImages(int width, int height) {
 			super.declareImages(width, height);
 
+			disparityImage = new ImageFloat32(width,height);
+
 			visualize.initializeImages( width, height );
 			outputWidth = visualize.getOutputWidth();
 			outputHeight = visualize.getOutputHeight();
@@ -177,8 +204,29 @@ public class DisparityActivity extends VideoDisplayActivity
 			disparity.init(width,height);
 		}
 
+		private StereoDisparity<ImageFloat32, ImageFloat32> createDisparity() {
+
+			DisparityAlgorithms which;
+			switch( changeDisparityAlg ) {
+				case 0:
+					which = DisparityAlgorithms.RECT;
+					break;
+
+				case 1:
+					which = DisparityAlgorithms.RECT_FIVE;
+					break;
+
+				default:
+					throw new RuntimeException("Unknown algorithm "+changeDisparityAlg);
+			}
+
+
+			return FactoryStereoDisparity.regionSubpixelWta(which,
+					5, 40, 5, 5, 100, 1, 0.1, ImageFloat32.class);
+		}
+
 		@Override
-		protected synchronized void process(ImageFloat32 gray) {
+		protected void process(ImageFloat32 gray) {
 
 			int target = 0;
 
@@ -220,26 +268,48 @@ public class DisparityActivity extends VideoDisplayActivity
 				}
 			}
 
-			if( computedFeatures && visualize.hasLeft && visualize.hasRight ) {
-				if( disparity.process() ) {
-					synchronized ( lockGui ) {
-						visualize.setMatches(disparity.getInliersPixel());
-						visualize.forgetSelection();
+			if( changeDisparityAlg != -1 ) {
+				disparity.setDisparityAlg(createDisparity());
+			}
+
+			if( disparity.disparityAlg != null ) {
+				if( computedFeatures && visualize.hasLeft && visualize.hasRight ) {
+					// rectify the images and compute the disparity
+					if( disparity.rectifyImage() ) {
+						disparity.computeDisparity();
+						synchronized ( lockGui ) {
+							disparityMin = disparity.getDisparityAlg().getMinDisparity();
+							disparityMax = disparity.getDisparityAlg().getMaxDisparity();
+							disparityImage.setTo(disparity.getDisparity());
+							visualize.setMatches(disparity.getInliersPixel());
+							visualize.forgetSelection();
+						}
+					} else {
+						synchronized ( lockGui ) {
+							ImageMiscOps.fill(disparityImage,0);
+						}
+						runOnUiThread(new Runnable() {
+							public void run() {
+								Toast toast = Toast.makeText(DisparityActivity.this, "Disparity computation failed!", 2000);
+								toast.show();
+							}});
 					}
-				} else {
-					runOnUiThread(new Runnable() {
-						public void run() {
-							Toast toast = Toast.makeText(DisparityActivity.this, "Disparity computation failed!", 2000);
-							toast.show();
-						}});
+				} else if( changeDisparityAlg != -1 && visualize.hasLeft && visualize.hasRight ) {
+					// recycle the rectified image but compute the disparity using the new algorithm
+					disparity.computeDisparity();
+					synchronized ( lockGui ) {
+						disparityMin = disparity.getDisparityAlg().getMinDisparity();
+						disparityMax = disparity.getDisparityAlg().getMaxDisparity();
+						disparityImage.setTo(disparity.getDisparity());
+					}
 				}
 			}
 
-			target = 0;
+			changeDisparityAlg = -1;
 		}
 
 		@Override
-		protected synchronized void render(Canvas canvas, double imageToOutput) {
+		protected void render(Canvas canvas, double imageToOutput) {
 			if( DemoMain.preference.intrinsic == null ) {
 				canvas.restore();
 				Paint paint = new Paint();
@@ -251,18 +321,15 @@ public class DisparityActivity extends VideoDisplayActivity
 			} else if( activeView == DView.DISPARITY ) {
 				// draw rectified image
 				ConvertBitmap.grayToBitmap(disparity.rectifiedLeft, visualize.bitmapSrc, visualize.storage);
-
-				// now draw the disparity as a colorized image
-				ImageFloat32 d = disparity.getDisparity();
-
-				int min = disparity.getDisparityAlg().getMinDisparity();
-				int max = disparity.getDisparityAlg().getMaxDisparity();
-
-				VisualizeImageData.disparity(d,min,max,0,visualize.bitmapDst,visualize.storage);
-
-				int startX = d.getWidth() + AssociationVisualize.SEPARATION;
 				canvas.drawBitmap(visualize.bitmapSrc,0,0,null);
-				canvas.drawBitmap(visualize.bitmapDst,startX,0,null);
+
+				if( disparity.isDisparityAvailable() ) {
+					VisualizeImageData.disparity(disparityImage,disparityMin,disparityMax,0,
+							visualize.bitmapDst,visualize.storage);
+
+					int startX = disparityImage.getWidth() + AssociationVisualize.SEPARATION;
+					canvas.drawBitmap(visualize.bitmapDst,startX,0,null);
+				}
 			} else if( activeView == DView.RECTIFICATION ) {
 				ConvertBitmap.grayToBitmap(disparity.rectifiedLeft,visualize.bitmapSrc,visualize.storage);
 				ConvertBitmap.grayToBitmap(disparity.rectifiedRight,visualize.bitmapDst,visualize.storage);

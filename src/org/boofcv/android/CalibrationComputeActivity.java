@@ -94,6 +94,9 @@ public class CalibrationComputeActivity extends Activity {
 			BoofAndroidFiles.write(intrinsic,writer);
 			fos.close();
 
+			// let it know that it needs to reload intrinsic parameters
+			DemoMain.changedPreferences = true;
+
 			// switch back to the main menu
 			Intent intent = new Intent(this, DemoMain.class);
 			// make it so the back button won't take it back here

@@ -63,4 +63,9 @@
 		<item>Rectification</item>
 		<item>Disparity</item>
 	</string-array>
+
+	<string-array name="disparity_algs">
+		<item>Rect</item>
+		<item>5-Rect</item>
+	</string-array>
 </resources>

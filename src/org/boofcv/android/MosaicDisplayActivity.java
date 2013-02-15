@@ -65,9 +65,12 @@ implements CompoundButton.OnCheckedChangeListener
 
 		CheckBox seek = (CheckBox)controls.findViewById(R.id.check_features);
 		seek.setOnCheckedChangeListener(this);
+	}
 
+	@Override
+	protected void onResume() {
+		super.onResume();
 		StitchingFromMotion2D<ImageUInt8,Affine2D_F64> distortAlg = createStabilization();
-
 		setProcessing(new PointProcessing(distortAlg));
 	}
 

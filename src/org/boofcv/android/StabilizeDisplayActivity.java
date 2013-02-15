@@ -69,6 +69,13 @@ implements CompoundButton.OnCheckedChangeListener
 		setProcessing(new PointProcessing(distortAlg));
 	}
 
+	@Override
+	protected void onResume() {
+		super.onResume();
+		StitchingFromMotion2D<ImageUInt8,Affine2D_F64> distortAlg = createStabilization();
+		setProcessing(new PointProcessing(distortAlg));
+	}
+
 	public void resetPressed( View view ) {
 		resetRequested = true;
 	}

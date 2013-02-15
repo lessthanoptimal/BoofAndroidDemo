@@ -16,8 +16,6 @@ import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.sfm.robust.DistanceSe3SymmetricSq;
 import boofcv.alg.sfm.robust.Se3FromEssentialGenerator;
-import boofcv.factory.feature.disparity.DisparityAlgorithms;
-import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.factory.geo.EnumEpipolar;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.factory.geo.FactoryTriangulate;
@@ -67,9 +65,12 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 	ImageFloat32 rectifiedLeft;
 	ImageFloat32 rectifiedRight;
 
-	// Edge image in an attempt to improve robustness to light variations
+	// Laplacian that has been applied to rectified images
 	ImageFloat32 edgeLeft;
 	ImageFloat32 edgeRight;
+
+	// has the disparity been computed
+	boolean computedDisparity = false;
 
 	public DisparityCalculation(DetectDescribePoint<ImageFloat32, Desc> detDesc,
 								AssociateDescription<Desc> associate ,
@@ -80,10 +81,10 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 
 		listSrc = UtilFeature.createQueue(detDesc, 10);
 		listDst = UtilFeature.createQueue(detDesc,10);
+	}
 
-		// compute disparity
-		disparityAlg = FactoryStereoDisparity.regionSubpixelWta(DisparityAlgorithms.RECT_FIVE,
-				5, 40, 5, 5, 100, 1, 0.1, ImageFloat32.class);
+	public void setDisparityAlg(StereoDisparity<ImageFloat32, ImageFloat32> disparityAlg) {
+		this.disparityAlg = disparityAlg;
 	}
 
 	public void init( int width , int height ) {
@@ -120,7 +121,14 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 		}
 	}
 
-	public boolean process() {
+	/**
+	 * Associates image features, computes camera motion, and rectifies images.
+	 *
+	 * @return true it was able to rectify the input images or false if not
+	 */
+	public boolean rectifyImage() {
+		computedDisparity = false;
+
 		associate.associate();
 		List<AssociatedPair> pairs = convertToNormalizedCoordinates();
 
@@ -154,9 +162,18 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 		DenseMatrix64F rectifiedK = new DenseMatrix64F(3,3);
 		rectifyImages(leftToRight,rectifiedK);
 
-		disparityAlg.process(edgeLeft, edgeRight);
-
 		return true;
+	}
+
+	/**
+	 * Computes the disparity between the two rectified images
+	 */
+	public void computeDisparity() {
+		if( disparityAlg == null )
+			return;
+
+		disparityAlg.process(edgeLeft, edgeRight);
+		computedDisparity = true;
 	}
 
 	/**
@@ -266,7 +283,7 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 		ImageDistort<ImageFloat32> distortRight =
 				RectifyImageOps.rectifyImage(intrinsic, rect2, ImageFloat32.class);
 
-		// Use laplacian to provide some limited lighting invariance when computing disparity
+		// Apply the Laplacian for some lighting invariance
 		ImageMiscOps.fill(rectifiedLeft,0);
 		distortLeft.apply(distortedLeft, rectifiedLeft);
 		LaplacianEdge.process(rectifiedLeft,edgeLeft);
@@ -286,6 +303,10 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 
 	public StereoDisparity<ImageFloat32, ImageFloat32> getDisparityAlg() {
 		return disparityAlg;
+	}
+
+	public boolean isDisparityAvailable() {
+		return computedDisparity;
 	}
 
 	public boolean isDirectionLeftToRight() {

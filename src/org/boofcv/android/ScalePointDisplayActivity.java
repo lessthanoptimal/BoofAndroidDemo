@@ -29,6 +29,8 @@ import georegression.struct.point.Point2D_F64;
 public class ScalePointDisplayActivity extends VideoDisplayActivity
 		implements AdapterView.OnItemSelectedListener  {
 
+	Spinner spinner;
+
 	Paint paintMax;
 
 	int active = -1;
@@ -46,14 +48,24 @@ public class ScalePointDisplayActivity extends VideoDisplayActivity
 		LinearLayout parent = (LinearLayout)findViewById(R.id.camera_preview_parent);
 		parent.addView(controls);
 
-		Spinner spinner = (Spinner)controls.findViewById(R.id.spinner_algs);
+		spinner = (Spinner)controls.findViewById(R.id.spinner_algs);
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
 				R.array.scale_features, android.R.layout.simple_spinner_item);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinner.setAdapter(adapter);
 		spinner.setOnItemSelectedListener(this);
+	}
 
+	@Override
+	protected void onResume() {
+		super.onResume();
 		setSelection( spinner.getSelectedItemPosition() );
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		active = -1;
 	}
 
 	private void setSelection( int which ) {

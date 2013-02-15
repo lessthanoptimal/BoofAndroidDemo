@@ -76,6 +76,14 @@ public class CombinedTrackerDisplayActivity extends PointTrackerDisplayActivity
 		spinnerDesc.setOnItemSelectedListener(this);
 	}
 
+	@Override
+	protected void onResume() {
+		super.onResume();
+
+		PointTracker<ImageUInt8> tracker = createTracker(selectedDetector,selectedDescriptor);
+		setProcessing(new PointProcessing(tracker));
+	}
+
 
 	private PointTracker<ImageUInt8> createTracker( int detector , int descriptor  )
 	{
@@ -91,8 +99,12 @@ public class CombinedTrackerDisplayActivity extends PointTrackerDisplayActivity
 	@Override
 	public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id ) {
 		if( adapterView == spinnerDesc ) {
+			if( selectedDescriptor == spinnerDesc.getSelectedItemPosition() )
+				return;
 			selectedDescriptor = spinnerDesc.getSelectedItemPosition();
 		} else if( adapterView == spinnerDet ) {
+			if( selectedDetector == spinnerDet.getSelectedItemPosition() )
+				return;
 			selectedDetector = spinnerDet.getSelectedItemPosition();
 		}
 

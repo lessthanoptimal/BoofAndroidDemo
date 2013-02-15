@@ -31,6 +31,8 @@ import georegression.struct.point.Point2D_I16;
 public class PointDisplayActivity extends VideoDisplayActivity
 		implements AdapterView.OnItemSelectedListener  {
 
+	Spinner spinner;
+
 	Paint paintMax,paintMin;
 	NonMaxSuppression nonmaxMax;
 	NonMaxSuppression nonmaxMinMax;
@@ -55,7 +57,7 @@ public class PointDisplayActivity extends VideoDisplayActivity
 		LinearLayout parent = (LinearLayout)findViewById(R.id.camera_preview_parent);
 		parent.addView(controls);
 
-		Spinner spinner = (Spinner)controls.findViewById(R.id.spinner_algs);
+		spinner = (Spinner)controls.findViewById(R.id.spinner_algs);
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
 				R.array.point_features, android.R.layout.simple_spinner_item);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -69,8 +71,18 @@ public class PointDisplayActivity extends VideoDisplayActivity
 		nonmaxMax = FactoryFeatureExtractor.nonmax(configCorner);
 		nonmaxCandidate = FactoryFeatureExtractor.nonmaxCandidate(configCorner);
 		nonmaxMinMax = FactoryFeatureExtractor.nonmax(configBlob);
+	}
 
+	@Override
+	protected void onResume() {
+		super.onResume();
 		setSelection( spinner.getSelectedItemPosition() );
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		active = -1;
 	}
 
 	private void setSelection( int which ) {

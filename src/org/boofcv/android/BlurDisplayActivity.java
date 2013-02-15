@@ -41,15 +41,23 @@ public class BlurDisplayActivity extends VideoDisplayActivity
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinnerView.setAdapter(adapter);
 		spinnerView.setOnItemSelectedListener(this);
+	}
 
-		setProcessing(new BlurProcessing(FactoryBlurFilter.mean(ImageUInt8.class,2)) );
+	@Override
+	protected void onResume() {
+		super.onResume();
+		startBlurProcess(spinnerView.getSelectedItemPosition());
 	}
 
 	@Override
 	public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id ) {
+		startBlurProcess(pos);
+	}
+
+	private void startBlurProcess(int pos) {
 		switch (pos) {
 			case 0:
-				setProcessing(new BlurProcessing(FactoryBlurFilter.mean(ImageUInt8.class,2)) );
+				setProcessing(new BlurProcessing(FactoryBlurFilter.mean(ImageUInt8.class, 2)) );
 				break;
 
 			case 1:

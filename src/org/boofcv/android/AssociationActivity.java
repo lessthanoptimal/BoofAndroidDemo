@@ -88,6 +88,10 @@ public class AssociationActivity extends VideoDisplayActivity
 	@Override
 	protected void onResume() {
 		super.onResume();
+		visualize.setSource(null);
+		visualize.setDestination(null);
+
+		startAssociationProcessing();
 	}
 
 	@Override
@@ -98,7 +102,11 @@ public class AssociationActivity extends VideoDisplayActivity
 			selectedDet = spinnerDet.getSelectedItemPosition();
 		}
 
-		DetectDescribePoint detDesc = CreateDetectorDescriptor.create(selectedDet,selectedDesc,ImageFloat32.class);
+		startAssociationProcessing();
+	}
+
+	private void startAssociationProcessing() {
+		DetectDescribePoint detDesc = CreateDetectorDescriptor.create(selectedDet, selectedDesc, ImageFloat32.class);
 
 		ScoreAssociation score = FactoryAssociation.defaultScore(detDesc.getDescriptionType());
 		AssociateDescription assoc = FactoryAssociation.greedy(score,Double.MAX_VALUE,true);

@@ -22,6 +22,8 @@ public class GradientDisplayActivity extends VideoDisplayActivity
 implements AdapterView.OnItemSelectedListener
 {
 
+	Spinner spinnerGradient;
+
 	Class imageType = ImageUInt8.class;
 	Class derivType = ImageSInt16.class;
 
@@ -35,7 +37,7 @@ implements AdapterView.OnItemSelectedListener
 		LinearLayout parent = (LinearLayout)findViewById(R.id.camera_preview_parent);
 		parent.addView(controls);
 
-		Spinner spinnerGradient = (Spinner)controls.findViewById(R.id.spinner_gradient);
+		spinnerGradient = (Spinner)controls.findViewById(R.id.spinner_gradient);
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
 				R.array.gradients, android.R.layout.simple_spinner_item);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -44,10 +46,21 @@ implements AdapterView.OnItemSelectedListener
 	}
 
 	@Override
+	protected void onResume() {
+		super.onResume();
+		startGradientProcess(spinnerGradient.getSelectedItemPosition());
+
+	}
+
+	@Override
 	public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id) {
+		startGradientProcess(pos);
+	}
+
+	private void startGradientProcess(int pos) {
 		switch( pos ) {
 			case 0:
-				setProcessing(new GradientProcessing(FactoryDerivative.three(imageType,derivType)) );
+				setProcessing(new GradientProcessing(FactoryDerivative.three(imageType, derivType)) );
 				break;
 
 			case 1:
@@ -60,7 +73,6 @@ implements AdapterView.OnItemSelectedListener
 
 			default:
 				throw new RuntimeException("Unknown gradient");
-
 		}
 	}
 

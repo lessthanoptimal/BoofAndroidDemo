@@ -32,6 +32,7 @@ public class LineDisplayActivity extends VideoDisplayActivity
 	Paint paint;
 
 	EditText editLines;
+	Spinner spinner;
 
 	// which algorithm is processing the image
 	int active = -1;
@@ -52,7 +53,7 @@ public class LineDisplayActivity extends VideoDisplayActivity
 		LinearLayout parent = (LinearLayout)findViewById(R.id.camera_preview_parent);
 		parent.addView(controls);
 
-		Spinner spinner = (Spinner)controls.findViewById(R.id.spinner_algs);
+		spinner = (Spinner)controls.findViewById(R.id.spinner_algs);
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
 				R.array.line_features, android.R.layout.simple_spinner_item);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -72,6 +73,18 @@ public class LineDisplayActivity extends VideoDisplayActivity
 					}
 				});
 		// TODO This doesn't cover the back where the user dismisses the keyboard with the back button
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		setSelection( spinner.getSelectedItemPosition() );
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		active = -1;
 	}
 
 	private void setSelection( int which ) {

@@ -16,7 +16,11 @@ public class KltDisplayActivity extends PointTrackerDisplayActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+	}
 
+	@Override
+	protected void onResume() {
+		super.onResume();
 		ConfigGeneralDetector config = new ConfigGeneralDetector();
 		config.maxFeatures = 150;
 		config.threshold = 40;
