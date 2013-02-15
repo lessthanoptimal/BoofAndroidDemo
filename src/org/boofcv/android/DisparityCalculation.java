@@ -9,9 +9,11 @@ import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.feature.UtilFeature;
+import boofcv.alg.filter.derivative.LaplacianEdge;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
+import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.sfm.robust.DistanceSe3SymmetricSq;
 import boofcv.alg.sfm.robust.Se3FromEssentialGenerator;
 import boofcv.factory.feature.disparity.DisparityAlgorithms;
@@ -65,6 +67,10 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 	ImageFloat32 rectifiedLeft;
 	ImageFloat32 rectifiedRight;
 
+	// Edge image in an attempt to improve robustness to light variations
+	ImageFloat32 edgeLeft;
+	ImageFloat32 edgeRight;
+
 	public DisparityCalculation(DetectDescribePoint<ImageFloat32, Desc> detDesc,
 								AssociateDescription<Desc> associate ,
 								IntrinsicParameters intrinsic ) {
@@ -77,7 +83,7 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 
 		// compute disparity
 		disparityAlg = FactoryStereoDisparity.regionSubpixelWta(DisparityAlgorithms.RECT_FIVE,
-				5, 40, 5, 5, 20, 1, 0.1, ImageFloat32.class);
+				5, 40, 5, 5, 100, 1, 0.1, ImageFloat32.class);
 	}
 
 	public void init( int width , int height ) {
@@ -85,6 +91,8 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 		distortedRight = new ImageFloat32(width,height);
 		rectifiedLeft = new ImageFloat32(width,height);
 		rectifiedRight = new ImageFloat32(width,height);
+		edgeLeft = new ImageFloat32(width,height);
+		edgeRight = new ImageFloat32(width,height);
 	}
 
 	public void setSource( ImageFloat32 image ) {
@@ -134,6 +142,9 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 			ImageFloat32 tmp = distortedLeft;
 			distortedLeft = distortedRight;
 			distortedRight = tmp;
+			tmp = edgeLeft;
+			edgeLeft = edgeRight;
+			edgeRight = tmp;
 			directionLeftToRight = false;
 		} else {
 			directionLeftToRight = true;
@@ -143,7 +154,7 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 		DenseMatrix64F rectifiedK = new DenseMatrix64F(3,3);
 		rectifyImages(leftToRight,rectifiedK);
 
-		disparityAlg.process(rectifiedLeft, rectifiedRight);
+		disparityAlg.process(edgeLeft, edgeRight);
 
 		return true;
 	}
@@ -247,7 +258,7 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 		rectifiedK.set(rectifyAlg.getCalibrationMatrix());
 
 		// Adjust the rectification to make the view area more useful
-		RectifyImageOps.allInsideLeft(intrinsic, rect1, rect2, rectifiedK);
+//		RectifyImageOps.allInsideLeft(intrinsic, rect1, rect2, rectifiedK);
 
 		// undistorted and rectify images
 		ImageDistort<ImageFloat32> distortLeft =
@@ -255,8 +266,14 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 		ImageDistort<ImageFloat32> distortRight =
 				RectifyImageOps.rectifyImage(intrinsic, rect2, ImageFloat32.class);
 
+		// Use laplacian to provide some limited lighting invariance when computing disparity
+		ImageMiscOps.fill(rectifiedLeft,0);
 		distortLeft.apply(distortedLeft, rectifiedLeft);
+		LaplacianEdge.process(rectifiedLeft,edgeLeft);
+
+		ImageMiscOps.fill(rectifiedRight, 0);
 		distortRight.apply(distortedRight, rectifiedRight);
+		LaplacianEdge.process(rectifiedRight,edgeRight);
 	}
 
 	public List<AssociatedPair> getInliersPixel() {

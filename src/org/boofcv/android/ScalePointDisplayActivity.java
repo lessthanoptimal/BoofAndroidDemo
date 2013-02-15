@@ -7,13 +7,18 @@ import android.graphics.Paint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.*;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.ConfigSiftDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.android.ConvertBitmap;
 import boofcv.core.image.ConvertImage;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
+import boofcv.struct.FastQueue;
+import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_F64;
@@ -22,7 +27,7 @@ import georegression.struct.point.Point2D_F64;
  * @author Peter Abeles
  */
 public class ScalePointDisplayActivity extends VideoDisplayActivity
-		implements SeekBar.OnSeekBarChangeListener , AdapterView.OnItemSelectedListener  {
+		implements AdapterView.OnItemSelectedListener  {
 
 	Paint paintMax;
 
@@ -40,9 +45,6 @@ public class ScalePointDisplayActivity extends VideoDisplayActivity
 
 		LinearLayout parent = (LinearLayout)findViewById(R.id.camera_preview_parent);
 		parent.addView(controls);
-
-		SeekBar seek = (SeekBar)controls.findViewById(R.id.slider_threshold);
-		seek.setOnSeekBarChangeListener(this);
 
 		Spinner spinner = (Spinner)controls.findViewById(R.id.spinner_algs);
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
@@ -88,22 +90,13 @@ public class ScalePointDisplayActivity extends VideoDisplayActivity
 	@Override
 	public void onNothingSelected(AdapterView<?> adapterView) {}
 
-	@Override
-	public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser ) {
-		//To change body of implemented methods use File | Settings | File Templates.
-	}
-
-	@Override
-	public void onStartTrackingTouch(SeekBar seekBar) {}
-
-	@Override
-	public void onStopTrackingTouch(SeekBar seekBar) {}
-
 	protected class PointProcessing extends BoofRenderProcessing<ImageUInt8> {
 		InterestPointDetector<ImageUInt8> detector;
 
 		Bitmap bitmap;
 		byte[] storage;
+
+		FastQueue<ScalePoint> foundGUI = new FastQueue<ScalePoint>(ScalePoint.class,true);
 
 		public PointProcessing(InterestPointDetector<ImageUInt8> detector) {
 			super(ImageUInt8.class);
@@ -120,18 +113,26 @@ public class ScalePointDisplayActivity extends VideoDisplayActivity
 		@Override
 		protected void process(ImageUInt8 gray) {
 			detector.detect(gray);
-			ConvertBitmap.grayToBitmap(gray,bitmap,storage);
+			synchronized ( lockGui ) {
+				ConvertBitmap.grayToBitmap(gray,bitmap,storage);
+
+				foundGUI.reset();
+				int N = detector.getNumberOfFeatures();
+				for( int i = 0; i < N; i++ ) {
+					Point2D_F64 p = detector.getLocation(i);
+					double scale = detector.getScale(i);
+					foundGUI.grow().set(p.x, p.y, scale);
+				}
+			}
 		}
 
 		@Override
 		protected void render(Canvas canvas, double imageToOutput) {
 			canvas.drawBitmap(bitmap,0,0,null);
 
-			int N = detector.getNumberOfFeatures();
-			for( int i = 0; i < N; i++ ) {
-				Point2D_F64 p = detector.getLocation(i);
-				double ory = detector.getOrientation(i);
-				int r = (int)(detector.getScale(i)*3.0);
+			for( int i = 0; i < foundGUI.size(); i++ ) {
+				ScalePoint p = foundGUI.get(i);
+				int r = (int)(p.scale*3.0);
 				canvas.drawCircle((int)p.x,(int)p.y,r,paintMax);
 			}
 		}

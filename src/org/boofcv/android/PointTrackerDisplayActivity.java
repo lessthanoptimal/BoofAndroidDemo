@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.android.ConvertBitmap;
+import boofcv.struct.FastQueue;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_F64;
 
@@ -43,6 +44,12 @@ public class PointTrackerDisplayActivity extends VideoDisplayActivity {
 		List<PointTrack> active = new ArrayList<PointTrack>();
 		List<PointTrack> spawned = new ArrayList<PointTrack>();
 		List<PointTrack> inactive = new ArrayList<PointTrack>();
+
+		// storage for data structures that are displayed in the GUI
+		FastQueue<Point2D_F64> trackSrc = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
+		FastQueue<Point2D_F64> trackDst = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
+		FastQueue<Point2D_F64> trackSpawn = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
+
 
 		public PointProcessing( PointTracker<ImageUInt8> tracker ) {
 			super(ImageUInt8.class);
@@ -102,7 +109,28 @@ public class PointTrackerDisplayActivity extends VideoDisplayActivity {
 				}
 			}
 
-			ConvertBitmap.grayToBitmap(gray,bitmap,storage);
+			synchronized ( lockGui ) {
+				ConvertBitmap.grayToBitmap(gray,bitmap,storage);
+
+				trackSrc.reset();
+				trackDst.reset();
+				trackSpawn.reset();
+
+				for( int i = 0; i < active.size(); i++ ) {
+					PointTrack t = active.get(i);
+					TrackInfo info = t.getCookie();
+					Point2D_F64 s = info.spawn;
+					Point2D_F64 p = active.get(i);
+
+					trackSrc.grow().set(s);
+					trackDst.grow().set(p);
+				}
+
+				for( int i = 0; i < spawned.size(); i++ ) {
+					Point2D_F64 p = spawned.get(i);
+					trackSpawn.grow().set(p);
+				}
+			}
 
 			tick++;
 		}
@@ -111,17 +139,15 @@ public class PointTrackerDisplayActivity extends VideoDisplayActivity {
 		protected void render(Canvas canvas, double imageToOutput) {
 			canvas.drawBitmap(bitmap,0,0,null);
 
-			for( int i = 0; i < active.size(); i++ ) {
-				PointTrack t = active.get(i);
-				TrackInfo info = t.getCookie();
-				Point2D_F64 s = info.spawn;
-				Point2D_F64 p = active.get(i);
+			for( int i = 0; i < trackSrc.size(); i++ ) {
+				Point2D_F64 s = trackSrc.get(i);
+				Point2D_F64 p = trackDst.get(i);
 				canvas.drawLine((int)s.x,(int)s.y,(int)p.x,(int)p.y,paintLine);
 				canvas.drawCircle((int)p.x,(int)p.y,2f, paintRed);
 			}
 
-			for( int i = 0; i < spawned.size(); i++ ) {
-				Point2D_F64 p = spawned.get(i);
+			for( int i = 0; i < trackSpawn.size(); i++ ) {
+				Point2D_F64 p = trackSpawn.get(i);
 				canvas.drawCircle((int)p.x,(int)p.y,3, paintBlue);
 			}
 		}

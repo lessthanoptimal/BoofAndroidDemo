@@ -19,10 +19,10 @@ import boofcv.abst.calib.ConfigChessboard;
 import boofcv.abst.calib.PlanarCalibrationDetector;
 import boofcv.abst.calib.WrapPlanarChessTarget;
 import boofcv.alg.feature.detect.chess.DetectChessCalibrationPoints;
-import boofcv.alg.feature.detect.chess.DetectChessSquaresBinary;
 import boofcv.alg.feature.detect.quadblob.QuadBlob;
 import boofcv.android.ConvertBitmap;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
+import boofcv.struct.FastQueue;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
@@ -239,7 +239,9 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 
 		PlanarCalibrationDetector detector;
 
-		List<Point2D_F64> points;
+		FastQueue<Point2D_F64> pointsGui = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
+
+		List<List<Point2D_I32>> debugQuads = new ArrayList<List<Point2D_I32>>();
 
 		Bitmap bitmap;
 		byte[] storage;
@@ -270,17 +272,55 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 			if( timeResume > System.currentTimeMillis() )
 				return;
 
-			ConvertBitmap.grayToBitmap(gray,bitmap,storage);
+			synchronized ( lockGui ) {
+				ConvertBitmap.grayToBitmap(gray,bitmap,storage);
+			}
 
+			boolean detected;
 			showDetectDebug = false;
 			if( captureRequested ) {
 				captureRequested = false;
-				collectMeasurement(gray);
+				detected = collectMeasurement(gray);
 
 			} else if( continuous ) {
-				detectTarget(gray);
+				detected = detectTarget(gray);
 			} else {
-				points = null;
+				detected = false;
+			}
+
+			// safely copy data into data structures used by GUI thread
+			synchronized ( lockGui ) {
+				ConvertBitmap.grayToBitmap(gray,bitmap,storage);
+				pointsGui.reset();
+				debugQuads.clear();
+				if( detected ) {
+					List<Point2D_F64> found = detector.getPoints();
+					for( Point2D_F64 p : found )
+						pointsGui.grow().set(p);
+				} else if( showDetectDebug ) {
+					if( detector instanceof WrapPlanarChessTarget ) {
+						extractQuads(((WrapPlanarChessTarget) detector).getAlg());
+					}
+				}
+			}
+		}
+
+		protected void extractQuads(  DetectChessCalibrationPoints chess ) {
+			debugQuads.clear();
+
+			List<QuadBlob> quads = chess.getFindBound().getDetectBlobs().getDetected();
+			if( quads != null ) {
+				for( QuadBlob b : quads ) {
+					if( b.corners.size() < 2 )
+						continue;
+
+					List<Point2D_I32> l = new ArrayList<Point2D_I32>();
+					for( int i = 0; i < b.corners.size(); i++ ) {
+						Point2D_I32 c = b.corners.get(i);
+						l.add( c.copy() );
+					}
+					debugQuads.add(l);
+				}
 			}
 		}
 
@@ -288,18 +328,17 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 		 * Detect calibration targets in the image and save the results.  Pause the display so the
 		 * user can see the results]
 		 */
-		private void collectMeasurement(ImageFloat32 gray) {
+		private boolean collectMeasurement(ImageFloat32 gray) {
 			// pause the display for 1 second
 			timeResume = System.currentTimeMillis()+1500;
 
 			if( detector.process(gray) ) {
-				showDetectDebug = true;
-				points = detector.getPoints();
-				shots.add( new CalibrationImageInfo(gray,points));
+				shots.add( new CalibrationImageInfo(gray,detector.getPoints()));
 				updateShotCountInUiThread();
+				return true;
 			}  else {
 				showDetectDebug = true;
-				points = null;
+				return false;
 			}
 		}
 
@@ -315,12 +354,12 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 			});
 		}
 
-		private void detectTarget(ImageFloat32 gray) {
+		private boolean detectTarget(ImageFloat32 gray) {
 			if( detector.process(gray) ) {
-				points = detector.getPoints();
+				return true;
 			} else {
 				showDetectDebug = true;
-				points = null;
+				return false;
 			}
 		}
 
@@ -333,58 +372,22 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 			} else {
 				canvas.drawBitmap(bitmap,0,0,null);
 
-				if( points == null ) {
-					if( showDetectDebug ) {
-						if( detector instanceof WrapPlanarChessTarget ) {
-							render(((WrapPlanarChessTarget)detector).getAlg(),canvas);
-						}
-					}
-					return;
-				}
-
-				// draw dots at calibration points
-				for( int i = 0; i < points.size(); i++ ) {
-					Point2D_F64 p = points.get(i);
-					canvas.drawCircle((float)p.x,(float)p.y,3,paintPoint);
-				}
-			}
-		}
-
-		/**
-		 * Draw debuging/visualization information specific to a chessboard target
-		 */
-		protected void render( DetectChessCalibrationPoints chess , Canvas canvas ) {
-
-			if( chess.isFoundBound() ) {
-				DetectChessSquaresBinary squares = chess.getFindBound();
-
-				List<Point2D_F64> quad = squares.getBoundingQuad();
-
-				Point2D_F64 p0 = quad.get(0);
-				Point2D_F64 p1 = quad.get(1);
-				Point2D_F64 p2 = quad.get(2);
-				Point2D_F64 p3 = quad.get(3);
-
-				canvas.drawLine((float)p0.x,(float)p0.y,(float)p1.x,(float)p1.y,paintFailed);
-				canvas.drawLine((float)p1.x,(float)p1.y,(float)p2.x,(float)p2.y,paintFailed);
-				canvas.drawLine((float)p2.x,(float)p2.y,(float)p3.x,(float)p3.y,paintFailed);
-				canvas.drawLine((float)p3.x,(float)p3.y,(float)p0.x,(float)p0.y,paintFailed);
-			}
-
-			List<QuadBlob> quads = chess.getFindBound().getDetectBlobs().getDetected();
-			if( quads != null ) {
-				for( QuadBlob b : quads ) {
-					if( b.corners.size() < 2 )
-						continue;
-
-					for( int i = 1; i < b.corners.size(); i++ ) {
-						Point2D_I32 c0 = b.corners.get(i-1);
-						Point2D_I32 c1 = b.corners.get(i);
+				// draw shapes for debugging purposes
+				for( List<Point2D_I32> l : debugQuads ) {
+					for( int i = 1; i < l.size(); i++ ) {
+						Point2D_I32 c0 = l.get(i-1);
+						Point2D_I32 c1 = l.get(i);
 						canvas.drawLine(c0.x,c0.y,c1.x,c1.y,paintFailed);
 					}
-					Point2D_I32 c0 = b.corners.get(0);
-					Point2D_I32 c1 = b.corners.get(b.corners.size()-1);
+					Point2D_I32 c0 = l.get(0);
+					Point2D_I32 c1 = l.get(l.size()-1);
 					canvas.drawLine(c0.x,c0.y,c1.x,c1.y,paintFailed);
+				}
+
+				// draw detected calibration points
+				for( int i = 0; i < pointsGui.size(); i++ ) {
+					Point2D_F64 p = pointsGui.get(i);
+					canvas.drawCircle((float)p.x,(float)p.y,3,paintPoint);
 				}
 			}
 		}

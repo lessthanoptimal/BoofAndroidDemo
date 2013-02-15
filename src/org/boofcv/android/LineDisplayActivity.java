@@ -15,12 +15,12 @@ import boofcv.abst.feature.detect.line.DetectLineSegment;
 import boofcv.alg.feature.detect.line.LineImageOps;
 import boofcv.android.ConvertBitmap;
 import boofcv.factory.feature.detect.line.FactoryDetectLineAlgs;
+import boofcv.struct.FastQueue;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.line.LineParametric2D_F32;
 import georegression.struct.line.LineSegment2D_F32;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -136,7 +136,7 @@ public class LineDisplayActivity extends VideoDisplayActivity
 		DetectLine<ImageUInt8> detector;
 		DetectLineSegment<ImageUInt8> detectorSegment = null;
 
-		List<LineSegment2D_F32> lines = new ArrayList<LineSegment2D_F32>();
+		FastQueue<LineSegment2D_F32> lines = new FastQueue<LineSegment2D_F32>(LineSegment2D_F32.class,true);
 
 		Bitmap bitmap;
 		byte[] storage;
@@ -160,18 +160,28 @@ public class LineDisplayActivity extends VideoDisplayActivity
 
 		@Override
 		protected void process(ImageUInt8 gray) {
-			ConvertBitmap.grayToBitmap(gray,bitmap,storage);
 
 			if( detector != null ) {
 				List<LineParametric2D_F32> found = detector.detect(gray);
-				lines.clear();
-				for( LineParametric2D_F32 p : found ) {
-					LineSegment2D_F32 ls = LineImageOps.convert(p, gray.width,gray.height);
-					lines.add(ls);
+
+				synchronized ( lockGui ) {
+					ConvertBitmap.grayToBitmap(gray,bitmap,storage);
+					lines.reset();
+					for( LineParametric2D_F32 p : found ) {
+						LineSegment2D_F32 ls = LineImageOps.convert(p, gray.width,gray.height);
+						lines.grow().set(ls.a,ls.b);
+					}
 				}
+
 			} else {
-				lines.clear();
-				lines.addAll( detectorSegment.detect(gray) );
+				List<LineSegment2D_F32> found = detectorSegment.detect(gray);
+				synchronized ( lockGui ) {
+					ConvertBitmap.grayToBitmap(gray,bitmap,storage);
+					lines.reset();
+					for( LineSegment2D_F32 p : found ) {
+						lines.grow().set(p.a,p.b);
+					}
+				}
 			}
 		}
 
@@ -179,7 +189,7 @@ public class LineDisplayActivity extends VideoDisplayActivity
 		protected void render(Canvas canvas, double imageToOutput) {
 			canvas.drawBitmap(bitmap,0,0,null);
 
-			for( LineSegment2D_F32 s : lines )  {
+			for( LineSegment2D_F32 s : lines.toList() )  {
 				canvas.drawLine((int)s.a.x,(int)s.a.y,(int)s.b.x,(int)s.b.y,paint);
 			}
 		}

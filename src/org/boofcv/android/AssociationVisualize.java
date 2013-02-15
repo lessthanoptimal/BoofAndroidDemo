@@ -69,6 +69,9 @@ public class AssociationVisualize {
 	 * Specifies size of input image and predeclares data structures
 	 */
 	public void initializeImages( int width , int height ) {
+		if( graySrc != null && graySrc.width == width && graySrc.height == height )
+			return;
+
 		graySrc = new ImageFloat32(width,height);
 		grayDst = new ImageFloat32(width,height);
 
@@ -94,10 +97,10 @@ public class AssociationVisualize {
 		this.locationDst.clear();
 
 		for( Point2D_F64 p : locationSrc ) {
-			this.locationSrc.add(p);
+			this.locationSrc.add(p.copy());
 		}
 		for( Point2D_F64 p : locationDst ) {
-			this.locationDst.add(p);
+			this.locationDst.add(p.copy());
 		}
 	}
 
@@ -108,8 +111,8 @@ public class AssociationVisualize {
 		for( int i = 0; i < matches.size(); i++ ) {
 			AssociatedPair p = matches.get(i);
 
-			locationSrc.add( p.p1 );
-			locationDst.add( p.p2 );
+			locationSrc.add( p.p1.copy() );
+			locationDst.add( p.p2.copy() );
 		}
 	}
 
@@ -167,7 +170,7 @@ public class AssociationVisualize {
 		}
 	}
 
-	public synchronized void render(Canvas canvas, double tranX , double tranY , double scale ) {
+	public void render(Canvas canvas, double tranX , double tranY , double scale ) {
 		this.scale = scale;
 		this.tranX = tranX;
 		this.tranY = tranY;

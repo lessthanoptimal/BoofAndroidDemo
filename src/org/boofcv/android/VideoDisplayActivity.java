@@ -176,7 +176,8 @@ public class VideoDisplayActivity extends Activity implements Camera.PreviewCall
 			meanFps /= history.length;
 
 			canvas.restore();
-			canvas.drawText(String.format("FPS = %5.2f",meanFps), 50, 50, textPaint);
+			if( DemoMain.preference.showFps )
+				canvas.drawText(String.format("FPS = %5.2f",meanFps), 50, 50, textPaint);
 		}
 	}
 

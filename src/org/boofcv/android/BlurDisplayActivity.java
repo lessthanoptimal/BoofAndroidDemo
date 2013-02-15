@@ -1,56 +1,69 @@
 package org.boofcv.android;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.hardware.Camera;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
-import boofcv.abst.filter.FilterImageInterface;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.android.ConvertBitmap;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.image.ImageUInt8;
 
 /**
+ * Blurs the input video image using different algorithms.
+ *
  * @author Peter Abeles
  */
-public class BlurDisplayActivity extends VideoDisplayActivity  {
+public class BlurDisplayActivity extends VideoDisplayActivity
+		implements AdapterView.OnItemSelectedListener
+{
+
+	Spinner spinnerView;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		LayoutInflater inflater = getLayoutInflater();
+		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.select_algorithm,null);
+
+		LinearLayout parent = (LinearLayout)findViewById(R.id.camera_preview_parent);
+		parent.addView(controls);
+
+		spinnerView = (Spinner)controls.findViewById(R.id.spinner_algs);
+		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+				R.array.blurs, android.R.layout.simple_spinner_item);
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		spinnerView.setAdapter(adapter);
+		spinnerView.setOnItemSelectedListener(this);
+
 		setProcessing(new BlurProcessing(FactoryBlurFilter.mean(ImageUInt8.class,2)) );
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.blur_menu, menu);
-		return true;
+	public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id ) {
+		switch (pos) {
+			case 0:
+				setProcessing(new BlurProcessing(FactoryBlurFilter.mean(ImageUInt8.class,2)) );
+				break;
+
+			case 1:
+				setProcessing(new BlurProcessing(FactoryBlurFilter.gaussian(ImageUInt8.class,-1,2)) );
+				break;
+
+			case 2:
+				setProcessing(new BlurProcessing(FactoryBlurFilter.median(ImageUInt8.class,2)) );
+				break;
+		}
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle item selection
-		switch (item.getItemId()) {
-			case R.id.blur_mean:
-				setProcessing(new BlurProcessing(FactoryBlurFilter.mean(ImageUInt8.class,2)) );
-				return true;
-			case R.id.blur_gaussian:
-				setProcessing(new BlurProcessing(FactoryBlurFilter.gaussian(ImageUInt8.class,-1,2)) );
-				return true;
-			case R.id.blur_median:
-				setProcessing(new BlurProcessing(FactoryBlurFilter.median(ImageUInt8.class,2)) );
-				return true;
-			default:
-				return super.onOptionsItemSelected(item);
-		}
-	}
+	public void onNothingSelected(AdapterView<?> adapterView) {}
 
 	protected class BlurProcessing extends BoofImageProcessing {
 		ImageUInt8 blurred;

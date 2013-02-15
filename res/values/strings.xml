@@ -12,6 +12,12 @@
 		<item>Denoise</item>
 	</string-array>
 
+	<string-array name="blurs">
+		<item>Mean</item>
+		<item>Gaussian</item>
+		<item>Median</item>
+	</string-array>
+
 	<string-array name="gradients">
 		<item>Three</item>
 		<item>Sobel</item>
@@ -54,6 +60,7 @@
 
 	<string-array name="disparity_views">
 		<item>Association</item>
+		<item>Rectification</item>
 		<item>Disparity</item>
 	</string-array>
 </resources>

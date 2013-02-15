@@ -20,6 +20,7 @@ import boofcv.android.ConvertBitmap;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.factory.sfm.FactoryMotion2D;
 import boofcv.misc.BoofMiscOps;
+import boofcv.struct.FastQueue;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.affine.Affine2D_F64;
@@ -110,6 +111,9 @@ implements CompoundButton.OnCheckedChangeListener
 		StitchingFromMotion2D.Corners corners = new StitchingFromMotion2D.Corners();
 		Point2D_F64 distPt = new Point2D_F64();
 
+		FastQueue<Point2D_F64> inliersGui = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
+		FastQueue<Point2D_F64> outliersGui = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
+
 		public PointProcessing( StitchingFromMotion2D<ImageUInt8,Affine2D_F64> alg  ) {
 			super(ImageUInt8.class);
 			this.alg = alg;
@@ -140,18 +144,42 @@ implements CompoundButton.OnCheckedChangeListener
 
 			if( !resetRequested && alg.process(gray) ) {
 				ImageUInt8 stitched = alg.getStitchedImage();
-				ConvertBitmap.grayToBitmap(stitched,bitmap,storage);
-				alg.getImageCorners(gray.width,gray.height,corners);
+
+				synchronized ( lockGui ) {
+					ConvertBitmap.grayToBitmap(stitched,bitmap,storage);
+
+					ImageMotion2D<?,?> motion = alg.getMotion();
+					if( showFeatures && (motion instanceof AccessPointTracks) ) {
+						AccessPointTracks access = (AccessPointTracks)motion;
+
+						alg.getWorldToCurr(imageToDistorted);
+						imageToDistorted.invert(distortedToImage);
+						inliersGui.reset();outliersGui.reset();
+						List<Point2D_F64> points = access.getAllTracks();
+						for( int i = 0; i < points.size(); i++ ) {
+							HomographyPointOps_F64.transform(distortedToImage,points.get(i),distPt);
+
+							if( access.isInlier(i) ) {
+								inliersGui.grow().set(distPt.x,distPt.y);
+							} else {
+								outliersGui.grow().set(distPt.x,distPt.y);
+							}
+						}
+					}
+
+					alg.getImageCorners(gray.width,gray.height,corners);
+				}
 
 				boolean inside = true;
 				inside &= BoofMiscOps.checkInside(stitched,corners.p0.x,corners.p0.y,5);
 				inside &= BoofMiscOps.checkInside(stitched,corners.p1.x,corners.p1.y,5);
 				inside &= BoofMiscOps.checkInside(stitched,corners.p2.x,corners.p2.y,5);
 				inside &= BoofMiscOps.checkInside(stitched,corners.p3.x,corners.p3.y,5);
-
 				if( !inside ) {
 					alg.setOriginToCurrent();
 				}
+
+
 
 			} else {
 				resetRequested = false;
@@ -173,22 +201,13 @@ implements CompoundButton.OnCheckedChangeListener
 			canvas.drawLine((int)p2.x,(int)p2.y,(int)p3.x,(int)p3.y, paintInlier);
 			canvas.drawLine((int)p3.x,(int)p3.y,(int)p0.x,(int)p0.y, paintInlier);
 
-			alg.getWorldToCurr(imageToDistorted);
-			imageToDistorted.invert(distortedToImage);
-			ImageMotion2D<?,?> motion = alg.getMotion();
-			if( showFeatures && (motion instanceof AccessPointTracks) ) {
-				AccessPointTracks access = (AccessPointTracks)motion;
-
-				List<Point2D_F64> points = access.getAllTracks();
-				for( int i = 0; i < points.size(); i++ ) {
-					HomographyPointOps_F64.transform(distortedToImage,points.get(i),distPt);
-
-					if( access.isInlier(i) ) {
-						canvas.drawCircle((float)distPt.x,(float)distPt.y,3,paintInlier);
-					} else {
-						canvas.drawCircle((float)distPt.x,(float)distPt.y,3, paintOutlier);
-					}
-				}
+			for( int i = 0; i < inliersGui.size; i++ ) {
+				Point2D_F64 p = inliersGui.get(i);
+				canvas.drawCircle((float)p.x,(float)p.y,3,paintInlier);
+			}
+			for( int i = 0; i < outliersGui.size; i++ ) {
+				Point2D_F64 p = outliersGui.get(i);
+				canvas.drawCircle((float)p.x,(float)p.y,3,paintOutlier);
 			}
 		}
 	}

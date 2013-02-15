@@ -5,17 +5,18 @@ import android.hardware.Camera;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
+import android.widget.*;
 
 import java.util.List;
 
 /**
  * @author Peter Abeles
  */
-public class PreferenceActivity extends Activity implements AdapterView.OnItemSelectedListener {
+public class PreferenceActivity extends Activity
+		implements AdapterView.OnItemSelectedListener , CompoundButton.OnCheckedChangeListener
+{
 
+	CheckBox checkFPS;
 	Spinner spinnerCamera;
 	Spinner spinnerVideo;
 	Spinner spinnerPicture;
@@ -35,6 +36,7 @@ public class PreferenceActivity extends Activity implements AdapterView.OnItemSe
 		specs = DemoMain.specs;
 		preference = DemoMain.preference;
 
+		checkFPS = (CheckBox) findViewById(R.id.checkbox_FPS);
 		spinnerCamera = (Spinner) findViewById(R.id.spinner_camera);
 		spinnerVideo = (Spinner) findViewById(R.id.spinner_video_size);
 		spinnerPicture = (Spinner) findViewById(R.id.spinner_picture_size);
@@ -58,7 +60,9 @@ public class PreferenceActivity extends Activity implements AdapterView.OnItemSe
 		setupSizeSpinners();
 
 		spinnerCamera.setSelection(preference.cameraId);
+		checkFPS.setChecked(preference.showFps);
 
+		checkFPS.setOnCheckedChangeListener(this);
 		spinnerCamera.setOnItemSelectedListener(this);
 		spinnerVideo.setOnItemSelectedListener(this);
 		spinnerPicture.setOnItemSelectedListener(this);
@@ -156,5 +160,10 @@ public class PreferenceActivity extends Activity implements AdapterView.OnItemSe
 
 	@Override
 	public void onNothingSelected(AdapterView<?> adapterView) {
+	}
+
+	@Override
+	public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+		preference.showFps = b;
 	}
 }

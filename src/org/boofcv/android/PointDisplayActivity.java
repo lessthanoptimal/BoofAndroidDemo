@@ -7,7 +7,10 @@ import android.graphics.Paint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.*;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
 import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
@@ -26,7 +29,7 @@ import georegression.struct.point.Point2D_I16;
  * @author Peter Abeles
  */
 public class PointDisplayActivity extends VideoDisplayActivity
-		implements SeekBar.OnSeekBarChangeListener , AdapterView.OnItemSelectedListener  {
+		implements AdapterView.OnItemSelectedListener  {
 
 	Paint paintMax,paintMin;
 	NonMaxSuppression nonmaxMax;
@@ -51,9 +54,6 @@ public class PointDisplayActivity extends VideoDisplayActivity
 
 		LinearLayout parent = (LinearLayout)findViewById(R.id.camera_preview_parent);
 		parent.addView(controls);
-
-		SeekBar seek = (SeekBar)controls.findViewById(R.id.slider_threshold);
-		seek.setOnSeekBarChangeListener(this);
 
 		Spinner spinner = (Spinner)controls.findViewById(R.id.spinner_algs);
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
@@ -91,7 +91,7 @@ public class PointDisplayActivity extends VideoDisplayActivity
 				break;
 
 			case 2:
-				intensity = FactoryIntensityPoint.fast(30,9,ImageUInt8.class);
+				intensity = FactoryIntensityPoint.fast(25,9,ImageUInt8.class);
 				nonmax = nonmaxCandidate;
 				break;
 
@@ -128,17 +128,6 @@ public class PointDisplayActivity extends VideoDisplayActivity
 	@Override
 	public void onNothingSelected(AdapterView<?> adapterView) {}
 
-	@Override
-	public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser ) {
-		//To change body of implemented methods use File | Settings | File Templates.
-	}
-
-	@Override
-	public void onStartTrackingTouch(SeekBar seekBar) {}
-
-	@Override
-	public void onStopTrackingTouch(SeekBar seekBar) {}
-
 	protected class PointProcessing extends BoofRenderProcessing<ImageUInt8> {
 		EasyGeneralFeatureDetector<ImageUInt8,ImageSInt16> detector;
 
@@ -146,6 +135,11 @@ public class PointDisplayActivity extends VideoDisplayActivity
 
 		Bitmap bitmap;
 		byte[] storage;
+
+		// location of point features displayed inside of GUI
+		QueueCorner maximumsGUI = new QueueCorner();
+		QueueCorner minimumsGUI = new QueueCorner();
+
 
 		public PointProcessing(GeneralFeatureIntensity<ImageUInt8, ImageSInt16> intensity,
 							   NonMaxSuppression nonmax) {
@@ -170,24 +164,38 @@ public class PointDisplayActivity extends VideoDisplayActivity
 			nonmax.setSearchRadius( 3*gray.width/320 );
 			detector.getDetector().setMaxFeatures( 200*gray.width/320 );
 			detector.detect(gray,null);
-			ConvertBitmap.grayToBitmap(gray,bitmap,storage);
+
+			synchronized ( lockGui ) {
+				ConvertBitmap.grayToBitmap(gray,bitmap,storage);
+
+				maximumsGUI.reset();
+				minimumsGUI.reset();
+
+				QueueCorner maximums = detector.getMaximums();
+				QueueCorner minimums = detector.getMinimums();
+
+				for( int i = 0; i < maximums.size; i++ ) {
+					Point2D_I16 p = maximums.get(i);
+					maximumsGUI.grow().set(p);
+				}
+				for( int i = 0; i < minimums.size; i++ ) {
+					Point2D_I16 p = minimums.get(i);
+					minimumsGUI.grow().set(p);
+				}
+			}
 		}
 
 		@Override
 		protected void render(Canvas canvas, double imageToOutput) {
 			canvas.drawBitmap(bitmap,0,0,null);
 
-			QueueCorner maximums = detector.getMaximums();
-
-			for( int i = 0; i < maximums.size; i++ ) {
-				Point2D_I16 p = maximums.get(i);
+			for( int i = 0; i < maximumsGUI.size; i++ ) {
+				Point2D_I16 p = maximumsGUI.get(i);
 				canvas.drawCircle(p.x,p.y,3,paintMax);
 			}
 
-			QueueCorner minimums = detector.getMinimums();
-
-			for( int i = 0; i < minimums.size; i++ ) {
-				Point2D_I16 p = minimums.get(i);
+			for( int i = 0; i < minimumsGUI.size; i++ ) {
+				Point2D_I16 p = minimumsGUI.get(i);
 				canvas.drawCircle(p.x,p.y,3,paintMin);
 			}
 		}

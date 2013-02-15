@@ -3,7 +3,6 @@ package org.boofcv.android;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.hardware.Camera;
 import android.os.Bundle;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
@@ -30,7 +29,10 @@ public class DisparityActivity extends VideoDisplayActivity
 
 	AssociationVisualize visualize;
 
-	int target = 0;
+	// indicate where the user touched the screen
+	volatile int touchEventType = 0;
+	volatile int touchX;
+	volatile int touchY;
 
 	private GestureDetector mDetector;
 
@@ -71,9 +73,6 @@ public class DisparityActivity extends VideoDisplayActivity
 	@Override
 	protected void onResume() {
 		super.onResume();
-		Camera.Size size = mCamera.getParameters().getPreviewSize();
-		visualize.initializeImages( size.width, size.height );
-
 		setProcessing(new DisparityProcessing());
 	}
 
@@ -83,6 +82,9 @@ public class DisparityActivity extends VideoDisplayActivity
 	public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id ) {
 		if( pos == 0 ) {
 			activeView = DView.ASSOCIATION;
+		} else if( pos == 1 ) {
+			touchY = -1;
+			activeView = DView.RECTIFICATION;
 		} else {
 			activeView = DView.DISPARITY;
 		}
@@ -110,17 +112,11 @@ public class DisparityActivity extends VideoDisplayActivity
 			}
 
 			if( activeView == DView.ASSOCIATION ) {
-				if( !visualize.setTouch((int)e.getX(),(int)e.getY()))
-				{
-					// select an image to capture
-					int half = v.getWidth()/2;
-
-					if( e.getX() < half ) {
-						target = 1;
-					} else {
-						target = 2;
-					}
-				}
+				touchEventType = 1;
+				touchX = (int)e.getX();
+				touchY = (int)e.getY();
+			} else if( activeView == DView.RECTIFICATION ) {
+				touchY = (int)e.getY();
 			}
 
 			return true;
@@ -135,14 +131,7 @@ public class DisparityActivity extends VideoDisplayActivity
 				return false;
 			}
 
-			int half = v.getWidth()/2;
-
-			if( e1.getX() < half ) {
-				visualize.setSource(null);
-			} else {
-				visualize.setDestination(null);
-			}
-			visualize.forgetSelection();
+			touchEventType = (int)e1.getX() < v.getWidth()/2 ? 2 : 3;
 
 			return true;
 		}
@@ -154,8 +143,7 @@ public class DisparityActivity extends VideoDisplayActivity
 				return false;
 			}
 
-			// clear selection of individual match
-			visualize.forgetSelection();
+			touchEventType = 4;
 			return true;
 		}
 	}
@@ -176,15 +164,13 @@ public class DisparityActivity extends VideoDisplayActivity
 					FactoryAssociation.greedy(score,Double.MAX_VALUE,true);
 
 			disparity = new DisparityCalculation<SurfFeature>(detDesc,associate,DemoMain.preference.intrinsic);
-
-			// clear any user selected points
-			visualize.forgetSelection();
 		}
 
 		@Override
 		protected void declareImages(int width, int height) {
 			super.declareImages(width, height);
 
+			visualize.initializeImages( width, height );
 			outputWidth = visualize.getOutputWidth();
 			outputHeight = visualize.getOutputHeight();
 
@@ -193,20 +179,53 @@ public class DisparityActivity extends VideoDisplayActivity
 
 		@Override
 		protected synchronized void process(ImageFloat32 gray) {
-			if( target == 0 )
-				return;
 
+			int target = 0;
+
+			// process GUI interactions
+			synchronized ( lockGui ) {
+				if( touchEventType == 1 ) {
+					// first see if there are any features to select
+					if( !visualize.setTouch(touchX,touchY) ) {
+						// if not then it must be a capture image request
+						target = touchX < view.getWidth()/2 ? 1 : 2;
+					}
+				} else if( touchEventType == 2 ) {
+					visualize.setSource(null);
+					visualize.forgetSelection();
+				} else if( touchEventType == 3 ) {
+					visualize.setDestination(null);
+					visualize.forgetSelection();
+				} else if( touchEventType == 4 ) {
+					visualize.forgetSelection();
+				}
+			}
+			touchEventType = 0;
+
+			boolean computedFeatures = false;
+			// compute image features for left or right depending on user selection
 			if( target == 1 ) {
-				visualize.setSource(gray);
 				disparity.setSource(gray);
+				computedFeatures = true;
 			} else if( target == 2 ) {
-				visualize.setDestination(gray);
 				disparity.setDestination(gray);
+				computedFeatures = true;
 			}
 
-			if( visualize.hasLeft && visualize.hasRight ) {
+			synchronized ( lockGui ) {
+				if( target == 1 ) {
+					visualize.setSource(gray);
+				} else if( target == 2 ) {
+					visualize.setDestination(gray);
+				}
+			}
+
+			if( computedFeatures && visualize.hasLeft && visualize.hasRight ) {
 				if( disparity.process() ) {
-					visualize.setMatches(disparity.getInliersPixel());
+					synchronized ( lockGui ) {
+						visualize.setMatches(disparity.getInliersPixel());
+						visualize.forgetSelection();
+					}
 				} else {
 					runOnUiThread(new Runnable() {
 						public void run() {
@@ -228,10 +247,10 @@ public class DisparityActivity extends VideoDisplayActivity
 				paint.setTextSize(60);
 				int textLength = (int)paint.measureText("Calibrate Camera First");
 
-				canvas.drawText("Calibrate Camera First", (canvas.getWidth() + textLength) / 2, canvas.getHeight() / 2, paint);
+				canvas.drawText("Calibrate Camera First", (canvas.getWidth() - textLength) / 2, canvas.getHeight() / 2, paint);
 			} else if( activeView == DView.DISPARITY ) {
 				// draw rectified image
-				ConvertBitmap.grayToBitmap(disparity.rectifiedLeft,visualize.bitmapSrc,visualize.storage);
+				ConvertBitmap.grayToBitmap(disparity.rectifiedLeft, visualize.bitmapSrc, visualize.storage);
 
 				// now draw the disparity as a colorized image
 				ImageFloat32 d = disparity.getDisparity();
@@ -244,6 +263,18 @@ public class DisparityActivity extends VideoDisplayActivity
 				int startX = d.getWidth() + AssociationVisualize.SEPARATION;
 				canvas.drawBitmap(visualize.bitmapSrc,0,0,null);
 				canvas.drawBitmap(visualize.bitmapDst,startX,0,null);
+			} else if( activeView == DView.RECTIFICATION ) {
+				ConvertBitmap.grayToBitmap(disparity.rectifiedLeft,visualize.bitmapSrc,visualize.storage);
+				ConvertBitmap.grayToBitmap(disparity.rectifiedRight,visualize.bitmapDst,visualize.storage);
+
+				int startX = disparity.rectifiedLeft.getWidth() + AssociationVisualize.SEPARATION;
+				canvas.drawBitmap(visualize.bitmapSrc,0,0,null);
+				canvas.drawBitmap(visualize.bitmapDst,startX,0,null);
+
+				if( touchY >= 0 ) {
+					canvas.restore();
+					canvas.drawLine(0,touchY,canvas.getWidth(),touchY,visualize.paintPoint);
+				}
 			} else {
 				// bit of a hack to reduce memory usage
 				ConvertBitmap.grayToBitmap(visualize.graySrc,visualize.bitmapSrc,visualize.storage);
@@ -256,6 +287,7 @@ public class DisparityActivity extends VideoDisplayActivity
 
 	enum DView {
 		ASSOCIATION,
+		RECTIFICATION,
 		DISPARITY
 	}
 }

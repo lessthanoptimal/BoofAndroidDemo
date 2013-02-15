@@ -2,7 +2,6 @@ package org.boofcv.android;
 
 import android.graphics.Canvas;
 import android.hardware.Camera;
-import android.util.Log;
 import android.view.View;
 import boofcv.android.ConvertNV21;
 import boofcv.core.image.GeneralizedImageOps;
@@ -10,6 +9,9 @@ import boofcv.struct.image.ImageSingleBand;
 import georegression.struct.point.Point2D_F64;
 
 /**
+ * Processing class for displaying more complex visualizations of data.  Children of this class must properly lock
+ * down the GUI when processing data that can be read/written to when updating GUI;
+ *
  * @author Peter Abeles
  */
 public abstract class BoofRenderProcessing<T extends ImageSingleBand> extends Thread implements BoofProcessing {
@@ -28,16 +30,12 @@ public abstract class BoofRenderProcessing<T extends ImageSingleBand> extends Th
 	View view;
 	Thread thread;
 
-	Object lockGui = new Object();
-	Object lockConvert = new Object();
+	protected final Object lockGui = new Object();
+	protected final Object lockConvert = new Object();
 
 	// scale and translation applied to the canvas
 	double scale;
 	double tranX,tranY;
-
-	// It is possible for this class to have been inserted between process() and render() operations
-	// this variable is used to make sure it won't try to render before processing
-	boolean hasProcessedImage = false;
 
 	protected BoofRenderProcessing(Class<T> imageType) {
 		this.imageType = imageType;
@@ -55,6 +53,7 @@ public abstract class BoofRenderProcessing<T extends ImageSingleBand> extends Th
 		}
 
 		// start the thread for processing
+		running = true;
 		start();
 	}
 
@@ -62,7 +61,7 @@ public abstract class BoofRenderProcessing<T extends ImageSingleBand> extends Th
 	public void onDraw(Canvas canvas) {
 		synchronized (lockGui) {
 			// the process class could have been swapped
-			if( !hasProcessedImage || gray == null )
+			if( gray == null )
 				return;
 
 			int w = canvas.getWidth();
@@ -109,7 +108,6 @@ public abstract class BoofRenderProcessing<T extends ImageSingleBand> extends Th
 		if( thread == null )
 			return;
 
-		Log.d("stopProcessin()","ENTER");
 		requestStop = true;
 		while( running ) {
 			// wake the thread up if needed
@@ -118,13 +116,11 @@ public abstract class BoofRenderProcessing<T extends ImageSingleBand> extends Th
 				Thread.sleep(10);
 			} catch (InterruptedException e) {}
 		}
-		Log.d("stopProcessin()", "EXIT");
 	}
 
 	@Override
 	public void run() {
 		thread = Thread.currentThread();
-		running = true;
 		while( !requestStop ) {
 			synchronized ( thread ) {
 				try {
@@ -141,10 +137,7 @@ public abstract class BoofRenderProcessing<T extends ImageSingleBand> extends Th
 				gray2 = tmp;
 			}
 
-			synchronized (lockGui) {
-				process(gray2);
-				hasProcessedImage = true;
-			}
+			process(gray2);
 
 			view.postInvalidate();
 		}
@@ -154,6 +147,8 @@ public abstract class BoofRenderProcessing<T extends ImageSingleBand> extends Th
 	/**
 	 * Image processing should be done here.  process and render will not be called at the same time, but won't
 	 * be called from the same threads.
+	 *
+	 * Be sure to use synchroize to lock the GUI as needed inside this function!
 	 */
 	protected abstract void process( T gray );
 

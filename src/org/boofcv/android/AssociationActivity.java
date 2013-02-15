@@ -1,7 +1,6 @@
 package org.boofcv.android;
 
 import android.graphics.Canvas;
-import android.hardware.Camera;
 import android.os.Bundle;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
@@ -34,8 +33,13 @@ public class AssociationActivity extends VideoDisplayActivity
 	Spinner spinnerDet;
 
 	AssociationVisualize visualize;
+	// if true the algorithm changed and it should reprocess the images it has in memory
+	boolean changedAlg = false;
 
-	int target = 0;
+	// indicate where the user touched the screen
+	volatile int touchEventType = 0;
+	volatile int touchX;
+	volatile int touchY;
 
 	private GestureDetector mDetector;
 
@@ -84,11 +88,7 @@ public class AssociationActivity extends VideoDisplayActivity
 	@Override
 	protected void onResume() {
 		super.onResume();
-		Camera.Size size = mCamera.getParameters().getPreviewSize();
-		visualize.initializeImages( size.width, size.height );
 	}
-
-
 
 	@Override
 	public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id ) {
@@ -120,17 +120,9 @@ public class AssociationActivity extends VideoDisplayActivity
 		@Override
 		public boolean onDown(MotionEvent e) {
 
-			if( !visualize.setTouch((int)e.getX(),(int)e.getY()))
-			{
-				// select an image to capture
-				int half = v.getWidth()/2;
-
-				if( e.getX() < half ) {
-					target = 1;
-				} else {
-					target = 2;
-				}
-			}
+			touchEventType = 1;
+			touchX = (int)e.getX();
+			touchY = (int)e.getY();
 
 			return true;
 		}
@@ -140,14 +132,7 @@ public class AssociationActivity extends VideoDisplayActivity
 		 */
 		@Override
 		public boolean onFling( MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-			int half = v.getWidth()/2;
-
-			if( e1.getX() < half ) {
-				visualize.setSource(null);
-			} else {
-				visualize.setDestination(null);
-			}
-			visualize.forgetSelection();
+			touchEventType = (int)e1.getX() < v.getWidth()/2 ? 2 : 3;
 
 			return true;
 		}
@@ -155,8 +140,7 @@ public class AssociationActivity extends VideoDisplayActivity
 		@Override
 		public boolean onDoubleTapEvent(MotionEvent e)
 		{
-			// clear selection of individual match
-			visualize.forgetSelection();
+			touchEventType = 4;
 			return true;
 		}
 	}
@@ -177,8 +161,6 @@ public class AssociationActivity extends VideoDisplayActivity
 			this.detDesc = detDesc;
 			this.associate = associate;
 
-			// clear any user selected points
-			visualize.forgetSelection();
 
 			listSrc = UtilFeature.createQueue(detDesc,10);
 			listDst = UtilFeature.createQueue(detDesc,10);
@@ -187,46 +169,97 @@ public class AssociationActivity extends VideoDisplayActivity
 		@Override
 		protected void declareImages(int width, int height) {
 			super.declareImages(width, height);
+			visualize.initializeImages( width, height );
 
 			outputWidth = visualize.getOutputWidth();
 			outputHeight = visualize.getOutputHeight();
+			changedAlg = true;
 		}
 
 		@Override
-		protected synchronized void process(ImageFloat32 gray) {
-			if( target == 0 )
-				return;
+		protected void process(ImageFloat32 gray) {
+			boolean computedFeatures = false;
 
-			detDesc.detect(gray);
+			int target = 0;
 
-			if( target == 1 ) {
-				visualize.setSource(gray);
-				detDesc.detect(gray);
-				describeImage(listSrc, locationSrc);
-			} else if( target == 2 ) {
-				visualize.setDestination(gray);
-				detDesc.detect(gray);
-				describeImage(listDst, locationDst);
+			// process GUI interactions
+			synchronized ( lockGui ) {
+				if( touchEventType == 1 ) {
+					// first see if there are any features to select
+					if( !visualize.setTouch(touchX,touchY) ) {
+						// if not then it must be a capture image request
+						target = touchX < view.getWidth()/2 ? 1 : 2;
+					}
+				} else if( touchEventType == 2 ) {
+					visualize.setSource(null);
+					visualize.forgetSelection();
+				} else if( touchEventType == 3 ) {
+					visualize.setDestination(null);
+					visualize.forgetSelection();
+				} else if( touchEventType == 4 ) {
+					visualize.forgetSelection();
+				}
+			}
+			touchEventType = 0;
+
+			// The algorithm being processed was changed and the old image should be reprocessed
+			if( changedAlg ) {
+				changedAlg = false;
+				// recompute image features with the newly selected algorithm
+				if( visualize.hasLeft ) {
+					detDesc.detect(visualize.graySrc);
+					describeImage(listSrc, locationSrc);
+					computedFeatures = true;
+				}
+				if( visualize.hasRight ) {
+					detDesc.detect(visualize.grayDst);
+					describeImage(listDst, locationDst);
+					computedFeatures = true;
+				}
+				synchronized ( lockGui ) {
+					visualize.forgetSelection();
+				}
 			}
 
-			if( visualize.hasLeft && visualize.hasRight ) {
+			// compute image features for left or right depending on user selection
+			if( target == 1 ) {
+				detDesc.detect(gray);
+				describeImage(listSrc, locationSrc);
+				computedFeatures = true;
+			} else if( target == 2 ) {
+				detDesc.detect(gray);
+				describeImage(listDst, locationDst);
+				computedFeatures = true;
+			}
+
+			synchronized ( lockGui ) {
+				if( target == 1 ) {
+					visualize.setSource(gray);
+				} else if( target == 2 ) {
+					visualize.setDestination(gray);
+				}
+			}
+
+			// associate image features
+			if( computedFeatures && visualize.hasLeft && visualize.hasRight ) {
 				associate.setSource(listSrc);
 				associate.setDestination(listDst);
 				associate.associate();
 
-				List<Point2D_F64> pointsSrc = new ArrayList<Point2D_F64>();
-				List<Point2D_F64> pointsDst = new ArrayList<Point2D_F64>();
+				synchronized ( lockGui ) {
+					List<Point2D_F64> pointsSrc = new ArrayList<Point2D_F64>();
+					List<Point2D_F64> pointsDst = new ArrayList<Point2D_F64>();
 
-				FastQueue<AssociatedIndex> matches = associate.getMatches();
-				for( int i = 0; i < matches.size; i++ ) {
-					AssociatedIndex m = matches.get(i);
-					pointsSrc.add( locationSrc.get(m.src));
-					pointsDst.add(locationDst.get(m.dst));
+					FastQueue<AssociatedIndex> matches = associate.getMatches();
+					for( int i = 0; i < matches.size; i++ ) {
+						AssociatedIndex m = matches.get(i);
+						pointsSrc.add(locationSrc.get(m.src));
+						pointsDst.add(locationDst.get(m.dst));
+					}
+					visualize.setMatches(pointsSrc,pointsDst);
+					visualize.forgetSelection();
 				}
-				visualize.setMatches(pointsSrc,pointsDst);
 			}
-
-			target = 0;
 		}
 
 		private void describeImage(FastQueue<Desc> listDesc, FastQueue<Point2D_F64> listLoc) {
@@ -240,7 +273,7 @@ public class AssociationActivity extends VideoDisplayActivity
 		}
 
 		@Override
-		protected synchronized void render(Canvas canvas, double imageToOutput) {
+		protected void render(Canvas canvas, double imageToOutput) {
 			visualize.render(canvas,tranX,tranY,scale);
 		}
 	}
