@@ -15,10 +15,9 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.*;
-import boofcv.abst.calib.ConfigChessboard;
-import boofcv.abst.calib.PlanarCalibrationDetector;
-import boofcv.abst.calib.WrapPlanarChessTarget;
+import boofcv.abst.calib.*;
 import boofcv.alg.feature.detect.chess.DetectChessCalibrationPoints;
+import boofcv.alg.feature.detect.grid.DetectSquareCalibrationPoints;
 import boofcv.alg.feature.detect.quadblob.QuadBlob;
 import boofcv.android.ConvertBitmap;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
@@ -121,9 +120,22 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 		}
 	}
 
+	/**
+	 * Configures the detector, configures target description for calibration and starts the detector thread.
+	 */
 	private void startVideoProcessing() {
-		ConfigChessboard config = new ConfigChessboard(numCols,numRows);
-		PlanarCalibrationDetector detector = FactoryPlanarCalibrationTarget.detectorChessboard(config);
+		PlanarCalibrationDetector detector;
+
+		if( targetType == 0 ) {
+			ConfigChessboard config = new ConfigChessboard(numCols,numRows);
+			detector = FactoryPlanarCalibrationTarget.detectorChessboard(config);
+			CalibrationComputeActivity.target = FactoryPlanarCalibrationTarget.gridChess(numCols, numRows, 30);
+		} else {
+			ConfigSquareGrid config = new ConfigSquareGrid(numCols,numRows);
+			config.maxCombinations = 1;
+			detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(config);
+			CalibrationComputeActivity.target = FactoryPlanarCalibrationTarget.gridSquare(numCols, numRows, 30,30);
+		}
 		setProcessing(new DetectTarget(detector));
 	}
 
@@ -159,7 +171,6 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 			Toast toast = Toast.makeText(this, "Need at least three images.", 2000);
 			toast.show();
 		} else {
-			CalibrationComputeActivity.target = FactoryPlanarCalibrationTarget.gridChess(numCols, numRows, 30);
 			CalibrationComputeActivity.images = shots;
 			Intent intent = new Intent(this, CalibrationComputeActivity.class);
 			startActivity(intent);
@@ -181,7 +192,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 		}
 	}
 
-	private class ManageDialog implements AdapterView.OnItemSelectedListener {
+	private class ManageDialog {
 		Spinner spinnerTarget;
 		EditText textRows;
 		EditText textCols;
@@ -198,6 +209,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 				public void onClick(DialogInterface dialogInterface, int i) {
 					CalibrationActivity.numCols = Integer.parseInt(textCols.getText().toString());
 					CalibrationActivity.numRows = Integer.parseInt(textRows.getText().toString());
+					CalibrationActivity.targetType = spinnerTarget.getSelectedItemPosition();
 					startVideoProcessing();
 				}
 			});
@@ -210,8 +222,6 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 			textCols.setText(""+CalibrationActivity.numCols);
 
 			setupTargetSpinner();
-
-			spinnerTarget.setOnItemSelectedListener(this);
 
 			AlertDialog dialog = builder.create();
 			dialog.show();
@@ -227,12 +237,6 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 			spinnerTarget.setAdapter(adapter);
 		}
 
-		@Override
-		public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-		}
-
-		@Override
-		public void onNothingSelected(AdapterView<?> adapterView) {}
 	}
 
 	private class DetectTarget extends BoofRenderProcessing<ImageFloat32> {
@@ -300,6 +304,8 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 				} else if( showDetectDebug ) {
 					if( detector instanceof WrapPlanarChessTarget ) {
 						extractQuads(((WrapPlanarChessTarget) detector).getAlg());
+					} else if( detector instanceof WrapPlanarSquareGridTarget ) {
+						extractQuads(((WrapPlanarSquareGridTarget) detector).getDetect());
 					}
 				}
 			}
@@ -309,6 +315,25 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 			debugQuads.clear();
 
 			List<QuadBlob> quads = chess.getFindBound().getDetectBlobs().getDetected();
+			if( quads != null ) {
+				for( QuadBlob b : quads ) {
+					if( b.corners.size() < 2 )
+						continue;
+
+					List<Point2D_I32> l = new ArrayList<Point2D_I32>();
+					for( int i = 0; i < b.corners.size(); i++ ) {
+						Point2D_I32 c = b.corners.get(i);
+						l.add( c.copy() );
+					}
+					debugQuads.add(l);
+				}
+			}
+		}
+
+		protected void extractQuads(  DetectSquareCalibrationPoints square ) {
+			debugQuads.clear();
+
+			List<QuadBlob> quads = square.getDetectBlobs().getDetected();
 			if( quads != null ) {
 				for( QuadBlob b : quads ) {
 					if( b.corners.size() < 2 )
