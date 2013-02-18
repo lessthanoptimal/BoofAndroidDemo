@@ -131,6 +131,8 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 				return true;
 			}
 			case R.id.about:
+				Intent intent = new Intent(this, AboutActivity.class);
+				startActivity(intent);
 				return true;
 			default:
 				return super.onOptionsItemSelected(item);

@@ -36,5 +36,6 @@
 				  android:configChanges="orientation|keyboardHidden|screenSize" />
 		<activity android:name=".CameraInformationActivity"/>
 		<activity android:name=".DisparityActivity" android:screenOrientation="landscape"/>
+		<activity android:name=".AboutActivity"/>
 	</application>
 </manifest>
