@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * To speed things up, just collect information on the cameras once and store them in this data structure.
+ *
  * @author Peter Abeles
  */
 public class CameraSpecs {

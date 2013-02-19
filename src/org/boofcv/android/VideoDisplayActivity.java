@@ -41,7 +41,7 @@ public class VideoDisplayActivity extends Activity implements Camera.PreviewCall
 	}
 
 	/**
-	 * Changes the CV algorithm running.  Should only be called from a GUI thread
+	 * Changes the CV algorithm running.  Should only be called from a GUI thread.
 	 */
 	public void setProcessing(  BoofProcessing processing ) {
 		if( this.processing != null ) {

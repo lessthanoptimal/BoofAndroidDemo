@@ -17,9 +17,11 @@ import android.view.View;
 import android.widget.*;
 import boofcv.abst.calib.*;
 import boofcv.alg.feature.detect.chess.DetectChessCalibrationPoints;
+import boofcv.alg.feature.detect.grid.AutoThresholdCalibrationGrid;
 import boofcv.alg.feature.detect.grid.DetectSquareCalibrationPoints;
 import boofcv.alg.feature.detect.quadblob.QuadBlob;
 import boofcv.android.ConvertBitmap;
+import boofcv.android.VisualizeImageData;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.struct.FastQueue;
 import boofcv.struct.image.ImageFloat32;
@@ -30,10 +32,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Activity for collecting images of calibration targets. The user must first specify the type of target it is
+ * searching for and click the screen to add the image.
+ *
  * @author Peter Abeles
  */
 public class CalibrationActivity extends PointTrackerDisplayActivity
-		implements CompoundButton.OnCheckedChangeListener
 {
 	public static final int TARGET_DIALOG = 10;
 
@@ -56,9 +60,6 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 	// displays the number of calibration images captured
 	TextView textCount;
 
-	// continuously detect the calibration target or only on user request
-	boolean continuous;
-
 	// true if detect failed
 	boolean showDetectDebug;
 
@@ -75,9 +76,9 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 		paintPoint.setColor(Color.RED);
 		paintPoint.setStyle(Paint.Style.FILL);
 
-		paintFailed.setColor(Color.BLUE);
+		paintFailed.setColor(Color.CYAN);
 		paintFailed.setStyle(Paint.Style.FILL);
-		paintFailed.setStrokeWidth(1.5f);
+		paintFailed.setStrokeWidth(3f);
 	}
 
 	public void onCreate(Bundle savedInstanceState) {
@@ -88,9 +89,6 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 
 		LinearLayout parent = (LinearLayout)findViewById(R.id.camera_preview_parent);
 		parent.addView(controls);
-
-		CheckBox seek = (CheckBox)controls.findViewById(R.id.checkBox_continuous);
-		seek.setOnCheckedChangeListener(this);
 
 		textCount = (TextView)controls.findViewById(R.id.text_total);
 
@@ -147,6 +145,11 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 		removeRequested = true;
 	}
 
+	public void pressedHelp( View view ) {
+		Intent intent = new Intent(this, CalibrationHelpActivity.class);
+		startActivity(intent);
+	}
+
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		switch (id) {
@@ -155,11 +158,6 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 				dialog.create(this);
 		}
 		return super.onCreateDialog(id);
-	}
-
-	@Override
-	public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-		continuous = b;
 	}
 
 	/**
@@ -280,16 +278,11 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 				ConvertBitmap.grayToBitmap(gray,bitmap,storage);
 			}
 
-			boolean detected;
+			boolean detected = false;
 			showDetectDebug = false;
 			if( captureRequested ) {
 				captureRequested = false;
 				detected = collectMeasurement(gray);
-
-			} else if( continuous ) {
-				detected = detectTarget(gray);
-			} else {
-				detected = false;
 			}
 
 			// safely copy data into data structures used by GUI thread
@@ -302,9 +295,14 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 					for( Point2D_F64 p : found )
 						pointsGui.grow().set(p);
 				} else if( showDetectDebug ) {
+					// show binary image to aid in debugging and detected rectangles
 					if( detector instanceof WrapPlanarChessTarget ) {
+						DetectChessCalibrationPoints alg = ((WrapPlanarChessTarget) detector).getAlg();
+						VisualizeImageData.binaryToBitmap(alg.getBinary(), bitmap, storage);
 						extractQuads(((WrapPlanarChessTarget) detector).getAlg());
 					} else if( detector instanceof WrapPlanarSquareGridTarget ) {
+						AutoThresholdCalibrationGrid alg = ((WrapPlanarSquareGridTarget) detector).getAutoThreshold();
+						VisualizeImageData.binaryToBitmap(alg.getBinary(), bitmap, storage);
 						extractQuads(((WrapPlanarSquareGridTarget) detector).getDetect());
 					}
 				}
@@ -354,10 +352,14 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 		 * user can see the results]
 		 */
 		private boolean collectMeasurement(ImageFloat32 gray) {
-			// pause the display for 1 second
+
+
+			boolean success = detector.process(gray);
+
+			// pause the display to provide feed back to the user
 			timeResume = System.currentTimeMillis()+1500;
 
-			if( detector.process(gray) ) {
+			if( success ) {
 				shots.add( new CalibrationImageInfo(gray,detector.getPoints()));
 				updateShotCountInUiThread();
 				return true;

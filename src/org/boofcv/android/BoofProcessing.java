@@ -5,6 +5,8 @@ import android.hardware.Camera;
 import android.view.View;
 
 /**
+ * Interface for processing and visualizing camera previews.
+ *
  * @author Peter Abeles
  */
 public interface BoofProcessing{

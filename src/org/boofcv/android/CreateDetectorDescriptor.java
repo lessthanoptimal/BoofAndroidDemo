@@ -20,6 +20,10 @@ import boofcv.factory.feature.orientation.FactoryOrientation;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
 
 /**
+ * Class which is intended to make it easier to create instances of DetectDescribePoint.  It will automatically
+ * check to see if there is a specialized version of some algorithm.  If not it will declare its components individually
+ * then combine them.
+ *
  * @author Peter Abeles
  */
 public class CreateDetectorDescriptor {

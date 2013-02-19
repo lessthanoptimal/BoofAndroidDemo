@@ -31,6 +31,8 @@ import georegression.transform.homo.HomographyPointOps_F64;
 import java.util.List;
 
 /**
+ * Displays an image mosaic created from the video stream.
+ *
  * @author Peter Abeles
  */
 public class MosaicDisplayActivity extends VideoDisplayActivity

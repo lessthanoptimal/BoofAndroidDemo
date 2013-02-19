@@ -111,7 +111,7 @@ public class AssociationActivity extends VideoDisplayActivity
 		ScoreAssociation score = FactoryAssociation.defaultScore(detDesc.getDescriptionType());
 		AssociateDescription assoc = FactoryAssociation.greedy(score,Double.MAX_VALUE,true);
 
-		setProcessing(new AssociationProcessing(detDesc, assoc ));
+		setProcessing(new AssociationProcessing(detDesc, assoc));
 	}
 
 	@Override

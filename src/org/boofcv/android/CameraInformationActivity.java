@@ -14,6 +14,8 @@ import java.io.*;
 import java.util.List;
 
 /**
+ * Displays information on the camera(s) in a text view.
+ *
  * @author Peter Abeles
  */
 public class CameraInformationActivity extends Activity {

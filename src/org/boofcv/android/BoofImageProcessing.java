@@ -47,5 +47,4 @@ public abstract class BoofImageProcessing extends BoofRenderProcessing<ImageUInt
 	}
 
 	protected abstract void process( ImageUInt8 gray , Bitmap output , byte[] storage );
-
 }

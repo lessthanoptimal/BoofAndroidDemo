@@ -12,6 +12,8 @@ import boofcv.android.VisualizeImageData;
 import boofcv.struct.image.ImageUInt8;
 
 /**
+ * Converts camera image into a binary image and lets the user control the threshold/filters.
+ *
  * @author Peter Abeles
  */
 public class BinaryDisplayActivity extends VideoDisplayActivity

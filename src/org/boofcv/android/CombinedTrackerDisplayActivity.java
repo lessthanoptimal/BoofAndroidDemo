@@ -22,6 +22,8 @@ import java.util.List;
 import static org.boofcv.android.CreateDetectorDescriptor.*;
 
 /**
+ * Displays tracking results from the combined tracker.
+ *
  * @author Peter Abeles
  */
 public class CombinedTrackerDisplayActivity extends PointTrackerDisplayActivity

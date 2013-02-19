@@ -16,6 +16,9 @@ import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt8;
 
 /**
+ * Displays the gradient of a gray scale image.  The gradient is colorized so that x and y directions are visible.
+ * User can select which gradient algorithm to use.
+ *
  * @author Peter Abeles
  */
 public class GradientDisplayActivity extends VideoDisplayActivity

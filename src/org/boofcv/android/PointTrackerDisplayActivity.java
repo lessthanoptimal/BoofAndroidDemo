@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Base tracks for point tracker display activities.
+ *
  * @author Peter Abeles
  */
 public class PointTrackerDisplayActivity extends VideoDisplayActivity {

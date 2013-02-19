@@ -26,6 +26,9 @@ import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_I16;
 
 /**
+ * Displays detected point features.  Scale-space algorithms are excluded and have their own activity.  User
+ * can select different algorithms.
+ *
  * @author Peter Abeles
  */
 public class PointDisplayActivity extends VideoDisplayActivity

@@ -23,6 +23,8 @@ import java.util.List;
 import static org.boofcv.android.CreateDetectorDescriptor.*;
 
 /**
+ * Displays tracking results for DDA type tracker.  User can select which internal algorithms to use.
+ *
  * @author Peter Abeles
  */
 public class DdaTrackerDisplayActivity extends PointTrackerDisplayActivity
@@ -60,14 +62,16 @@ public class DdaTrackerDisplayActivity extends PointTrackerDisplayActivity
 
 		spinnerDet = (Spinner)controls.findViewById(R.id.spinner_detector);
 		ArrayAdapter<String> spinnerAdapter =
-				new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, detectors);
+				new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, detectors);
 		spinnerDet.setAdapter(spinnerAdapter);
 		spinnerDet.setOnItemSelectedListener(this);
+		spinnerDet.invalidate();
 
 		spinnerDesc = (Spinner)controls.findViewById(R.id.spinner_descriptor);
-		spinnerAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, descriptors);
+		spinnerAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, descriptors);
 		spinnerDesc.setAdapter(spinnerAdapter);
 		spinnerDesc.setOnItemSelectedListener(this);
+		spinnerDesc.invalidate();
 	}
 
 	@Override

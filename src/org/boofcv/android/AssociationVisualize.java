@@ -13,6 +13,7 @@ import georegression.struct.point.Point2D_F64;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Visualizes associated features between two images.
@@ -25,10 +26,11 @@ public class AssociationVisualize {
 
 	Activity owner;
 
-	// what color everthing is drawn
+	// what color everything is drawn
 	Paint paintPoint = new Paint();
 	Paint paintWideLine = new Paint();
 	private Paint textPaint = new Paint();
+	Paint paintLine = new Paint();
 
 	boolean hasLeft = false;
 	boolean hasRight = false;
@@ -63,6 +65,8 @@ public class AssociationVisualize {
 
 		textPaint.setColor(Color.BLUE);
 		textPaint.setTextSize(60);
+
+		paintLine.setStrokeWidth(2);
 	}
 
 	/**
@@ -237,10 +241,13 @@ public class AssociationVisualize {
 
 	private void drawAllMatches(Canvas canvas, int startX) {
 
+		Random rand = new Random(234);
+
 		for( int i = 0; i < locationSrc.size(); i++ ) {
 			Point2D_F64 s = locationSrc.get(i);
 			Point2D_F64 d = locationDst.get(i);
-			canvas.drawLine((float)s.x,(float)s.y,(float)d.x+startX,(float)d.y,paintPoint);
+			paintLine.setARGB(255,rand.nextInt(255),rand.nextInt(255),rand.nextInt(255));
+			canvas.drawLine((float)s.x,(float)s.y,(float)d.x+startX,(float)d.y,paintLine);
 		}
 	}
 

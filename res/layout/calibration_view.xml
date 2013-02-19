@@ -5,12 +5,6 @@
 			  android:layout_width="match_parent"
 			  android:layout_height="match_parent">
 
-	<CheckBox
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="Continuous"
-			android:id="@+id/checkBox_continuous" android:layout_gravity="left|center_vertical"/>
-
 	<TextView
 			android:layout_width="70dip"
 			android:layout_height="wrap_content"
@@ -46,6 +40,14 @@
 			android:layout_marginLeft="10dip"
 			android:text="Compute"
 			android:onClick="pressedOK"
+			android:layout_gravity="center"/>
+
+	<Button
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="10dip"
+			android:text="Help"
+			android:onClick="pressedHelp"
 			android:layout_gravity="center"/>
 
 </LinearLayout>

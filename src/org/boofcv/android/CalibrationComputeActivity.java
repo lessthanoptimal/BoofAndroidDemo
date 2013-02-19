@@ -29,6 +29,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * After images have been collected in the {@link CalibrationActivity}, this activity is brought up which computes
+ * the calibration parameters and shows the user its progress.  After the parameters have been computed the user
+ * then has the option to save or discard the results.
+ *
  * @author Peter Abeles
  */
 public class CalibrationComputeActivity extends Activity {

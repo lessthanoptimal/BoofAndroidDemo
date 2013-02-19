@@ -4,6 +4,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -24,6 +25,9 @@ import boofcv.struct.feature.SurfFeature;
 import boofcv.struct.image.ImageFloat32;
 
 /**
+ * Computes the stereo disparity between two images captured by the camera.  The user selects the images and which
+ * algorithm to process them using.
+ *
  * @author Peter Abeles
  */
 public class DisparityActivity extends VideoDisplayActivity
@@ -278,10 +282,14 @@ public class DisparityActivity extends VideoDisplayActivity
 				if( computedFeatures && visualize.hasLeft && visualize.hasRight ) {
 					// rectify the images and compute the disparity
 					setProgressMessage("Rectifying");
+					Log.e("DisparityActivity","Before Rectifying image");
 					boolean success = disparity.rectifyImage();
+					Log.e("DisparityActivity","After Rectifying image");
 					if( success ) {
 						setProgressMessage("Disparity");
+						Log.e("DisparityActivity","Before Disparity");
 						disparity.computeDisparity();
+						Log.e("DisparityActivity","After Disparity");
 						synchronized ( lockGui ) {
 							disparityMin = disparity.getDisparityAlg().getMinDisparity();
 							disparityMax = disparity.getDisparityAlg().getMaxDisparity();
@@ -299,7 +307,6 @@ public class DisparityActivity extends VideoDisplayActivity
 								toast.show();
 							}});
 					}
-					hideProgressDialog();
 				} else if( changeDisparityAlg != -1 && visualize.hasLeft && visualize.hasRight ) {
 					// recycle the rectified image but compute the disparity using the new algorithm
 					setProgressMessage("Disparity");

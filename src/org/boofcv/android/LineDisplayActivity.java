@@ -24,6 +24,9 @@ import georegression.struct.line.LineSegment2D_F32;
 import java.util.List;
 
 /**
+ * Displays detected lines.  User can adjust the number of lines it will display.  Default is set to three to
+ * reduce false positives.
+ *
  * @author Peter Abeles
  */
 public class LineDisplayActivity extends VideoDisplayActivity

@@ -29,6 +29,8 @@ import georegression.transform.homo.HomographyPointOps_F64;
 import java.util.List;
 
 /**
+ * Displays image stabilization.
+ *
  * @author Peter Abeles
  */
 public class StabilizeDisplayActivity extends VideoDisplayActivity

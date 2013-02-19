@@ -3,9 +3,6 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../boofcv" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/../ddogleg" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/../ejml/trunk" vcs="svn" />
-    <mapping directory="$PROJECT_DIR$/../georegression" vcs="Git" />
   </component>
 </project>
 

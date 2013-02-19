@@ -8,6 +8,8 @@ import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageUInt8;
 
 /**
+ * Displays KLT tracks.
+ *
  * @author Peter Abeles
  */
 public class KltDisplayActivity extends PointTrackerDisplayActivity {

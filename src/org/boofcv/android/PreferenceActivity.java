@@ -10,6 +10,8 @@ import android.widget.*;
 import java.util.List;
 
 /**
+ * Lets the user configure the camera size.
+ *
  * @author Peter Abeles
  */
 public class PreferenceActivity extends Activity

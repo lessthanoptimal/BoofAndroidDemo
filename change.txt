@@ -1,0 +1,20 @@
+Change Log for BoofCV Demonstration App
+
+(year)-(month)-(day)
+
+-------------------------------------------------
+Version 1.1
+Date:
+
+- All classes at least have a high level description now
+- Buttons in DDA tracker activity are now an appropriate size
+- Fixed AndroidManifest.xml so that tablets are supported
+- Removed continuous detection of calibration targets
+- Added help for calibration
+- Colorized association window
+
+-------------------------------------------------
+Version 1.0
+Date:   2012-02-18
+
+- Initial public release on Play store
