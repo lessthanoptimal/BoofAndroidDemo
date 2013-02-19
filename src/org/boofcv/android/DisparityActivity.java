@@ -253,9 +253,11 @@ public class DisparityActivity extends VideoDisplayActivity
 			boolean computedFeatures = false;
 			// compute image features for left or right depending on user selection
 			if( target == 1 ) {
+				setProgressMessage("Detecting Features Left");
 				disparity.setSource(gray);
 				computedFeatures = true;
 			} else if( target == 2 ) {
+				setProgressMessage("Detecting Features Right");
 				disparity.setDestination(gray);
 				computedFeatures = true;
 			}
@@ -275,7 +277,10 @@ public class DisparityActivity extends VideoDisplayActivity
 			if( disparity.disparityAlg != null ) {
 				if( computedFeatures && visualize.hasLeft && visualize.hasRight ) {
 					// rectify the images and compute the disparity
-					if( disparity.rectifyImage() ) {
+					setProgressMessage("Rectifying");
+					boolean success = disparity.rectifyImage();
+					if( success ) {
+						setProgressMessage("Disparity");
 						disparity.computeDisparity();
 						synchronized ( lockGui ) {
 							disparityMin = disparity.getDisparityAlg().getMinDisparity();
@@ -294,9 +299,12 @@ public class DisparityActivity extends VideoDisplayActivity
 								toast.show();
 							}});
 					}
+					hideProgressDialog();
 				} else if( changeDisparityAlg != -1 && visualize.hasLeft && visualize.hasRight ) {
 					// recycle the rectified image but compute the disparity using the new algorithm
+					setProgressMessage("Disparity");
 					disparity.computeDisparity();
+
 					synchronized ( lockGui ) {
 						disparityMin = disparity.getDisparityAlg().getMinDisparity();
 						disparityMax = disparity.getDisparityAlg().getMaxDisparity();
@@ -305,6 +313,7 @@ public class DisparityActivity extends VideoDisplayActivity
 				}
 			}
 
+			hideProgressDialog();
 			changeDisparityAlg = -1;
 		}
 

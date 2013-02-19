@@ -213,6 +213,10 @@ public class AssociationActivity extends VideoDisplayActivity
 			// The algorithm being processed was changed and the old image should be reprocessed
 			if( changedAlg ) {
 				changedAlg = false;
+				if( visualize.hasLeft || visualize.hasRight ) {
+					setProgressMessage("Detect/Describe images");
+				}
+
 				// recompute image features with the newly selected algorithm
 				if( visualize.hasLeft ) {
 					detDesc.detect(visualize.graySrc);
@@ -224,12 +228,16 @@ public class AssociationActivity extends VideoDisplayActivity
 					describeImage(listDst, locationDst);
 					computedFeatures = true;
 				}
+
 				synchronized ( lockGui ) {
 					visualize.forgetSelection();
 				}
 			}
 
 			// compute image features for left or right depending on user selection
+			if( target != 0 )
+				setProgressMessage("Detect/Describe image");
+
 			if( target == 1 ) {
 				detDesc.detect(gray);
 				describeImage(listSrc, locationSrc);
@@ -250,6 +258,7 @@ public class AssociationActivity extends VideoDisplayActivity
 
 			// associate image features
 			if( computedFeatures && visualize.hasLeft && visualize.hasRight ) {
+				setProgressMessage("Associating");
 				associate.setSource(listSrc);
 				associate.setDestination(listDst);
 				associate.associate();
@@ -268,6 +277,8 @@ public class AssociationActivity extends VideoDisplayActivity
 					visualize.forgetSelection();
 				}
 			}
+
+			hideProgressDialog();
 		}
 
 		private void describeImage(FastQueue<Desc> listDesc, FastQueue<Point2D_F64> listLoc) {

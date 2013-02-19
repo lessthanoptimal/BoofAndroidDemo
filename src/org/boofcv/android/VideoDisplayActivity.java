@@ -1,6 +1,7 @@
 package org.boofcv.android;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.hardware.Camera;
@@ -23,6 +24,12 @@ public class VideoDisplayActivity extends Activity implements Camera.PreviewCall
 	protected BoofProcessing processing;
 
 	public static DemoPreference preference;
+
+	// Used to inform the user that its doing some calculations
+	ProgressDialog progressDialog;
+	// after the GUI thread has finished setting up the dialog this is set to true
+	boolean progressDialogSetup;
+	protected final Object lockProgress = new Object();
 
 	boolean hidePreview = true;
 
@@ -87,9 +94,12 @@ public class VideoDisplayActivity extends Activity implements Camera.PreviewCall
 	protected void onPause() {
 		super.onPause();
 
+		hideProgressDialog();
+
 		if( processing != null ) {
-			processing.stopProcessing();
+			BoofProcessing p = processing;
 			processing = null;
+			p.stopProcessing();
 		}
 
 		if (mCamera != null){
@@ -181,4 +191,74 @@ public class VideoDisplayActivity extends Activity implements Camera.PreviewCall
 		}
 	}
 
+	/**
+	 * Displays an indeterminate progress dialog.   If the dialog is already open this will change the message being
+	 * displayed.  Function blocks until the dialog has been declared.
+	 *
+	 * @param message Text shown in dialog
+	 */
+	protected void setProgressMessage(final String message) {
+		runOnUiThread(new Runnable() {
+			public void run() {
+				synchronized ( lockProgress ) {
+					if( progressDialog != null ) {
+						// a dialog is already open, change the message
+						progressDialog.setMessage(message);
+						return;
+					}
+					progressDialog = new ProgressDialog(VideoDisplayActivity.this);
+					progressDialog.setMessage(message);
+					progressDialog.setIndeterminate(true);
+					progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+				}
+
+				// don't show the dialog until 1 second has passed
+				long showTime = System.currentTimeMillis()+1000;
+				while( showTime > System.currentTimeMillis() ) {
+					Thread.yield();
+				}
+				// if it hasn't been dismissed, show the dialog
+				synchronized ( lockProgress ) {
+					if( progressDialog != null )
+						progressDialog.show();
+				}
+			}});
+
+		// block until the GUI thread has been called
+		while( progressDialog == null  ) {
+			Thread.yield();
+		}
+	}
+
+	/**
+	 * Dismisses the progress dialog.  Can be called even if there is no progressDialog being shown.
+	 */
+	protected void hideProgressDialog() {
+		// do nothing if the dialog is already being displayed
+		synchronized ( lockProgress ) {
+			if( progressDialog == null )
+				return;
+		}
+
+		if (Looper.getMainLooper().getThread() == Thread.currentThread()) {
+			// if inside the UI thread just dismiss the dialog and avoid a potential locking condition
+			synchronized ( lockProgress ) {
+				progressDialog.dismiss();
+				progressDialog = null;
+			}
+		} else {
+			runOnUiThread(new Runnable() {
+				public void run() {
+					synchronized ( lockProgress ) {
+						progressDialog.dismiss();
+						progressDialog = null;
+					}
+				}});
+
+			// block until dialog has been dismissed
+			while( progressDialog != null  ) {
+				Thread.yield();
+			}
+		}
+	}
 }
