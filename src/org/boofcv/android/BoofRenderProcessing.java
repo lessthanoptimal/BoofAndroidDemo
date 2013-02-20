@@ -64,8 +64,8 @@ public abstract class BoofRenderProcessing<T extends ImageSingleBand> extends Th
 			if( gray == null )
 				return;
 
-			int w = canvas.getWidth();
-			int h = canvas.getHeight();
+			int w = view.getWidth();
+			int h = view.getHeight();
 
 			// fill the window and center it
 			double scaleX = w/(double)outputWidth;

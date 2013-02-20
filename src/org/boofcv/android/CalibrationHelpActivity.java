@@ -24,8 +24,9 @@ public class CalibrationHelpActivity extends Activity {
 			"<a href=\"http://peterabeles.com/blog/?p=204\">http://peterabeles.com/blog/?p=204</a></p><br>"+
 			"* Tap picture to detect target.<br>" +
 			"* Red dots means it work.<br>"+
-			"* B&W threshold + cyan rectangles means it did not work.<br>"+
-			"* Works best with uniform lighting.";
+			"* B&W threshold image means it did not work.<br>"+
+			"* Works best when there are no shadows<br>"+
+			"* Try to maximize target size in the screen";
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

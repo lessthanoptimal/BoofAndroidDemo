@@ -4,7 +4,7 @@ Change Log for BoofCV Demonstration App
 
 -------------------------------------------------
 Version 1.1
-Date:
+Date: 2012-02-20
 
 - All classes at least have a high level description now
 - Buttons in DDA tracker activity are now an appropriate size
@@ -12,6 +12,7 @@ Date:
 - Removed continuous detection of calibration targets
 - Added help for calibration
 - Colorized association window
+- Changed how threshold is computed during calibration in an attempt to make it more robust to shadows
 
 -------------------------------------------------
 Version 1.0

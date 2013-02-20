@@ -158,7 +158,7 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 		}
 
 		DenseMatrix64F rectifiedK = new DenseMatrix64F(3,3);
-		rectifyImages(leftToRight,rectifiedK);
+		rectifyImages(leftToRight, rectifiedK);
 
 		return true;
 	}
@@ -203,8 +203,11 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 	 * Estimates image motion up to a scale factor
 	 * @param matchedNorm List of associated features in normalized image coordinates
 	 */
+	public volatile int numInside = 0;
 	public Se3_F64 estimateCameraMotion( List<AssociatedPair> matchedNorm )
 	{
+		numInside++;
+		System.out.println("DISPARITY "+numInside);
 		Estimate1ofEpipolar essentialAlg = FactoryMultiView.computeFundamental_1(EnumEpipolar.ESSENTIAL_5_NISTER, 5);
 		TriangulateTwoViewsCalibrated triangulate = FactoryTriangulate.twoGeometric();
 		ModelGenerator<Se3_F64, AssociatedPair> generateEpipolarMotion =
@@ -222,11 +225,14 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 				new Ransac<Se3_F64, AssociatedPair>(2323, generateEpipolarMotion, distanceSe3,
 						300, ransacTOL);
 
-		if (!epipolarMotion.process(matchedNorm))
+		if (!epipolarMotion.process(matchedNorm)) {
+			numInside--;
 			return null;
+		}
 
 		createInliersList(epipolarMotion);
 
+		numInside--;
 		return epipolarMotion.getModel();
 	}
 
