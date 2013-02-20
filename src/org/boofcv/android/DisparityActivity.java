@@ -4,7 +4,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -282,14 +281,10 @@ public class DisparityActivity extends VideoDisplayActivity
 				if( computedFeatures && visualize.hasLeft && visualize.hasRight ) {
 					// rectify the images and compute the disparity
 					setProgressMessage("Rectifying");
-					Log.e("DisparityActivity","Before Rectifying image");
 					boolean success = disparity.rectifyImage();
-					Log.e("DisparityActivity","After Rectifying image");
 					if( success ) {
 						setProgressMessage("Disparity");
-						Log.e("DisparityActivity","Before Disparity");
 						disparity.computeDisparity();
-						Log.e("DisparityActivity","After Disparity");
 						synchronized ( lockGui ) {
 							disparityMin = disparity.getDisparityAlg().getMinDisparity();
 							disparityMax = disparity.getDisparityAlg().getMaxDisparity();

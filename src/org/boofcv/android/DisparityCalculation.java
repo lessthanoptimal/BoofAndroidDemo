@@ -129,14 +129,10 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 	public boolean rectifyImage() {
 		computedDisparity = false;
 
-		Log.e("Disparity Calculation","Before associate");
 		associate.associate();
-		Log.e("Disparity Calculation","After associate");
 		List<AssociatedPair> pairs = convertToNormalizedCoordinates();
 
-		Log.e("Disparity Calculation","Before estimate motion");
 		Se3_F64 leftToRight = estimateCameraMotion(pairs);
-		Log.e("Disparity Calculation","After estimate motion");
 
 		if( leftToRight == null ) {
 			Log.e("disparity","estimate motion failed");
@@ -147,7 +143,6 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 
 			return false;
 		} else if( leftToRight.getT().x > 0 ) {
-			Log.d("disparity","swapping left and right "+leftToRight.getT().x);
 			// the user took a picture from right to left instead of left to right
 			// so now everything needs to be swapped
 			leftToRight = leftToRight.invert(null);
@@ -160,13 +155,10 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 			directionLeftToRight = false;
 		} else {
 			directionLeftToRight = true;
-			Log.d("disparity","leaving left and right alone "+leftToRight.getT().x);
 		}
 
-		Log.e("Disparity Calculation","Before rectify");
 		DenseMatrix64F rectifiedK = new DenseMatrix64F(3,3);
 		rectifyImages(leftToRight,rectifiedK);
-		Log.e("Disparity Calculation","After rectify");
 
 		return true;
 	}
@@ -230,10 +222,8 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 				new Ransac<Se3_F64, AssociatedPair>(2323, generateEpipolarMotion, distanceSe3,
 						300, ransacTOL);
 
-		Log.e("Disparity Calculation","Before RANSAC "+matchedNorm.size());
 		if (!epipolarMotion.process(matchedNorm))
 			return null;
-		Log.e("Disparity Calculation","After RANSAC");
 
 		createInliersList(epipolarMotion);
 

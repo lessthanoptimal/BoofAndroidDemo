@@ -8,3 +8,9 @@ http://peterabeles.com/blog/?p=204
 
 Author: Peter Abeles
 Date: February 18, 2013
+
+-------------- Build Instructions ----------------
+
+To build the source code you will need to check out source code for DDogleg and EJML.  There appears to be some
+strange bug (maybe in Android) and if you include the DDogleg jar it will freeze while rectifying an image, but
+if you include the source code everything works fine.  All the other included jars work just fine.

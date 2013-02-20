@@ -167,22 +167,25 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/BoofAndroidDemo.iml" filepath="$PROJECT_DIR$/BoofAndroidDemo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../ddogleg/DDogleg.iml" filepath="$PROJECT_DIR$/../ddogleg/DDogleg.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../ejml/trunk/ejml.iml" filepath="$PROJECT_DIR$/../ejml/trunk/ejml.iml" />
     </modules>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="Android 4.2 Platform" project-jdk-type="Android SDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
+  <component name="SvnBranchConfigurationManager">
+    <option name="mySupportsUserInfoFilter" value="true" />
+  </component>
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../ddogleg" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../ejml/trunk" vcs="svn" />
   </component>
   <component name="libraryTable">
-    <library name="lib">
+    <library name="testing">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/lib/BoofCV.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/GeoRegression.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/EJML.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/DDogleg.jar!/" />
-        <root url="jar://$PROJECT_DIR$/lib/BoofCVAndroid.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../boofcv/lib/testing/junit-4.10.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />
