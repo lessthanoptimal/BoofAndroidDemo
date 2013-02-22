@@ -3,6 +3,13 @@ Change Log for BoofCV Demonstration App
 (year)-(month)-(day)
 
 -------------------------------------------------
+Version 1.1.1
+Date: 2012-02-20
+
+- Changed how calibration grid size is specified
+- Reduced size of calibration target dialog so that it will fit in smaller screen
+
+-------------------------------------------------
 Version 1.1
 Date: 2012-02-20
 

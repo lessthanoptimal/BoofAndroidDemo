@@ -77,10 +77,10 @@ public class CalibrationHelpActivity extends Activity {
 			int smallest = Math.min(w,h);
 
 			// how wide a black square is
-			squareWidth = smallest / (Math.max(numCols, numRows)*2-1);
+			squareWidth = smallest / (Math.max(numCols, numRows));
 
-			gridWidth = squareWidth*(numCols*2-1);
-			gridHeight = squareWidth*(numRows*2-1);
+			gridWidth = squareWidth*numCols;
+			gridHeight = squareWidth*numRows;
 		}
 
 		@Override
@@ -93,11 +93,11 @@ public class CalibrationHelpActivity extends Activity {
 			// center the grid
 			canvas.translate((getWidth()-gridWidth)/2,(getHeight()-gridHeight)/2);
 
-			for( int i = 0; i < numRows; i++ ) {
-				int y0 = i*2*squareWidth;
+			for( int i = 0; i < numRows; i += 2 ) {
+				int y0 = i*squareWidth;
 				int y1 = y0+squareWidth;
-				for( int j = 0; j < numCols; j++ ) {
-					int x0 = j*2*squareWidth;
+				for( int j = 0; j < numCols; j += 2 ) {
+					int x0 = j*squareWidth;
 					int x1 = x0+squareWidth;
 
 					canvas.drawRect(x0,y0,x1,y1,paintBlack);
@@ -105,11 +105,11 @@ public class CalibrationHelpActivity extends Activity {
 			}
 
 			if( CalibrationActivity.targetType == 0 ) {
-				for( int i = 0; i < numRows-1; i++ ) {
-					int y0 = (i*2+1)*squareWidth;
+				for( int i = 1; i < numRows; i += 2 ) {
+					int y0 = i*squareWidth;
 					int y1 = y0+squareWidth;
-					for( int j = 0; j < numCols-1; j++) {
-						int x0 = (j*2+1)*squareWidth;
+					for( int j = 1; j < numCols-1; j += 2) {
+						int x0 = j*squareWidth;
 						int x1 = x0+squareWidth;
 
 						canvas.drawRect(x0,y0,x1,y1,paintBlack);

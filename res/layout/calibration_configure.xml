@@ -5,56 +5,51 @@
 			  android:layout_width="match_parent"
 			  android:layout_height="match_parent">
 
-	<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-				 android:id="@+id/tableLayout1"
-				 android:layout_width="wrap_content"
-				 android:layout_height="wrap_content"
-				 android:layout_gravity="center_horizontal" >
+	<LinearLayout android:orientation="horizontal"
+				  android:layout_width="match_parent"
+				  android:layout_height="wrap_content"
+				  android:gravity="center">
 
-		<TableRow
-				android:id="@+id/tableRow2"
+		<TextView
+				android:text="Type"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:padding="5dip" >
-			<TextView
-					android:text="Type"
-					android:textAppearance="?android:attr/textAppearanceLarge" />
+				android:textAppearance="?android:attr/textAppearanceLarge" />
 
-			<Spinner
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:id="@+id/spinner_type" android:layout_gravity="center"/>
-		</TableRow>
-
-		<TableRow
-				android:id="@+id/tableRow3"
+		<Spinner
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:padding="5dip" >
-			<TextView
-					android:text="Rows"
-					android:textAppearance="?android:attr/textAppearanceLarge" />
+				android:id="@+id/spinner_type" android:layout_gravity="center"/>
+	</LinearLayout>
 
-			<EditText android:id="@+id/text_rows"
-					  android:layout_width="wrap_content"
-					  android:layout_height="wrap_content"
-					  android:inputType="number"/>
-		</TableRow>
+	<LinearLayout android:orientation="horizontal"
+				  android:layout_width="match_parent"
+				  android:layout_height="wrap_content"
+				  android:gravity="center">
 
-		<TableRow
-				android:id="@+id/tableRow3"
+		<TextView
+				android:text="Rows"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:padding="5dip" >
-			<TextView
-					android:text="Columns"
-					android:textAppearance="?android:attr/textAppearanceLarge" />
+				android:textAppearance="?android:attr/textAppearanceLarge" />
 
-			<EditText android:id="@+id/text_cols"
-					  android:layout_width="wrap_content"
-					  android:layout_height="wrap_content"
-					  android:inputType="number"/>
-		</TableRow>
+		<EditText android:id="@+id/text_rows"
+				  android:layout_width="45sp"
+				  android:layout_height="wrap_content"
+				  android:inputType="number"/>
 
-	</TableLayout>
+		<TextView
+				android:text="Columns"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:textAppearance="?android:attr/textAppearanceLarge" />
+
+		<EditText android:id="@+id/text_cols"
+				  android:layout_width="45sp"
+				  android:layout_height="wrap_content"
+				  android:inputType="number"/>
+
+	</LinearLayout>
+
+
 </LinearLayout>

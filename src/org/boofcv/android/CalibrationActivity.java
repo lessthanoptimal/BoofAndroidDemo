@@ -42,8 +42,8 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 	public static final int TARGET_DIALOG = 10;
 
 	public static int targetType = 0;
-	public static int numRows = 3;
-	public static int numCols = 4;
+	public static int numRows = 5;
+	public static int numCols = 7;
 
 	Paint paintPoint = new Paint();
 	Paint paintFailed = new Paint();
