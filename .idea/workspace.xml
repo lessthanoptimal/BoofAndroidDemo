@@ -28,19 +28,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/libs/BoofCV.jar" afterPath="$PROJECT_DIR$/libs/BoofCV.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/boofcv/android/CalibrationActivity.java" afterPath="$PROJECT_DIR$/src/org/boofcv/android/CalibrationActivity.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/boofcv/android/CalibrationHelpActivity.java" afterPath="$PROJECT_DIR$/src/org/boofcv/android/CalibrationHelpActivity.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/AndroidManifest.xml" afterPath="$PROJECT_DIR$/AndroidManifest.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../boofcv/main/calibration/src/boofcv/abst/calib/WrapPlanarSquareGridTarget.java" afterPath="$PROJECT_DIR$/../boofcv/main/calibration/src/boofcv/abst/calib/WrapPlanarSquareGridTarget.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/res/layout/calibration_configure.xml" afterPath="$PROJECT_DIR$/res/layout/calibration_configure.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/change.txt" afterPath="$PROJECT_DIR$/change.txt" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../boofcv/change.txt" afterPath="$PROJECT_DIR$/../boofcv/change.txt" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <list id="99fde06e-1bdc-4abb-801a-55921227c8be" name="Failed commit: Default" comment="" />
     <ignored path="BoofAndroidDemo.iws" />
     <ignored path=".idea/workspace.xml" />
-    <file path="/Dummy.txt" changelist="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" time="1361500679153" ignored="false" />
+    <file path="/Dummy.txt" changelist="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" time="1361503147404" ignored="false" />
     <file path="/fragment.java" changelist="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" time="1360940765569" ignored="false" />
     <file path="/CalibrationComputeActivity.java" changelist="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" time="1361283278708" ignored="false" />
     <file path="/a.java" changelist="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" time="1360953541674" ignored="false" />
@@ -156,15 +152,6 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DisparityCalculation.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/org/boofcv/android/DisparityCalculation.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="252" column="87" selection-start="8139" selection-end="8139" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="calibration_configure.xml" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/res/layout/calibration_configure.xml">
           <provider editor-type-id="android-designer">
@@ -186,10 +173,19 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="change.txt" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="change.txt" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/change.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="9" column="81" selection-start="275" selection-end="275" vertical-scroll-proportion="0.19565217">
+            <state line="7" column="25" selection-start="144" selection-end="144" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="AndroidManifest.xml" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/AndroidManifest.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="4" column="36" selection-start="199" selection-end="199" vertical-scroll-proportion="0.08695652">
               <folding />
             </state>
           </provider>
@@ -265,7 +261,6 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/src/org/boofcv/android/StabilizeDisplayActivity.java" />
         <option value="$PROJECT_DIR$/src/org/boofcv/android/BoofImageProcessing.java" />
         <option value="$PROJECT_DIR$/src/org/boofcv/android/BoofProcessing.java" />
         <option value="$PROJECT_DIR$/src/org/boofcv/android/BoofRenderProcessing.java" />
@@ -281,6 +276,7 @@
         <option value="$PROJECT_DIR$/res/layout/calibration_configure.xml" />
         <option value="$PROJECT_DIR$/src/org/boofcv/android/CalibrationHelpActivity.java" />
         <option value="$PROJECT_DIR$/change.txt" />
+        <option value="$PROJECT_DIR$/AndroidManifest.xml" />
       </list>
     </option>
   </component>
@@ -338,56 +334,6 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="BoofAndroidDemo" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="BoofAndroidDemo" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="BoofAndroidDemo" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="android" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="BoofAndroidDemo" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="BoofAndroidDemo" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="res" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="BoofAndroidDemo" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="BoofAndroidDemo" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="res" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="layout" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -628,7 +574,11 @@
       <created>1361308649286</created>
       <updated>1361308649286</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="- Changed how grid size is specified for calibration&#10;- tweaked gui">
+      <created>1361503152124</created>
+      <updated>1361503152124</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -703,7 +653,7 @@
     <option name="MAXIMUM_HISTORY_ROWS" value="1000" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="- More debugging information in calibrate&#10;- Colorized association window&#10;- Various UI tweaks" />
+    <option name="LAST_COMMIT_MESSAGE" value="- Changed how grid size is specified for calibration&#10;- tweaked gui" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="false" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="CHECK_FILES_UP_TO_DATE_BEFORE_COMMIT" value="false" />
@@ -718,6 +668,7 @@
     <option name="FILE_HISTORY_SPLITTER_PROPORTION" value="0.6" />
     <MESSAGE value="- Improved handling of switching away and back to the app&#10;- Algorithm selection for stereo" />
     <MESSAGE value="- More debugging information in calibrate&#10;- Colorized association window&#10;- Various UI tweaks" />
+    <MESSAGE value="- Changed how grid size is specified for calibration&#10;- tweaked gui" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -727,13 +678,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/org/boofcv/android/BoofRenderProcessing.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="16" column="22" selection-start="548" selection-end="548" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/org/boofcv/android/BoofProcessing.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="11" column="17" selection-start="233" selection-end="233" vertical-scroll-proportion="0.0">
@@ -847,7 +791,14 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/change.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="9" column="81" selection-start="275" selection-end="275" vertical-scroll-proportion="0.19565217">
+        <state line="7" column="25" selection-start="144" selection-end="144" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/AndroidManifest.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="4" column="36" selection-start="199" selection-end="199" vertical-scroll-proportion="0.08695652">
           <folding />
         </state>
       </provider>
