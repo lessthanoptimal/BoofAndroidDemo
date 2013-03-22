@@ -3,10 +3,7 @@ package org.boofcv.android;
 import boofcv.abst.feature.describe.ConfigBrief;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
-import boofcv.abst.feature.detect.interest.ConfigFastHessian;
-import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
-import boofcv.abst.feature.detect.interest.ConfigSiftDetector;
-import boofcv.abst.feature.detect.interest.InterestPointDetector;
+import boofcv.abst.feature.detect.interest.*;
 import boofcv.abst.feature.orientation.OrientationImage;
 import boofcv.abst.feature.orientation.OrientationIntegral;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
@@ -90,7 +87,7 @@ public class CreateDetectorDescriptor {
 				break;
 
 			case DETECT_FAST:
-				general = FactoryDetectPoint.createFast(3, 9, 20, 150, imageType);
+				general = FactoryDetectPoint.createFast(new ConfigFast(20,9),new ConfigGeneralDetector(150,3,20), imageType);
 				break;
 
 			default:

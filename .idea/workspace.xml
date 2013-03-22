@@ -28,23 +28,33 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/org/boofcv/android/EnhanceDisplayActivity.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../boofcv/main/visualize/src/boofcv/gui/feature/VisualizeShapes.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/libs/BoofCV.jar" afterPath="$PROJECT_DIR$/libs/BoofCV.jar" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/libs/DDogleg.jar" afterPath="$PROJECT_DIR$/libs/DDogleg.jar" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/libs/EJML.jar" afterPath="$PROJECT_DIR$/libs/EJML.jar" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/libs/GeoRegression.jar" afterPath="$PROJECT_DIR$/libs/GeoRegression.jar" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../boofcv/data" afterPath="$PROJECT_DIR$/../boofcv/data" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/AndroidManifest.xml" afterPath="$PROJECT_DIR$/AndroidManifest.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../boofcv/main/calibration/src/boofcv/abst/calib/WrapPlanarSquareGridTarget.java" afterPath="$PROJECT_DIR$/../boofcv/main/calibration/src/boofcv/abst/calib/WrapPlanarSquareGridTarget.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../boofcv/change.txt" afterPath="$PROJECT_DIR$/../boofcv/change.txt" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/boofcv/android/CreateDetectorDescriptor.java" afterPath="$PROJECT_DIR$/src/org/boofcv/android/CreateDetectorDescriptor.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/boofcv/android/DemoMain.java" afterPath="$PROJECT_DIR$/src/org/boofcv/android/DemoMain.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../boofcv/examples/src/boofcv/examples/ExampleFitPolynomial.java" afterPath="$PROJECT_DIR$/../boofcv/examples/src/boofcv/examples/ExampleFitPolynomial.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../boofcv/main/ip/src/boofcv/struct/PointIndex_I32.java" afterPath="$PROJECT_DIR$/../boofcv/main/ip/src/boofcv/struct/PointIndex_I32.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/res/values/strings.xml" afterPath="$PROJECT_DIR$/res/values/strings.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <list id="99fde06e-1bdc-4abb-801a-55921227c8be" name="Failed commit: Default" comment="" />
     <ignored path="BoofAndroidDemo.iws" />
     <ignored path=".idea/workspace.xml" />
-    <file path="/Dummy.txt" changelist="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" time="1361503147404" ignored="false" />
-    <file path="/fragment.java" changelist="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" time="1360940765569" ignored="false" />
+    <file path="/Dummy.txt" changelist="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" time="1363976498356" ignored="false" />
+    <file path="/fragment.java" changelist="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" time="1363976294103" ignored="false" />
     <file path="/CalibrationComputeActivity.java" changelist="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" time="1361283278708" ignored="false" />
     <file path="/a.java" changelist="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" time="1360953541674" ignored="false" />
     <file path="/DisparityCalculation.java" changelist="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" time="1361304311615" ignored="false" />
     <file path="/DisparityActivity.java" changelist="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" time="1361303882781" ignored="false" />
     <file path="/disparity_controls.xml" changelist="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" time="1360953415581" ignored="false" />
     <file path="/a.xml" changelist="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" time="1360953549448" ignored="false" />
-    <file path="/strings.xml" changelist="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" time="1361194822587" ignored="false" />
+    <file path="/strings.xml" changelist="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" time="1363977575346" ignored="false" />
     <file path="/DdaTrackerDisplayActivity.java" changelist="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" time="1361283644153" ignored="false" />
     <file path="/BlurDisplayActivity.java" changelist="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" time="1360963098127" ignored="false" />
     <file path="/GradientDisplayActivity.java" changelist="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" time="1361288963470" ignored="false" />
@@ -52,14 +62,14 @@
     <file path="/PointDisplayActivity.java" changelist="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" time="1361289047688" ignored="false" />
     <file path="/AboutActivity.java" changelist="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" time="1361195794331" ignored="false" />
     <file path="/about.xml" changelist="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" time="1361195442775" ignored="false" />
-    <file path="/DemoMain.java" changelist="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" time="1361195500448" ignored="false" />
+    <file path="/DemoMain.java" changelist="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" time="1363977226235" ignored="false" />
     <file path="/BinaryDisplayActivity.java" changelist="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" time="1361283063087" ignored="false" />
     <file path="/BoofProcessing.java" changelist="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" time="1361289708449" ignored="false" />
     <file path="/CalibrationActivity.java" changelist="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" time="1361301631760" ignored="false" />
     <file path="/CameraInformationActivity.java" changelist="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" time="1361283297276" ignored="false" />
     <file path="/CameraSpecs.java" changelist="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" time="1361283327090" ignored="false" />
     <file path="/CombinedTrackerDisplayActivity.java" changelist="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" time="1361283340441" ignored="false" />
-    <file path="/CreateDetectorDescriptor.java" changelist="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" time="1361283409991" ignored="false" />
+    <file path="/CreateDetectorDescriptor.java" changelist="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" time="1363976588877" ignored="false" />
     <file path="/change.txt" changelist="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" time="1361503106846" ignored="false" />
     <file path="/KltDisplayActivity.java" changelist="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" time="1361288971674" ignored="false" />
     <file path="/MosaicDisplayActivity.java" changelist="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" time="1361289017870" ignored="false" />
@@ -76,6 +86,9 @@
     <file path="/AssociationVisualize.java" changelist="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" time="1361303423677" ignored="false" />
     <file path="/ConfigChessboard.java" changelist="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" time="1361487073897" ignored="false" />
     <file path="/DetectChessCalibrationPoints.java" changelist="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" time="1361487117144" ignored="false" />
+    <file path="$PROJECT_DIR$/gen/org/boofcv/android/BuildConfig.java" changelist="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" time="1361503345872" ignored="false" />
+    <file path="/AndroidManifest.xml" changelist="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" time="1363976323366" ignored="false" />
+    <file path="/EnhanceDisplayActivity.java" changelist="d0f3e411-9213-42d6-bae8-29d3f7ed2e83" time="1363977640122" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -134,33 +147,15 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="CalibrationComputeActivity.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/org/boofcv/android/CalibrationComputeActivity.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="37" column="13" selection-start="1314" selection-end="1314" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="CalibrationActivity.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/org/boofcv/android/CalibrationActivity.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="45" column="33" selection-start="1561" selection-end="1561" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="calibration_configure.xml" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/res/layout/calibration_configure.xml">
-          <provider editor-type-id="android-designer">
-            <state />
-          </provider>
           <provider selected="true" editor-type-id="text-editor">
-            <state line="27" column="42" selection-start="926" selection-end="926" vertical-scroll-proportion="-7.9411764">
+            <state line="27" column="42" selection-start="926" selection-end="926" vertical-scroll-proportion="0.0">
               <folding />
             </state>
+          </provider>
+          <provider editor-type-id="android-designer">
+            <state />
           </provider>
         </entry>
       </file>
@@ -176,66 +171,78 @@
       <file leaf-file-name="change.txt" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/change.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="7" column="25" selection-start="144" selection-end="144" vertical-scroll-proportion="0.0">
+            <state line="7" column="0" selection-start="144" selection-end="144" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="AndroidManifest.xml" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="AndroidManifest.xml" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/AndroidManifest.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="4" column="36" selection-start="199" selection-end="199" vertical-scroll-proportion="0.08695652">
+            <state line="29" column="55" selection-start="1290" selection-end="1290" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="child_row.xml" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/res/layout/child_row.xml">
-          <provider editor-type-id="android-designer">
-            <state />
+      <file leaf-file-name="BlurDisplayActivity.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/boofcv/android/BlurDisplayActivity.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="21" column="13" selection-start="599" selection-end="599" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
           </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="EnhanceDisplayActivity.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/org/boofcv/android/EnhanceDisplayActivity.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="76" column="18" selection-start="2138" selection-end="2138" vertical-scroll-proportion="1.1928687">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="DemoMain.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/boofcv/android/DemoMain.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="86" column="36" selection-start="2824" selection-end="2824" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="e#6065#6095#0" expanded="true" />
+                <element signature="e#6427#6457#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="strings.xml" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/res/values/strings.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="25" column="18" selection-start="600" selection-end="600" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="CreateDetectorDescriptor.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/boofcv/android/CreateDetectorDescriptor.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="89" column="75" selection-start="3558" selection-end="3558" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="select_algorithm.xml" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/res/layout/select_algorithm.xml">
           <provider selected="true" editor-type-id="text-editor">
             <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-0.0">
               <folding />
             </state>
           </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="camera_info_activity.xml" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/res/layout/camera_info_activity.xml">
           <provider editor-type-id="android-designer">
             <state />
-          </provider>
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="calibration_help.xml" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/res/layout/calibration_help.xml">
-          <provider editor-type-id="android-designer">
-            <state />
-          </provider>
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="20" column="36" selection-start="655" selection-end="655" vertical-scroll-proportion="-5.882353">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="calibration_view.xml" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/res/layout/calibration_view.xml">
-          <provider editor-type-id="android-designer">
-            <state />
-          </provider>
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="20" column="40" selection-start="586" selection-end="610" vertical-scroll-proportion="-5.882353">
-              <folding />
-            </state>
           </provider>
         </entry>
       </file>
@@ -261,11 +268,6 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/src/org/boofcv/android/BoofImageProcessing.java" />
-        <option value="$PROJECT_DIR$/src/org/boofcv/android/BoofProcessing.java" />
-        <option value="$PROJECT_DIR$/src/org/boofcv/android/BoofRenderProcessing.java" />
-        <option value="$PROJECT_DIR$/src/org/boofcv/android/AssociationActivity.java" />
-        <option value="$PROJECT_DIR$/src/org/boofcv/android/DemoMain.java" />
         <option value="$PROJECT_DIR$/res/layout/calibration_help.xml" />
         <option value="$PROJECT_DIR$/res/layout/calibration_view.xml" />
         <option value="$PROJECT_DIR$/src/org/boofcv/android/AssociationVisualize.java" />
@@ -276,7 +278,12 @@
         <option value="$PROJECT_DIR$/res/layout/calibration_configure.xml" />
         <option value="$PROJECT_DIR$/src/org/boofcv/android/CalibrationHelpActivity.java" />
         <option value="$PROJECT_DIR$/change.txt" />
+        <option value="$PROJECT_DIR$/src/org/boofcv/android/HistogramEnhanceDisplayActivity.java" />
         <option value="$PROJECT_DIR$/AndroidManifest.xml" />
+        <option value="$PROJECT_DIR$/src/org/boofcv/android/CreateDetectorDescriptor.java" />
+        <option value="$PROJECT_DIR$/src/org/boofcv/android/DemoMain.java" />
+        <option value="$PROJECT_DIR$/res/values/strings.xml" />
+        <option value="$PROJECT_DIR$/src/org/boofcv/android/EnhanceDisplayActivity.java" />
       </list>
     </option>
   </component>
@@ -319,6 +326,8 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="Scope" />
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -339,12 +348,10 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scope" />
-      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.last.edited" value="SDKs" />
     <property name="GoToFile.includeJavaFiles" value="false" />
     <property name="OverrideImplement.combined" value="false" />
     <property name="project.structure.proportion" value="0.15" />
@@ -364,10 +371,13 @@
     <property name="restartRequiresConfirmation" value="true" />
     <property name="MemberChooser.showClasses" value="true" />
     <property name="GoToClass.includeLibraries" value="false" />
-    <property name="options.searchVisible" value="true" />
     <property name="options.splitter.details.proportions" value="0.2" />
+    <property name="options.searchVisible" value="true" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="org.boofcv.android" />
+    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/res/layout" />
     </key>
@@ -404,6 +414,19 @@
       <option name="PORT" value="5005" />
       <method />
     </configuration>
+    <configuration default="true" type="Applet" factoryName="Applet">
+      <module name="" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="HTML_FILE_NAME" />
+      <option name="HTML_USED" value="false" />
+      <option name="WIDTH" value="400" />
+      <option name="HEIGHT" value="300" />
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <option name="VM_PARAMETERS" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <method />
+    </configuration>
     <configuration default="true" type="TestNG" factoryName="TestNG">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
       <module name="" />
@@ -430,19 +453,6 @@
       <envs />
       <properties />
       <listeners />
-      <method />
-    </configuration>
-    <configuration default="true" type="Applet" factoryName="Applet">
-      <module name="" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="HTML_FILE_NAME" />
-      <option name="HTML_USED" value="false" />
-      <option name="WIDTH" value="400" />
-      <option name="HEIGHT" value="300" />
-      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
-      <option name="VM_PARAMETERS" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
       <method />
     </configuration>
     <configuration default="true" type="Application" factoryName="Application">
@@ -578,7 +588,11 @@
       <created>1361503152124</created>
       <updated>1361503152124</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="forgot to update the manifest">
+      <created>1361503345347</created>
+      <updated>1361503345347</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -591,21 +605,21 @@
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39941692" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39941692" sideWeight="0.49786553" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.39941692" sideWeight="0.49839914" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32944608" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32944608" sideWeight="0.49786553" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Android" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.42468417" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2497332" sideWeight="0.6715258" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32847425" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2497332" sideWeight="0.6005831" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32847425" sideWeight="0.49786553" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32977587" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -653,7 +667,7 @@
     <option name="MAXIMUM_HISTORY_ROWS" value="1000" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="- Changed how grid size is specified for calibration&#10;- tweaked gui" />
+    <option name="LAST_COMMIT_MESSAGE" value="forgot to update the manifest" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="false" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="CHECK_FILES_UP_TO_DATE_BEFORE_COMMIT" value="false" />
@@ -669,6 +683,7 @@
     <MESSAGE value="- Improved handling of switching away and back to the app&#10;- Algorithm selection for stereo" />
     <MESSAGE value="- More debugging information in calibrate&#10;- Colorized association window&#10;- Various UI tweaks" />
     <MESSAGE value="- Changed how grid size is specified for calibration&#10;- tweaked gui" />
+    <MESSAGE value="forgot to update the manifest" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -678,46 +693,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/org/boofcv/android/BoofProcessing.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="11" column="17" selection-start="233" selection-end="233" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/boofcv/android/BoofImageProcessing.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="12" column="22" selection-start="303" selection-end="303" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/boofcv/android/VideoDisplayActivity.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="199" column="19" selection-start="5125" selection-end="5125" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../boofcv/integration/android/src/boofcv/android/ConvertNV21.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="2" column="26" selection-start="51" selection-end="51" vertical-scroll-proportion="0.043541364" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/boofcv/android/DisparityActivity.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="281" column="50" selection-start="8095" selection-end="8095" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/boofcv/android/DisparityCalculation.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="252" column="87" selection-start="8139" selection-end="8139" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/org/boofcv/android/CalibrationComputeActivity.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="37" column="13" selection-start="1314" selection-end="1314" vertical-scroll-proportion="0.0">
@@ -733,53 +708,53 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/res/layout/calibration_help.xml">
-      <provider editor-type-id="android-designer">
-        <state />
-      </provider>
       <provider selected="true" editor-type-id="text-editor">
-        <state line="20" column="36" selection-start="655" selection-end="655" vertical-scroll-proportion="-5.882353">
+        <state line="20" column="36" selection-start="655" selection-end="655" vertical-scroll-proportion="0.0">
           <folding />
         </state>
+      </provider>
+      <provider editor-type-id="android-designer">
+        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/res/layout/child_row.xml">
-      <provider editor-type-id="android-designer">
-        <state />
-      </provider>
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
           <folding />
         </state>
+      </provider>
+      <provider editor-type-id="android-designer">
+        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/res/layout/camera_info_activity.xml">
-      <provider editor-type-id="android-designer">
-        <state />
-      </provider>
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/res/layout/calibration_view.xml">
       <provider editor-type-id="android-designer">
         <state />
       </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/res/layout/calibration_view.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="20" column="40" selection-start="586" selection-end="610" vertical-scroll-proportion="-5.882353">
+        <state line="20" column="36" selection-start="586" selection-end="610" vertical-scroll-proportion="0.0">
           <folding />
         </state>
+      </provider>
+      <provider editor-type-id="android-designer">
+        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/res/layout/calibration_configure.xml">
-      <provider editor-type-id="android-designer">
-        <state />
-      </provider>
       <provider selected="true" editor-type-id="text-editor">
-        <state line="27" column="42" selection-start="926" selection-end="926" vertical-scroll-proportion="-7.9411764">
+        <state line="27" column="42" selection-start="926" selection-end="926" vertical-scroll-proportion="0.0">
           <folding />
         </state>
+      </provider>
+      <provider editor-type-id="android-designer">
+        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/org/boofcv/android/CalibrationHelpActivity.java">
@@ -791,14 +766,62 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/change.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="7" column="25" selection-start="144" selection-end="144" vertical-scroll-proportion="0.0">
+        <state line="7" column="0" selection-start="144" selection-end="144" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/boofcv/android/BlurDisplayActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="21" column="13" selection-start="599" selection-end="599" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/res/layout/select_algorithm.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+      <provider editor-type-id="android-designer">
+        <state />
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/AndroidManifest.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="4" column="36" selection-start="199" selection-end="199" vertical-scroll-proportion="0.08695652">
+        <state line="29" column="55" selection-start="1290" selection-end="1290" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/boofcv/android/DemoMain.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="86" column="36" selection-start="2824" selection-end="2824" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="e#6065#6095#0" expanded="true" />
+            <element signature="e#6427#6457#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/res/values/strings.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="25" column="18" selection-start="600" selection-end="600" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/boofcv/android/CreateDetectorDescriptor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="89" column="75" selection-start="3558" selection-end="3558" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/boofcv/android/EnhanceDisplayActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="76" column="18" selection-start="2138" selection-end="2138" vertical-scroll-proportion="1.1928687">
           <folding />
         </state>
       </provider>
@@ -832,6 +855,7 @@
       </state>
       <state key="GlobalLibrariesConfigurable.UI">
         <settings>
+          <last-edited>Apache</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
@@ -843,7 +867,7 @@
       </state>
       <state key="JdkListConfigurable.UI">
         <settings>
-          <last-edited>1.7</last-edited>
+          <last-edited>Android 4.2 Platform</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>

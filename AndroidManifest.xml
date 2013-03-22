@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 		  package="org.boofcv.android"
-		  android:versionCode="3"
-		  android:versionName="1.1.1">
+		  android:versionCode="4"
+		  android:versionName="1.3">
 	<uses-sdk android:minSdkVersion="10" android:targetSdkVersion="17" />
 
 	<uses-permission android:name="android.permission.CAMERA" />
@@ -27,6 +27,7 @@
 		<activity android:name=".VideoDisplayActivity" android:screenOrientation="landscape"/>
 		<activity android:name=".PreferenceActivity"/>
 		<activity android:name=".BlurDisplayActivity" android:screenOrientation="landscape"/>
+		<activity android:name=".EnhanceDisplayActivity" android:screenOrientation="landscape"/>
 		<activity android:name=".GradientDisplayActivity" android:screenOrientation="landscape"/>
 		<activity android:name=".BinaryDisplayActivity" android:screenOrientation="landscape"/>
 		<activity android:name=".PointDisplayActivity" android:screenOrientation="landscape"/>

@@ -79,13 +79,14 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 	private void createGroups() {
 		Group ip = new Group("Image Processing");
 		Group detect = new Group("Detection");
-		Group assoc = new Group("Assocation");
+		Group assoc = new Group("Association");
 		Group track = new Group("Tracking");
 		Group sfm = new Group("Structure From Motion");
 
 		ip.addChild("Blur",BlurDisplayActivity.class);
 		ip.addChild("Gradient",GradientDisplayActivity.class);
 		ip.addChild("Binary Ops",BinaryDisplayActivity.class);
+		ip.addChild("Enhance",EnhanceDisplayActivity.class);
 
 		detect.addChild("Corner/Blob",PointDisplayActivity.class);
 		detect.addChild("Scale Space",ScalePointDisplayActivity.class);
