@@ -8,6 +8,7 @@ import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.android.ConvertBitmap;
 import boofcv.struct.FastQueue;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_F64;
 
@@ -54,7 +55,7 @@ public class PointTrackerDisplayActivity extends VideoDisplayActivity {
 
 
 		public PointProcessing( PointTracker<ImageUInt8> tracker ) {
-			super(ImageUInt8.class);
+			super(ImageDataType.single(ImageUInt8.class));
 			this.tracker = tracker;
 		}
 

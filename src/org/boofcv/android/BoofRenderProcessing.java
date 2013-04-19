@@ -5,7 +5,10 @@ import android.hardware.Camera;
 import android.view.View;
 import boofcv.android.ConvertNV21;
 import boofcv.core.image.GeneralizedImageOps;
+import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.MultiSpectral;
 import georegression.struct.point.Point2D_F64;
 
 /**
@@ -14,9 +17,9 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public abstract class BoofRenderProcessing<T extends ImageSingleBand> extends Thread implements BoofProcessing {
+public abstract class BoofRenderProcessing<T extends ImageBase> extends Thread implements BoofProcessing {
 
-	Class<T> imageType;
+	ImageDataType<T> imageType;
 	T gray;
 	T gray2;
 
@@ -37,7 +40,7 @@ public abstract class BoofRenderProcessing<T extends ImageSingleBand> extends Th
 	double scale;
 	double tranX,tranY;
 
-	protected BoofRenderProcessing(Class<T> imageType) {
+	protected BoofRenderProcessing(ImageDataType<T> imageType) {
 		this.imageType = imageType;
 	}
 
@@ -97,7 +100,10 @@ public abstract class BoofRenderProcessing<T extends ImageSingleBand> extends Th
 			return;
 
 		synchronized ( lockConvert ) {
-			ConvertNV21.nv21ToGray(bytes, gray.width, gray.height, gray,imageType);
+			if( imageType.getFamily() == ImageDataType.Family.SINGLE_BAND )
+				ConvertNV21.nv21ToGray(bytes, gray.width, gray.height, (ImageSingleBand)gray,(Class)gray.getClass());
+			else
+				ConvertNV21.nv21ToMsRgb_U8(bytes, gray.width, gray.height, (MultiSpectral) gray );
 		}
 		// wake up the thread and tell it to do some processing
 		thread.interrupt();
@@ -158,7 +164,7 @@ public abstract class BoofRenderProcessing<T extends ImageSingleBand> extends Th
 	protected abstract void render(  Canvas canvas , double imageToOutput );
 
 	protected void declareImages( int width , int height ) {
-		gray = GeneralizedImageOps.createSingleBand(imageType,width,height);
-		gray2 = GeneralizedImageOps.createSingleBand(imageType,width,height);
+		gray = imageType.createImage(width,height,3);
+		gray2 = imageType.createImage(width, height, 3);
 	}
 }

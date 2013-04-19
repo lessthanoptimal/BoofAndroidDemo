@@ -1,15 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="AntConfiguration">
-    <defaultAnt bundledAnt="true" />
-    <buildFile url="file://$PROJECT_DIR$/build.xml">
-      <additionalClassPath />
-      <antReference projectDefault="true" />
-      <customJdkName value="" />
-      <maximumHeapSize value="128" />
-      <maximumStackSize value="2" />
-      <properties />
-    </buildFile>
+    <buildFile url="file://$PROJECT_DIR$/build.xml" />
   </component>
   <component name="CompilerConfiguration">
     <option name="DEFAULT_COMPILER" value="Javac" />
@@ -43,6 +35,7 @@
   <component name="EntryPointsManager">
     <entry_points version="2.0" />
   </component>
+  <component name="IdProvider" IDEtalkID="751FDF0FA5FC5A38A101237E43F90D45" />
   <component name="Palette2">
     <group name="Swing">
       <item class="com.intellij.uiDesigner.HSpacer" tooltip-text="Horizontal Spacer" icon="/com/intellij/uiDesigner/icons/hspacer.png" removable="false" auto-create-binding="false" can-attach-label="false">
@@ -167,9 +160,19 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/BoofAndroidDemo.iml" filepath="$PROJECT_DIR$/BoofAndroidDemo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../boofcv/integration/android/BoofCV Android.iml" filepath="$PROJECT_DIR$/../boofcv/integration/android/BoofCV Android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../boofcv/main/calibration/BoofCV Calibration.iml" filepath="$PROJECT_DIR$/../boofcv/main/calibration/BoofCV Calibration.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../boofcv/main/feature/BoofCV Feature.iml" filepath="$PROJECT_DIR$/../boofcv/main/feature/BoofCV Feature.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../boofcv/main/geo/BoofCV Geometric Vision.iml" filepath="$PROJECT_DIR$/../boofcv/main/geo/BoofCV Geometric Vision.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../boofcv/main/io/BoofCV IO.iml" filepath="$PROJECT_DIR$/../boofcv/main/io/BoofCV IO.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../boofcv/main/ip/BoofCV Image Processing.iml" filepath="$PROJECT_DIR$/../boofcv/main/ip/BoofCV Image Processing.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../boofcv/main/sfm/BoofCV SFM.iml" filepath="$PROJECT_DIR$/../boofcv/main/sfm/BoofCV SFM.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../ddogleg/DDogleg.iml" filepath="$PROJECT_DIR$/../ddogleg/DDogleg.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../georegression/GeoRegression.iml" filepath="$PROJECT_DIR$/../georegression/GeoRegression.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../ejml/trunk/ejml.iml" filepath="$PROJECT_DIR$/../ejml/trunk/ejml.iml" />
     </modules>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="Android 4.2 Platform" project-jdk-type="Android SDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="Android 4.2.2 Platform" project-jdk-type="Android SDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
   <component name="SvnBranchConfigurationManager">
@@ -177,6 +180,10 @@
   </component>
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../boofcv" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../ddogleg" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../ejml/trunk" vcs="svn" />
+    <mapping directory="$PROJECT_DIR$/../georegression" vcs="Git" />
   </component>
   <component name="libraryTable">
     <library name="testing">

@@ -19,6 +19,7 @@ import boofcv.core.image.ConvertImage;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.ScalePoint;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_F64;
@@ -111,7 +112,7 @@ public class ScalePointDisplayActivity extends VideoDisplayActivity
 		FastQueue<ScalePoint> foundGUI = new FastQueue<ScalePoint>(ScalePoint.class,true);
 
 		public PointProcessing(InterestPointDetector<ImageUInt8> detector) {
-			super(ImageUInt8.class);
+			super(ImageDataType.single(ImageUInt8.class));
 			this.detector = detector;
 		}
 

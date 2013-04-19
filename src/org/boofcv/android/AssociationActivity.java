@@ -15,6 +15,7 @@ import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
 
@@ -165,7 +166,7 @@ public class AssociationActivity extends VideoDisplayActivity
 
 		public AssociationProcessing( DetectDescribePoint<ImageFloat32,Desc> detDesc ,
 									  AssociateDescription<Desc> associate  ) {
-			super(ImageFloat32.class);
+			super(ImageDataType.single(ImageFloat32.class));
 			this.detDesc = detDesc;
 			this.associate = associate;
 

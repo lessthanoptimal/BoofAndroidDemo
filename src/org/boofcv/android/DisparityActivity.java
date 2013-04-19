@@ -21,6 +21,7 @@ import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.feature.disparity.DisparityAlgorithms;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.struct.feature.SurfFeature;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
 
 /**
@@ -182,7 +183,7 @@ public class DisparityActivity extends VideoDisplayActivity
 		int disparityMin,disparityMax;
 
 		public DisparityProcessing() {
-			super(ImageFloat32.class);
+			super(ImageDataType.single(ImageFloat32.class));
 
 			DetectDescribePoint<ImageFloat32, SurfFeature> detDesc =
 					FactoryDetectDescribe.surfFast(null,null,null,ImageFloat32.class);

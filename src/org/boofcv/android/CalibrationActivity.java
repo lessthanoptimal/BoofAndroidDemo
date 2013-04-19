@@ -24,6 +24,7 @@ import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.struct.FastQueue;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
@@ -249,7 +250,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 		byte[] storage;
 
 		protected DetectTarget( PlanarCalibrationDetector detector ) {
-			super(ImageFloat32.class);
+			super(ImageDataType.single(ImageFloat32.class));
 			this.detector = detector;
 		}
 
