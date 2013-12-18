@@ -12,12 +12,12 @@ import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.alg.feature.UtilFeature;
 import boofcv.factory.feature.associate.FactoryAssociation;
-import boofcv.struct.FastQueue;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
+import org.ddogleg.struct.FastQueue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -166,7 +166,7 @@ public class AssociationActivity extends VideoDisplayActivity
 
 		public AssociationProcessing( DetectDescribePoint<ImageFloat32,Desc> detDesc ,
 									  AssociateDescription<Desc> associate  ) {
-			super(ImageDataType.single(ImageFloat32.class));
+			super(ImageType.single(ImageFloat32.class));
 			this.detDesc = detDesc;
 			this.associate = associate;
 

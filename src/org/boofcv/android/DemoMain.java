@@ -80,13 +80,15 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		Group ip = new Group("Image Processing");
 		Group detect = new Group("Detection");
 		Group assoc = new Group("Association");
-		Group track = new Group("Tracking");
+		Group trackPoint = new Group("Point Tracking");
+		Group trackObj = new Group("Object Tracking");
 		Group sfm = new Group("Structure From Motion");
 
 		ip.addChild("Blur",BlurDisplayActivity.class);
 		ip.addChild("Gradient",GradientDisplayActivity.class);
 		ip.addChild("Binary Ops",BinaryDisplayActivity.class);
 		ip.addChild("Enhance",EnhanceDisplayActivity.class);
+		ip.addChild("Transform",ImageTransformActivity.class);
 
 		detect.addChild("Corner/Blob",PointDisplayActivity.class);
 		detect.addChild("Scale Space",ScalePointDisplayActivity.class);
@@ -94,9 +96,9 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 
 		assoc.addChild("Two Pictures",AssociationActivity.class);
 
-		track.addChild("KLT",KltDisplayActivity.class);
-		track.addChild("Det-Desc-Assoc",DdaTrackerDisplayActivity.class);
-		track.addChild("Combined",CombinedTrackerDisplayActivity.class);
+		trackPoint.addChild("KLT", KltDisplayActivity.class);
+		trackPoint.addChild("Det-Desc-Assoc", DdaTrackerDisplayActivity.class);
+		trackPoint.addChild("Combined", CombinedTrackerDisplayActivity.class);
 
 		sfm.addChild("Calibration",CalibrationActivity.class);
 		sfm.addChild("Stereo",DisparityActivity.class);
@@ -106,7 +108,8 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		groups.add(ip);
 		groups.add(detect);
 		groups.add(assoc);
-		groups.add(track);
+		groups.add(trackPoint);
+		groups.add(trackObj);
 		groups.add(sfm);
 	}
 

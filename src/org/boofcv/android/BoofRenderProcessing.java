@@ -4,10 +4,9 @@ import android.graphics.Canvas;
 import android.hardware.Camera;
 import android.view.View;
 import boofcv.android.ConvertNV21;
-import boofcv.core.image.GeneralizedImageOps;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.MultiSpectral;
 import georegression.struct.point.Point2D_F64;
 
@@ -19,7 +18,7 @@ import georegression.struct.point.Point2D_F64;
  */
 public abstract class BoofRenderProcessing<T extends ImageBase> extends Thread implements BoofProcessing {
 
-	ImageDataType<T> imageType;
+	ImageType<T> imageType;
 	T gray;
 	T gray2;
 
@@ -40,7 +39,7 @@ public abstract class BoofRenderProcessing<T extends ImageBase> extends Thread i
 	double scale;
 	double tranX,tranY;
 
-	protected BoofRenderProcessing(ImageDataType<T> imageType) {
+	protected BoofRenderProcessing(ImageType<T> imageType) {
 		this.imageType = imageType;
 	}
 
@@ -100,7 +99,7 @@ public abstract class BoofRenderProcessing<T extends ImageBase> extends Thread i
 			return;
 
 		synchronized ( lockConvert ) {
-			if( imageType.getFamily() == ImageDataType.Family.SINGLE_BAND )
+			if( imageType.getFamily() == ImageType.Family.SINGLE_BAND )
 				ConvertNV21.nv21ToGray(bytes, gray.width, gray.height, (ImageSingleBand)gray,(Class)gray.getClass());
 			else
 				ConvertNV21.nv21ToMsRgb_U8(bytes, gray.width, gray.height, (MultiSpectral) gray );
@@ -164,7 +163,7 @@ public abstract class BoofRenderProcessing<T extends ImageBase> extends Thread i
 	protected abstract void render(  Canvas canvas , double imageToOutput );
 
 	protected void declareImages( int width , int height ) {
-		gray = imageType.createImage(width,height,3);
-		gray2 = imageType.createImage(width, height, 3);
+		gray = imageType.createImage(width, height);
+		gray2 = imageType.createImage(width, height);
 	}
 }

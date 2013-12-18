@@ -18,6 +18,12 @@
 		<item>Median</item>
 	</string-array>
 
+	<string-array name="transforms">
+		<item>DFT</item>
+		<item>Pyramid</item>
+		<item>Wavelet</item>
+	</string-array>
+
 	<string-array name="enhance">
 		<item>Histogram Global</item>
 		<item>Histogram Local</item>

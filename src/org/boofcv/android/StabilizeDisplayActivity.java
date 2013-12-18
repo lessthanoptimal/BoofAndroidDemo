@@ -18,14 +18,14 @@ import boofcv.alg.sfm.d2.StitchingFromMotion2D;
 import boofcv.android.ConvertBitmap;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.factory.sfm.FactoryMotion2D;
-import boofcv.struct.FastQueue;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.homo.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.transform.homo.HomographyPointOps_F64;
+import org.ddogleg.struct.FastQueue;
 
 import java.util.List;
 
@@ -119,7 +119,7 @@ implements CompoundButton.OnCheckedChangeListener
 		FastQueue<Point2D_F64> outliersGui = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
 
 		public PointProcessing( StitchingFromMotion2D<ImageUInt8,Affine2D_F64> alg  ) {
-			super(ImageDataType.single(ImageUInt8.class));
+			super(ImageType.single(ImageUInt8.class));
 			this.alg = alg;
 		}
 

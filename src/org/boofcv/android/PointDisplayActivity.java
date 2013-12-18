@@ -21,8 +21,8 @@ import boofcv.android.ConvertBitmap;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_I16;
 
@@ -159,7 +159,7 @@ public class PointDisplayActivity extends VideoDisplayActivity
 
 		public PointProcessing(GeneralFeatureIntensity<ImageUInt8, ImageSInt16> intensity,
 							   NonMaxSuppression nonmax) {
-			super(ImageDataType.single(ImageUInt8.class));
+			super(ImageType.single(ImageUInt8.class));
 			GeneralFeatureDetector<ImageUInt8,ImageSInt16> general =
 			new GeneralFeatureDetector<ImageUInt8, ImageSInt16>(intensity,nonmax);
 

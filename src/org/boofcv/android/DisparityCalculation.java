@@ -19,19 +19,21 @@ import boofcv.alg.sfm.robust.Se3FromEssentialGenerator;
 import boofcv.factory.geo.EnumEpipolar;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.factory.geo.FactoryTriangulate;
-import boofcv.struct.FastQueue;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.ImageFloat32;
+import georegression.fitting.se.ModelManagerSe3_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
 import org.ddogleg.fitting.modelset.DistanceFromModel;
 import org.ddogleg.fitting.modelset.ModelGenerator;
+import org.ddogleg.fitting.modelset.ModelManager;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
+import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DenseMatrix64F;
 
 import java.util.ArrayList;
@@ -221,8 +223,10 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 		// 1/2 a pixel tolerance for RANSAC inliers
 		double ransacTOL = 0.5 * 0.5 * 2.0;
 
+		ModelManager<Se3_F64> mm = new ModelManagerSe3_F64();
+
 		ModelMatcher<Se3_F64, AssociatedPair> epipolarMotion =
-				new Ransac<Se3_F64, AssociatedPair>(2323, generateEpipolarMotion, distanceSe3,
+				new Ransac<Se3_F64, AssociatedPair>(2323, mm,generateEpipolarMotion, distanceSe3,
 						300, ransacTOL);
 
 		if (!epipolarMotion.process(matchedNorm)) {
@@ -233,7 +237,7 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 		createInliersList(epipolarMotion);
 
 		numInside--;
-		return epipolarMotion.getModel();
+		return epipolarMotion.getModelParameters();
 	}
 
 	/**

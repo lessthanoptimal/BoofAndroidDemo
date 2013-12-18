@@ -15,12 +15,12 @@ import boofcv.abst.feature.detect.line.DetectLineSegment;
 import boofcv.alg.feature.detect.line.LineImageOps;
 import boofcv.android.ConvertBitmap;
 import boofcv.factory.feature.detect.line.FactoryDetectLineAlgs;
-import boofcv.struct.FastQueue;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.line.LineParametric2D_F32;
 import georegression.struct.line.LineSegment2D_F32;
+import org.ddogleg.struct.FastQueue;
 
 import java.util.List;
 
@@ -159,12 +159,12 @@ public class LineDisplayActivity extends VideoDisplayActivity
 		byte[] storage;
 
 		public LineProcessing(DetectLine<ImageUInt8> detector) {
-			super(ImageDataType.single(ImageUInt8.class));
+			super(ImageType.single(ImageUInt8.class));
 			this.detector = detector;
 		}
 
 		public LineProcessing(DetectLineSegment<ImageUInt8> detectorSegment) {
-			super(ImageDataType.single(ImageUInt8.class));
+			super(ImageType.single(ImageUInt8.class));
 			this.detectorSegment = detectorSegment;
 		}
 

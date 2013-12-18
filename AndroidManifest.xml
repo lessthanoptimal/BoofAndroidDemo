@@ -47,5 +47,6 @@
 		<activity android:name=".AboutActivity"/>
 		<activity android:name=".CalibrationHelpActivity"/>
 		<activity android:name=".ShapeFitDisplayActivity"/>
-	</application>
+        <activity android:name=".ImageTransformActivity" android:screenOrientation="landscape"/>
+    </application>
 </manifest>

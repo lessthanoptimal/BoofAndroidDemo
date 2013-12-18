@@ -11,6 +11,7 @@ import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.tracker.PointTracker;
+import boofcv.alg.tracker.klt.PkltConfig;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.struct.feature.TupleDesc_B;
@@ -95,7 +96,11 @@ public class CombinedTrackerDisplayActivity extends PointTrackerDisplayActivity
 
 		AssociateDescription<TupleDesc_B> association = FactoryAssociation.greedy(score, Double.MAX_VALUE, true);
 
-		return FactoryPointTracker.combined(detDesc,association,3,new int[]{1,2,4},75,ImageUInt8.class);
+		PkltConfig config = new PkltConfig();
+		config.templateRadius = 3;
+		config.pyramidScaling = new int[]{1,2,4};
+
+		return FactoryPointTracker.combined(detDesc,association,config,75,ImageUInt8.class);
 	}
 
 	@Override

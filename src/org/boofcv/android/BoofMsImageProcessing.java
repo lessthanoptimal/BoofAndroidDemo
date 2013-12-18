@@ -3,7 +3,7 @@ package org.boofcv.android;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import boofcv.android.ConvertBitmap;
-import boofcv.struct.image.ImageDataType;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
 
@@ -22,7 +22,7 @@ public abstract class BoofMsImageProcessing extends BoofRenderProcessing<MultiSp
 	byte[] storage;
 
 	protected BoofMsImageProcessing() {
-		super(ImageDataType.ms(ImageUInt8.class));
+		super(ImageType.ms(3,ImageUInt8.class));
 	}
 
 	@Override

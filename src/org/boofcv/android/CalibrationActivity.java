@@ -17,17 +17,16 @@ import android.view.View;
 import android.widget.*;
 import boofcv.abst.calib.*;
 import boofcv.alg.feature.detect.chess.DetectChessCalibrationPoints;
-import boofcv.alg.feature.detect.grid.AutoThresholdCalibrationGrid;
 import boofcv.alg.feature.detect.grid.DetectSquareCalibrationPoints;
 import boofcv.alg.feature.detect.quadblob.QuadBlob;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
-import boofcv.struct.FastQueue;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
+import org.ddogleg.struct.FastQueue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -250,7 +249,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 		byte[] storage;
 
 		protected DetectTarget( PlanarCalibrationDetector detector ) {
-			super(ImageDataType.single(ImageFloat32.class));
+			super(ImageType.single(ImageFloat32.class));
 			this.detector = detector;
 		}
 
@@ -302,8 +301,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 						VisualizeImageData.binaryToBitmap(alg.getBinary(), bitmap, storage);
 						extractQuads(((WrapPlanarChessTarget) detector).getAlg());
 					} else if( detector instanceof WrapPlanarSquareGridTarget ) {
-						AutoThresholdCalibrationGrid alg = ((WrapPlanarSquareGridTarget) detector).getAutoThreshold();
-						VisualizeImageData.binaryToBitmap(alg.getBinary(), bitmap, storage);
+						VisualizeImageData.binaryToBitmap(((WrapPlanarSquareGridTarget) detector).getBinary(), bitmap, storage);
 						extractQuads(((WrapPlanarSquareGridTarget) detector).getDetect());
 					}
 				}

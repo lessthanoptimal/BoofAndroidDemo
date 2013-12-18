@@ -21,8 +21,8 @@ import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.feature.disparity.DisparityAlgorithms;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.struct.feature.SurfFeature;
-import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.ImageType;
 
 /**
  * Computes the stereo disparity between two images captured by the camera.  The user selects the images and which
@@ -183,7 +183,7 @@ public class DisparityActivity extends VideoDisplayActivity
 		int disparityMin,disparityMax;
 
 		public DisparityProcessing() {
-			super(ImageDataType.single(ImageFloat32.class));
+			super(ImageType.single(ImageFloat32.class));
 
 			DetectDescribePoint<ImageFloat32, SurfFeature> detDesc =
 					FactoryDetectDescribe.surfFast(null,null,null,ImageFloat32.class);
