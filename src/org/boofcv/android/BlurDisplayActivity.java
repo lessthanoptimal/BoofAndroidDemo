@@ -12,6 +12,7 @@ import android.widget.Spinner;
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.android.ConvertBitmap;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 
 /**
@@ -73,11 +74,12 @@ public class BlurDisplayActivity extends VideoDisplayActivity
 	@Override
 	public void onNothingSelected(AdapterView<?> adapterView) {}
 
-	protected class BlurProcessing extends BoofImageProcessing {
+	protected class BlurProcessing extends BoofImageProcessing<ImageUInt8> {
 		ImageUInt8 blurred;
 		BlurFilter<ImageUInt8> filter;
 
 		public BlurProcessing(BlurFilter<ImageUInt8> filter) {
+			super(ImageType.single(ImageUInt8.class));
 			this.filter = filter;
 		}
 

@@ -10,6 +10,7 @@ import boofcv.alg.enhance.EnhanceImageOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.android.ConvertBitmap;
 import boofcv.core.image.ConvertImage;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
 
@@ -104,8 +105,12 @@ public class EnhanceDisplayActivity extends VideoDisplayActivity
 		startBlurProcess(spinnerView.getSelectedItemPosition(),isChecked);
 	}
 
-	protected abstract class EnhanceProcessing extends BoofImageProcessing {
+	protected abstract class EnhanceProcessing extends BoofImageProcessing<ImageUInt8> {
 		ImageUInt8 enhanced;
+
+		protected EnhanceProcessing() {
+			super(ImageType.single(ImageUInt8.class));
+		}
 
 		@Override
 		public void init(View view, Camera camera) {

@@ -85,10 +85,14 @@ public class ImageTransformActivity extends VideoDisplayActivity
 		}
 	}
 
-	protected class FourierProcessing extends BoofImageProcessing {
+	protected class FourierProcessing extends BoofImageProcessing<ImageUInt8> {
 		DiscreteFourierTransform<ImageFloat32,InterleavedF32> dft = DiscreteFourierTransformOps.createTransformF32();
 		ImageFloat32 grayF;
 		InterleavedF32 transform;
+
+		protected FourierProcessing() {
+			super(ImageType.single(ImageUInt8.class));
+		}
 
 		@Override
 		public void init(View view, Camera camera) {
@@ -114,12 +118,16 @@ public class ImageTransformActivity extends VideoDisplayActivity
 	}
 
 	protected class PyramidProcessing<C extends WlCoef>
-			extends BoofImageProcessing
+			extends BoofImageProcessing<ImageUInt8>
 	{
 		ImagePyramid<ImageUInt8> pyramid = FactoryPyramid.discreteGaussian(new int[]{2,4,8,16},-1,2,false,ImageUInt8.class);
 
 		ImageUInt8 output;
 		ImageUInt8 sub = new ImageUInt8();
+
+		protected PyramidProcessing() {
+			super(ImageType.single(ImageUInt8.class));
+		}
 
 		@Override
 		public void init(View view, Camera camera) {
@@ -154,12 +162,16 @@ public class ImageTransformActivity extends VideoDisplayActivity
 	}
 
 	protected class WaveletProcessing<C extends WlCoef>
-			extends BoofImageProcessing
+			extends BoofImageProcessing<ImageUInt8>
 	{
 		WaveletDescription<C> desc = GFactoryWavelet.haar(ImageUInt8.class);
 		WaveletTransform<ImageUInt8,ImageSInt32,C> waveletTran =
 				FactoryWaveletTransform.create(ImageUInt8.class, desc, 3, 0, 255);
 		ImageSInt32 transform;
+
+		protected WaveletProcessing() {
+			super(ImageType.single(ImageUInt8.class));
+		}
 
 		@Override
 		public void init(View view, Camera camera) {

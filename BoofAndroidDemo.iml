@@ -24,6 +24,7 @@
     <orderEntry type="module" module-name="DDogleg" />
     <orderEntry type="module" module-name="ejml" />
     <orderEntry type="module" module-name="GeoRegression" />
+    <orderEntry type="module" module-name="BoofCV Recognition" />
   </component>
 </module>
 

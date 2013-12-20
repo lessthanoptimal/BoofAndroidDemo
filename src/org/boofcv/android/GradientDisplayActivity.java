@@ -13,6 +13,7 @@ import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.android.VisualizeImageData;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 
 /**
@@ -82,12 +83,13 @@ implements AdapterView.OnItemSelectedListener
 	@Override
 	public void onNothingSelected(AdapterView<?> adapterView) {}
 
-	protected class GradientProcessing extends BoofImageProcessing {
+	protected class GradientProcessing extends BoofImageProcessing<ImageUInt8> {
 		ImageSInt16 derivX;
 		ImageSInt16 derivY;
 		ImageGradient<ImageUInt8,ImageSInt16> gradient;
 
 		public GradientProcessing(ImageGradient<ImageUInt8,ImageSInt16> gradient) {
+			super(ImageType.single(ImageUInt8.class));
 			this.gradient = gradient;
 		}
 

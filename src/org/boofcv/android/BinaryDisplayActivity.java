@@ -9,6 +9,7 @@ import android.widget.*;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.android.VisualizeImageData;
+import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 
 /**
@@ -82,9 +83,13 @@ public class BinaryDisplayActivity extends VideoDisplayActivity
 	@Override
 	public void onNothingSelected(AdapterView<?> adapterView) {}
 
-	protected class ThresholdProcessing extends BoofImageProcessing {
+	protected class ThresholdProcessing extends BoofImageProcessing<ImageUInt8> {
 		ImageUInt8 binary;
 		ImageUInt8 afterOps;
+
+		protected ThresholdProcessing() {
+			super(ImageType.single(ImageUInt8.class));
+		}
 
 		@Override
 		public void init(View view, Camera camera) {

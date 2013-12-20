@@ -3,15 +3,15 @@ package org.boofcv.android;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import boofcv.android.ConvertBitmap;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 
 /**
  * Visualizes a process where the output is simply a rendered Bitmap image.
  *
  * @author Peter Abeles
  */
-public abstract class BoofImageProcessing extends BoofRenderProcessing<ImageUInt8> {
+public abstract class BoofImageProcessing<T extends ImageBase> extends BoofRenderProcessing<T> {
 
 	// output image which is modified by processing thread
 	Bitmap output;
@@ -20,8 +20,8 @@ public abstract class BoofImageProcessing extends BoofRenderProcessing<ImageUInt
 	// storage used during image convert
 	byte[] storage;
 
-	protected BoofImageProcessing() {
-		super(ImageType.single(ImageUInt8.class));
+	protected BoofImageProcessing(ImageType<T> imageType ) {
+		super(imageType);
 	}
 
 	@Override
@@ -33,7 +33,7 @@ public abstract class BoofImageProcessing extends BoofRenderProcessing<ImageUInt
 	}
 
 	@Override
-	protected void process(ImageUInt8 gray) {
+	protected void process(T gray) {
 		process(gray,output,storage);
 		synchronized ( lockGui ) {
 			Bitmap tmp = output;
@@ -47,5 +47,5 @@ public abstract class BoofImageProcessing extends BoofRenderProcessing<ImageUInt
 		canvas.drawBitmap(outputGUI,0,0,null);
 	}
 
-	protected abstract void process( ImageUInt8 gray , Bitmap output , byte[] storage );
+	protected abstract void process( T gray , Bitmap output , byte[] storage );
 }

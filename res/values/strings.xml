@@ -18,6 +18,19 @@
 		<item>Median</item>
 	</string-array>
 
+	<string-array name="shapes">
+		<item>Ellipse</item>
+		<item>Polygon</item>
+	</string-array>
+
+	<string-array name="tracking_objects">
+		<item>Circulant</item>
+		<item>Mean-Shift</item>
+		<item>Mean-Shift Scale</item>
+		<item>Sparse Flow</item>
+		<item>TLD</item>
+	</string-array>
+
 	<string-array name="transforms">
 		<item>DFT</item>
 		<item>Pyramid</item>

@@ -4,10 +4,7 @@ import android.graphics.Canvas;
 import android.hardware.Camera;
 import android.view.View;
 import boofcv.android.ConvertNV21;
-import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageSingleBand;
-import boofcv.struct.image.ImageType;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.*;
 import georegression.struct.point.Point2D_F64;
 
 /**
@@ -92,6 +89,11 @@ public abstract class BoofRenderProcessing<T extends ImageBase> extends Thread i
 		pt.y = y/scale - tranY/scale;
 	}
 
+	protected void outputToImage( double x , double y , Point2D_F64 pt ) {
+		pt.x = x*scale + tranX;
+		pt.y = y*scale + tranY;
+	}
+
 
 	@Override
 	public void convertPreview(byte[] bytes, Camera camera) {
@@ -101,8 +103,16 @@ public abstract class BoofRenderProcessing<T extends ImageBase> extends Thread i
 		synchronized ( lockConvert ) {
 			if( imageType.getFamily() == ImageType.Family.SINGLE_BAND )
 				ConvertNV21.nv21ToGray(bytes, gray.width, gray.height, (ImageSingleBand)gray,(Class)gray.getClass());
-			else
-				ConvertNV21.nv21ToMsRgb_U8(bytes, gray.width, gray.height, (MultiSpectral) gray );
+			else if( imageType.getFamily() == ImageType.Family.MULTI_SPECTRAL ) {
+				if( imageType.getDataType() == ImageDataType.U8)
+					ConvertNV21.nv21ToMsRgb_U8(bytes, gray.width, gray.height, (MultiSpectral) gray );
+				else if( imageType.getDataType() == ImageDataType.F32)
+					ConvertNV21.nv21ToMsRgb_F32(bytes, gray.width, gray.height, (MultiSpectral) gray );
+				else
+					throw new RuntimeException("Oh Crap");
+			} else {
+				throw new RuntimeException("Unexpected image type: "+imageType);
+			}
 		}
 		// wake up the thread and tell it to do some processing
 		thread.interrupt();

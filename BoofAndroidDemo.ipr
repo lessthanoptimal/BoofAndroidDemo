@@ -391,6 +391,7 @@
       <module fileurl="file://$PROJECT_DIR$/../boofcv/main/geo/BoofCV Geometric Vision.iml" filepath="$PROJECT_DIR$/../boofcv/main/geo/BoofCV Geometric Vision.iml" />
       <module fileurl="file://$PROJECT_DIR$/../boofcv/main/io/BoofCV IO.iml" filepath="$PROJECT_DIR$/../boofcv/main/io/BoofCV IO.iml" />
       <module fileurl="file://$PROJECT_DIR$/../boofcv/main/ip/BoofCV Image Processing.iml" filepath="$PROJECT_DIR$/../boofcv/main/ip/BoofCV Image Processing.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../boofcv/main/recognition/BoofCV Recognition.iml" filepath="$PROJECT_DIR$/../boofcv/main/recognition/BoofCV Recognition.iml" />
       <module fileurl="file://$PROJECT_DIR$/../boofcv/main/sfm/BoofCV SFM.iml" filepath="$PROJECT_DIR$/../boofcv/main/sfm/BoofCV SFM.iml" />
       <module fileurl="file://$PROJECT_DIR$/../ddogleg/DDogleg.iml" filepath="$PROJECT_DIR$/../ddogleg/DDogleg.iml" />
       <module fileurl="file://$PROJECT_DIR$/../georegression/GeoRegression.iml" filepath="$PROJECT_DIR$/../georegression/GeoRegression.iml" />
