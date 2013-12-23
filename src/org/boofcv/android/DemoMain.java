@@ -92,14 +92,16 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		detect.addChild("Corner/Blob",PointDisplayActivity.class);
 		detect.addChild("Scale Space",ScalePointDisplayActivity.class);
 		detect.addChild("Lines",LineDisplayActivity.class);
+		detect.addChild("Canny Edge",CannyEdgeActivity.class);
 		detect.addChild("Shape Fitting",ShapeFittingActivity.class);
 
 		assoc.addChild("Two Pictures",AssociationActivity.class);
 
-		tracker.addChild("Object Quad", ObjectTrackerActivity.class);
-		tracker.addChild("Point: KLT", KltDisplayActivity.class);
-		tracker.addChild("Point: Det-Desc-Assoc", DdaTrackerDisplayActivity.class);
-		tracker.addChild("Point: Combined", CombinedTrackerDisplayActivity.class);
+		tracker.addChild("Object Tracking", ObjectTrackerActivity.class);
+		tracker.addChild("KLT Pyramid", KltDisplayActivity.class);
+		// To most people the trackers below will look like a broken KLT
+//		tracker.addChild("Point: Det-Desc-Assoc", DdaTrackerDisplayActivity.class);
+//		tracker.addChild("Point: Combined", CombinedTrackerDisplayActivity.class);
 
 		sfm.addChild("Calibration",CalibrationActivity.class);
 		sfm.addChild("Stereo",DisparityActivity.class);

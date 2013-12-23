@@ -10,9 +10,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.*;
 import boofcv.abst.tracker.ConfigComaniciu2003;
+import boofcv.abst.tracker.ConfigTld;
 import boofcv.abst.tracker.TrackerObjectQuad;
 import boofcv.alg.tracker.sfot.SfotConfig;
-import boofcv.alg.tracker.tld.TldConfig;
 import boofcv.android.ConvertBitmap;
 import boofcv.core.image.ConvertImage;
 import boofcv.factory.tracker.FactoryTrackerObjectQuad;
@@ -29,10 +29,6 @@ import georegression.struct.shapes.Quadrilateral_F64;
  *
  * @author Peter Abeles
  */
-// TODO select tracker
-//      display if track is visible or not
-//		clear track selection and reset
-//		select track by click on the screen and selecting 4 points
 public class ObjectTrackerActivity extends VideoDisplayActivity
 		implements AdapterView.OnItemSelectedListener, View.OnTouchListener
 {
@@ -113,7 +109,7 @@ public class ObjectTrackerActivity extends VideoDisplayActivity
 
 			case 4:
 				imageType = ImageType.single(ImageUInt8.class);
-				tracker = FactoryTrackerObjectQuad.tld(new TldConfig(true,ImageUInt8.class));
+				tracker = FactoryTrackerObjectQuad.tld(new ConfigTld(false),ImageUInt8.class);
 				break;
 
 			default:
@@ -138,13 +134,7 @@ public class ObjectTrackerActivity extends VideoDisplayActivity
 				click1.set((int)motionEvent.getX(),(int)motionEvent.getY());
 			} else if(MotionEvent.ACTION_UP == motionEvent.getActionMasked()) {
 				click1.set((int)motionEvent.getX(),(int)motionEvent.getY());
-
-				if( movedSignificantly() ) {
-					mode = 2;
-				} else {
-					Toast.makeText(this, "Drag a larger region", Toast.LENGTH_SHORT).show();
-					mode = 0;
-				}
+				mode = 2;
 			}
 		}
 		return true;
@@ -170,6 +160,7 @@ public class ObjectTrackerActivity extends VideoDisplayActivity
 		Paint paintLine1 = new Paint();
 		Paint paintLine2 = new Paint();
 		Paint paintLine3 = new Paint();
+		private Paint textPaint = new Paint();
 
 		protected TrackingProcessing(TrackerObjectQuad tracker , ImageType<T> inputType) {
 			super(ImageType.ms(3,ImageUInt8.class));
@@ -193,6 +184,10 @@ public class ObjectTrackerActivity extends VideoDisplayActivity
 			paintLine3.setColor(Color.GREEN);
 			paintLine3.setStrokeWidth(3f);
 
+			// Create out paint to use for drawing
+			textPaint.setARGB(255, 200, 0, 0);
+			textPaint.setTextSize(60);
+
 		}
 
 		@Override
@@ -211,15 +206,31 @@ public class ObjectTrackerActivity extends VideoDisplayActivity
 			}
 
 			if( mode == 2 ) {
-				// TODO sanity check points
 				imageToOutput(click0.x, click0.y, location.a);
 				imageToOutput(click1.x, click1.y, location.c);
-				location.b.set(location.c.x, location.a.y);
-				location.d.set( location.a.x, location.c.y );
 
-				tracker.initialize(input, location);
-				visible = true;
-				mode = 3;
+				// make sure the user selected a valid region
+				makeInBounds(location.a);
+				makeInBounds(location.c);
+
+				if( movedSignificantly(location.a,location.c) ) {
+					// use the selected region and start the tracker
+					location.b.set(location.c.x, location.a.y);
+					location.d.set( location.a.x, location.c.y );
+
+					tracker.initialize(input, location);
+					visible = true;
+					mode = 3;
+				} else {
+					// the user screw up. Let them know what they did wrong
+					runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							Toast.makeText(ObjectTrackerActivity.this, "Drag a larger region", Toast.LENGTH_SHORT).show();
+						}
+					});
+					mode = 0;
+				}
 			} else if( mode == 3 ) {
 				visible = tracker.process(input,location);
 			}
@@ -245,6 +256,8 @@ public class ObjectTrackerActivity extends VideoDisplayActivity
 					drawLine(canvas,q.b,q.c,paintLine1);
 					drawLine(canvas,q.c,q.d,paintLine2);
 					drawLine(canvas,q.d,q.a,paintLine3);
+				} else {
+					canvas.drawText("?",color.width/2,color.height/2,textPaint);
 				}
 			}
 		}
@@ -252,14 +265,25 @@ public class ObjectTrackerActivity extends VideoDisplayActivity
 		private void drawLine( Canvas canvas , Point2D_F64 a , Point2D_F64 b , Paint color ) {
 			canvas.drawLine((int)a.x,(int)a.y,(int)b.x,(int)b.y,color);
 		}
-	}
 
-	private boolean movedSignificantly() {
-		if( Math.abs(click0.x-click1.x) < MINIMUM_MOTION )
-			return false;
-		if( Math.abs(click0.y-click1.y) < MINIMUM_MOTION )
-			return false;
+		private void makeInBounds( Point2D_F64 p ) {
+			if( p.x < 0 ) p.x = 0;
+			else if( p.x >= input.width )
+				p.x = input.width - 1;
 
-		return true;
+			if( p.y < 0 ) p.y = 0;
+			else if( p.y >= input.height )
+				p.y = input.height - 1;
+
+		}
+
+		private boolean movedSignificantly( Point2D_F64 a , Point2D_F64 b ) {
+			if( Math.abs(a.x-b.x) < MINIMUM_MOTION )
+				return false;
+			if( Math.abs(a.y-b.y) < MINIMUM_MOTION )
+				return false;
+
+			return true;
+		}
 	}
 }

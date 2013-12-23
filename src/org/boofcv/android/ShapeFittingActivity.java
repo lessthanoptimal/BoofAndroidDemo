@@ -15,8 +15,12 @@ import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.alg.filter.binary.ThresholdImageOps;
+import boofcv.alg.filter.derivative.GImageDerivativeOps;
+import boofcv.alg.misc.GPixelMath;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.android.VisualizeImageData;
+import boofcv.struct.PointIndex_I32;
+import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
@@ -24,7 +28,6 @@ import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.EllipseRotated_F64;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -73,9 +76,9 @@ public class ShapeFittingActivity extends VideoDisplayActivity
 				setProcessing(new EllipseProcessing() );
 				break;
 
-//			case 1:
-//				setProcessing(new BlurProcessing(FactoryBlurFilter.gaussian(ImageUInt8.class,-1,2)) );
-//				break;
+			case 1:
+				setProcessing(new PolygonProcessing() );
+				break;
 //
 //			case 2:
 //				setProcessing(new BlurProcessing(FactoryBlurFilter.median(ImageUInt8.class,2)) );
@@ -86,19 +89,16 @@ public class ShapeFittingActivity extends VideoDisplayActivity
 	@Override
 	public void onNothingSelected(AdapterView<?> adapterView) {}
 
-	protected class EllipseProcessing extends BoofImageProcessing<ImageUInt8> {
+	protected abstract class BaseProcessing extends BoofImageProcessing<ImageUInt8> {
+		ImageSInt16 edge;
 		ImageUInt8 binary;
 		ImageUInt8 filtered1;
-		ImageUInt8 filtered2;
 		ImageSInt32 contourOutput;
 		Paint paint = new Paint();
 		RectF r = new RectF();
 		LinearContourLabelChang2004 findContours = new LinearContourLabelChang2004(8);
 
-		FitData<EllipseRotated_F64> ellipse = new FitData<EllipseRotated_F64>();
-		List<List<Point2D_I32>> allContours = new ArrayList<List<Point2D_I32>>();
-
-		protected EllipseProcessing() {
+		protected BaseProcessing() {
 			super(ImageType.single(ImageUInt8.class));
 		}
 
@@ -107,59 +107,96 @@ public class ShapeFittingActivity extends VideoDisplayActivity
 			super.init(view, camera);
 			Camera.Size size = camera.getParameters().getPreviewSize();
 
+			edge = new ImageSInt16(size.width,size.height);
 			binary = new ImageUInt8(size.width,size.height);
 			filtered1 = new ImageUInt8(size.width,size.height);
-			filtered2 = new ImageUInt8(size.width,size.height);
 			contourOutput = new ImageSInt32(size.width,size.height);
 
 			paint.setStyle(Paint.Style.STROKE);
 			paint.setStrokeWidth(3f);
 			paint.setColor(Color.RED);
-			ellipse.shape = new EllipseRotated_F64();
 		}
 
 		@Override
 		protected void process(ImageUInt8 gray, Bitmap output, byte[] storage) {
+
+			GImageDerivativeOps.laplace(gray,edge);
+			GPixelMath.abs(edge,edge);
+
 			// use the mean value to threshold the image
-			int mean = (int)ImageStatistics.mean(gray);
+			int mean = (int)ImageStatistics.mean(edge)*2;
 
 			// create a binary image by thresholding
-			ThresholdImageOps.threshold(gray, binary, mean, true);
+			ThresholdImageOps.threshold(edge, binary, mean, false);
 
 			// reduce noise with some filtering
-			BinaryImageOps.erode8(binary, filtered1);
-			BinaryImageOps.dilate8(filtered1, filtered2);
+			BinaryImageOps.removePointNoise(binary, filtered1);
 
 			// draw binary image for output
-			VisualizeImageData.binaryToBitmap(filtered2, output, storage);
+			VisualizeImageData.binaryToBitmap(filtered1, output, storage);
 
 			// draw the ellipses
-			findContours.process(filtered2,contourOutput);
+			findContours.process(filtered1,contourOutput);
 			List<Contour> contours = findContours.getContours().toList();
-
-			allContours.clear();
-			for( Contour contour : contours ) {
-				allContours.add( contour.external);
-				allContours.addAll( contour.internal );
-			}
 
 			Canvas canvas = new Canvas(output);
 
-			for( List<Point2D_I32> contour : allContours ) {
-				// TODO unroll and recycle this function
-				ShapeFittingOps.fitEllipse_I32(contour, 0, false, ellipse);
+			for( Contour contour : contours ) {
+				List<Point2D_I32> points = contour.external;
+				if( points.size() < 20 )
+					continue;
 
-				float phi = (float)UtilAngle.radianToDegree(ellipse.shape.phi);
-				float cx =  (float)ellipse.shape.center.x;
-				float cy =  (float)ellipse.shape.center.y;
-				float w = (float)ellipse.shape.a;
-				float h = (float)ellipse.shape.b;
-
-				canvas.rotate(phi, cx, cy);
-				r.set(cx-w,cy-h,cx+w+1,cy+h+1);
-				canvas.drawOval(r,paint);
-				canvas.rotate(-phi, cx, cy);
+				fitShape(points,canvas);
 			}
+		}
+
+		protected abstract void fitShape( List<Point2D_I32> contour , Canvas canvas );
+	}
+
+	protected class EllipseProcessing extends BaseProcessing {
+
+		FitData<EllipseRotated_F64> ellipse = new FitData<EllipseRotated_F64>(new EllipseRotated_F64());
+
+		@Override
+		protected void fitShape(List<Point2D_I32> contour, Canvas canvas) {
+			// TODO unroll and recycle this function
+			ShapeFittingOps.fitEllipse_I32(contour, 0, false, ellipse);
+
+			float phi = (float)UtilAngle.radianToDegree(ellipse.shape.phi);
+			float cx =  (float)ellipse.shape.center.x;
+			float cy =  (float)ellipse.shape.center.y;
+			float w = (float)ellipse.shape.a;
+			float h = (float)ellipse.shape.b;
+
+			//  really skinny ones are probably just a line and not what the user wants
+			if( w <= 2 || h <= 2 )
+				return;
+
+			canvas.rotate(phi, cx, cy);
+			r.set(cx-w,cy-h,cx+w+1,cy+h+1);
+			canvas.drawOval(r,paint);
+			canvas.rotate(-phi, cx, cy);
+		}
+	}
+
+	protected class PolygonProcessing extends BaseProcessing {
+
+		@Override
+		protected void fitShape(List<Point2D_I32> contour, Canvas canvas) {
+			// TODO unroll and recycle this function
+			List<PointIndex_I32> poly = ShapeFittingOps.fitPolygon(contour, true, 4, 0.3f, 0);
+
+			for( int i = 1; i < poly.size(); i++ ) {
+				PointIndex_I32 a = poly.get(i-1);
+				PointIndex_I32 b = poly.get(i);
+
+				canvas.drawLine(a.x,a.y,b.x,b.y,paint);
+			}
+
+			PointIndex_I32 a = poly.get(poly.size()-1);
+			PointIndex_I32 b = poly.get(0);
+
+			canvas.drawLine(a.x,a.y,b.x,b.y,paint);
 		}
 	}
 }
