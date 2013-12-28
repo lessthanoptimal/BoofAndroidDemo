@@ -3,6 +3,16 @@ Change Log for BoofCV Demonstration App
 (year)-(month)-(day)
 
 -------------------------------------------------
+Version 1.3
+Date: 2013-12-28
+
+- Added object tracking
+- Added image enhance
+- Added image transform
+- Added canny edge
+- Reduced number of point trackers
+
+-------------------------------------------------
 Version 1.1.1
 Date: 2012-02-20
 
