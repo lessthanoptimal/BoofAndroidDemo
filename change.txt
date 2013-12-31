@@ -2,6 +2,12 @@ Change Log for BoofCV Demonstration App
 
 (year)-(month)-(day)
 
+
+TODO:  Fix video like that guy suggested
+TODO:  Put calibration stuff in its own folder.
+       show image with and without lens distortion
+       estimate location of calibration grid
+
 -------------------------------------------------
 Version 1.3
 Date: 2013-12-28
