@@ -41,10 +41,14 @@ public class CameraInformationActivity extends Activity {
 		for( int i = 0; i < numCamera; i++ ) {
 			write("------ Camera "+i);
 			Camera c = Camera.open(i);
+			Camera.CameraInfo info = DemoMain.specs.get(i).info;
 			Camera.Parameters param = c.getParameters();
+			String facing = info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT ? "Front" : "Back";
+			write(" Facing: "+facing);
+			write(" Orientation: "+info.orientation+" degrees");
 			write(" Local Length: "+param.getFocalLength()+" (mm)");
-			write(" Focus Mode "+param.getFocusMode());
-			write(" Horiz view angle "+param.getHorizontalViewAngle());
+			write(" Focus Mode: "+param.getFocusMode());
+			write(" Horiz view angle: "+param.getHorizontalViewAngle());
 			write(" * Preview Sizes");
 			List<Camera.Size> supported = param.getSupportedPreviewSizes();
 			for( Camera.Size size : supported ) {

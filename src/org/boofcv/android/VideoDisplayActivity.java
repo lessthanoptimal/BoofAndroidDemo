@@ -27,8 +27,6 @@ public class VideoDisplayActivity extends Activity implements Camera.PreviewCall
 
 	// Used to inform the user that its doing some calculations
 	ProgressDialog progressDialog;
-	// after the GUI thread has finished setting up the dialog this is set to true
-	boolean progressDialogSetup;
 	protected final Object lockProgress = new Object();
 
 	boolean hidePreview = true;
@@ -43,7 +41,7 @@ public class VideoDisplayActivity extends Activity implements Camera.PreviewCall
 	/**
 	 * Changes the CV algorithm running.  Should only be called from a GUI thread.
 	 */
-	public void setProcessing(  BoofProcessing processing ) {
+	public void setProcessing( BoofProcessing processing ) {
 		if( this.processing != null ) {
 			// kill the old process
 			this.processing.stopProcessing();

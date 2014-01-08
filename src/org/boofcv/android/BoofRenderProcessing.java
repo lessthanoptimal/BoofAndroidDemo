@@ -3,6 +3,7 @@ package org.boofcv.android;
 import android.graphics.Canvas;
 import android.hardware.Camera;
 import android.view.View;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.android.ConvertNV21;
 import boofcv.struct.image.*;
 import georegression.struct.point.Point2D_F64;
@@ -36,6 +37,9 @@ public abstract class BoofRenderProcessing<T extends ImageBase> extends Thread i
 	double scale;
 	double tranX,tranY;
 
+	// if true the input image is flipped horizontally
+	boolean flipHorizontal;
+
 	protected BoofRenderProcessing(ImageType<T> imageType) {
 		this.imageType = imageType;
 	}
@@ -45,6 +49,9 @@ public abstract class BoofRenderProcessing<T extends ImageBase> extends Thread i
 		synchronized (lockGui) {
 			this.view = view;
 
+			// Front facing cameras need to be flipped to appear correctly
+			flipHorizontal = DemoMain.specs.get(DemoMain.preference.cameraId).info.facing ==
+					Camera.CameraInfo.CAMERA_FACING_FRONT;
 			Camera.Size size = camera.getParameters().getPreviewSize();
 			outputWidth = size.width;
 			outputHeight = size.height;
@@ -113,6 +120,9 @@ public abstract class BoofRenderProcessing<T extends ImageBase> extends Thread i
 			} else {
 				throw new RuntimeException("Unexpected image type: "+imageType);
 			}
+
+			if( flipHorizontal )
+				GImageMiscOps.flipHorizontal(gray);
 		}
 		// wake up the thread and tell it to do some processing
 		thread.interrupt();
