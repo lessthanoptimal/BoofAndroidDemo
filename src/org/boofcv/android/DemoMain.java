@@ -1,6 +1,8 @@
 package org.boofcv.android;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.hardware.Camera;
 import android.os.Bundle;
@@ -162,6 +164,13 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 
 	private void setDefaultPreferences() {
 		preference.showFps = false;
+
+		// There are no cameras.  This is possible due to the hardware camera setting being set to false
+		// which was a work around a bad design decision where front facing cameras wouldn't be accepted as hardware
+		// which is an issue on tablets with only front facing cameras
+		if( specs.size() == 0 ) {
+			dialogNoCamera();
+		}
 		// select a front facing camera as the default
 		for (int i = 0; i < specs.size(); i++) {
 		    CameraSpecs c = specs.get(i);
@@ -169,6 +178,9 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 			if( c.info.facing == Camera.CameraInfo.CAMERA_FACING_BACK ) {
 				preference.cameraId = i;
 				break;
+			} else {
+				// default to a front facing camera if a back facing one can't be found
+				preference.cameraId = i;
 			}
 		}
 
@@ -178,6 +190,19 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 
 		// see if there are any intrinsic parameters to load
 		loadIntrinsic();
+	}
+
+	private void dialogNoCamera() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage("Your device has no cameras!")
+				.setCancelable(false)
+				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						System.exit(0);
+					}
+				});
+		AlertDialog alert = builder.create();
+		alert.show();
 	}
 
 	private void loadIntrinsic() {

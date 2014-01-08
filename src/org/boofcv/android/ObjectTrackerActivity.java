@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.*;
 import boofcv.abst.tracker.ConfigComaniciu2003;
 import boofcv.abst.tracker.ConfigTld;
+import boofcv.abst.tracker.MeanShiftLikelihoodType;
 import boofcv.abst.tracker.TrackerObjectQuad;
 import boofcv.alg.tracker.sfot.SfotConfig;
 import boofcv.android.ConvertBitmap;
@@ -99,7 +100,12 @@ public class ObjectTrackerActivity extends VideoDisplayActivity
 				tracker = FactoryTrackerObjectQuad.meanShiftComaniciu2003(new ConfigComaniciu2003(true),imageType);
 				break;
 
-			case 3:{
+			case 3:
+				imageType = ImageType.ms(3, ImageUInt8.class);
+				tracker = FactoryTrackerObjectQuad.meanShiftLikelihood(30,5,256, MeanShiftLikelihoodType.HISTOGRAM,imageType);
+				break;
+
+			case 4:{
 				imageType = ImageType.single(ImageUInt8.class);
 				SfotConfig config = new SfotConfig(ImageUInt8.class);
 				config.numberOfSamples = 10;
@@ -107,7 +113,7 @@ public class ObjectTrackerActivity extends VideoDisplayActivity
 				tracker = FactoryTrackerObjectQuad.sparseFlow(config);
 			}break;
 
-			case 4:
+			case 5:
 				imageType = ImageType.single(ImageUInt8.class);
 				tracker = FactoryTrackerObjectQuad.tld(new ConfigTld(false),ImageUInt8.class);
 				break;

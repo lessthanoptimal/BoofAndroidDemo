@@ -27,6 +27,7 @@
 		<item>Circulant</item>
 		<item>Mean-Shift</item>
 		<item>Mean-Shift Scale</item>
+		<item>Mean-Shift Likelihood</item>
 		<item>Sparse Flow</item>
 		<item>TLD</item>
 	</string-array>
