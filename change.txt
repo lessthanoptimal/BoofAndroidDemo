@@ -8,15 +8,17 @@ Date: 2014
 
 - Added mean-shift likelihood tracker
 - Application can now be loaded onto Nexus 7 devices
-  * Thanks to BLAH for the fix
+  * Thanks to "Member 4367060" for the fix
 - Front facing images are flipped for correct viewing
-  * Thanks to BLAH for pointing out this problem
+  * Thanks to "Member 4367060" for pointing out this problem
+- Fixed bug where camera capture doesn't start again if surfaceCreated isn't called
+  * Isn't a problem under normal operation because all camera activities are changed landscape view
+  * Thanks to "Member 4367060" for pointing out this problem
 
-TODO:  Fix video like that guy suggested
 TODO:  Put calibration stuff in its own folder.
        show image with and without lens distortion
        estimate location of calibration grid
-TODO:  Webpage with grid for calibration.  Add link in app descripton
+TODO:  Webpage with grid for calibration.  Add link in app description
 TODO: See if mosaic can be improved with a different tracker
 
 -------------------------------------------------

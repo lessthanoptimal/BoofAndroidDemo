@@ -42,6 +42,11 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 	public void setCamera(Camera camera) {
 		mCamera = camera;
 		if (mCamera != null) {
+			// need to start the preview here because it is possible for it to be paused and resumed and not
+			// have surfaceChanged called if the orientation doesn't need to be changed.  Yes, you will have
+			// to start and stop the camera in the more common situations
+			startPreview();
+			// Need to adjust the layout for the new camera
 			requestLayout();
 		}
 	}
@@ -51,7 +56,7 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 		if( hidden ) {
 			this.setMeasuredDimension(2, 2);
 		} else {
-			// We purposely disregard child measurements because act as a
+			// We purposely disregard child measurements because want it to act as a
 			// wrapper to a SurfaceView that centers the camera preview instead
 			// of stretching it.
 			final int width = resolveSize(getSuggestedMinimumWidth(), widthMeasureSpec);
@@ -91,6 +96,9 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 				b = (height + scaledChildHeight) / 2;
 			}
 			child.layout(l,t,r,b);
+			Log.w("BoofCV","onLayout did stuff");
+		} else {
+			Log.w("BoofCV","onLayout nothing done");
 		}
 	}
 
@@ -140,6 +148,10 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 		// reformatting changes here
 
 		// start preview with new settings
+		startPreview();
+	}
+
+	private void startPreview() {
 		try {
 			mCamera.setPreviewDisplay(mHolder);
 			mCamera.setPreviewCallback(previewCallback);
