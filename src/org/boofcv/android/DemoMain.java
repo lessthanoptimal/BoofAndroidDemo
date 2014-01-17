@@ -83,6 +83,7 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		Group detect = new Group("Detection");
 		Group assoc = new Group("Association");
 		Group tracker = new Group("Tracking");
+		Group calib = new Group("Calibration");
 		Group sfm = new Group("Structure From Motion");
 
 		ip.addChild("Blur",BlurDisplayActivity.class);
@@ -105,7 +106,9 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 //		tracker.addChild("Point: Det-Desc-Assoc", DdaTrackerDisplayActivity.class);
 //		tracker.addChild("Point: Combined", CombinedTrackerDisplayActivity.class);
 
-		sfm.addChild("Calibration",CalibrationActivity.class);
+		calib.addChild("Calibrate",CalibrationActivity.class);
+		calib.addChild("Undistort",UndistortDisplayActivity.class);
+
 		sfm.addChild("Stereo",DisparityActivity.class);
 		sfm.addChild("Stabilization",StabilizeDisplayActivity.class);
 		sfm.addChild("Mosaic",MosaicDisplayActivity.class);
@@ -114,6 +117,7 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		groups.add(detect);
 		groups.add(assoc);
 		groups.add(tracker);
+		groups.add(calib);
 		groups.add(sfm);
 	}
 

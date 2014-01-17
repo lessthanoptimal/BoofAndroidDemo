@@ -51,5 +51,6 @@
 		<activity android:name=".ObjectTrackerActivity" android:screenOrientation="landscape"/>
 		<activity android:name=".ShapeFittingActivity" android:screenOrientation="landscape"/>
 		<activity android:name=".CannyEdgeActivity" android:screenOrientation="landscape"/>
+		<activity android:name=".UndistortDisplayActivity" android:screenOrientation="landscape"/>
 	</application>
 </manifest>
