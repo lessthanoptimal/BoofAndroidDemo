@@ -110,7 +110,7 @@ public class UndistortDisplayActivity extends VideoDisplayActivity
 		}
 
 		@Override
-		protected void process(MultiSpectral<ImageUInt8> color, Bitmap output, byte[] storage) {
+		protected void process(MultiSpectral<ImageUInt8> input, Bitmap output, byte[] storage) {
 			if( DemoMain.preference.intrinsic == null ) {
 				Canvas canvas = new Canvas(output);
 				Paint paint = new Paint();
@@ -121,20 +121,20 @@ public class UndistortDisplayActivity extends VideoDisplayActivity
 				canvas.drawText("Calibrate Camera First", (canvas.getWidth() - textLength) / 2, canvas.getHeight() / 2, paint);
 			} else if( isDistorted ) {
 				if( isColor )
-					ConvertBitmap.multiToBitmap(color,output,storage);
+					ConvertBitmap.multiToBitmap(input,output,storage);
 				else {
-					ConvertImage.average(color,undistorted.getBand(0));
+					ConvertImage.average(input,undistorted.getBand(0));
 					ConvertBitmap.grayToBitmap(undistorted.getBand(0),output,storage);
 				}
 			} else {
 				if( isColor ) {
-					for( int i = 0; i < color.getNumBands(); i++ ) {
-						removeDistortion.apply(color.getBand(i),undistorted.getBand(i));
+					for( int i = 0; i < input.getNumBands(); i++ ) {
+						removeDistortion.apply(input.getBand(i),undistorted.getBand(i));
 					}
 
 					ConvertBitmap.multiToBitmap(undistorted,output,storage);
 				} else {
-					ConvertImage.average(color,undistorted.getBand(0));
+					ConvertImage.average(input,undistorted.getBand(0));
 					removeDistortion.apply(undistorted.getBand(0),undistorted.getBand(1));
 					ConvertBitmap.grayToBitmap(undistorted.getBand(1),output,storage);
 				}

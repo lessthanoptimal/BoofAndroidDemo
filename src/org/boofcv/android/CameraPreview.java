@@ -56,9 +56,8 @@ public class CameraPreview extends ViewGroup implements SurfaceHolder.Callback {
 		if( hidden ) {
 			this.setMeasuredDimension(2, 2);
 		} else {
-			// We purposely disregard child measurements because want it to act as a
-			// wrapper to a SurfaceView that centers the camera preview instead
-			// of stretching it.
+			// We purposely disregard child measurements so that the SurfaceView will center the camera
+			// preview instead of stretching it.
 			final int width = resolveSize(getSuggestedMinimumWidth(), widthMeasureSpec);
 			final int height = resolveSize(getSuggestedMinimumHeight(), heightMeasureSpec);
 			setMeasuredDimension(width, height);

@@ -197,10 +197,10 @@ public class ObjectTrackerActivity extends VideoDisplayActivity
 		}
 
 		@Override
-		protected void process(MultiSpectral<ImageUInt8> color, Bitmap output, byte[] storage)
+		protected void process(MultiSpectral<ImageUInt8> input, Bitmap output, byte[] storage)
 		{
-			updateTracker(color);
-			visualize(color, output, storage);
+			updateTracker(input);
+			visualize(input, output, storage);
 		}
 
 		private void updateTracker(MultiSpectral<ImageUInt8> color) {

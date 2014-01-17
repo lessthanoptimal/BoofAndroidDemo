@@ -90,13 +90,13 @@ public class CannyEdgeActivity extends VideoDisplayActivity
 		}
 
 		@Override
-		protected void process(ImageUInt8 gray, Bitmap output, byte[] storage) {
+		protected void process(ImageUInt8 input, Bitmap output, byte[] storage) {
 
 			// make sure it doesn't get too low
 			if( threshold <= 0.03f )
 				threshold = 0.03f;
 
-			canny.process(gray,threshold/3.0f,threshold,null);
+			canny.process(input,threshold/3.0f,threshold,null);
 			List<EdgeContour> contours = canny.getContours();
 
 			// random colors for each line

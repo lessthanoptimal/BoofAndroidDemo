@@ -47,5 +47,5 @@ public abstract class BoofImageProcessing<T extends ImageBase> extends BoofRende
 		canvas.drawBitmap(outputGUI,0,0,null);
 	}
 
-	protected abstract void process( T gray , Bitmap output , byte[] storage );
+	protected abstract void process( T input , Bitmap output , byte[] storage );
 }
