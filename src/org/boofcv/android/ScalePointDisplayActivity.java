@@ -15,6 +15,7 @@ import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.ConfigSiftDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.android.ConvertBitmap;
+import boofcv.android.gui.VideoRenderProcessing;
 import boofcv.core.image.ConvertImage;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.struct.feature.ScalePoint;
@@ -27,7 +28,7 @@ import org.ddogleg.struct.FastQueue;
 /**
  * @author Peter Abeles
  */
-public class ScalePointDisplayActivity extends VideoDisplayActivity
+public class ScalePointDisplayActivity extends DemoVideoDisplayActivity
 		implements AdapterView.OnItemSelectedListener  {
 
 	Spinner spinner;
@@ -46,7 +47,7 @@ public class ScalePointDisplayActivity extends VideoDisplayActivity
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.detect_point_controls,null);
 
-		LinearLayout parent = (LinearLayout)findViewById(R.id.camera_preview_parent);
+		LinearLayout parent = getViewContent();
 		parent.addView(controls);
 
 		spinner = (Spinner)controls.findViewById(R.id.spinner_algs);
@@ -103,7 +104,7 @@ public class ScalePointDisplayActivity extends VideoDisplayActivity
 	@Override
 	public void onNothingSelected(AdapterView<?> adapterView) {}
 
-	protected class PointProcessing extends BoofRenderProcessing<ImageUInt8> {
+	protected class PointProcessing extends VideoRenderProcessing<ImageUInt8> {
 		InterestPointDetector<ImageUInt8> detector;
 
 		Bitmap bitmap;

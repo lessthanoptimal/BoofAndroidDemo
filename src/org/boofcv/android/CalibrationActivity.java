@@ -21,6 +21,7 @@ import boofcv.alg.feature.detect.grid.DetectSquareCalibrationPoints;
 import boofcv.alg.feature.detect.quadblob.QuadBlob;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
+import boofcv.android.gui.VideoRenderProcessing;
 import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageType;
@@ -87,14 +88,14 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.calibration_view,null);
 
-		LinearLayout parent = (LinearLayout)findViewById(R.id.camera_preview_parent);
+		LinearLayout parent = getViewContent();
 		parent.addView(controls);
 
 		textCount = (TextView)controls.findViewById(R.id.text_total);
 
 		shots = new ArrayList<CalibrationImageInfo>();
 
-		FrameLayout iv = (FrameLayout)findViewById(R.id.camera_preview);
+		FrameLayout iv = getViewPreview();
 		mDetector = new GestureDetector(this, new MyGestureDetector(iv));
 		iv.setOnTouchListener(new View.OnTouchListener(){
 			@Override
@@ -237,7 +238,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 
 	}
 
-	private class DetectTarget extends BoofRenderProcessing<ImageFloat32> {
+	private class DetectTarget extends VideoRenderProcessing<ImageFloat32> {
 
 		PlanarCalibrationDetector detector;
 

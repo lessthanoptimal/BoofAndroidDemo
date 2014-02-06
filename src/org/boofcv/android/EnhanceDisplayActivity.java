@@ -1,7 +1,6 @@
 package org.boofcv.android;
 
 import android.graphics.Bitmap;
-import android.hardware.Camera;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +8,7 @@ import android.widget.*;
 import boofcv.alg.enhance.EnhanceImageOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.android.ConvertBitmap;
+import boofcv.android.gui.VideoImageProcessing;
 import boofcv.core.image.ConvertImage;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
@@ -19,7 +19,7 @@ import boofcv.struct.image.MultiSpectral;
  *
  * @author Peter Abeles
  */
-public class EnhanceDisplayActivity extends VideoDisplayActivity
+public class EnhanceDisplayActivity extends DemoVideoDisplayActivity
 		implements AdapterView.OnItemSelectedListener, CompoundButton.OnCheckedChangeListener
 {
 
@@ -33,7 +33,7 @@ public class EnhanceDisplayActivity extends VideoDisplayActivity
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.enhance_controls,null);
 
-		LinearLayout parent = (LinearLayout)findViewById(R.id.camera_preview_parent);
+		LinearLayout parent = getViewContent();
 		parent.addView(controls);
 
 		spinnerView = (Spinner)controls.findViewById(R.id.spinner_enhance);
@@ -105,7 +105,7 @@ public class EnhanceDisplayActivity extends VideoDisplayActivity
 		startBlurProcess(spinnerView.getSelectedItemPosition(),isChecked);
 	}
 
-	protected abstract class EnhanceProcessing extends BoofImageProcessing<ImageUInt8> {
+	protected abstract class EnhanceProcessing extends VideoImageProcessing<ImageUInt8> {
 		ImageUInt8 enhanced;
 
 		protected EnhanceProcessing() {
@@ -113,25 +113,27 @@ public class EnhanceDisplayActivity extends VideoDisplayActivity
 		}
 
 		@Override
-		public void init(View view, Camera camera) {
-			super.init(view, camera);
-			Camera.Size size = camera.getParameters().getPreviewSize();
+		protected void declareImages( int width , int height ) {
+			super.declareImages(width, height);
 
-			enhanced = new ImageUInt8(size.width,size.height);
+			enhanced = new ImageUInt8(width,height);
 		}
 	}
 
-	protected abstract class EnhanceProcessingColor extends BoofMsImageProcessing {
+	protected abstract class EnhanceProcessingColor extends VideoImageProcessing<MultiSpectral<ImageUInt8>> {
 		MultiSpectral<ImageUInt8> enhanced;
 		ImageUInt8 gray;
 
-		@Override
-		public void init(View view, Camera camera) {
-			super.init(view, camera);
-			Camera.Size size = camera.getParameters().getPreviewSize();
+		public EnhanceProcessingColor() {
+			super(ImageType.ms(3,ImageUInt8.class));
+		}
 
-			gray = new ImageUInt8(size.width,size.height);
-			enhanced = new MultiSpectral<ImageUInt8>(ImageUInt8.class,size.width,size.height,3);
+		@Override
+		protected void declareImages( int width , int height ) {
+			super.declareImages(width, height);
+
+			gray = new ImageUInt8(width,height);
+			enhanced = new MultiSpectral<ImageUInt8>(ImageUInt8.class,width,height,3);
 		}
 	}
 

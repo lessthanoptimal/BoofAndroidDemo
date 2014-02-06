@@ -4,10 +4,8 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.hardware.Camera;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -17,6 +15,7 @@ import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.android.ConvertBitmap;
+import boofcv.android.gui.VideoImageProcessing;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.distort.FactoryDistort;
@@ -31,7 +30,7 @@ import boofcv.struct.image.MultiSpectral;
  *
  * @author Peter Abeles
  */
-public class UndistortDisplayActivity extends VideoDisplayActivity
+public class UndistortDisplayActivity extends DemoVideoDisplayActivity
 		implements CompoundButton.OnCheckedChangeListener
 {
 
@@ -48,7 +47,7 @@ public class UndistortDisplayActivity extends VideoDisplayActivity
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.undistort_controls,null);
 
-		LinearLayout parent = (LinearLayout)findViewById(R.id.camera_preview_parent);
+		LinearLayout parent = getViewContent();
 		parent.addView(controls);
 
 		toggleDistort = (ToggleButton)controls.findViewById(R.id.toggle_distort);
@@ -82,7 +81,7 @@ public class UndistortDisplayActivity extends VideoDisplayActivity
 		}
 	}
 
-	protected class UndistortProcessing extends BoofImageProcessing<MultiSpectral<ImageUInt8>> {
+	protected class UndistortProcessing extends VideoImageProcessing<MultiSpectral<ImageUInt8>> {
 		MultiSpectral<ImageUInt8> undistorted;
 
 		public UndistortProcessing() {
@@ -90,11 +89,10 @@ public class UndistortDisplayActivity extends VideoDisplayActivity
 		}
 
 		@Override
-		public void init(View view, Camera camera) {
-			super.init(view, camera);
-			Camera.Size size = camera.getParameters().getPreviewSize();
+		protected void declareImages( int width , int height ) {
+			super.declareImages(width, height);
 
-			undistorted = new MultiSpectral<ImageUInt8>(ImageUInt8.class,size.width,size.height,3);
+			undistorted = new MultiSpectral<ImageUInt8>(ImageUInt8.class,width,height,3);
 		}
 
 		@Override

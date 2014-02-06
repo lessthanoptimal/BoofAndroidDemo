@@ -11,6 +11,7 @@ import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.alg.feature.UtilFeature;
+import boofcv.android.gui.VideoRenderProcessing;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
@@ -27,7 +28,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class AssociationActivity extends VideoDisplayActivity
+public class AssociationActivity extends DemoVideoDisplayActivity
 		implements AdapterView.OnItemSelectedListener
 {
 	Spinner spinnerDesc;
@@ -58,7 +59,7 @@ public class AssociationActivity extends VideoDisplayActivity
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.associate_controls,null);
 
-		LinearLayout parent = (LinearLayout)findViewById(R.id.camera_preview_parent);
+		LinearLayout parent = getViewContent();
 		parent.addView(controls);
 
 		spinnerDet = (Spinner)controls.findViewById(R.id.spinner_detector);
@@ -75,7 +76,7 @@ public class AssociationActivity extends VideoDisplayActivity
 		spinnerDesc.setAdapter(adapter);
 		spinnerDesc.setOnItemSelectedListener(this);
 
-		FrameLayout iv = (FrameLayout)findViewById(R.id.camera_preview);
+		FrameLayout iv = getViewPreview();
 		mDetector = new GestureDetector(this, new MyGestureDetector(iv));
 		iv.setOnTouchListener(new View.OnTouchListener(){
 			@Override
@@ -155,7 +156,7 @@ public class AssociationActivity extends VideoDisplayActivity
 	}
 
 
-	protected class AssociationProcessing<Desc extends TupleDesc> extends BoofRenderProcessing<ImageFloat32> {
+	protected class AssociationProcessing<Desc extends TupleDesc> extends VideoRenderProcessing<ImageFloat32> {
 		DetectDescribePoint<ImageFloat32,Desc> detDesc;
 		AssociateDescription<Desc> associate;
 

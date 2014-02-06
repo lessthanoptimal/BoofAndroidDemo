@@ -16,6 +16,7 @@ import boofcv.abst.feature.disparity.StereoDisparity;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
+import boofcv.android.gui.VideoRenderProcessing;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.feature.disparity.DisparityAlgorithms;
@@ -30,7 +31,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class DisparityActivity extends VideoDisplayActivity
+public class DisparityActivity extends DemoVideoDisplayActivity
 		implements AdapterView.OnItemSelectedListener
 {
 	Spinner spinnerView;
@@ -61,7 +62,7 @@ public class DisparityActivity extends VideoDisplayActivity
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.disparity_controls,null);
 
-		LinearLayout parent = (LinearLayout)findViewById(R.id.camera_preview_parent);
+		LinearLayout parent = getViewContent();
 		parent.addView(controls);
 
 		spinnerView = (Spinner)controls.findViewById(R.id.spinner_view);
@@ -78,7 +79,7 @@ public class DisparityActivity extends VideoDisplayActivity
 		spinnerAlgs.setAdapter(adapter);
 		spinnerAlgs.setOnItemSelectedListener(this);
 
-		FrameLayout iv = (FrameLayout)findViewById(R.id.camera_preview);
+		FrameLayout iv = getViewPreview();
 		mDetector = new GestureDetector(this, new MyGestureDetector(iv));
 		iv.setOnTouchListener(new View.OnTouchListener(){
 			@Override
@@ -175,7 +176,7 @@ public class DisparityActivity extends VideoDisplayActivity
 	}
 
 
-	protected class DisparityProcessing extends BoofRenderProcessing<ImageFloat32> {
+	protected class DisparityProcessing extends VideoRenderProcessing<ImageFloat32> {
 
 		DisparityCalculation<SurfFeature> disparity;
 

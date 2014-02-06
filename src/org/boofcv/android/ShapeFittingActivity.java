@@ -1,7 +1,6 @@
 package org.boofcv.android;
 
 import android.graphics.*;
-import android.hardware.Camera;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +18,7 @@ import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.misc.GPixelMath;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.android.VisualizeImageData;
+import boofcv.android.gui.VideoImageProcessing;
 import boofcv.struct.PointIndex_I32;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageSInt32;
@@ -35,7 +35,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class ShapeFittingActivity extends VideoDisplayActivity
+public class ShapeFittingActivity extends DemoVideoDisplayActivity
 		implements AdapterView.OnItemSelectedListener
 {
 
@@ -48,7 +48,7 @@ public class ShapeFittingActivity extends VideoDisplayActivity
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.select_algorithm,null);
 
-		LinearLayout parent = (LinearLayout)findViewById(R.id.camera_preview_parent);
+		LinearLayout parent = getViewContent();
 		parent.addView(controls);
 
 		spinnerView = (Spinner)controls.findViewById(R.id.spinner_algs);
@@ -89,7 +89,7 @@ public class ShapeFittingActivity extends VideoDisplayActivity
 	@Override
 	public void onNothingSelected(AdapterView<?> adapterView) {}
 
-	protected abstract class BaseProcessing extends BoofImageProcessing<ImageUInt8> {
+	protected abstract class BaseProcessing extends VideoImageProcessing<ImageUInt8> {
 		ImageSInt16 edge;
 		ImageUInt8 binary;
 		ImageUInt8 filtered1;
@@ -103,14 +103,13 @@ public class ShapeFittingActivity extends VideoDisplayActivity
 		}
 
 		@Override
-		public void init(View view, Camera camera) {
-			super.init(view, camera);
-			Camera.Size size = camera.getParameters().getPreviewSize();
+		protected void declareImages( int width , int height ) {
+			super.declareImages(width, height);
 
-			edge = new ImageSInt16(size.width,size.height);
-			binary = new ImageUInt8(size.width,size.height);
-			filtered1 = new ImageUInt8(size.width,size.height);
-			contourOutput = new ImageSInt32(size.width,size.height);
+			edge = new ImageSInt16(width,height);
+			binary = new ImageUInt8(width,height);
+			filtered1 = new ImageUInt8(width,height);
+			contourOutput = new ImageSInt32(width,height);
 
 			paint.setStyle(Paint.Style.STROKE);
 			paint.setStrokeWidth(3f);

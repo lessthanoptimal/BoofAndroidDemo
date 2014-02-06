@@ -16,6 +16,7 @@ import boofcv.abst.sfm.AccessPointTracks;
 import boofcv.abst.sfm.d2.ImageMotion2D;
 import boofcv.alg.sfm.d2.StitchingFromMotion2D;
 import boofcv.android.ConvertBitmap;
+import boofcv.android.gui.VideoRenderProcessing;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.factory.sfm.FactoryMotion2D;
 import boofcv.struct.image.ImageSInt16;
@@ -34,7 +35,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class StabilizeDisplayActivity extends VideoDisplayActivity
+public class StabilizeDisplayActivity extends DemoVideoDisplayActivity
 implements CompoundButton.OnCheckedChangeListener
 {
 
@@ -60,7 +61,7 @@ implements CompoundButton.OnCheckedChangeListener
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.stabilization_controls,null);
 
-		LinearLayout parent = (LinearLayout)findViewById(R.id.camera_preview_parent);
+		LinearLayout parent = getViewContent();
 		parent.addView(controls);
 
 		CheckBox seek = (CheckBox)controls.findViewById(R.id.check_features);
@@ -104,7 +105,7 @@ implements CompoundButton.OnCheckedChangeListener
 		showFeatures = b;
 	}
 
-	protected class PointProcessing extends BoofRenderProcessing<ImageUInt8> {
+	protected class PointProcessing extends VideoRenderProcessing<ImageUInt8> {
 		StitchingFromMotion2D<ImageUInt8,Affine2D_F64> alg;
 		Homography2D_F64 imageToDistorted = new Homography2D_F64();
 		Homography2D_F64 distortedToImage = new Homography2D_F64();

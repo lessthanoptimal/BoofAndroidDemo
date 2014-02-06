@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.android.ConvertBitmap;
+import boofcv.android.gui.VideoRenderProcessing;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_F64;
@@ -20,7 +21,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class PointTrackerDisplayActivity extends VideoDisplayActivity {
+public class PointTrackerDisplayActivity extends DemoVideoDisplayActivity {
 
 	Paint paintLine = new Paint();
 	Paint paintRed = new Paint();
@@ -36,7 +37,7 @@ public class PointTrackerDisplayActivity extends VideoDisplayActivity {
 		paintBlue.setStyle(Paint.Style.FILL);
 	}
 
-	protected class PointProcessing extends BoofRenderProcessing<ImageUInt8> {
+	protected class PointProcessing extends VideoRenderProcessing<ImageUInt8> {
 		PointTracker<ImageUInt8> tracker;
 
 		long tick;

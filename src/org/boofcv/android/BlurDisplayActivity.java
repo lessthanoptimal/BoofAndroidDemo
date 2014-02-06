@@ -1,7 +1,6 @@
 package org.boofcv.android;
 
 import android.graphics.Bitmap;
-import android.hardware.Camera;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.android.ConvertBitmap;
+import boofcv.android.gui.VideoImageProcessing;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
@@ -20,7 +20,7 @@ import boofcv.struct.image.ImageUInt8;
  *
  * @author Peter Abeles
  */
-public class BlurDisplayActivity extends VideoDisplayActivity
+public class BlurDisplayActivity extends DemoVideoDisplayActivity
 		implements AdapterView.OnItemSelectedListener
 {
 
@@ -33,7 +33,7 @@ public class BlurDisplayActivity extends VideoDisplayActivity
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.select_algorithm,null);
 
-		LinearLayout parent = (LinearLayout)findViewById(R.id.camera_preview_parent);
+		LinearLayout parent = getViewContent();
 		parent.addView(controls);
 
 		spinnerView = (Spinner)controls.findViewById(R.id.spinner_algs);
@@ -74,7 +74,7 @@ public class BlurDisplayActivity extends VideoDisplayActivity
 	@Override
 	public void onNothingSelected(AdapterView<?> adapterView) {}
 
-	protected class BlurProcessing extends BoofImageProcessing<ImageUInt8> {
+	protected class BlurProcessing extends VideoImageProcessing<ImageUInt8> {
 		ImageUInt8 blurred;
 		BlurFilter<ImageUInt8> filter;
 
@@ -84,11 +84,10 @@ public class BlurDisplayActivity extends VideoDisplayActivity
 		}
 
 		@Override
-		public void init(View view, Camera camera) {
-			super.init(view, camera);
-			Camera.Size size = camera.getParameters().getPreviewSize();
+		protected void declareImages( int width , int height ) {
+			super.declareImages(width, height);
 
-			blurred = new ImageUInt8(size.width,size.height);
+			blurred = new ImageUInt8(width,height);
 		}
 
 		@Override

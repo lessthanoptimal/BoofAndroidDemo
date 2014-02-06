@@ -24,7 +24,7 @@
 				<category android:name="android.intent.category.LAUNCHER"/>
 			</intent-filter>
 		</activity>
-		<activity android:name=".VideoDisplayActivity" android:screenOrientation="landscape"/>
+		<activity android:name=".DemoVideoDisplayActivity" android:screenOrientation="landscape"/>
 		<activity android:name=".PreferenceActivity"/>
 		<activity android:name=".BlurDisplayActivity" android:screenOrientation="landscape"/>
 		<activity android:name=".EnhanceDisplayActivity" android:screenOrientation="landscape"/>

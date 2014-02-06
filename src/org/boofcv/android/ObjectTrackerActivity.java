@@ -15,6 +15,7 @@ import boofcv.abst.tracker.MeanShiftLikelihoodType;
 import boofcv.abst.tracker.TrackerObjectQuad;
 import boofcv.alg.tracker.sfot.SfotConfig;
 import boofcv.android.ConvertBitmap;
+import boofcv.android.gui.VideoImageProcessing;
 import boofcv.core.image.ConvertImage;
 import boofcv.factory.tracker.FactoryTrackerObjectQuad;
 import boofcv.struct.image.ImageBase;
@@ -30,7 +31,7 @@ import georegression.struct.shapes.Quadrilateral_F64;
  *
  * @author Peter Abeles
  */
-public class ObjectTrackerActivity extends VideoDisplayActivity
+public class ObjectTrackerActivity extends DemoVideoDisplayActivity
 		implements AdapterView.OnItemSelectedListener, View.OnTouchListener
 {
 
@@ -55,10 +56,10 @@ public class ObjectTrackerActivity extends VideoDisplayActivity
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.objecttrack_controls,null);
 
-		LinearLayout parent = (LinearLayout)findViewById(R.id.camera_preview_parent);
+		LinearLayout parent = getViewContent();
 		parent.addView(controls);
 
-		FrameLayout iv = (FrameLayout)findViewById(R.id.camera_preview);
+		FrameLayout iv = getViewPreview();
 		iv.setOnTouchListener(this);
 
 		spinnerView = (Spinner)controls.findViewById(R.id.spinner_algs);
@@ -150,7 +151,7 @@ public class ObjectTrackerActivity extends VideoDisplayActivity
 		mode = 0;
 	}
 
-	protected class TrackingProcessing<T extends ImageBase> extends BoofImageProcessing<MultiSpectral<ImageUInt8>>
+	protected class TrackingProcessing<T extends ImageBase> extends VideoImageProcessing<MultiSpectral<ImageUInt8>>
 	{
 
 		T input;

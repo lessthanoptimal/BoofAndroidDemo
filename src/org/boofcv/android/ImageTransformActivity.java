@@ -1,7 +1,6 @@
 package org.boofcv.android;
 
 import android.graphics.Bitmap;
-import android.hardware.Camera;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +16,7 @@ import boofcv.alg.transform.fft.DiscreteFourierTransformOps;
 import boofcv.alg.transform.wavelet.UtilWavelet;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
+import boofcv.android.gui.VideoImageProcessing;
 import boofcv.core.image.ConvertImage;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.factory.transform.wavelet.FactoryWaveletTransform;
@@ -31,7 +31,7 @@ import boofcv.struct.wavelet.WlCoef;
  *
  * @author Peter Abeles
  */
-public class ImageTransformActivity extends VideoDisplayActivity
+public class ImageTransformActivity extends DemoVideoDisplayActivity
 		implements AdapterView.OnItemSelectedListener
 {
 
@@ -44,7 +44,7 @@ public class ImageTransformActivity extends VideoDisplayActivity
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.select_algorithm,null);
 
-		LinearLayout parent = (LinearLayout)findViewById(R.id.camera_preview_parent);
+		LinearLayout parent = getViewContent();
 		parent.addView(controls);
 
 		spinnerView = (Spinner)controls.findViewById(R.id.spinner_algs);
@@ -85,7 +85,7 @@ public class ImageTransformActivity extends VideoDisplayActivity
 		}
 	}
 
-	protected class FourierProcessing extends BoofImageProcessing<ImageUInt8> {
+	protected class FourierProcessing extends VideoImageProcessing<ImageUInt8> {
 		DiscreteFourierTransform<ImageFloat32,InterleavedF32> dft = DiscreteFourierTransformOps.createTransformF32();
 		ImageFloat32 grayF;
 		InterleavedF32 transform;
@@ -95,12 +95,11 @@ public class ImageTransformActivity extends VideoDisplayActivity
 		}
 
 		@Override
-		public void init(View view, Camera camera) {
-			super.init(view, camera);
-			Camera.Size size = camera.getParameters().getPreviewSize();
+		protected void declareImages( int width , int height ) {
+			super.declareImages(width, height);
 
-			grayF = new ImageFloat32(size.width,size.height);
-			transform = new InterleavedF32(size.width,size.height,2);
+			grayF = new ImageFloat32(width,height);
+			transform = new InterleavedF32(width,height,2);
 		}
 
 		@Override
@@ -118,7 +117,7 @@ public class ImageTransformActivity extends VideoDisplayActivity
 	}
 
 	protected class PyramidProcessing<C extends WlCoef>
-			extends BoofImageProcessing<ImageUInt8>
+			extends VideoImageProcessing<ImageUInt8>
 	{
 		ImagePyramid<ImageUInt8> pyramid = FactoryPyramid.discreteGaussian(new int[]{2,4,8,16},-1,2,false,ImageUInt8.class);
 
@@ -130,12 +129,10 @@ public class ImageTransformActivity extends VideoDisplayActivity
 		}
 
 		@Override
-		public void init(View view, Camera camera) {
-			super.init(view, camera);
+		protected void declareImages( int width , int height ) {
+			super.declareImages(width, height);
 
-			Camera.Size size = camera.getParameters().getPreviewSize();
-
-			output = new ImageUInt8(size.width,size.height);
+			output = new ImageUInt8(width,height);
 		}
 
 		@Override
@@ -162,7 +159,7 @@ public class ImageTransformActivity extends VideoDisplayActivity
 	}
 
 	protected class WaveletProcessing<C extends WlCoef>
-			extends BoofImageProcessing<ImageUInt8>
+			extends VideoImageProcessing<ImageUInt8>
 	{
 		WaveletDescription<C> desc = GFactoryWavelet.haar(ImageUInt8.class);
 		WaveletTransform<ImageUInt8,ImageSInt32,C> waveletTran =
@@ -174,13 +171,11 @@ public class ImageTransformActivity extends VideoDisplayActivity
 		}
 
 		@Override
-		public void init(View view, Camera camera) {
-			super.init(view, camera);
-
-			Camera.Size size = camera.getParameters().getPreviewSize();
+		protected void declareImages( int width , int height ) {
+			super.declareImages(width, height);
 
 
-			ImageDimension d = UtilWavelet.transformDimension(size.width, size.height, waveletTran.getLevels() );
+			ImageDimension d = UtilWavelet.transformDimension(width, height, waveletTran.getLevels() );
 			transform = new ImageSInt32(d.width,d.height);
 		}
 

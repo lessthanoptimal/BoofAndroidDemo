@@ -14,6 +14,7 @@ import boofcv.abst.feature.detect.line.DetectLine;
 import boofcv.abst.feature.detect.line.DetectLineSegment;
 import boofcv.alg.feature.detect.line.LineImageOps;
 import boofcv.android.ConvertBitmap;
+import boofcv.android.gui.VideoRenderProcessing;
 import boofcv.factory.feature.detect.line.FactoryDetectLineAlgs;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageType;
@@ -30,7 +31,7 @@ import java.util.List;
  *
  * @author Peter Abeles
  */
-public class LineDisplayActivity extends VideoDisplayActivity
+public class LineDisplayActivity extends DemoVideoDisplayActivity
 		implements AdapterView.OnItemSelectedListener {
 
 	Paint paint;
@@ -54,7 +55,7 @@ public class LineDisplayActivity extends VideoDisplayActivity
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.detect_line_controls,null);
 
-		LinearLayout parent = (LinearLayout)findViewById(R.id.camera_preview_parent);
+		LinearLayout parent = getViewContent();
 		parent.addView(controls);
 
 		spinner = (Spinner)controls.findViewById(R.id.spinner_algs);
@@ -149,7 +150,7 @@ public class LineDisplayActivity extends VideoDisplayActivity
 	@Override
 	public void onNothingSelected(AdapterView<?> adapterView) {}
 
-	protected class LineProcessing extends BoofRenderProcessing<ImageUInt8> {
+	protected class LineProcessing extends VideoRenderProcessing<ImageUInt8> {
 		DetectLine<ImageUInt8> detector;
 		DetectLineSegment<ImageUInt8> detectorSegment = null;
 

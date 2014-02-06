@@ -1,7 +1,6 @@
 package org.boofcv.android;
 
 import android.graphics.Bitmap;
-import android.hardware.Camera;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +8,7 @@ import android.widget.*;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.android.VisualizeImageData;
+import boofcv.android.gui.VideoImageProcessing;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 
@@ -17,7 +17,7 @@ import boofcv.struct.image.ImageUInt8;
  *
  * @author Peter Abeles
  */
-public class BinaryDisplayActivity extends VideoDisplayActivity
+public class BinaryDisplayActivity extends DemoVideoDisplayActivity
 		implements SeekBar.OnSeekBarChangeListener ,
 		CompoundButton.OnCheckedChangeListener,
 		AdapterView.OnItemSelectedListener {
@@ -32,7 +32,7 @@ public class BinaryDisplayActivity extends VideoDisplayActivity
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.binary_controls,null);
 
-		LinearLayout parent = (LinearLayout)findViewById(R.id.camera_preview_parent);
+		LinearLayout parent = getViewContent();
 		parent.addView(controls);
 
 		SeekBar seek = (SeekBar)controls.findViewById(R.id.slider_threshold);
@@ -83,7 +83,7 @@ public class BinaryDisplayActivity extends VideoDisplayActivity
 	@Override
 	public void onNothingSelected(AdapterView<?> adapterView) {}
 
-	protected class ThresholdProcessing extends BoofImageProcessing<ImageUInt8> {
+	protected class ThresholdProcessing extends VideoImageProcessing<ImageUInt8> {
 		ImageUInt8 binary;
 		ImageUInt8 afterOps;
 
@@ -92,12 +92,11 @@ public class BinaryDisplayActivity extends VideoDisplayActivity
 		}
 
 		@Override
-		public void init(View view, Camera camera) {
-			super.init(view, camera);
-			Camera.Size size = camera.getParameters().getPreviewSize();
+		protected void declareImages( int width , int height ) {
+			super.declareImages(width, height);
 
-			binary = new ImageUInt8(size.width,size.height);
-			afterOps = new ImageUInt8(size.width,size.height);
+			binary = new ImageUInt8(width,height);
+			afterOps = new ImageUInt8(width,height);
 		}
 
 		@Override

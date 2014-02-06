@@ -1,7 +1,6 @@
 package org.boofcv.android;
 
 import android.graphics.Bitmap;
-import android.hardware.Camera;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.android.VisualizeImageData;
+import boofcv.android.gui.VideoImageProcessing;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageType;
@@ -22,7 +22,7 @@ import boofcv.struct.image.ImageUInt8;
  *
  * @author Peter Abeles
  */
-public class GradientDisplayActivity extends VideoDisplayActivity
+public class GradientDisplayActivity extends DemoVideoDisplayActivity
 implements AdapterView.OnItemSelectedListener
 {
 
@@ -38,7 +38,7 @@ implements AdapterView.OnItemSelectedListener
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.gradient_controls,null);
 
-		LinearLayout parent = (LinearLayout)findViewById(R.id.camera_preview_parent);
+		LinearLayout parent = getViewContent();
 		parent.addView(controls);
 
 		spinnerGradient = (Spinner)controls.findViewById(R.id.spinner_gradient);
@@ -83,7 +83,7 @@ implements AdapterView.OnItemSelectedListener
 	@Override
 	public void onNothingSelected(AdapterView<?> adapterView) {}
 
-	protected class GradientProcessing extends BoofImageProcessing<ImageUInt8> {
+	protected class GradientProcessing extends VideoImageProcessing<ImageUInt8> {
 		ImageSInt16 derivX;
 		ImageSInt16 derivY;
 		ImageGradient<ImageUInt8,ImageSInt16> gradient;
@@ -94,12 +94,11 @@ implements AdapterView.OnItemSelectedListener
 		}
 
 		@Override
-		public void init(View view, Camera camera) {
-			super.init(view, camera);
-			Camera.Size size = camera.getParameters().getPreviewSize();
+		protected void declareImages( int width , int height ) {
+			super.declareImages(width, height);
 
-			derivX = new ImageSInt16(size.width,size.height);
-			derivY = new ImageSInt16(size.width,size.height);
+			derivX = new ImageSInt16(width,height);
+			derivY = new ImageSInt16(width,height);
 		}
 
 		@Override

@@ -18,6 +18,7 @@ import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.alg.feature.detect.interest.EasyGeneralFeatureDetector;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.android.ConvertBitmap;
+import boofcv.android.gui.VideoRenderProcessing;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
 import boofcv.struct.QueueCorner;
@@ -32,7 +33,7 @@ import georegression.struct.point.Point2D_I16;
  *
  * @author Peter Abeles
  */
-public class PointDisplayActivity extends VideoDisplayActivity
+public class PointDisplayActivity extends DemoVideoDisplayActivity
 		implements AdapterView.OnItemSelectedListener  {
 
 	Spinner spinner;
@@ -58,7 +59,7 @@ public class PointDisplayActivity extends VideoDisplayActivity
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.detect_point_controls,null);
 
-		LinearLayout parent = (LinearLayout)findViewById(R.id.camera_preview_parent);
+		LinearLayout parent = getViewContent();
 		parent.addView(controls);
 
 		spinner = (Spinner)controls.findViewById(R.id.spinner_algs);
@@ -144,7 +145,7 @@ public class PointDisplayActivity extends VideoDisplayActivity
 	@Override
 	public void onNothingSelected(AdapterView<?> adapterView) {}
 
-	protected class PointProcessing extends BoofRenderProcessing<ImageUInt8> {
+	protected class PointProcessing extends VideoRenderProcessing<ImageUInt8> {
 		EasyGeneralFeatureDetector<ImageUInt8,ImageSInt16> detector;
 
 		NonMaxSuppression nonmax;

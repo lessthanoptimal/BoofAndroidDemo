@@ -10,6 +10,7 @@ import android.widget.SeekBar;
 import boofcv.alg.feature.detect.edge.CannyEdge;
 import boofcv.alg.feature.detect.edge.EdgeContour;
 import boofcv.android.VisualizeImageData;
+import boofcv.android.gui.VideoImageProcessing;
 import boofcv.factory.feature.detect.edge.FactoryEdgeDetectors;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageType;
@@ -23,7 +24,7 @@ import java.util.Random;
  *
  * @author Peter Abeles
  */
-public class CannyEdgeActivity extends VideoDisplayActivity
+public class CannyEdgeActivity extends DemoVideoDisplayActivity
 	implements SeekBar.OnSeekBarChangeListener, CompoundButton.OnCheckedChangeListener
 {
 	Random rand = new Random(234);
@@ -43,7 +44,7 @@ public class CannyEdgeActivity extends VideoDisplayActivity
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.canny_controls,null);
 
-		LinearLayout parent = (LinearLayout)findViewById(R.id.camera_preview_parent);
+		LinearLayout parent = getViewContent();
 		parent.addView(controls);
 
 		SeekBar seek = (SeekBar)controls.findViewById(R.id.slider_threshold);
@@ -81,7 +82,7 @@ public class CannyEdgeActivity extends VideoDisplayActivity
 		colorize = b;
 	}
 
-	protected class CannyProcessing extends BoofImageProcessing<ImageUInt8> {
+	protected class CannyProcessing extends VideoImageProcessing<ImageUInt8> {
 		CannyEdge<ImageUInt8,ImageSInt16> canny;
 
 		public CannyProcessing() {
