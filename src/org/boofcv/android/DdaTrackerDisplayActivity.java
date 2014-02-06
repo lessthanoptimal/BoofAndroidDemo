@@ -47,7 +47,7 @@ public class DdaTrackerDisplayActivity extends PointTrackerDisplayActivity
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.associate_controls,null);
 
-		LinearLayout parent = (LinearLayout)findViewById(R.id.camera_preview_parent);
+		LinearLayout parent = getViewContent();
 		parent.addView(controls);
 
 		List<String> detectors = new ArrayList<String>();

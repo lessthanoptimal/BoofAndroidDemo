@@ -47,7 +47,7 @@ public class CombinedTrackerDisplayActivity extends PointTrackerDisplayActivity
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.combined_tracker_controls,null);
 
-		LinearLayout parent = (LinearLayout)findViewById(R.id.camera_preview_parent);
+		LinearLayout parent = getViewContent();
 		parent.addView(controls);
 
 		List<String> local = new ArrayList<String>();

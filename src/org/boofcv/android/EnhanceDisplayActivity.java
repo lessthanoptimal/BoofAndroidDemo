@@ -1,7 +1,6 @@
 package org.boofcv.android;
 
 import android.graphics.Bitmap;
-import android.hardware.Camera;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
