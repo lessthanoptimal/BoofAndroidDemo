@@ -22,10 +22,10 @@ public class CalibrationHelpActivity extends Activity {
 			"The expected calibration target is shown below.  "+
 			"For detailed instructions go to the following webpage: "+
 			"<a href=\"http://peterabeles.com/blog/?p=204\">http://peterabeles.com/blog/?p=204</a></p><br>"+
-			"* Tap picture to detect target.<br>" +
-			"* Red dots means it work.<br>"+
+			"* GENTLY tap the picture to detect target.<br>" +
+			"* Tapping too hard will cause motion blur.<br>" +
+			"* Red dots means it worked.<br>"+
 			"* B&W threshold image means it did not work.<br>"+
-			"* Works best when there are no shadows<br>"+
 			"* Try to maximize target size in the screen";
 
 	public void onCreate(Bundle savedInstanceState) {

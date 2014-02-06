@@ -100,8 +100,8 @@ public class BinaryDisplayActivity extends DemoVideoDisplayActivity
 		}
 
 		@Override
-		protected void process(ImageUInt8 gray, Bitmap output, byte[] storage) {
-			GThresholdImageOps.threshold(gray,binary,threshold, down);
+		protected void process(ImageUInt8 input, Bitmap output, byte[] storage) {
+			GThresholdImageOps.threshold(input,binary,threshold, down);
 
 			switch( action ) {
 				case 1:

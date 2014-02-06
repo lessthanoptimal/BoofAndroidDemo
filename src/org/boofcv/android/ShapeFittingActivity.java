@@ -117,9 +117,9 @@ public class ShapeFittingActivity extends DemoVideoDisplayActivity
 		}
 
 		@Override
-		protected void process(ImageUInt8 gray, Bitmap output, byte[] storage) {
+		protected void process(ImageUInt8 input, Bitmap output, byte[] storage) {
 
-			GImageDerivativeOps.laplace(gray,edge);
+			GImageDerivativeOps.laplace(input,edge);
 			GPixelMath.abs(edge,edge);
 
 			// use the mean value to threshold the image

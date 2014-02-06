@@ -1,6 +1,7 @@
 package org.boofcv.android;
 
 import android.graphics.Bitmap;
+import android.hardware.Camera;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -143,10 +144,10 @@ public class EnhanceDisplayActivity extends DemoVideoDisplayActivity
 
 
 		@Override
-		protected void process(ImageUInt8 gray, Bitmap output, byte[] storage) {
-			ImageStatistics.histogram(gray, histogram);
+		protected void process(ImageUInt8 input, Bitmap output, byte[] storage) {
+			ImageStatistics.histogram(input, histogram);
 			EnhanceImageOps.equalize(histogram, transform);
-			EnhanceImageOps.applyTransform(gray, transform, enhanced);
+			EnhanceImageOps.applyTransform(input, transform, enhanced);
 			ConvertBitmap.grayToBitmap(enhanced,output,storage);
 		}
 	}
@@ -156,12 +157,12 @@ public class EnhanceDisplayActivity extends DemoVideoDisplayActivity
 		int transform[] = new int[256];
 
 		@Override
-		protected void process(MultiSpectral<ImageUInt8> color, Bitmap output, byte[] storage) {
-			ConvertImage.average(color,gray);
+		protected void process(MultiSpectral<ImageUInt8> input, Bitmap output, byte[] storage) {
+			ConvertImage.average(input,gray);
 			ImageStatistics.histogram(gray, histogram);
 			EnhanceImageOps.equalize(histogram, transform);
 			for( int i = 0; i < 3; i++ )
-				EnhanceImageOps.applyTransform(color.getBand(i), transform, enhanced.getBand(i));
+				EnhanceImageOps.applyTransform(input.getBand(i), transform, enhanced.getBand(i));
 			ConvertBitmap.multiToBitmap(enhanced,output,storage);
 		}
 	}
@@ -171,8 +172,8 @@ public class EnhanceDisplayActivity extends DemoVideoDisplayActivity
 		int transform[] = new int[256];
 
 		@Override
-		protected void process(ImageUInt8 gray, Bitmap output, byte[] storage) {
-			EnhanceImageOps.equalizeLocal(gray, 50, enhanced, histogram, transform);
+		protected void process(ImageUInt8 input, Bitmap output, byte[] storage) {
+			EnhanceImageOps.equalizeLocal(input, 50, enhanced, histogram, transform);
 			ConvertBitmap.grayToBitmap(enhanced,output,storage);
 		}
 	}
@@ -182,9 +183,9 @@ public class EnhanceDisplayActivity extends DemoVideoDisplayActivity
 		int transform[] = new int[256];
 
 		@Override
-		protected void process(MultiSpectral<ImageUInt8> color, Bitmap output, byte[] storage) {
+		protected void process(MultiSpectral<ImageUInt8> input, Bitmap output, byte[] storage) {
 			for( int i = 0; i < 3; i++ )
-				EnhanceImageOps.equalizeLocal(color.getBand(i), 50, enhanced.getBand(i), histogram, transform);
+				EnhanceImageOps.equalizeLocal(input.getBand(i), 50, enhanced.getBand(i), histogram, transform);
 			ConvertBitmap.multiToBitmap(enhanced,output,storage);
 		}
 	}
@@ -198,11 +199,11 @@ public class EnhanceDisplayActivity extends DemoVideoDisplayActivity
 		}
 
 		@Override
-		protected void process(ImageUInt8 gray, Bitmap output, byte[] storage) {
+		protected void process(ImageUInt8 input, Bitmap output, byte[] storage) {
 			if( which == 4 )
-				EnhanceImageOps.sharpen4(gray, enhanced);
+				EnhanceImageOps.sharpen4(input, enhanced);
 			else
-				EnhanceImageOps.sharpen8(gray, enhanced);
+				EnhanceImageOps.sharpen8(input, enhanced);
 			ConvertBitmap.grayToBitmap(enhanced,output,storage);
 		}
 	}
@@ -216,12 +217,12 @@ public class EnhanceDisplayActivity extends DemoVideoDisplayActivity
 		}
 
 		@Override
-		protected void process( MultiSpectral<ImageUInt8> color, Bitmap output, byte[] storage) {
+		protected void process( MultiSpectral<ImageUInt8> input, Bitmap output, byte[] storage) {
 			for( int i = 0; i < 3; i++ ) {
 				if( which == 4 )
-					EnhanceImageOps.sharpen4(color.getBand(i), enhanced.getBand(i));
+					EnhanceImageOps.sharpen4(input.getBand(i), enhanced.getBand(i));
 				else
-					EnhanceImageOps.sharpen8(color.getBand(i), enhanced.getBand(i));
+					EnhanceImageOps.sharpen8(input.getBand(i), enhanced.getBand(i));
 			}
 			ConvertBitmap.multiToBitmap(enhanced, output, storage);
 		}
@@ -230,16 +231,16 @@ public class EnhanceDisplayActivity extends DemoVideoDisplayActivity
 	protected class NoneProcessing extends EnhanceProcessing {
 
 		@Override
-		protected void process(ImageUInt8 gray, Bitmap output, byte[] storage) {
-			ConvertBitmap.grayToBitmap(gray,output,storage);
+		protected void process(ImageUInt8 input, Bitmap output, byte[] storage) {
+			ConvertBitmap.grayToBitmap(input,output,storage);
 		}
 	}
 
 	protected class NoneProcessingColor extends EnhanceProcessingColor {
 
 		@Override
-		protected void process(MultiSpectral<ImageUInt8> color, Bitmap output, byte[] storage) {
-			ConvertBitmap.multiToBitmap(color, output, storage);
+		protected void process(MultiSpectral<ImageUInt8> input, Bitmap output, byte[] storage) {
+			ConvertBitmap.multiToBitmap(input, output, storage);
 		}
 	}
 }

@@ -4,8 +4,10 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.hardware.Camera;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -16,6 +18,7 @@ import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.gui.VideoImageProcessing;
+import boofcv.core.image.ConvertImage;
 import boofcv.core.image.border.FactoryImageBorder;
 import boofcv.core.image.border.ImageBorder;
 import boofcv.factory.distort.FactoryDistort;
@@ -35,8 +38,10 @@ public class UndistortDisplayActivity extends DemoVideoDisplayActivity
 {
 
 	ToggleButton toggleDistort;
+	ToggleButton toggleColor;
 
 	boolean isDistorted = false;
+	boolean isColor = false;
 
 	ImageDistort<ImageUInt8> removeDistortion;
 
@@ -54,12 +59,19 @@ public class UndistortDisplayActivity extends DemoVideoDisplayActivity
 		toggleDistort.setOnCheckedChangeListener(this);
 		toggleDistort.setChecked(isDistorted);
 
+		toggleColor = (ToggleButton)controls.findViewById(R.id.toggle_color);
+		toggleColor.setOnCheckedChangeListener(this);
+		toggleColor.setChecked(isColor);
+
 		if( DemoMain.preference.intrinsic != null ) {
 			// define the transform.  Cache the results for quick rendering later on
 			PointTransform_F32 fullView = LensDistortionOps.fullView(DemoMain.preference.intrinsic, null);
 			InterpolatePixelS<ImageUInt8> interp = FactoryInterpolation.bilinearPixelS(ImageUInt8.class);
 			ImageBorder border = FactoryImageBorder.value(ImageUInt8.class,0);
-			removeDistortion = FactoryDistort.distortCached(interp,border,ImageUInt8.class);
+//			removeDistortion = FactoryDistort.distortCached(interp,border,ImageUInt8.class);
+			// for some reason this is faster on a low end phone.  Maybe it has to do with CPU memory cache misses
+			// when looking up a point?
+			removeDistortion = FactoryDistort.distort(interp,border,ImageUInt8.class);
 			removeDistortion.setModel(new PointToPixelTransform_F32(fullView));
 		}
 	}
@@ -78,6 +90,8 @@ public class UndistortDisplayActivity extends DemoVideoDisplayActivity
 		}
 		if( toggleDistort == compoundButton ) {
 			isDistorted = b;
+		} else if( toggleColor == compoundButton ) {
+			isColor = b;
 		}
 	}
 
@@ -96,7 +110,7 @@ public class UndistortDisplayActivity extends DemoVideoDisplayActivity
 		}
 
 		@Override
-		protected void process(MultiSpectral<ImageUInt8> color, Bitmap output, byte[] storage) {
+		protected void process(MultiSpectral<ImageUInt8> input, Bitmap output, byte[] storage) {
 			if( DemoMain.preference.intrinsic == null ) {
 				Canvas canvas = new Canvas(output);
 				Paint paint = new Paint();
@@ -106,12 +120,24 @@ public class UndistortDisplayActivity extends DemoVideoDisplayActivity
 
 				canvas.drawText("Calibrate Camera First", (canvas.getWidth() - textLength) / 2, canvas.getHeight() / 2, paint);
 			} else if( isDistorted ) {
-				ConvertBitmap.multiToBitmap(color,output,storage);
-			} else {
-				for( int i = 0; i < color.getNumBands(); i++ ) {
-					removeDistortion.apply(color.getBand(i),undistorted.getBand(i));
+				if( isColor )
+					ConvertBitmap.multiToBitmap(input,output,storage);
+				else {
+					ConvertImage.average(input,undistorted.getBand(0));
+					ConvertBitmap.grayToBitmap(undistorted.getBand(0),output,storage);
 				}
-				ConvertBitmap.multiToBitmap(undistorted,output,storage);
+			} else {
+				if( isColor ) {
+					for( int i = 0; i < input.getNumBands(); i++ ) {
+						removeDistortion.apply(input.getBand(i),undistorted.getBand(i));
+					}
+
+					ConvertBitmap.multiToBitmap(undistorted,output,storage);
+				} else {
+					ConvertImage.average(input,undistorted.getBand(0));
+					removeDistortion.apply(undistorted.getBand(0),undistorted.getBand(1));
+					ConvertBitmap.grayToBitmap(undistorted.getBand(1),output,storage);
+				}
 			}
 		}
 	}

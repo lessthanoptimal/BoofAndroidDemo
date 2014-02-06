@@ -102,8 +102,8 @@ implements AdapterView.OnItemSelectedListener
 		}
 
 		@Override
-		protected void process(ImageUInt8 gray, Bitmap output, byte[] storage) {
-			gradient.process(gray,derivX,derivY);
+		protected void process(ImageUInt8 input, Bitmap output, byte[] storage) {
+			gradient.process(input,derivX,derivY);
 			VisualizeImageData.colorizeGradient(derivX,derivY,-1,output,storage);
 		}
 	}

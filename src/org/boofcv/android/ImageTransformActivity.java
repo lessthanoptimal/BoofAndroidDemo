@@ -103,8 +103,8 @@ public class ImageTransformActivity extends DemoVideoDisplayActivity
 		}
 
 		@Override
-		protected void process(ImageUInt8 gray, Bitmap output, byte[] storage) {
-			ConvertImage.convert(gray, grayF);
+		protected void process(ImageUInt8 input, Bitmap output, byte[] storage) {
+			ConvertImage.convert(input, grayF);
 			PixelMath.divide(grayF,255.0f,grayF);
 			dft.forward(grayF, transform);
 			DiscreteFourierTransformOps.shiftZeroFrequency(transform, true);
@@ -136,9 +136,9 @@ public class ImageTransformActivity extends DemoVideoDisplayActivity
 		}
 
 		@Override
-		protected void process(ImageUInt8 gray, Bitmap output, byte[] storage) {
+		protected void process(ImageUInt8 input, Bitmap output, byte[] storage) {
 
-			pyramid.process(gray);
+			pyramid.process(input);
 
 			draw(0, 0, pyramid.getLayer(0));
 			int height = 0;
@@ -180,9 +180,9 @@ public class ImageTransformActivity extends DemoVideoDisplayActivity
 		}
 
 		@Override
-		protected void process(ImageUInt8 gray, Bitmap output, byte[] storage) {
+		protected void process(ImageUInt8 input, Bitmap output, byte[] storage) {
 
-			waveletTran.transform(gray,transform);
+			waveletTran.transform(input,transform);
 			System.out.println("BOOF: num levels " + waveletTran.getLevels());
 			System.out.println("BOOF: width "+transform.getWidth()+" "+transform.getHeight());
 			UtilWavelet.adjustForDisplay(transform, waveletTran.getLevels(), 255);

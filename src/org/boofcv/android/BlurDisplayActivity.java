@@ -91,8 +91,8 @@ public class BlurDisplayActivity extends DemoVideoDisplayActivity
 		}
 
 		@Override
-		protected void process(ImageUInt8 gray, Bitmap output, byte[] storage) {
-			filter.process(gray,blurred);
+		protected void process(ImageUInt8 input, Bitmap output, byte[] storage) {
+			filter.process(input,blurred);
 			ConvertBitmap.grayToBitmap(blurred,output,storage);
 		}
 	}
