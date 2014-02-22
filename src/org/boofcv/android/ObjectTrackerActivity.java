@@ -108,10 +108,10 @@ public class ObjectTrackerActivity extends DemoVideoDisplayActivity
 
 			case 4:{
 				imageType = ImageType.single(ImageUInt8.class);
-				SfotConfig config = new SfotConfig(ImageUInt8.class);
+				SfotConfig config = new SfotConfig();
 				config.numberOfSamples = 10;
 				config.robustMaxError = 30;
-				tracker = FactoryTrackerObjectQuad.sparseFlow(config);
+				tracker = FactoryTrackerObjectQuad.sparseFlow(config,ImageUInt8.class,null);
 			}break;
 
 			case 5:

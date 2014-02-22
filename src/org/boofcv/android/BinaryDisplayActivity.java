@@ -105,19 +105,19 @@ public class BinaryDisplayActivity extends DemoVideoDisplayActivity
 
 			switch( action ) {
 				case 1:
-					BinaryImageOps.dilate4(binary,afterOps);
+					BinaryImageOps.dilate4(binary,1,afterOps);
 					break;
 
 				case 2:
-					BinaryImageOps.dilate8(binary,afterOps);
+					BinaryImageOps.dilate8(binary,1,afterOps);
 					break;
 
 				case 3:
-					BinaryImageOps.erode4(binary,afterOps);
+					BinaryImageOps.erode4(binary,1,afterOps);
 					break;
 
 				case 4:
-					BinaryImageOps.erode8(binary,afterOps);
+					BinaryImageOps.erode8(binary,1,afterOps);
 					break;
 
 				case 5:

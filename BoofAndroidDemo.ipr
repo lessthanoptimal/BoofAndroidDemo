@@ -398,7 +398,7 @@
       <module fileurl="file://$PROJECT_DIR$/../ejml/trunk/ejml.iml" filepath="$PROJECT_DIR$/../ejml/trunk/ejml.iml" />
     </modules>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="Android 4.2" project-jdk-type="Android SDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="Android 4.2 Platform" project-jdk-type="Android SDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
   <component name="SvnBranchConfigurationManager">
@@ -408,7 +408,7 @@
     <mapping directory="" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../boofcv" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../ddogleg" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/../ejml/trunk" vcs="svn" />
+    <mapping directory="$PROJECT_DIR$/../ejml/trunk" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../georegression" vcs="Git" />
   </component>
   <component name="libraryTable">

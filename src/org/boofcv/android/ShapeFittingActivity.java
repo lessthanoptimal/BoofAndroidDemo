@@ -19,6 +19,7 @@ import boofcv.alg.misc.GPixelMath;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.android.VisualizeImageData;
 import boofcv.android.gui.VideoImageProcessing;
+import boofcv.struct.ConnectRule;
 import boofcv.struct.PointIndex_I32;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageSInt32;
@@ -96,7 +97,7 @@ public class ShapeFittingActivity extends DemoVideoDisplayActivity
 		ImageSInt32 contourOutput;
 		Paint paint = new Paint();
 		RectF r = new RectF();
-		LinearContourLabelChang2004 findContours = new LinearContourLabelChang2004(8);
+		LinearContourLabelChang2004 findContours = new LinearContourLabelChang2004(ConnectRule.EIGHT);
 
 		protected BaseProcessing() {
 			super(ImageType.single(ImageUInt8.class));
