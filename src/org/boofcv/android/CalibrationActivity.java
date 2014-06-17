@@ -114,8 +114,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 		startVideoProcessing();
 
 		if( DemoMain.preference.intrinsic != null ) {
-			Toast toast = Toast.makeText(this, "Camera already calibrated", 2000);
-			toast.show();
+			Toast.makeText(this, "Camera already calibrated", 2000).show();
 		}
 	}
 
@@ -131,7 +130,6 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 			CalibrationComputeActivity.target = FactoryPlanarCalibrationTarget.gridChess(numCols, numRows, 30);
 		} else {
 			ConfigSquareGrid config = new ConfigSquareGrid(numCols,numRows);
-			config.maxCombinations = 1;
 			detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(config);
 			CalibrationComputeActivity.target = FactoryPlanarCalibrationTarget.gridSquare(numCols, numRows, 30,30);
 		}
@@ -167,8 +165,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 	 */
 	private void handleProcessRequest() {
 		if( shots.size() < 3 ) {
-			Toast toast = Toast.makeText(this, "Need at least three images.", 2000);
-			toast.show();
+			Toast.makeText(this, "Need at least three images.", 2000).show();
 		} else {
 			CalibrationComputeActivity.images = shots;
 			Intent intent = new Intent(this, CalibrationComputeActivity.class);

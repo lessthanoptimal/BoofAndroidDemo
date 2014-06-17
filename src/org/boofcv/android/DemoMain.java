@@ -97,6 +97,7 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		detect.addChild("Lines",LineDisplayActivity.class);
 		detect.addChild("Canny Edge",CannyEdgeActivity.class);
 		detect.addChild("Shape Fitting",ShapeFittingActivity.class);
+		detect.addChild("Segmentation",SegmentationDisplayActivity.class);
 
 		assoc.addChild("Two Pictures",AssociationActivity.class);
 
@@ -218,8 +219,7 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		} catch (FileNotFoundException e) {
 
 		} catch (IOException e) {
-			Toast toast = Toast.makeText(this, "Failed to load intrinsic parameters", 2000);
-			toast.show();
+			Toast.makeText(this, "Failed to load intrinsic parameters", 2000).show();
 		}
 	}
 

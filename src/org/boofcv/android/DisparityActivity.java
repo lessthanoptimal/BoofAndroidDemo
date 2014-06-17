@@ -133,8 +133,7 @@ public class DisparityActivity extends DemoVideoDisplayActivity
 
 			// make sure the camera is calibrated first
 			if( DemoMain.preference.intrinsic == null ) {
-				Toast toast = Toast.makeText(DisparityActivity.this, "You must first calibrate the camera!", 2000);
-				toast.show();
+				Toast.makeText(DisparityActivity.this, "You must first calibrate the camera!", 2000).show();
 				return false;
 			}
 
@@ -300,8 +299,7 @@ public class DisparityActivity extends DemoVideoDisplayActivity
 						}
 						runOnUiThread(new Runnable() {
 							public void run() {
-								Toast toast = Toast.makeText(DisparityActivity.this, "Disparity computation failed!", 2000);
-								toast.show();
+								Toast.makeText(DisparityActivity.this, "Disparity computation failed!", 2000).show();
 							}});
 					}
 				} else if( changeDisparityAlg != -1 && visualize.hasLeft && visualize.hasRight ) {

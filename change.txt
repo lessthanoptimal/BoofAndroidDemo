@@ -7,6 +7,7 @@ Version
 Date: 2014
 
 - Pushed several classes into BoofCV Android integration package
+- Added image segmentation demonstration
 
 -------------------------------------------------
 Version 1.4.1

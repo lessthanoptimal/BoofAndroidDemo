@@ -15,6 +15,8 @@ import boofcv.abst.feature.detect.line.DetectLineSegment;
 import boofcv.alg.feature.detect.line.LineImageOps;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.gui.VideoRenderProcessing;
+import boofcv.factory.feature.detect.line.ConfigHoughFoot;
+import boofcv.factory.feature.detect.line.ConfigHoughPolar;
 import boofcv.factory.feature.detect.line.FactoryDetectLineAlgs;
 import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageType;
@@ -106,11 +108,13 @@ public class LineDisplayActivity extends DemoVideoDisplayActivity
 
 		switch( active ) {
 			case 0:
-				detector = FactoryDetectLineAlgs.houghFoot(5,6,5,40,numLines,ImageUInt8.class,ImageSInt16.class);
+				detector = FactoryDetectLineAlgs.houghFoot(
+						new ConfigHoughFoot(5,6,5,40,numLines),ImageUInt8.class,ImageSInt16.class);
 				break;
 
 			case 1:
-				detector = FactoryDetectLineAlgs.houghPolar(5,6,2,Math.PI/120.0,40,numLines,ImageUInt8.class,ImageSInt16.class);
+				detector = FactoryDetectLineAlgs.houghPolar(
+						new ConfigHoughPolar(5,6,2,Math.PI/120.0,40,numLines),ImageUInt8.class,ImageSInt16.class);
 				break;
 
 			default:

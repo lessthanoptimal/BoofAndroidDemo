@@ -96,4 +96,12 @@
 		<item>Rect</item>
 		<item>5-Rect</item>
 	</string-array>
+
+	<string-array name="segmentation_algs">
+		<item>Watershed</item>
+		<item>Felzenszwalb-Huttenloche</item>
+		<item>SLIC</item>
+		<item>Mean-Shift</item>
+	</string-array>
+
 </resources>
