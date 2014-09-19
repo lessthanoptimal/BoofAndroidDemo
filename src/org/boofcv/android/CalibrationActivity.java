@@ -114,7 +114,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 		startVideoProcessing();
 
 		if( DemoMain.preference.intrinsic != null ) {
-			Toast.makeText(this, "Camera already calibrated", 2000).show();
+			Toast.makeText(this, "Camera already calibrated", Toast.LENGTH_SHORT).show();
 		}
 	}
 
@@ -165,7 +165,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 	 */
 	private void handleProcessRequest() {
 		if( shots.size() < 3 ) {
-			Toast.makeText(this, "Need at least three images.", 2000).show();
+			Toast.makeText(this, "Need at least three images.", Toast.LENGTH_SHORT).show();
 		} else {
 			CalibrationComputeActivity.images = shots;
 			Intent intent = new Intent(this, CalibrationComputeActivity.class);

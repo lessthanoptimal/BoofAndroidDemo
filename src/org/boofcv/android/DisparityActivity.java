@@ -1,5 +1,6 @@
 package org.boofcv.android;
 
+import android.app.Activity;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -133,7 +134,7 @@ public class DisparityActivity extends DemoVideoDisplayActivity
 
 			// make sure the camera is calibrated first
 			if( DemoMain.preference.intrinsic == null ) {
-				Toast.makeText(DisparityActivity.this, "You must first calibrate the camera!", 2000).show();
+				Toast.makeText(DisparityActivity.this, "You must first calibrate the camera!", Toast.LENGTH_SHORT).show();
 				return false;
 			}
 
@@ -292,6 +293,13 @@ public class DisparityActivity extends DemoVideoDisplayActivity
 							disparityImage.setTo(disparity.getDisparity());
 							visualize.setMatches(disparity.getInliersPixel());
 							visualize.forgetSelection();
+
+							runOnUiThread(new Runnable() {
+								@Override
+								public void run() {
+									spinnerView.setSelection(2); // switch to disparity view
+								}
+							});
 						}
 					} else {
 						synchronized ( lockGui ) {
@@ -299,7 +307,7 @@ public class DisparityActivity extends DemoVideoDisplayActivity
 						}
 						runOnUiThread(new Runnable() {
 							public void run() {
-								Toast.makeText(DisparityActivity.this, "Disparity computation failed!", 2000).show();
+								Toast.makeText(DisparityActivity.this, "Disparity computation failed!", Toast.LENGTH_SHORT).show();
 							}});
 					}
 				} else if( changeDisparityAlg != -1 && visualize.hasLeft && visualize.hasRight ) {

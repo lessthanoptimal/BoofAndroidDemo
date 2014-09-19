@@ -7,7 +7,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.*;
-import boofcv.abst.segmentation.ImageSegmentation;
+import boofcv.abst.segmentation.ImageSuperpixels;
 import boofcv.alg.segmentation.ComputeRegionMeanColor;
 import boofcv.alg.segmentation.ImageSegmentationOps;
 import boofcv.android.ConvertBitmap;
@@ -66,6 +66,8 @@ public class SegmentationDisplayActivity extends DemoVideoDisplayActivity
 				mDetector.onTouchEvent(event);
 				return true;
 			}});
+
+		Toast.makeText(this,"FAST DEVICES ONLY! Can take minutes.",Toast.LENGTH_LONG).show();
 	}
 
 	@Override
@@ -132,14 +134,14 @@ public class SegmentationDisplayActivity extends DemoVideoDisplayActivity
 
 	protected class SegmentationProcessing extends VideoImageProcessing<MultiSpectral<ImageUInt8>> {
 		ImageSInt32 pixelToRegion;
-		ImageSegmentation<MultiSpectral<ImageUInt8>> segmentation;
+		ImageSuperpixels<MultiSpectral<ImageUInt8>> segmentation;
 		MultiSpectral<ImageUInt8> background;
 
 		ComputeRegionMeanColor colorize;
 		FastQueue<float[]> segmentColor = new ColorQueue_F32(3);
 		GrowQueue_I32 regionMemberCount = new GrowQueue_I32();
 
-		public SegmentationProcessing(ImageSegmentation<MultiSpectral<ImageUInt8>> segmentation) {
+		public SegmentationProcessing(ImageSuperpixels<MultiSpectral<ImageUInt8>> segmentation) {
 			super(ImageType.ms(3,ImageUInt8.class));
 			this.segmentation = segmentation;
 			this.colorize = FactorySegmentationAlg.regionMeanColor(segmentation.getImageType());
@@ -168,7 +170,7 @@ public class SegmentationDisplayActivity extends DemoVideoDisplayActivity
 					// Computes the mean color inside each region
 					ComputeRegionMeanColor colorize = FactorySegmentationAlg.regionMeanColor(input.getImageType());
 
-					int numSegments = segmentation.getTotalSegments();
+					int numSegments = segmentation.getTotalSuperpixels();
 
 					segmentColor.resize(numSegments);
 					regionMemberCount.resize(numSegments);

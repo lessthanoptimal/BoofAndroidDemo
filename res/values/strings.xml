@@ -18,6 +18,21 @@
 		<item>Median</item>
 	</string-array>
 
+	<string-array name="thresholding">
+		<item>Global: Otsu</item>
+		<item>Global: Entropy</item>
+		<item>Adaptive: Square</item>
+		<item>Adaptive: Gaussian</item>
+		<item>Adaptive: Sauvola</item>
+	</string-array>
+
+	<string-array name="fiducials">
+		<item>Square Binary</item>
+		<item>Square Image</item>
+		<item>Chessboard</item>
+		<item>Square Grid</item>
+	</string-array>
+
 	<string-array name="shapes">
 		<item>Ellipse</item>
 		<item>Polygon</item>

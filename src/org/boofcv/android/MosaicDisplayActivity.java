@@ -25,9 +25,9 @@ import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.affine.Affine2D_F64;
-import georegression.struct.homo.Homography2D_F64;
+import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
-import georegression.transform.homo.HomographyPointOps_F64;
+import georegression.transform.homography.HomographyPointOps_F64;
 import org.ddogleg.struct.FastQueue;
 
 import java.util.List;

@@ -41,7 +41,7 @@ public class UndistortDisplayActivity extends DemoVideoDisplayActivity
 	boolean isDistorted = false;
 	boolean isColor = false;
 
-	ImageDistort<ImageUInt8> removeDistortion;
+	ImageDistort<ImageUInt8,ImageUInt8> removeDistortion;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -66,10 +66,9 @@ public class UndistortDisplayActivity extends DemoVideoDisplayActivity
 			PointTransform_F32 fullView = LensDistortionOps.fullView(DemoMain.preference.intrinsic, null);
 			InterpolatePixelS<ImageUInt8> interp = FactoryInterpolation.bilinearPixelS(ImageUInt8.class);
 			ImageBorder border = FactoryImageBorder.value(ImageUInt8.class,0);
-//			removeDistortion = FactoryDistort.distortCached(interp,border,ImageUInt8.class);
-			// for some reason this is faster on a low end phone.  Maybe it has to do with CPU memory cache misses
-			// when looking up a point?
-			removeDistortion = FactoryDistort.distort(interp,border,ImageUInt8.class);
+			// for some reason not caching is faster on a low end phone.  Maybe it has to do with CPU memory
+			// cache misses when looking up a point?
+			removeDistortion = FactoryDistort.distort(false,interp,border,ImageUInt8.class);
 			removeDistortion.setModel(new PointToPixelTransform_F32(fullView));
 		}
 	}

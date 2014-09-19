@@ -53,5 +53,10 @@
 		<activity android:name=".CannyEdgeActivity" android:screenOrientation="landscape"/>
 		<activity android:name=".UndistortDisplayActivity" android:screenOrientation="landscape"/>
 		<activity android:name=".SegmentationDisplayActivity" android:screenOrientation="landscape"/>
+		<activity android:name=".ThresholdDisplayActivity" android:screenOrientation="landscape"/>
+		<activity android:name=".FiducialSquareBinaryActivity" android:screenOrientation="landscape"/>
+		<activity android:name=".FiducialSquareBinaryHelpActivity"/>
+		<activity android:name=".FiducialSquareImageActivity" android:screenOrientation="landscape"/>
+		<activity android:name=".FiducialSquareImageHelpActivity"/>
 	</application>
 </manifest>

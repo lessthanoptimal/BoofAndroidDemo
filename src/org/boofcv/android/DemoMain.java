@@ -83,11 +83,13 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		Group detect = new Group("Detection");
 		Group assoc = new Group("Association");
 		Group tracker = new Group("Tracking");
+		Group fiducials = new Group("Fiducials");
 		Group calib = new Group("Calibration");
 		Group sfm = new Group("Structure From Motion");
 
 		ip.addChild("Blur",BlurDisplayActivity.class);
 		ip.addChild("Gradient",GradientDisplayActivity.class);
+		ip.addChild("Auto Threshold",ThresholdDisplayActivity.class);
 		ip.addChild("Binary Ops",BinaryDisplayActivity.class);
 		ip.addChild("Enhance",EnhanceDisplayActivity.class);
 		ip.addChild("Transform",ImageTransformActivity.class);
@@ -107,6 +109,9 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 //		tracker.addChild("Point: Det-Desc-Assoc", DdaTrackerDisplayActivity.class);
 //		tracker.addChild("Point: Combined", CombinedTrackerDisplayActivity.class);
 
+		fiducials.addChild("Square Binary",FiducialSquareBinaryActivity.class);
+		fiducials.addChild("Square Image",FiducialSquareImageActivity.class);
+
 		calib.addChild("Calibrate",CalibrationActivity.class);
 		calib.addChild("Undistort",UndistortDisplayActivity.class);
 
@@ -118,6 +123,7 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		groups.add(detect);
 		groups.add(assoc);
 		groups.add(tracker);
+		groups.add(fiducials);
 		groups.add(calib);
 		groups.add(sfm);
 	}
@@ -219,7 +225,7 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		} catch (FileNotFoundException e) {
 
 		} catch (IOException e) {
-			Toast.makeText(this, "Failed to load intrinsic parameters", 2000).show();
+			Toast.makeText(this, "Failed to load intrinsic parameters", Toast.LENGTH_SHORT).show();
 		}
 	}
 

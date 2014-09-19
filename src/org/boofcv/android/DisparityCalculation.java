@@ -286,9 +286,9 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 //		RectifyImageOps.allInsideLeft(intrinsic, rect1, rect2, rectifiedK);
 
 		// undistorted and rectify images
-		ImageDistort<ImageFloat32> distortLeft =
+		ImageDistort<ImageFloat32,ImageFloat32> distortLeft =
 				RectifyImageOps.rectifyImage(intrinsic, rect1, ImageFloat32.class);
-		ImageDistort<ImageFloat32> distortRight =
+		ImageDistort<ImageFloat32,ImageFloat32> distortRight =
 				RectifyImageOps.rectifyImage(intrinsic, rect2, ImageFloat32.class);
 
 		// Apply the Laplacian for some lighting invariance
