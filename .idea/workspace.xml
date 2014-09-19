@@ -25,40 +25,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e2751d56-3cdc-4cbc-bc00-0a7fd8271162" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/libs/BoofCV-recognition-0.18.jar" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/libs/georegression-0.7.jar" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/org/boofcv/android/FiducialSquareActivity.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/org/boofcv/android/FiducialSquareBinaryActivity.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/org/boofcv/android/FiducialSquareBinaryHelpActivity.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/org/boofcv/android/FiducialSquareImageActivity.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/org/boofcv/android/FiducialSquareImageHelpActivity.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/org/boofcv/android/ThresholdDisplayActivity.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/res/layout/fiducial_controls.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/res/layout/fiducial_help.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/res/layout/thresholding_controls.xml" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/libs/BoofCV-recognition-0.17-SNAPSHOT.jar" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/libs/georegression-0.6-SNAPSHOT.jar" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/libs/BoofCV-android-0.17-SNAPSHOT.jar" afterPath="$PROJECT_DIR$/libs/BoofCV-android-0.18.jar" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/libs/BoofCV-calibration-0.17-SNAPSHOT.jar" afterPath="$PROJECT_DIR$/libs/BoofCV-calibration-0.18.jar" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/libs/BoofCV-feature-0.17-SNAPSHOT.jar" afterPath="$PROJECT_DIR$/libs/BoofCV-feature-0.18.jar" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/libs/BoofCV-geo-0.17-SNAPSHOT.jar" afterPath="$PROJECT_DIR$/libs/BoofCV-geo-0.18.jar" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/libs/BoofCV-io-0.17-SNAPSHOT.jar" afterPath="$PROJECT_DIR$/libs/BoofCV-io-0.18.jar" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/libs/BoofCV-ip-0.17-SNAPSHOT.jar" afterPath="$PROJECT_DIR$/libs/BoofCV-ip-0.18.jar" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/libs/BoofCV-sfm-0.17-SNAPSHOT.jar" afterPath="$PROJECT_DIR$/libs/BoofCV-sfm-0.18.jar" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/libs/ddogleg-0.5-SNAPSHOT.jar" afterPath="$PROJECT_DIR$/libs/ddogleg-0.6.jar" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/libs/ejml-0.25.jar" afterPath="$PROJECT_DIR$/libs/core-0.26.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/AndroidManifest.xml" afterPath="$PROJECT_DIR$/AndroidManifest.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/BoofAndroidDemo.iml" afterPath="$PROJECT_DIR$/BoofAndroidDemo.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/boofcv/android/CalibrationActivity.java" afterPath="$PROJECT_DIR$/src/org/boofcv/android/CalibrationActivity.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/boofcv/android/DemoMain.java" afterPath="$PROJECT_DIR$/src/org/boofcv/android/DemoMain.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/boofcv/android/DisparityActivity.java" afterPath="$PROJECT_DIR$/src/org/boofcv/android/DisparityActivity.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/boofcv/android/DisparityCalculation.java" afterPath="$PROJECT_DIR$/src/org/boofcv/android/DisparityCalculation.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/boofcv/android/MosaicDisplayActivity.java" afterPath="$PROJECT_DIR$/src/org/boofcv/android/MosaicDisplayActivity.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/boofcv/android/SegmentationDisplayActivity.java" afterPath="$PROJECT_DIR$/src/org/boofcv/android/SegmentationDisplayActivity.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/boofcv/android/StabilizeDisplayActivity.java" afterPath="$PROJECT_DIR$/src/org/boofcv/android/StabilizeDisplayActivity.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/boofcv/android/UndistortDisplayActivity.java" afterPath="$PROJECT_DIR$/src/org/boofcv/android/UndistortDisplayActivity.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/change.txt" afterPath="$PROJECT_DIR$/change.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/res/values/strings.xml" afterPath="$PROJECT_DIR$/res/values/strings.xml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/res/drawable/dog.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/res/drawable/fiducial_square_binary.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/res/drawable/fiducial_square_image.png" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="BoofAndroidDemo.iws" />
@@ -588,17 +557,21 @@
       <workItem from="1403636195437" duration="848000" />
       <workItem from="1403723181359" duration="90000" />
       <workItem from="1405449084201" duration="4473000" />
-      <workItem from="1411048958734" duration="21785000" />
+      <workItem from="1411048958734" duration="21845000" />
     </task>
     <task id="LOCAL-00001" summary="- Adding jars&#10;- Added support for segmentation">
       <created>1403044470173</created>
       <updated>1403044470173</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="- Added fiducials&#10;- Added automatic thresholding&#10;- Shows disparity view by default after calculating disparity">
+      <created>1411148797909</created>
+      <updated>1411148797909</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="36211000" />
+    <option name="totallyTimeSpent" value="36271000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-3" y="0" width="1606" height="877" extended-state="6" />
@@ -676,7 +649,8 @@
       <TodoPanelSettings />
     </option>
     <MESSAGE value="- Adding jars&#10;- Added support for segmentation" />
-    <option name="LAST_COMMIT_MESSAGE" value="- Adding jars&#10;- Added support for segmentation" />
+    <MESSAGE value="- Added fiducials&#10;- Added automatic thresholding&#10;- Shows disparity view by default after calculating disparity" />
+    <option name="LAST_COMMIT_MESSAGE" value="- Added fiducials&#10;- Added automatic thresholding&#10;- Shows disparity view by default after calculating disparity" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
