@@ -99,7 +99,8 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		detect.addChild("Lines",LineDisplayActivity.class);
 		detect.addChild("Canny Edge",CannyEdgeActivity.class);
 		detect.addChild("Shape Fitting",ShapeFittingActivity.class);
-		detect.addChild("Segmentation",SegmentationDisplayActivity.class);
+		// segmentation is just too slow right now
+//		detect.addChild("Segmentation",SegmentationDisplayActivity.class);
 
 		assoc.addChild("Two Pictures",AssociationActivity.class);
 
