@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="org.boofcv.android">
+
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
+
+    <supports-screens
+        android:anyDensity="true"
+        android:xlargeScreens="true"
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:smallScreens="true" />
+
+    <application
+        android:allowBackup="true"
+        android:label="@string/app_name"
+        android:icon="@drawable/ic_launcher">
+
+        <activity android:name="org.boofcv.android.DemoMain"
+                  android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <activity android:name=".DemoVideoDisplayActivity" android:screenOrientation="landscape"/>
+        <activity android:name=".PreferenceActivity"/>
+        <activity android:name=".BlurDisplayActivity" android:screenOrientation="landscape"/>
+        <activity android:name=".EnhanceDisplayActivity" android:screenOrientation="landscape"/>
+        <activity android:name=".GradientDisplayActivity" android:screenOrientation="landscape"/>
+        <activity android:name=".BinaryDisplayActivity" android:screenOrientation="landscape"/>
+        <activity android:name=".PointDisplayActivity" android:screenOrientation="landscape"/>
+        <activity android:name=".ScalePointDisplayActivity" android:screenOrientation="landscape"/>
+        <activity android:name=".LineDisplayActivity" android:screenOrientation="landscape"/>
+        <activity android:name=".KltDisplayActivity" android:screenOrientation="landscape"/>
+        <activity android:name=".StabilizeDisplayActivity" android:screenOrientation="landscape"/>
+        <activity android:name=".MosaicDisplayActivity" android:screenOrientation="landscape"/>
+        <activity android:name=".AssociationActivity" android:screenOrientation="landscape"/>
+        <activity android:name=".DdaTrackerDisplayActivity" android:screenOrientation="landscape"/>
+        <activity android:name=".CombinedTrackerDisplayActivity" android:screenOrientation="landscape"/>
+        <activity android:name=".CalibrationActivity" android:screenOrientation="landscape"/>
+        <activity android:name=".CalibrationComputeActivity"
+                  android:configChanges="orientation|keyboardHidden|screenSize" />
+        <activity android:name=".CameraInformationActivity"/>
+        <activity android:name=".DisparityActivity" android:screenOrientation="landscape"/>
+        <activity android:name=".AboutActivity"/>
+        <activity android:name=".CalibrationHelpActivity"/>
+        <activity android:name=".ShapeFitDisplayActivity" android:screenOrientation="landscape"/>
+        <activity android:name=".ImageTransformActivity" android:screenOrientation="landscape"/>
+        <activity android:name=".ObjectTrackerActivity" android:screenOrientation="landscape"/>
+        <activity android:name=".ShapeFittingActivity" android:screenOrientation="landscape"/>
+        <activity android:name=".CannyEdgeActivity" android:screenOrientation="landscape"/>
+        <activity android:name=".UndistortDisplayActivity" android:screenOrientation="landscape"/>
+        <activity android:name=".SegmentationDisplayActivity" android:screenOrientation="landscape"/>
+        <activity android:name=".ThresholdDisplayActivity" android:screenOrientation="landscape"/>
+        <activity android:name=".FiducialSquareBinaryActivity" android:screenOrientation="landscape"/>
+        <activity android:name=".FiducialSquareBinaryHelpActivity"/>
+        <activity android:name=".FiducialSquareImageActivity" android:screenOrientation="landscape"/>
+        <activity android:name=".FiducialSquareImageHelpActivity"/>
+    </application>
+
+</manifest>
