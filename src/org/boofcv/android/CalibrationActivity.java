@@ -97,13 +97,13 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 
 		FrameLayout iv = getViewPreview();
 		mDetector = new GestureDetector(this, new MyGestureDetector(iv));
-		iv.setOnTouchListener(new View.OnTouchListener(){
+		iv.setOnTouchListener(new View.OnTouchListener() {
 			@Override
-			public boolean onTouch(View v, MotionEvent event)
-			{
+			public boolean onTouch(View v, MotionEvent event) {
 				mDetector.onTouchEvent(event);
 				return true;
-			}});
+			}
+		});
 
 		showDialog(TARGET_DIALOG);
 	}
@@ -203,10 +203,23 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 			builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialogInterface, int i) {
-					CalibrationActivity.numCols = Integer.parseInt(textCols.getText().toString());
-					CalibrationActivity.numRows = Integer.parseInt(textRows.getText().toString());
-					CalibrationActivity.targetType = spinnerTarget.getSelectedItemPosition();
-					startVideoProcessing();
+					numCols = Integer.parseInt(textCols.getText().toString());
+					numRows = Integer.parseInt(textRows.getText().toString());
+					targetType = spinnerTarget.getSelectedItemPosition();
+
+					// ensure the chessboard has an odd number of rows and columns
+					if( targetType == 1 ) {
+						if( numCols % 2 == 0 )
+							numCols--;
+						if( numRows % 2 == 0 )
+							numRows--;
+					}
+
+					if( numCols > 0 && numRows > 0 ) {
+						startVideoProcessing();
+					} else {
+						Toast.makeText(CalibrationActivity.this,"Invalid configuration!",Toast.LENGTH_SHORT).show();
+					}
 				}
 			});
 

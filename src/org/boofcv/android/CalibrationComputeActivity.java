@@ -108,7 +108,7 @@ public class CalibrationComputeActivity extends Activity {
 			startActivity(intent);
 		} catch (IOException e) {
 			Log.d("calibration","Saving intrinsic failed");
-			Toast toast = Toast.makeText(this, "IOException when saving intrinsic!", 2000);
+			Toast toast = Toast.makeText(this, "IOException when saving intrinsic!", Toast.LENGTH_LONG);
 			toast.show();
 		}
 	}

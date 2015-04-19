@@ -44,8 +44,6 @@ public class PreferenceActivity extends Activity
 		spinnerPicture = (Spinner) findViewById(R.id.spinner_picture_size);
 
 		// remember the size the user selected
-
-
 		CameraSpecs camera = specs.get( preference.cameraId );
 		prefVideoSize = camera.sizePreview.get( preference.preview );
 		prefPictureSize = camera.sizePicture.get( preference.picture );
@@ -92,6 +90,7 @@ public class PreferenceActivity extends Activity
 		}
 
 		spinnerCamera.setAdapter(adapter);
+		spinnerCamera.setSelection(preference.cameraId);
 	}
 
 	private void setupSizeSpinners() {
