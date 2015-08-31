@@ -15,8 +15,6 @@ import android.widget.Spinner;
 
 import java.util.List;
 
-import boofcv.alg.feature.shapes.FitData;
-import boofcv.alg.feature.shapes.ShapeFittingOps;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
@@ -24,6 +22,8 @@ import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.misc.GPixelMath;
 import boofcv.alg.misc.ImageStatistics;
+import boofcv.alg.shapes.FitData;
+import boofcv.alg.shapes.ShapeFittingOps;
 import boofcv.android.VisualizeImageData;
 import boofcv.android.gui.VideoImageProcessing;
 import boofcv.struct.ConnectRule;
@@ -138,7 +138,7 @@ public class ShapeFittingActivity extends DemoVideoDisplayActivity
 			BinaryImageOps.removePointNoise(binary, filtered1);
 
 			// draw binary image for output
-			VisualizeImageData.binaryToBitmap(filtered1, output, storage);
+			VisualizeImageData.binaryToBitmap(filtered1, false, output, storage);
 
 			// draw the ellipses
 			findContours.process(filtered1,contourOutput);

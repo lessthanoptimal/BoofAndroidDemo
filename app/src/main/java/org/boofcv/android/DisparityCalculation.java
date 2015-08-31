@@ -18,19 +18,19 @@ import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.disparity.StereoDisparity;
 import boofcv.abst.geo.Estimate1ofEpipolar;
 import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
+import boofcv.alg.descriptor.UtilFeature;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionOps;
-import boofcv.alg.feature.UtilFeature;
 import boofcv.alg.filter.derivative.LaplacianEdge;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
+import boofcv.alg.geo.robust.DistanceSe3SymmetricSq;
+import boofcv.alg.geo.robust.Se3FromEssentialGenerator;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.alg.sfm.robust.DistanceSe3SymmetricSq;
-import boofcv.alg.sfm.robust.Se3FromEssentialGenerator;
+import boofcv.core.image.border.BorderType;
 import boofcv.factory.geo.EnumEpipolar;
 import boofcv.factory.geo.FactoryMultiView;
-import boofcv.factory.geo.FactoryTriangulate;
 import boofcv.struct.calib.IntrinsicParameters;
 import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.feature.AssociatedIndex;
@@ -84,7 +84,7 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 		this.intrinsic = intrinsic;
 
 		listSrc = UtilFeature.createQueue(detDesc, 10);
-		listDst = UtilFeature.createQueue(detDesc,10);
+		listDst = UtilFeature.createQueue(detDesc, 10);
 	}
 
 	public void setDisparityAlg(StereoDisparity<ImageFloat32, ImageFloat32> disparityAlg) {
@@ -183,7 +183,7 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 	 */
 	public List<AssociatedPair> convertToNormalizedCoordinates() {
 
-		PointTransform_F64 tran = LensDistortionOps.transformRadialToNorm_F64(intrinsic);
+		PointTransform_F64 tran = LensDistortionOps.transformPoint(intrinsic).undistort_F64(true,false);
 
 		List<AssociatedPair> calibratedFeatures = new ArrayList<AssociatedPair>();
 
@@ -213,7 +213,7 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 		numInside++;
 		System.out.println("DISPARITY "+numInside);
 		Estimate1ofEpipolar essentialAlg = FactoryMultiView.computeFundamental_1(EnumEpipolar.ESSENTIAL_5_NISTER, 5);
-		TriangulateTwoViewsCalibrated triangulate = FactoryTriangulate.twoGeometric();
+		TriangulateTwoViewsCalibrated triangulate = FactoryMultiView.triangulateTwoGeometric();
 		ModelGenerator<Se3_F64, AssociatedPair> generateEpipolarMotion =
 				new Se3FromEssentialGenerator(essentialAlg, triangulate);
 
@@ -289,9 +289,9 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 
 		// undistorted and rectify images
 		ImageDistort<ImageFloat32,ImageFloat32> distortLeft =
-				RectifyImageOps.rectifyImage(intrinsic, rect1, ImageFloat32.class);
+				RectifyImageOps.rectifyImage(intrinsic, rect1, BorderType.VALUE, ImageFloat32.class);
 		ImageDistort<ImageFloat32,ImageFloat32> distortRight =
-				RectifyImageOps.rectifyImage(intrinsic, rect2, ImageFloat32.class);
+				RectifyImageOps.rectifyImage(intrinsic, rect2, BorderType.VALUE, ImageFloat32.class);
 
 		// Apply the Laplacian for some lighting invariance
 		ImageMiscOps.fill(rectifiedLeft,0);

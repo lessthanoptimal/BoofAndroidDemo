@@ -143,7 +143,7 @@ public class BinaryDisplayActivity extends DemoVideoDisplayActivity
 					afterOps.setTo(binary);
 			}
 
-			VisualizeImageData.binaryToBitmap(afterOps, output, storage);
+			VisualizeImageData.binaryToBitmap(afterOps, false, output, storage);
 		}
 	}
 }

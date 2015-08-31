@@ -30,11 +30,10 @@ import java.util.List;
 import boofcv.abst.calib.ConfigChessboard;
 import boofcv.abst.calib.ConfigSquareGrid;
 import boofcv.abst.calib.PlanarCalibrationDetector;
-import boofcv.abst.calib.WrapPlanarChessTarget;
-import boofcv.abst.calib.WrapPlanarSquareGridTarget;
-import boofcv.alg.feature.detect.chess.DetectChessCalibrationPoints;
-import boofcv.alg.feature.detect.grid.DetectSquareCalibrationPoints;
-import boofcv.alg.feature.detect.quadblob.QuadBlob;
+import boofcv.abst.calib.PlanarDetectorChessboard;
+import boofcv.abst.calib.PlanarDetectorSquareGrid;
+import boofcv.alg.feature.detect.chess.DetectChessboardFiducial;
+import boofcv.alg.feature.detect.grid.DetectSquareGridFiducial;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
 import boofcv.android.gui.VideoRenderProcessing;
@@ -43,6 +42,7 @@ import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
+import georegression.struct.shapes.Polygon2D_F64;
 
 /**
  * Activity for collecting images of calibration targets. The user must first specify the type of target it is
@@ -137,14 +137,14 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 		PlanarCalibrationDetector detector;
 
 		if( targetType == 0 ) {
-			ConfigChessboard config = new ConfigChessboard(numCols,numRows);
+			ConfigChessboard config = new ConfigChessboard(numCols,numRows, 30);
 			detector = FactoryPlanarCalibrationTarget.detectorChessboard(config);
-			CalibrationComputeActivity.target = FactoryPlanarCalibrationTarget.gridChess(numCols, numRows, 30);
+
 		} else {
-			ConfigSquareGrid config = new ConfigSquareGrid(numCols,numRows);
+			ConfigSquareGrid config = new ConfigSquareGrid(numCols,numRows, 30 , 30);
 			detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(config);
-			CalibrationComputeActivity.target = FactoryPlanarCalibrationTarget.gridSquare(numCols, numRows, 30,30);
 		}
+		CalibrationComputeActivity.targetLayout = detector.getLayout();
 		setProcessing(new DetectTarget(detector));
 	}
 
@@ -314,55 +314,34 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 				pointsGui.reset();
 				debugQuads.clear();
 				if( detected ) {
-					List<Point2D_F64> found = detector.getPoints();
+					List<Point2D_F64> found = detector.getDetectedPoints();
 					for( Point2D_F64 p : found )
 						pointsGui.grow().set(p);
 				} else if( showDetectDebug ) {
 					// show binary image to aid in debugging and detected rectangles
-					if( detector instanceof WrapPlanarChessTarget ) {
-						DetectChessCalibrationPoints alg = ((WrapPlanarChessTarget) detector).getAlg();
-						VisualizeImageData.binaryToBitmap(alg.getBinary(), bitmap, storage);
-						extractQuads(((WrapPlanarChessTarget) detector).getAlg());
-					} else if( detector instanceof WrapPlanarSquareGridTarget ) {
-						VisualizeImageData.binaryToBitmap(((WrapPlanarSquareGridTarget) detector).getBinary(), bitmap, storage);
-						extractQuads(((WrapPlanarSquareGridTarget) detector).getDetect());
+					if( detector instanceof PlanarDetectorChessboard) {
+						DetectChessboardFiducial<ImageFloat32> alg = ((PlanarDetectorChessboard) detector).getAlg();
+						VisualizeImageData.binaryToBitmap(alg.getBinary(), false, bitmap, storage);
+						extractQuads(alg.getFindSeeds().getDetectorSquare().getFound());
+					} else if( detector instanceof PlanarDetectorSquareGrid) {
+						DetectSquareGridFiducial<ImageFloat32> alg = ((PlanarDetectorSquareGrid) detector).getDetect();
+						VisualizeImageData.binaryToBitmap(alg.getBinary(), false ,bitmap, storage);
+						extractQuads(alg.getDetectorSquare().getFound());
 					}
 				}
 			}
 		}
 
-		protected void extractQuads(  DetectChessCalibrationPoints chess ) {
+		protected void extractQuads(  FastQueue<Polygon2D_F64> squares ) {
 			debugQuads.clear();
 
-			List<QuadBlob> quads = chess.getFindBound().getDetectBlobs().getDetected();
-			if( quads != null ) {
-				for( QuadBlob b : quads ) {
-					if( b.corners.size() < 2 )
-						continue;
+			if( squares != null ) {
+				for( Polygon2D_F64 b : squares.toList() ) {
 
 					List<Point2D_I32> l = new ArrayList<Point2D_I32>();
-					for( int i = 0; i < b.corners.size(); i++ ) {
-						Point2D_I32 c = b.corners.get(i);
-						l.add( c.copy() );
-					}
-					debugQuads.add(l);
-				}
-			}
-		}
-
-		protected void extractQuads(  DetectSquareCalibrationPoints square ) {
-			debugQuads.clear();
-
-			List<QuadBlob> quads = square.getDetectBlobs().getDetected();
-			if( quads != null ) {
-				for( QuadBlob b : quads ) {
-					if( b.corners.size() < 2 )
-						continue;
-
-					List<Point2D_I32> l = new ArrayList<Point2D_I32>();
-					for( int i = 0; i < b.corners.size(); i++ ) {
-						Point2D_I32 c = b.corners.get(i);
-						l.add( c.copy() );
+					for( int i = 0; i < b.size(); i++ ) {
+						Point2D_F64 c = b.get(i);
+						l.add( new Point2D_I32((int)c.x,(int)c.y) );
 					}
 					debugQuads.add(l);
 				}
@@ -382,7 +361,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 			timeResume = System.currentTimeMillis()+1500;
 
 			if( success ) {
-				shots.add( new CalibrationImageInfo(gray,detector.getPoints()));
+				shots.add( new CalibrationImageInfo(gray,detector.getDetectedPoints()));
 				updateShotCountInUiThread();
 				return true;
 			}  else {

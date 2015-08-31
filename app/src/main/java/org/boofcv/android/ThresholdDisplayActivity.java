@@ -157,7 +157,7 @@ public class ThresholdDisplayActivity extends DemoVideoDisplayActivity
 			if( filter != null ) {
 				filter.process(input, binary);
 			}
-			VisualizeImageData.binaryToBitmap(binary, output, storage);
+			VisualizeImageData.binaryToBitmap(binary,false,  output, storage);
 		}
 	}
 }

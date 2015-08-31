@@ -172,7 +172,6 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 				intrinsic.cy = intrinsic.height/2;
 				intrinsic.fx = intrinsic.cx/Math.tan(UtilAngle.degreeToRadian(30)); // assume 60 degree FOV
 				intrinsic.fy = intrinsic.cx/Math.tan(UtilAngle.degreeToRadian(30));
-				intrinsic.flipY = false;
 			} else {
 				intrinsic = DemoMain.preference.intrinsic;
 			}
@@ -207,7 +206,7 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 			Canvas canvas = new Canvas(output);
 
 			for (int i = 0; i < detector.totalFound(); i++) {
-				detector.getFiducialToWorld(i,targetToCamera);
+				detector.getFiducialToCamera(i,targetToCamera);
 
 				drawCube(detector.getId(i),targetToCamera,intrinsic,0.1,canvas);
 			}

@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import boofcv.alg.distort.AdjustmentType;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.distort.PointToPixelTransform_F32;
@@ -18,8 +19,7 @@ import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.gui.VideoImageProcessing;
 import boofcv.core.image.ConvertImage;
-import boofcv.core.image.border.FactoryImageBorder;
-import boofcv.core.image.border.ImageBorder;
+import boofcv.core.image.border.BorderType;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.distort.PointTransform_F32;
@@ -64,12 +64,13 @@ public class UndistortDisplayActivity extends DemoVideoDisplayActivity
 
 		if( DemoMain.preference.intrinsic != null ) {
 			// define the transform.  Cache the results for quick rendering later on
-			PointTransform_F32 fullView = LensDistortionOps.fullView(DemoMain.preference.intrinsic, null);
-			InterpolatePixelS<ImageUInt8> interp = FactoryInterpolation.bilinearPixelS(ImageUInt8.class);
-			ImageBorder border = FactoryImageBorder.value(ImageUInt8.class,0);
+			PointTransform_F32 fullView = LensDistortionOps.transform_F32(AdjustmentType.FULL_VIEW,
+					DemoMain.preference.intrinsic, null, false);
+			InterpolatePixelS<ImageUInt8> interp = FactoryInterpolation.
+					bilinearPixelS(ImageUInt8.class, BorderType.VALUE);
 			// for some reason not caching is faster on a low end phone.  Maybe it has to do with CPU memory
 			// cache misses when looking up a point?
-			removeDistortion = FactoryDistort.distort(false,interp,border,ImageUInt8.class);
+			removeDistortion = FactoryDistort.distortSB(false,interp,ImageUInt8.class);
 			removeDistortion.setModel(new PointToPixelTransform_F32(fullView));
 		}
 	}
@@ -83,7 +84,8 @@ public class UndistortDisplayActivity extends DemoVideoDisplayActivity
 	@Override
 	public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
 		if( DemoMain.preference.intrinsic == null ) {
-			Toast toast = Toast.makeText(UndistortDisplayActivity.this, "You must first calibrate the camera!", 2000);
+			Toast toast = Toast.makeText(UndistortDisplayActivity.this,
+					"You must first calibrate the camera!", Toast.LENGTH_LONG);
 			toast.show();
 		}
 		if( toggleDistort == compoundButton ) {

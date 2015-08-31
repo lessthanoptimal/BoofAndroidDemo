@@ -23,8 +23,7 @@ import java.util.List;
 import boofcv.abst.calib.CalibrateMonoPlanar;
 import boofcv.abst.calib.ImageResults;
 import boofcv.alg.geo.calibration.CalibrationPlanarGridZhang99;
-import boofcv.alg.geo.calibration.PlanarCalibrationTarget;
-import boofcv.alg.geo.calibration.Zhang99Parameters;
+import boofcv.alg.geo.calibration.Zhang99ParamAll;
 import boofcv.android.BoofAndroidFiles;
 import boofcv.struct.calib.IntrinsicParameters;
 import georegression.struct.point.Point2D_F64;
@@ -40,7 +39,7 @@ public class CalibrationComputeActivity extends Activity {
 
 	// image information which is to be processed
 	public static List<CalibrationImageInfo> images;
-	public static PlanarCalibrationTarget target;
+	public static List<Point2D_F64> targetLayout;
 	public static IntrinsicParameters intrinsic;
 
 	TextView text;
@@ -65,7 +64,7 @@ public class CalibrationComputeActivity extends Activity {
 		buttonOK = (Button) findViewById(R.id.button_accept);
 
 		// start a new process
-		calibrationAlg = new CalibrationPlanarGridZhang99(target,true,2);
+		calibrationAlg = new CalibrationPlanarGridZhang99(targetLayout,true,2,false);
 		intrinsic = null;
 		threadRunning = true;
 		new CalibrationThread().start();
@@ -155,7 +154,7 @@ public class CalibrationComputeActivity extends Activity {
 			calibrationAlg.process(points);
 
 			try {
-				Zhang99Parameters zhangParam = calibrationAlg.getOptimized();
+				Zhang99ParamAll zhangParam = calibrationAlg.getOptimized();
 
 				// need to open the camera to get its size
 				Camera mCamera = Camera.open(DemoMain.preference.cameraId);
@@ -163,7 +162,6 @@ public class CalibrationComputeActivity extends Activity {
 				Camera.Size sizePreview = param.getSupportedPreviewSizes().get(DemoMain.preference.preview);
 
 				intrinsic = zhangParam.convertToIntrinsic();
-				intrinsic.flipY = false;
 				intrinsic.width = sizePreview.width;
 				intrinsic.height = sizePreview.height;
 
@@ -175,7 +173,7 @@ public class CalibrationComputeActivity extends Activity {
 				write(String.format("cx = %6.2f cy = %6.2f",intrinsic.cx,intrinsic.cy));
 				write(String.format("radial = [ %6.2e ][ %6.2e ]",intrinsic.radial[0],intrinsic.radial[1]));
 				write("----------------------------");
-				List<ImageResults> results = CalibrateMonoPlanar.computeErrors(points, zhangParam, target.points);
+				List<ImageResults> results = CalibrateMonoPlanar.computeErrors(points, zhangParam, targetLayout);
 				double totalError = 0;
 				for( int i = 0; i < results.size(); i++ ) {
 					ImageResults r = results.get(i);
