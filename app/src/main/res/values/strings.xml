@@ -65,6 +65,8 @@
 		<item>Three</item>
 		<item>Sobel</item>
 		<item>Prewitt</item>
+		<item>two-0</item>
+		<item>two-1</item>
 	</string-array>
 
 	<string-array name="point_features">

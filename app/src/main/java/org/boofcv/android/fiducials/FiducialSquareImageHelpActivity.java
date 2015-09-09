@@ -1,4 +1,4 @@
-package org.boofcv.android;
+package org.boofcv.android.fiducials;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
@@ -8,6 +8,8 @@ import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import org.boofcv.android.R;
 
 /**
  * Displays instructions and tips for the user

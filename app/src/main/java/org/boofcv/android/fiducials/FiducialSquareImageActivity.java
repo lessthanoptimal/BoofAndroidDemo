@@ -1,12 +1,14 @@
-package org.boofcv.android;
+package org.boofcv.android.fiducials;
 
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 
+import java.util.List;
+
 import boofcv.abst.fiducial.FiducialDetector;
 import boofcv.abst.fiducial.SquareImage_to_FiducialDetector;
-import boofcv.android.ConvertBitmap;
+import boofcv.alg.filter.binary.BinaryImageOps;
+import boofcv.alg.misc.PixelMath;
 import boofcv.factory.fiducial.ConfigFiducialImage;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.struct.image.ImageUInt8;
@@ -18,7 +20,8 @@ import boofcv.struct.image.ImageUInt8;
  */
 public class FiducialSquareImageActivity extends FiducialSquareActivity
 {
-	ImageUInt8 target;
+	FiducialManager manager;
+	List<FiducialManager.Info> list;
 
 	public FiducialSquareImageActivity() {
 		super(FiducialSquareImageHelpActivity.class);
@@ -30,11 +33,15 @@ public class FiducialSquareImageActivity extends FiducialSquareActivity
 
 		BitmapFactory.Options options = new BitmapFactory.Options();
 		options.inScaled = false;
-		Bitmap input = BitmapFactory.decodeResource(getResources(), R.drawable.dog, options);
+	}
 
-		target = new ImageUInt8(input.getWidth(),input.getHeight());
+	@Override
+	protected void onResume() {
+		super.onResume();
 
-		ConvertBitmap.bitmapToGray(input, target, null);
+		manager = new FiducialManager(this);
+		manager.loadList();
+		list = manager.copyList();
 	}
 
 	@Override
@@ -48,7 +55,13 @@ public class FiducialSquareImageActivity extends FiducialSquareActivity
 				detector = FactoryFiducial.squareImageFast(new ConfigFiducialImage(), binaryThreshold, ImageUInt8.class);
 			}
 		}
-		detector.addPatternImage(target,125,0.1);
+
+		for (int i = 0; i < list.size(); i++) {
+			ImageUInt8 binary = manager.loadBinaryImage(list.get(i).id);
+			BinaryImageOps.invert(binary,binary);
+			PixelMath.multiply(binary,255,0,255,binary);
+			detector.addPatternImage(binary,125,list.get(i).sideLength);
+		}
 
 		return detector;
 	}

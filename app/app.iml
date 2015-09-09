@@ -94,17 +94,17 @@
     <orderEntry type="library" exported="" name="geo-0.19-SNAPSHOT" level="project" />
     <orderEntry type="library" exported="" name="support-v4-21.0.2" level="project" />
     <orderEntry type="library" exported="" name="equation-0.28" level="project" />
-    <orderEntry type="library" exported="" name="feature-0.19-SNAPSHOT" level="project" />
     <orderEntry type="library" exported="" name="dense64-0.28" level="project" />
+    <orderEntry type="library" exported="" name="feature-0.19-SNAPSHOT" level="project" />
     <orderEntry type="library" exported="" name="xpp3_min-1.1.4c" level="project" />
     <orderEntry type="library" exported="" name="georegression-0.8-SNAPSHOT" level="project" />
     <orderEntry type="library" exported="" name="ip-0.19-SNAPSHOT" level="project" />
     <orderEntry type="library" exported="" name="simple-0.28" level="project" />
     <orderEntry type="library" exported="" name="xstream-1.4.7" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-21.0.2" level="project" />
-    <orderEntry type="library" exported="" name="ddogleg-0.7-SNAPSHOT" level="project" />
-    <orderEntry type="library" exported="" name="android-0.19-SNAPSHOT" level="project" />
     <orderEntry type="library" exported="" name="core-0.28" level="project" />
+    <orderEntry type="library" exported="" name="android-0.19-SNAPSHOT" level="project" />
+    <orderEntry type="library" exported="" name="ddogleg-0.7-SNAPSHOT" level="project" />
     <orderEntry type="library" exported="" name="io-0.19-SNAPSHOT" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-21.0.2" level="project" />
   </component>

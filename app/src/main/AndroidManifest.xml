@@ -55,10 +55,12 @@
         <activity android:name=".UndistortDisplayActivity" android:screenOrientation="landscape"/>
         <activity android:name=".SegmentationDisplayActivity" android:screenOrientation="landscape"/>
         <activity android:name=".ThresholdDisplayActivity" android:screenOrientation="landscape"/>
-        <activity android:name=".FiducialSquareBinaryActivity" android:screenOrientation="landscape"/>
-        <activity android:name=".FiducialSquareBinaryHelpActivity"/>
-        <activity android:name=".FiducialSquareImageActivity" android:screenOrientation="landscape"/>
-        <activity android:name=".FiducialSquareImageHelpActivity"/>
+        <activity android:name=".fiducials.FiducialSquareBinaryActivity" android:screenOrientation="landscape"/>
+        <activity android:name=".fiducials.FiducialSquareBinaryHelpActivity"/>
+        <activity android:name=".fiducials.FiducialSquareImageActivity" android:screenOrientation="landscape"/>
+        <activity android:name=".fiducials.FiducialSquareImageHelpActivity"/>
+        <activity android:name=".fiducials.FiducialLearnActivity" android:screenOrientation="landscape"/>
+        <activity android:name=".fiducials.FiducialImageLibraryAcitivity"/>
     </application>
 
 </manifest>

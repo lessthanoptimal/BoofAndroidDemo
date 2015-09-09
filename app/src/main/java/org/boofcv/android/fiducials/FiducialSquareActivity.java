@@ -1,4 +1,4 @@
-package org.boofcv.android;
+package org.boofcv.android.fiducials;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -14,6 +14,11 @@ import android.widget.SeekBar;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import org.boofcv.android.DemoMain;
+import org.boofcv.android.DemoVideoDisplayActivity;
+import org.boofcv.android.R;
+import org.boofcv.android.misc.MiscUtil;
+
 import boofcv.abst.fiducial.FiducialDetector;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.android.ConvertBitmap;
@@ -24,9 +29,8 @@ import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.MultiSpectral;
-import georegression.metric.UtilAngle;
+import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.point.Point2D_I32;
 import georegression.struct.point.Point3D_F64;
 import georegression.struct.se.Se3_F64;
 import georegression.transform.se.SePointOps_F64;
@@ -38,6 +42,8 @@ import georegression.transform.se.SePointOps_F64;
  */
 public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 {
+	public static final String TAG = "FiducialSquareActivity";
+
 	final Object lock = new Object();
 	volatile boolean changed = true;
 	volatile boolean robust = true;
@@ -135,52 +141,54 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 		Paint paintLine4 = new Paint();
 		Paint paintLine5 = new Paint();
 		private Paint textPaint = new Paint();
+		private Paint textBorder = new Paint();
 
 		protected FiducialProcessor() {
-			super(ImageType.ms(3,ImageUInt8.class));
+			super(ImageType.ms(3, ImageUInt8.class));
 
 			paintSelected.setColor(Color.argb(0xFF / 2, 0xFF, 0, 0));
 
 			paintLine0.setColor(Color.RED);
 			paintLine0.setStrokeWidth(3f);
+			paintLine0.setFlags(Paint.ANTI_ALIAS_FLAG);
 			paintLine1.setColor(Color.BLACK);
 			paintLine1.setStrokeWidth(3f);
+			paintLine1.setFlags(Paint.ANTI_ALIAS_FLAG);
 			paintLine2.setColor(Color.BLUE);
 			paintLine2.setStrokeWidth(3f);
+			paintLine2.setFlags(Paint.ANTI_ALIAS_FLAG);
 			paintLine3.setColor(Color.GREEN);
 			paintLine3.setStrokeWidth(3f);
+			paintLine3.setFlags(Paint.ANTI_ALIAS_FLAG);
 			paintLine4.setColor(Color.MAGENTA);
 			paintLine4.setStrokeWidth(3f);
+			paintLine4.setFlags(Paint.ANTI_ALIAS_FLAG);
 			paintLine5.setColor(Color.YELLOW);
 			paintLine5.setStrokeWidth(3f);
+			paintLine5.setFlags(Paint.ANTI_ALIAS_FLAG);
 
 			// Create out paint to use for drawing
-			textPaint.setARGB(255, 200, 0, 0);
+			textPaint.setARGB(255, 255, 100, 100);
 			textPaint.setTextSize(30);
 
+			textBorder.setARGB(255, 0, 0, 0);
+			textBorder.setTextSize(30);
+			textBorder.setStyle(Paint.Style.STROKE);
+			textBorder.setStrokeWidth(3);
 		}
 
 		@Override
 		protected void declareImages(int width, int height) {
 			super.declareImages(width, height);
 
-			// make sure the camera is calibrated first
-			if( DemoMain.preference.intrinsic == null ) {
-				intrinsic = new IntrinsicParameters();
-				intrinsic.width = width; intrinsic.height = height;
-				intrinsic.cx = intrinsic.width/2;
-				intrinsic.cy = intrinsic.height/2;
-				intrinsic.fx = intrinsic.cx/Math.tan(UtilAngle.degreeToRadian(30)); // assume 60 degree FOV
-				intrinsic.fy = intrinsic.cx/Math.tan(UtilAngle.degreeToRadian(30));
-			} else {
-				intrinsic = DemoMain.preference.intrinsic;
-			}
+			intrinsic = MiscUtil.checkThenInventIntrinsic();
 		}
 
 		@Override
 		protected void process(MultiSpectral<ImageUInt8> color, Bitmap output, byte[] storage)
 		{
 			if( changed && intrinsic != null ) {
+				changed = false;
 				detector = (FiducialDetector)createDetector();
 				detector.setIntrinsic(intrinsic);
 				if( input == null || input.getImageType() != detector.getInputType() ) {
@@ -198,7 +206,7 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 				input.reshape(color.width,color.height);
 				ConvertImage.average(color, (ImageUInt8) input);
 			} else {
-				input = (T)color;
+				input = (T) color;
 			}
 
 			detector.detect(input);
@@ -206,9 +214,10 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 			Canvas canvas = new Canvas(output);
 
 			for (int i = 0; i < detector.totalFound(); i++) {
-				detector.getFiducialToCamera(i,targetToCamera);
+				detector.getFiducialToCamera(i, targetToCamera);
 
-				drawCube(detector.getId(i),targetToCamera,intrinsic,0.1,canvas);
+				double width = detector.getWidth(i);
+				drawCube(detector.getId(i),targetToCamera,intrinsic,width,canvas);
 			}
 		}
 
@@ -230,14 +239,22 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 			corners[6] = new Point3D_F64( r, r,r);
 			corners[7] = new Point3D_F64(-r, r,r);
 
-			Point2D_I32 pixel[] = new Point2D_I32[8];
+			Point2D_F32 pixel[] = new Point2D_F32[8];
 			Point2D_F64 p = new Point2D_F64();
 			for (int i = 0; i < 8; i++) {
 				Point3D_F64 c = corners[i];
 				SePointOps_F64.transform(targetToCamera, c, c);
 				PerspectiveOps.convertNormToPixel(intrinsic, c.x / c.z, c.y / c.z, p);
-				pixel[i] = new Point2D_I32((int)(p.x+0.5),(int)(p.y+0.5));
+				pixel[i] = new Point2D_F32((float)p.x,(float)p.y);
 			}
+
+			Point3D_F64 centerPt = new Point3D_F64();
+
+			SePointOps_F64.transform(targetToCamera, centerPt, centerPt);
+			PerspectiveOps.convertNormToPixel(intrinsic,
+					centerPt.x / centerPt.z, centerPt.y / centerPt.z, p);
+			Point2D_F32 centerPixel  = new Point2D_F32((float)p.x,(float)p.y);
+
 
 			// red
 			drawLine(canvas,pixel[0],pixel[1],paintLine0);
@@ -258,11 +275,12 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 
 			String numberString = ""+number;
 			int textLength = (int)textPaint.measureText(numberString);
-			canvas.drawText(numberString, pixel[7].x-textLength/2,pixel[7].y, textPaint);
+			canvas.drawText(numberString, centerPixel.x-textLength/2,centerPixel.y+textLength, textBorder);
+			canvas.drawText(numberString, centerPixel.x-textLength/2,centerPixel.y+textLength, textPaint);
 		}
 
-		private void drawLine( Canvas canvas , Point2D_I32 a , Point2D_I32 b , Paint color ) {
-			canvas.drawLine((int)a.x,(int)a.y,(int)b.x,(int)b.y,color);
+		private void drawLine( Canvas canvas , Point2D_F32 a , Point2D_F32 b , Paint color ) {
+			canvas.drawLine(a.x,a.y,b.x,b.y,color);
 		}
 
 	}

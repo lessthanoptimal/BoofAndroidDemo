@@ -76,6 +76,14 @@ implements AdapterView.OnItemSelectedListener
 				setProcessing(new GradientProcessing(FactoryDerivative.prewitt(imageType, derivType)) );
 				break;
 
+			case 3:
+				setProcessing(new GradientProcessing(FactoryDerivative.two0(imageType, derivType)) );
+				break;
+
+			case 4:
+				setProcessing(new GradientProcessing(FactoryDerivative.two1(imageType, derivType)) );
+				break;
+
 			default:
 				throw new RuntimeException("Unknown gradient");
 		}

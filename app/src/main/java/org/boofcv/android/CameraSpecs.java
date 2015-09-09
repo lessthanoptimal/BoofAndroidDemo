@@ -11,7 +11,9 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class CameraSpecs {
-	Camera.CameraInfo info = new Camera.CameraInfo();
-	List<Camera.Size> sizePreview = new ArrayList<Camera.Size>();
-	List<Camera.Size> sizePicture = new ArrayList<Camera.Size>();
+	public Camera.CameraInfo info = new Camera.CameraInfo();
+	public List<Camera.Size> sizePreview = new ArrayList<Camera.Size>();
+	public List<Camera.Size> sizePicture = new ArrayList<Camera.Size>();
+	public float horizontalViewAngle;
+	public float verticalViewAngle;
 }

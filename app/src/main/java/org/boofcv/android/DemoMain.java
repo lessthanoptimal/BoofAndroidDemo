@@ -14,6 +14,11 @@ import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.Toast;
 
+import org.boofcv.android.fiducials.FiducialImageLibraryAcitivity;
+import org.boofcv.android.fiducials.FiducialLearnActivity;
+import org.boofcv.android.fiducials.FiducialSquareBinaryActivity;
+import org.boofcv.android.fiducials.FiducialSquareImageActivity;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -117,6 +122,8 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 
 		fiducials.addChild("Square Binary",FiducialSquareBinaryActivity.class);
 		fiducials.addChild("Square Image",FiducialSquareImageActivity.class);
+		fiducials.addChild("Test Image",FiducialLearnActivity.class);
+		fiducials.addChild("Library",FiducialImageLibraryAcitivity.class);
 
 		calib.addChild("Calibrate",CalibrationActivity.class);
 		calib.addChild("Undistort",UndistortDisplayActivity.class);
@@ -173,6 +180,8 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 			Camera.getCameraInfo(i, c.info);
 			Camera camera = Camera.open(i);
 			Camera.Parameters params = camera.getParameters();
+			c.horizontalViewAngle = params.getHorizontalViewAngle();
+			c.verticalViewAngle = params.getVerticalViewAngle();
 			c.sizePreview.addAll(params.getSupportedPreviewSizes());
 			c.sizePicture.addAll(params.getSupportedPictureSizes());
 			camera.release();

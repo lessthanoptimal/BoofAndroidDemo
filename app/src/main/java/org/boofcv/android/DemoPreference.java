@@ -6,9 +6,9 @@ import boofcv.struct.calib.IntrinsicParameters;
  * @author Peter Abeles
  */
 public class DemoPreference {
-	int cameraId;
-	int preview;
-	int picture;
-	boolean showFps;
-	IntrinsicParameters intrinsic;
+	public int cameraId;
+	public int preview;
+	public int picture;
+	public boolean showFps;
+	public IntrinsicParameters intrinsic;
 }
