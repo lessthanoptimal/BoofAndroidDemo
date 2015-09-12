@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+			  android:orientation="horizontal"
+			  android:layout_width="match_parent"
+			  android:layout_height="match_parent">
+
+	<Spinner
+			android:id="@+id/spinner_algs"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:gravity="center"
+			android:layout_gravity="center" />
+
+	<SeekBar
+		android:paddingTop="20dip"
+		android:layout_width="0dp"
+		android:layout_height="wrap_content"
+		android:layout_weight=".40"
+		android:gravity="center"
+		android:layout_gravity="center"
+		android:max="100"
+		android:progress="8"
+		android:secondaryProgress="0"
+		android:id="@+id/slider_threshold"/>
+
+	<Button
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_marginLeft="10dip"
+		android:text="Reset"
+		android:onClick="pressedReset"
+		android:layout_gravity="center"/>
+
+</LinearLayout>

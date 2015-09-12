@@ -14,9 +14,10 @@ Date:
 - Binary Image: Added thin operator
 - Added a slider to the blur activity
 - When not in use seekbar is dimmed for thresholding
+- Added motion detection activity
+  * With PIP mode when touched!
 
 TODO Color histogram lookup of photos on phone?
-TODO Motion detection from videos on phone
 TODO quadrilateral detector
 TODO Calibration help.  When in landscape  display preview on right side instead
 -------------------------------------------------
