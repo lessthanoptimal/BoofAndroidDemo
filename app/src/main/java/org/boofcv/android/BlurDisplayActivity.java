@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
 import android.widget.Spinner;
 
 import boofcv.abst.filter.blur.BlurFilter;
@@ -27,12 +28,17 @@ public class BlurDisplayActivity extends DemoVideoDisplayActivity
 
 	Spinner spinnerView;
 
+	// amount of blur applied to the image
+	int radius;
+
+	BlurProcessing processing;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		LayoutInflater inflater = getLayoutInflater();
-		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.select_algorithm,null);
+		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.blur_controls,null);
 
 		LinearLayout parent = getViewContent();
 		parent.addView(controls);
@@ -43,6 +49,24 @@ public class BlurDisplayActivity extends DemoVideoDisplayActivity
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinnerView.setAdapter(adapter);
 		spinnerView.setOnItemSelectedListener(this);
+
+		SeekBar seek = (SeekBar)controls.findViewById(R.id.slider_radius);
+		radius = seek.getProgress();
+
+		seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+			@Override
+			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+				radius = progress;
+				if( radius > 0 )
+					processing.setRadius(radius);
+			}
+
+			@Override
+			public void onStartTrackingTouch(SeekBar seekBar) {}
+
+			@Override
+			public void onStopTrackingTouch(SeekBar seekBar) {}
+		});
 	}
 
 	@Override
@@ -57,19 +81,23 @@ public class BlurDisplayActivity extends DemoVideoDisplayActivity
 	}
 
 	private void startBlurProcess(int pos) {
+		// not sure what these do if the radius is set to 0
+		int radius = Math.max(1,this.radius);
 		switch (pos) {
 			case 0:
-				setProcessing(new BlurProcessing(FactoryBlurFilter.mean(ImageUInt8.class, 2)) );
+				processing = new BlurProcessing(FactoryBlurFilter.mean(ImageUInt8.class, radius));
 				break;
 
 			case 1:
-				setProcessing(new BlurProcessing(FactoryBlurFilter.gaussian(ImageUInt8.class,-1,2)) );
+				processing = new BlurProcessing(FactoryBlurFilter.gaussian(ImageUInt8.class,-1,radius));
 				break;
 
 			case 2:
-				setProcessing(new BlurProcessing(FactoryBlurFilter.median(ImageUInt8.class,2)) );
+				processing = new BlurProcessing(FactoryBlurFilter.median(ImageUInt8.class,radius));
 				break;
 		}
+
+		setProcessing(processing);
 	}
 
 	@Override
@@ -77,7 +105,7 @@ public class BlurDisplayActivity extends DemoVideoDisplayActivity
 
 	protected class BlurProcessing extends VideoImageProcessing<ImageUInt8> {
 		ImageUInt8 blurred;
-		BlurFilter<ImageUInt8> filter;
+		final BlurFilter<ImageUInt8> filter;
 
 		public BlurProcessing(BlurFilter<ImageUInt8> filter) {
 			super(ImageType.single(ImageUInt8.class));
@@ -93,8 +121,20 @@ public class BlurDisplayActivity extends DemoVideoDisplayActivity
 
 		@Override
 		protected void process(ImageUInt8 input, Bitmap output, byte[] storage) {
-			filter.process(input,blurred);
-			ConvertBitmap.grayToBitmap(blurred,output,storage);
+			if( radius > 0 ) {
+				synchronized ( filter ) {
+					filter.process(input, blurred);
+				}
+				ConvertBitmap.grayToBitmap(blurred, output, storage);
+			} else {
+				ConvertBitmap.grayToBitmap(input, output, storage);
+			}
+		}
+
+		public void setRadius( int radius ) {
+			synchronized ( filter ) {
+				filter.setRadius(radius);
+			}
 		}
 	}
 }

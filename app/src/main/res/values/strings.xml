@@ -10,6 +10,7 @@
 		<item>Edge-4</item>
 		<item>Edge-8</item>
 		<item>Denoise</item>
+		<item>Thin</item>
 	</string-array>
 
 	<string-array name="blurs">

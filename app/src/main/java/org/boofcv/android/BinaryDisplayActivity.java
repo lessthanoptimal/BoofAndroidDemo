@@ -116,27 +116,31 @@ public class BinaryDisplayActivity extends DemoVideoDisplayActivity
 					break;
 
 				case 2:
-					BinaryImageOps.dilate8(binary,1,afterOps);
+					BinaryImageOps.dilate8(binary, 1, afterOps);
 					break;
 
 				case 3:
-					BinaryImageOps.erode4(binary,1,afterOps);
+					BinaryImageOps.erode4(binary, 1, afterOps);
 					break;
 
 				case 4:
-					BinaryImageOps.erode8(binary,1,afterOps);
+					BinaryImageOps.erode8(binary, 1, afterOps);
 					break;
 
 				case 5:
-					BinaryImageOps.edge4(binary,afterOps);
+					BinaryImageOps.edge4(binary, afterOps);
 					break;
 
 				case 6:
-					BinaryImageOps.edge8(binary,afterOps);
+					BinaryImageOps.edge8(binary, afterOps);
 					break;
 
 				case 7:
-					BinaryImageOps.removePointNoise(binary,afterOps);
+					BinaryImageOps.removePointNoise(binary, afterOps);
+					break;
+
+				case 8:
+					BinaryImageOps.thin(binary,50,afterOps);
 					break;
 
 				default:

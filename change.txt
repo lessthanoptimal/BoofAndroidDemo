@@ -11,10 +11,10 @@ Date:
 - Fiducials
   * Fixed bug which caused it to run very slow.  New image and detector was declared every cycle.
   * Can now add fiducials by taking a picture of them
+- Binary Image: Added thin operator
+- Added a slider to the blur activity
 
 TODO Color histogram lookup of photos on phone?
-TODO Learn fiducial by taking a picture of it?
-TODO Thin to binary ops
 TODO Motion detection from videos on phone
 TODO quadrilateral detector
 TODO Calibration help.  When in landscape  display preview on right side instead
