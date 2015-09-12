@@ -52,10 +52,11 @@ public class ThresholdDisplayActivity extends DemoVideoDisplayActivity
 		spinnerView.setAdapter(adapter);
 
 		ToggleButton toggle = (ToggleButton)controls.findViewById(R.id.toggle_threshold);
-		SeekBar seek = (SeekBar)controls.findViewById(R.id.slider_radius);
+		final SeekBar seek = (SeekBar)controls.findViewById(R.id.slider_radius);
 
 		changed = true;
 		selectedAlg = spinnerView.getSelectedItemPosition();
+		adjustSeekEnabled(seek);
 		down = toggle.isChecked();
 		radius = seek.getProgress();
 
@@ -81,6 +82,7 @@ public class ThresholdDisplayActivity extends DemoVideoDisplayActivity
 				synchronized (lock) {
 					changed = true;
 					selectedAlg = position;
+					adjustSeekEnabled(seek);
 				}
 			}
 
@@ -97,6 +99,14 @@ public class ThresholdDisplayActivity extends DemoVideoDisplayActivity
 				}
 			}
 		});
+	}
+
+	private void adjustSeekEnabled(SeekBar seek) {
+		if( selectedAlg <= 1 ) {
+			seek.setEnabled(false);
+		} else {
+			seek.setEnabled(true);
+		}
 	}
 
 	@Override
