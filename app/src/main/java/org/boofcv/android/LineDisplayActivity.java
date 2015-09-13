@@ -219,7 +219,7 @@ public class LineDisplayActivity extends DemoVideoDisplayActivity
 			canvas.drawBitmap(bitmap,0,0,null);
 
 			for( LineSegment2D_F32 s : lines.toList() )  {
-				canvas.drawLine((int)s.a.x,(int)s.a.y,(int)s.b.x,(int)s.b.y,paint);
+				canvas.drawLine(s.a.x,s.a.y,s.b.x,s.b.y,paint);
 			}
 		}
 	}

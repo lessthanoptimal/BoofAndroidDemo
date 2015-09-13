@@ -91,9 +91,15 @@
 		<item>SURF</item>
 		<item>SIFT</item>
 	</string-array>
+
 	<string-array name="line_features">
 		<item>Hough Foot</item>
 		<item>Hough Polar</item>
+	</string-array>
+
+	<string-array name="threshold_styles">
+		<item>global</item>
+		<item>local</item>
 	</string-array>
 
 	<string-array name="detectors">

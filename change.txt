@@ -17,7 +17,7 @@ Date:
 - Added motion detection activity
   * With PIP mode when touched!
 
-TODO Color histogram lookup of photos on phone?
+TODO finish update to fiducials
 TODO quadrilateral detector
 TODO Calibration help.  When in landscape  display preview on right side instead
 -------------------------------------------------

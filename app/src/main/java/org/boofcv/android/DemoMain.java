@@ -109,6 +109,7 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		detect.addChild("Lines",LineDisplayActivity.class);
 		detect.addChild("Canny Edge",CannyEdgeActivity.class);
 		detect.addChild("Shape Fitting",ShapeFittingActivity.class);
+		detect.addChild("Black Polygon",DetectBlackPolygonActivity.class);
 		// segmentation is just too slow right now
 //		detect.addChild("Segmentation",SegmentationDisplayActivity.class);
 
@@ -116,7 +117,7 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 
 		tracker.addChild("Object Tracking", ObjectTrackerActivity.class);
 		tracker.addChild("KLT Pyramid", KltDisplayActivity.class);
-		tracker.addChild("Motion Detection", StaticBackgroundDisplayActivity.class);
+		tracker.addChild("Motion Detection", StaticBackgroundMotionActivity.class);
 		// To most people the trackers below will look like a broken KLT
 //		tracker.addChild("Point: Det-Desc-Assoc", DdaTrackerDisplayActivity.class);
 //		tracker.addChild("Point: Combined", CombinedTrackerDisplayActivity.class);

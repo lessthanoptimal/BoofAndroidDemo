@@ -61,7 +61,8 @@
         <activity android:name=".fiducials.FiducialSquareImageHelpActivity"/>
         <activity android:name=".fiducials.FiducialLearnActivity" android:screenOrientation="landscape"/>
         <activity android:name=".fiducials.FiducialImageLibraryAcitivity"/>
-        <activity android:name=".StaticBackgroundDisplayActivity" android:screenOrientation="landscape"/>
+        <activity android:name=".StaticBackgroundMotionActivity" android:screenOrientation="landscape"/>
+        <activity android:name=".DetectBlackPolygonActivity" android:screenOrientation="landscape"/>
     </application>
 
 </manifest>

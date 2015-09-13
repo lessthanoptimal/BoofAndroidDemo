@@ -148,8 +148,8 @@ public class ScalePointDisplayActivity extends DemoVideoDisplayActivity
 
 			for( int i = 0; i < foundGUI.size(); i++ ) {
 				ScalePoint p = foundGUI.get(i);
-				int r = (int)(p.scale*3.0);
-				canvas.drawCircle((int)p.x,(int)p.y,r,paintMax);
+				float r = (float)(p.scale*3.0);
+				canvas.drawCircle((float)p.x,(float)p.y,r,paintMax);
 			}
 		}
 	}

@@ -276,7 +276,7 @@ public class ObjectTrackerActivity extends DemoVideoDisplayActivity
 		}
 
 		private void drawLine( Canvas canvas , Point2D_F64 a , Point2D_F64 b , Paint color ) {
-			canvas.drawLine((int)a.x,(int)a.y,(int)b.x,(int)b.y,color);
+			canvas.drawLine((float)a.x,(float)a.y,(float)b.x,(float)b.y,color);
 		}
 
 		private void makeInBounds( Point2D_F64 p ) {

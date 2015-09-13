@@ -148,8 +148,8 @@ public class PointTrackerDisplayActivity extends DemoVideoDisplayActivity {
 			for( int i = 0; i < trackSrc.size(); i++ ) {
 				Point2D_F64 s = trackSrc.get(i);
 				Point2D_F64 p = trackDst.get(i);
-				canvas.drawLine((int)s.x,(int)s.y,(int)p.x,(int)p.y,paintLine);
-				canvas.drawCircle((int)p.x,(int)p.y,2f, paintRed);
+				canvas.drawLine((float)s.x,(float)s.y,(float)p.x,(float)p.y,paintLine);
+				canvas.drawCircle((float)p.x,(float)p.y,2f, paintRed);
 			}
 
 			for( int i = 0; i < trackSpawn.size(); i++ ) {

@@ -37,7 +37,7 @@ import boofcv.struct.image.ImageUInt8;
  *
  * @author Peter Abeles
  */
-public class StaticBackgroundDisplayActivity extends DemoVideoDisplayActivity
+public class StaticBackgroundMotionActivity extends DemoVideoDisplayActivity
 		implements AdapterView.OnItemSelectedListener, View.OnTouchListener
 {
 
