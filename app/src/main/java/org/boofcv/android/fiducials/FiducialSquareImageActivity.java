@@ -42,6 +42,10 @@ public class FiducialSquareImageActivity extends FiducialSquareActivity
 		manager = new FiducialManager(this);
 		manager.loadList();
 		list = manager.copyList();
+
+		if( list.size() == 0 ) {
+			drawText = "ADD FIDUCIALS!";
+		}
 	}
 
 	@Override

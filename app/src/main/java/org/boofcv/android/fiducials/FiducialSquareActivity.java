@@ -55,6 +55,9 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 
 	Class help;
 
+	// this text is displayed
+	String drawText = "";
+
 	FiducialSquareActivity(Class help) {
 		this.help = help;
 	}
@@ -116,6 +119,8 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 	@Override
 	protected void onResume() {
 		super.onResume();
+		changed = true;
+		intrinsic = null;
 		startDetector();
 		if( DemoMain.preference.intrinsic == null ) {
 			Toast.makeText(FiducialSquareActivity.this, "Calibrate camera for better results!", Toast.LENGTH_LONG).show();
@@ -222,6 +227,11 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 				double width = detector.getWidth(i);
 				drawCube(detector.getId(i),targetToCamera,intrinsic,width,canvas);
 			}
+
+			if( drawText != null ) {
+				renderDrawText(canvas);
+			}
+
 		}
 
 		/**
@@ -284,6 +294,19 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 
 			canvas.drawText(numberString, centerPixel.x-textLength/2,centerPixel.y+textHeight/2, textBorder);
 			canvas.drawText(numberString, centerPixel.x-textLength/2,centerPixel.y+textHeight/2, textPaint);
+		}
+
+		private void renderDrawText( Canvas canvas ) {
+			textPaint.getTextBounds(drawText,0,drawText.length(),bounds);
+
+			int textLength = bounds.width();
+			int textHeight = bounds.height();
+
+			int x0 = canvas.getWidth()/2 - textLength/2;
+			int y0 = canvas.getHeight()/2 + textHeight/2;
+
+			canvas.drawText(drawText, x0, y0, textBorder);
+			canvas.drawText(drawText, x0, y0, textPaint);
 		}
 
 		private void drawLine( Canvas canvas , Point2D_F32 a , Point2D_F32 b , Paint color ) {

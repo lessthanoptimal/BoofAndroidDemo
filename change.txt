@@ -19,9 +19,6 @@ Date:
 - Landscape mode for fiducial help
 - Added black polygon detector
 
-TODO image: no images to detect
-TODO image: improve help dialog -> link to capture
-
 -------------------------------------------------
 Version 1.5
 Date: 2014-9-23
