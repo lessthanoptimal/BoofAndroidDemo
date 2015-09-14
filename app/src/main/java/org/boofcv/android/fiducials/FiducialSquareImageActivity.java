@@ -48,11 +48,14 @@ public class FiducialSquareImageActivity extends FiducialSquareActivity
 	protected FiducialDetector<ImageUInt8> createDetector() {
 
 		SquareImage_to_FiducialDetector<ImageUInt8> detector;
+		ConfigFiducialImage config = new ConfigFiducialImage();
+		config.maxErrorFraction = 0.20;
+
 		synchronized ( lock ) {
 			if (robust) {
-				detector = FactoryFiducial.squareImageRobust(new ConfigFiducialImage(), 4, ImageUInt8.class);
+				detector = FactoryFiducial.squareImageRobust(config, 6, ImageUInt8.class);
 			} else {
-				detector = FactoryFiducial.squareImageFast(new ConfigFiducialImage(), binaryThreshold, ImageUInt8.class);
+				detector = FactoryFiducial.squareImageFast(config, binaryThreshold, ImageUInt8.class);
 			}
 		}
 

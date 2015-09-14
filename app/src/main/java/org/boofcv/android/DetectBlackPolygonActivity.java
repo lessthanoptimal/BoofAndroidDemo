@@ -88,6 +88,7 @@ public class DetectBlackPolygonActivity extends DemoVideoDisplayActivity
 
 		paint = new Paint();
 		paint.setStyle(Paint.Style.STROKE);
+		paint.setFlags(Paint.ANTI_ALIAS_FLAG);
 		paint.setStrokeWidth(3.0f);
 
 		LayoutInflater inflater = getLayoutInflater();
@@ -139,8 +140,6 @@ public class DetectBlackPolygonActivity extends DemoVideoDisplayActivity
 		super.onResume();
 		ConfigPolygonDetector configPoly = new ConfigPolygonDetector(createSideArray());
 		configPoly.contour2Poly_splitDistanceFraction = 0.03;
-//		configPoly.refineWithCorners = false;
-		configPoly.refineWithLines = true;
 
 		detector = FactoryShapeDetector.polygon(configPoly,ImageUInt8.class);
 		setSelection(spinnerThresholder.getSelectedItemPosition());

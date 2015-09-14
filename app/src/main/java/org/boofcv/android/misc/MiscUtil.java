@@ -6,6 +6,7 @@ import org.boofcv.android.CameraSpecs;
 import org.boofcv.android.DemoMain;
 
 import boofcv.struct.calib.IntrinsicParameters;
+import georegression.metric.UtilAngle;
 
 /**
  * @author Peter Abeles
@@ -27,11 +28,14 @@ public class MiscUtil {
 
 			intrinsic = new IntrinsicParameters();
 
+			double hfov = UtilAngle.degreeToRadian(specs.horizontalViewAngle);
+			double vfov = UtilAngle.degreeToRadian(specs.verticalViewAngle);
+
 			intrinsic.width = size.width; intrinsic.height = size.height;
 			intrinsic.cx = intrinsic.width/2;
 			intrinsic.cy = intrinsic.height/2;
-			intrinsic.fx = intrinsic.cx / Math.tan(specs.horizontalViewAngle/2.0f);
-			intrinsic.fy = intrinsic.cy / Math.tan(specs.verticalViewAngle/2.0f);
+			intrinsic.fx = intrinsic.cx / Math.tan(hfov/2.0f);
+			intrinsic.fy = intrinsic.cy / Math.tan(vfov/2.0f);
 		} else {
 			intrinsic = DemoMain.preference.intrinsic;
 		}

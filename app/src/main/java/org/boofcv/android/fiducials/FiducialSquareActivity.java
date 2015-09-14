@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -143,6 +144,8 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 		private Paint textPaint = new Paint();
 		private Paint textBorder = new Paint();
 
+		Rect bounds = new Rect();
+
 		protected FiducialProcessor() {
 			super(ImageType.ms(3, ImageUInt8.class));
 
@@ -255,7 +258,6 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 					centerPt.x / centerPt.z, centerPt.y / centerPt.z, p);
 			Point2D_F32 centerPixel  = new Point2D_F32((float)p.x,(float)p.y);
 
-
 			// red
 			drawLine(canvas,pixel[0],pixel[1],paintLine0);
 			drawLine(canvas,pixel[1],pixel[2],paintLine0);
@@ -274,9 +276,14 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 			drawLine(canvas,pixel[7],pixel[4],paintLine5);
 
 			String numberString = ""+number;
-			int textLength = (int)textPaint.measureText(numberString);
-			canvas.drawText(numberString, centerPixel.x-textLength/2,centerPixel.y+textLength, textBorder);
-			canvas.drawText(numberString, centerPixel.x-textLength/2,centerPixel.y+textLength, textPaint);
+
+			textPaint.getTextBounds(numberString,0,numberString.length(),bounds);
+
+			int textLength = bounds.width();
+			int textHeight = bounds.height();
+
+			canvas.drawText(numberString, centerPixel.x-textLength/2,centerPixel.y+textHeight/2, textBorder);
+			canvas.drawText(numberString, centerPixel.x-textLength/2,centerPixel.y+textHeight/2, textPaint);
 		}
 
 		private void drawLine( Canvas canvas , Point2D_F32 a , Point2D_F32 b , Paint color ) {

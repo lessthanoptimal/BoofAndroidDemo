@@ -21,11 +21,14 @@ public class FiducialSquareBinaryActivity extends FiducialSquareActivity
 	protected FiducialDetector<ImageUInt8> createDetector() {
 
 		FiducialDetector<ImageUInt8> detector;
+		ConfigFiducialBinary config = new ConfigFiducialBinary(0.1);
+		config.ambiguousThreshold = 0.75;
+
 		synchronized ( lock ) {
 			if (robust) {
-				detector = FactoryFiducial.squareBinaryRobust(new ConfigFiducialBinary(0.1), 4, ImageUInt8.class);
+				detector = FactoryFiducial.squareBinaryRobust(config, 6, ImageUInt8.class);
 			} else {
-				detector = FactoryFiducial.squareBinaryFast(new ConfigFiducialBinary(0.1), binaryThreshold, ImageUInt8.class);
+				detector = FactoryFiducial.squareBinaryFast(config, binaryThreshold, ImageUInt8.class);
 			}
 		}
 
