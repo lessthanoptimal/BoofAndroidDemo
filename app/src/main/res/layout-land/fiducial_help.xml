@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-			  android:orientation="vertical"
+			  android:orientation="horizontal"
 			  android:layout_width="match_parent"
 			  android:layout_height="match_parent"
 			  android:id="@+id/parent_layout">
 
 	<TextView
-			android:layout_width="match_parent"
+			android:layout_width="0px"
+			android:layout_height="match_parent"
 			android:layout_weight="10"
-			android:layout_height="0px"
 			android:scrollbars = "vertical"
 			android:id="@+id/text_info" android:layout_gravity="center"/>
 
 	<ImageView
 			android:id="@+id/imageView"
-			android:layout_width="fill_parent"
-			android:layout_height="0px"
+			android:layout_width="0px"
+			android:layout_height="match_parent"
 			android:layout_weight="5"
 			android:src="@drawable/fiducial_square_image"/>
 </LinearLayout>

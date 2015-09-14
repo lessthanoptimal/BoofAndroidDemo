@@ -15,7 +15,6 @@ import android.widget.SimpleExpandableListAdapter;
 import android.widget.Toast;
 
 import org.boofcv.android.fiducials.FiducialImageLibraryAcitivity;
-import org.boofcv.android.fiducials.FiducialLearnActivity;
 import org.boofcv.android.fiducials.FiducialSquareBinaryActivity;
 import org.boofcv.android.fiducials.FiducialSquareImageActivity;
 
@@ -124,8 +123,7 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 
 		fiducials.addChild("Square Binary",FiducialSquareBinaryActivity.class);
 		fiducials.addChild("Square Image",FiducialSquareImageActivity.class);
-		fiducials.addChild("Test Image",FiducialLearnActivity.class);
-		fiducials.addChild("Library",FiducialImageLibraryAcitivity.class);
+		fiducials.addChild("Square Image Library",FiducialImageLibraryAcitivity.class);
 
 		calib.addChild("Calibrate",CalibrationActivity.class);
 		calib.addChild("Undistort",UndistortDisplayActivity.class);

@@ -97,6 +97,11 @@ public class FiducialImageLibraryAcitivity extends Activity {
 		startActivity(intent);
 	}
 
+	public void buttonHelp( View view ) {
+		Intent intent = new Intent(this, FiducialSelectHelpActivity.class);
+		startActivity(intent);
+	}
+
 	protected void performDelete( int index ) {
 //		FiducialInfo info = fiducials.get(index);
 //		if( !ViaVigoUtilities.deleteFiducial(info.name,this)) {
