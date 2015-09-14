@@ -16,10 +16,10 @@ Date:
 - When not in use seekbar is dimmed for thresholding
 - Added motion detection activity
   * With PIP mode when touched!
+- Landscape mode for fiducial help
+- Added black polygon detector
 
 TODO finish update to fiducials
-TODO quadrilateral detector
-TODO Calibration help.  When in landscape  display preview on right side instead
 -------------------------------------------------
 Version 1.5
 Date: 2014-9-23

@@ -1,8 +1,8 @@
 package org.boofcv.android;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -66,7 +66,7 @@ public class DetectBlackPolygonActivity extends DemoVideoDisplayActivity
 
 	ImageUInt8 binary = new ImageUInt8(1,1);
 
-	int colors[] = new int[ MAX_SIDES - MIN_SIDES];
+	int colors[] = new int[ MAX_SIDES - MIN_SIDES + 1];
 
 	public DetectBlackPolygonActivity() {
 		double rgb[] = new double[3];
@@ -87,9 +87,8 @@ public class DetectBlackPolygonActivity extends DemoVideoDisplayActivity
 		super.onCreate(savedInstanceState);
 
 		paint = new Paint();
-		paint.setColor(Color.RED);
 		paint.setStyle(Paint.Style.STROKE);
-		paint.setStrokeWidth(2.0f);
+		paint.setStrokeWidth(3.0f);
 
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.detect_black_polygon_controls,null);
@@ -155,7 +154,8 @@ public class DetectBlackPolygonActivity extends DemoVideoDisplayActivity
 	}
 
 	public void pressedHelp( View view ) {
-
+		Intent intent = new Intent(this, DetectBlackPolygonHelpActivity.class);
+		startActivity(intent);
 	}
 
 	private void checkUpdateSides() {
