@@ -96,6 +96,32 @@ public class FiducialManager {
 		return id;
 	}
 
+	public void deleteFiducial( Info which ) {
+
+		if( !removeFromList(list,which) ) {
+			Log.d(TAG,"Can't find fiducial in list! "+which.id+" "+which.name);
+			return;
+		}
+
+		File directory = owner.getApplicationContext().getDir(DIRECTORY_NAME,Context.MODE_PRIVATE);
+		if( !new File(directory,which.id+"").delete() ) {
+			Log.d(TAG,"Can't delete fiducial image for "+which.id+"  "+which.name);
+			return;
+		}
+		saveList();
+	}
+
+	private boolean removeFromList(List<Info> list, Info which) {
+		for (int i = 0; i < list.size(); i++) {
+			Info info = list.get(i);
+			if( info.id == which.id ) {
+				list.remove(i);
+				return true;
+			}
+		}
+		return false;
+	}
+
 	/**
 	 * Deletes files which shouldn't be there
 	 */

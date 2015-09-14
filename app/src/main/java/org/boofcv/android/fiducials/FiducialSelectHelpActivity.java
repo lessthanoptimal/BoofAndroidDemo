@@ -18,14 +18,20 @@ import org.boofcv.android.R;
  */
 public class FiducialSelectHelpActivity extends Activity {
 
-	private final static String text = "<p>Imports fiducial image patterns by taking a photo of " +
-			"them.</p>"+
-			"Instructions:<br>"+
+	private final static String text = "<p>To import a fiducial image pattern you take a photo of " +
+			"one that you have already printed.  The image is inside a square region that is " +
+			"centered inside a larger square and half its total width.  The border is completely " +
+			"black.</p>"+
+			"Add Instructions:<br>"+
 			"* Click 'Capture' button<br>" +
 			"* Move close to fiducial, see image<br>" +
 			"* Touch inside highlighted region<br"+
 			"* Enter all information and save<br>" +
-			"* It should now appear in the library";
+			"* It should now appear in the library<br>" +
+			"<br>" +
+			"Delete Instructions:<br>"+
+			"* Touch and hold pattern icon<br>" +
+			"* Select 'Yes'";
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

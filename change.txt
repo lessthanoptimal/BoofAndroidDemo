@@ -20,7 +20,7 @@ Date:
 - Added black polygon detector
 
 TODO image: no images to detect
-TODO library: delete
+TODO image: improve help dialog -> link to capture
 
 -------------------------------------------------
 Version 1.5

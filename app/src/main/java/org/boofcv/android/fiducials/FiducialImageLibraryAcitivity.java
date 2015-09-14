@@ -1,7 +1,9 @@
 package org.boofcv.android.fiducials;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -103,34 +105,32 @@ public class FiducialImageLibraryAcitivity extends Activity {
 	}
 
 	protected void performDelete( int index ) {
-//		FiducialInfo info = fiducials.get(index);
-//		if( !ViaVigoUtilities.deleteFiducial(info.name,this)) {
-//			Toast.makeText(this, R.string.failed_to_delete_fiducial, Toast.LENGTH_SHORT).show();
-//		} else {
-//			fiducials.remove(index);
-//			adaptor.notifyDataSetChanged();
-//		}
+		// this is all happening in the GUI thread so it should be save to manipulate list
+		FiducialManager.Info info = list.get(index);
+		fiducialManager.deleteFiducial(info);
+		list.remove(index);
+		adaptor.notifyDataSetChanged();
 	}
 
 	protected void dialogDelete(  final int index ) {
-//		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//
-//		String name = fiducials.get(index).name;
-//
-//		// Create the GUI and show it
-//		builder.setTitle(R.string.delete_fiducial_question)
-//				.setMessage(name)
-//				.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-//					public void onClick(DialogInterface dialog, int id) {
-//						performDelete(index);
-//					}
-//				})
-//				.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-//					public void onClick(DialogInterface dialog, int id) {
-//					}
-//				});
-//		AlertDialog dialog = builder.create();
-//		dialog.show();
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+		String name = list.get(index).name;
+
+		// Create the GUI and show it
+		builder.setTitle("Delete Fiducial?")
+				.setMessage(name)
+				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						performDelete(index);
+					}
+				})
+				.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+					}
+				});
+		AlertDialog dialog = builder.create();
+		dialog.show();
 	}
 
 	public class ImageAdapter extends BaseAdapter {
