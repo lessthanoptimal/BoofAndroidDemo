@@ -10,7 +10,6 @@ android {
         targetSdkVersion 21
         versionCode 8
         versionName "1.6"
-        stark290
     }
     buildTypes {
         release {
