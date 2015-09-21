@@ -4,7 +4,7 @@ Change Log for BoofCV Demonstration App
 
 -------------------------------------------------
 Version 1.6
-Date:
+Date: 2014-9-21
 
 - Calibration now checks to see if the target specified has a valid number of rows/columns
   * Before it would just crash

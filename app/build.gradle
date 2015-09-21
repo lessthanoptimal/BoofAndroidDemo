@@ -8,8 +8,9 @@ android {
         applicationId "org.boofcv.android"
         minSdkVersion 13
         targetSdkVersion 21
-        versionCode 7
-        versionName "1.5"
+        versionCode 8
+        versionName "1.6"ts
+        stark290
     }
     buildTypes {
         release {
@@ -29,8 +30,7 @@ configurations {
 }
 
 dependencies {
-    ['android','calibration','feature','geo','io','ip','recognition','sfm'].each
-            { String a -> compile group: 'org.boofcv', name: a, version: '0.19-SNAPSHOT'}
+    ['android','all'].each { String a -> compile group: 'org.boofcv', name: a, version: '0.19'}
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:21.0.2'
