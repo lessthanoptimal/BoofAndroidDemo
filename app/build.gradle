@@ -9,7 +9,7 @@ android {
         minSdkVersion 13
         targetSdkVersion 21
         versionCode 8
-        versionName "1.6"ts
+        versionName "1.6"
         stark290
     }
     buildTypes {
