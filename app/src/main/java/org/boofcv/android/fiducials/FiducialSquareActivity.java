@@ -127,7 +127,7 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 		}
 	}
 
-	private void startDetector() {
+	protected void startDetector() {
 		setProcessing(new FiducialProcessor() );
 	}
 
@@ -144,8 +144,6 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 		Paint paintLine1 = new Paint();
 		Paint paintLine2 = new Paint();
 		Paint paintLine3 = new Paint();
-		Paint paintLine4 = new Paint();
-		Paint paintLine5 = new Paint();
 		private Paint textPaint = new Paint();
 		private Paint textBorder = new Paint();
 
@@ -157,23 +155,17 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 			paintSelected.setColor(Color.argb(0xFF / 2, 0xFF, 0, 0));
 
 			paintLine0.setColor(Color.RED);
-			paintLine0.setStrokeWidth(3f);
+			paintLine0.setStrokeWidth(4f);
 			paintLine0.setFlags(Paint.ANTI_ALIAS_FLAG);
 			paintLine1.setColor(Color.BLACK);
-			paintLine1.setStrokeWidth(3f);
+			paintLine1.setStrokeWidth(4f);
 			paintLine1.setFlags(Paint.ANTI_ALIAS_FLAG);
 			paintLine2.setColor(Color.BLUE);
-			paintLine2.setStrokeWidth(3f);
+			paintLine2.setStrokeWidth(4f);
 			paintLine2.setFlags(Paint.ANTI_ALIAS_FLAG);
 			paintLine3.setColor(Color.GREEN);
-			paintLine3.setStrokeWidth(3f);
+			paintLine3.setStrokeWidth(4f);
 			paintLine3.setFlags(Paint.ANTI_ALIAS_FLAG);
-			paintLine4.setColor(Color.MAGENTA);
-			paintLine4.setStrokeWidth(3f);
-			paintLine4.setFlags(Paint.ANTI_ALIAS_FLAG);
-			paintLine5.setColor(Color.YELLOW);
-			paintLine5.setStrokeWidth(3f);
-			paintLine5.setFlags(Paint.ANTI_ALIAS_FLAG);
 
 			// Create out paint to use for drawing
 			textPaint.setARGB(255, 255, 100, 100);
@@ -281,9 +273,9 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 			drawLine(canvas,pixel[3],pixel[7],paintLine1);
 
 			drawLine(canvas,pixel[4],pixel[5],paintLine2);
-			drawLine(canvas,pixel[5],pixel[6],paintLine3);
-			drawLine(canvas,pixel[6],pixel[7],paintLine4);
-			drawLine(canvas,pixel[7],pixel[4],paintLine5);
+			drawLine(canvas,pixel[5],pixel[6],paintLine2);
+			drawLine(canvas,pixel[6],pixel[7],paintLine2);
+			drawLine(canvas,pixel[7],pixel[4],paintLine3);
 
 			String numberString = ""+number;
 

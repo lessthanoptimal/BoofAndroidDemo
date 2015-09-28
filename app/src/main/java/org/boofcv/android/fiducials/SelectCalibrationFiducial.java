@@ -35,6 +35,12 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 		this.targetType = targetType;
 	}
 
+	/**
+	 * Creates and displays dialog
+	 *
+	 * @param activity Reference to acitvity launching this dialog
+	 * @param success If use selects OK then run() is called.  Called while in GUI thread.
+	 */
 	public void create( Activity activity , final Runnable success ) {
 		this.activity = activity;
 		LayoutInflater inflater = activity.getLayoutInflater();

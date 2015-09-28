@@ -160,11 +160,15 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 	protected Dialog onCreateDialog(int id) {
 		switch (id) {
 			case TARGET_DIALOG:
-				SelectCalibrationFiducial dialog = new SelectCalibrationFiducial(numRows,numCols,targetType);
+				final SelectCalibrationFiducial dialog = new SelectCalibrationFiducial(numRows,numCols,targetType);
 
 				dialog.create(this, new Runnable() {
 					@Override
 					public void run() {
+						numCols = dialog.getGridColumns();
+						numRows = dialog.getGridRows();
+						targetType = dialog.getGridType();
+
 						startVideoProcessing();
 					}
 				});

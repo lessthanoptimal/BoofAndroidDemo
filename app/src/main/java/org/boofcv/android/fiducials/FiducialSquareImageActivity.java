@@ -1,6 +1,5 @@
 package org.boofcv.android.fiducials;
 
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 
 import java.util.List;
@@ -30,9 +29,6 @@ public class FiducialSquareImageActivity extends FiducialSquareActivity
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		BitmapFactory.Options options = new BitmapFactory.Options();
-		options.inScaled = false;
 	}
 
 	@Override
