@@ -1,9 +1,6 @@
 package org.boofcv.android;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -14,14 +11,12 @@ import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.boofcv.android.fiducials.SelectCalibrationFiducial;
 import org.ddogleg.struct.FastQueue;
 
 import java.util.ArrayList;
@@ -165,8 +160,14 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 	protected Dialog onCreateDialog(int id) {
 		switch (id) {
 			case TARGET_DIALOG:
-				ManageDialog dialog = new ManageDialog();
-				dialog.create(this);
+				SelectCalibrationFiducial dialog = new SelectCalibrationFiducial(numRows,numCols,targetType);
+
+				dialog.create(this, new Runnable() {
+					@Override
+					public void run() {
+						startVideoProcessing();
+					}
+				});
 		}
 		return super.onCreateDialog(id);
 	}
@@ -198,66 +199,6 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 			captureRequested = true;
 			return true;
 		}
-	}
-
-	private class ManageDialog {
-		Spinner spinnerTarget;
-		EditText textRows;
-		EditText textCols;
-
-		public void create( Context context ) {
-			LayoutInflater inflater = getLayoutInflater();
-			LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.calibration_configure,null);
-			// Create out AlterDialog
-			AlertDialog.Builder builder = new AlertDialog.Builder(context);
-			builder.setView(controls);
-			builder.setCancelable(true);
-			builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-				@Override
-				public void onClick(DialogInterface dialogInterface, int i) {
-					numCols = Integer.parseInt(textCols.getText().toString());
-					numRows = Integer.parseInt(textRows.getText().toString());
-					targetType = spinnerTarget.getSelectedItemPosition();
-
-					// ensure the chessboard has an odd number of rows and columns
-					if( targetType == 1 ) {
-						if( numCols % 2 == 0 )
-							numCols--;
-						if( numRows % 2 == 0 )
-							numRows--;
-					}
-
-					if( numCols > 0 && numRows > 0 ) {
-						startVideoProcessing();
-					} else {
-						Toast.makeText(CalibrationActivity.this,"Invalid configuration!",Toast.LENGTH_SHORT).show();
-					}
-				}
-			});
-
-			spinnerTarget = (Spinner) controls.findViewById(R.id.spinner_type);
-			textRows = (EditText) controls.findViewById(R.id.text_rows);
-			textCols = (EditText) controls.findViewById(R.id.text_cols);
-
-			textRows.setText(""+CalibrationActivity.numRows);
-			textCols.setText(""+CalibrationActivity.numCols);
-
-			setupTargetSpinner();
-
-			AlertDialog dialog = builder.create();
-			dialog.show();
-		}
-
-		private void setupTargetSpinner() {
-			ArrayAdapter<CharSequence> adapter =
-					new ArrayAdapter<CharSequence>(CalibrationActivity.this, android.R.layout.simple_spinner_item);
-			adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-			adapter.add("Chessboard");
-			adapter.add("Square Grid");
-
-			spinnerTarget.setAdapter(adapter);
-		}
-
 	}
 
 	private class DetectTarget extends VideoRenderProcessing<ImageFloat32> {

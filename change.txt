@@ -3,8 +3,14 @@ Change Log for BoofCV Demonstration App
 (year)-(month)-(day)
 
 -------------------------------------------------
+Version 1.7
+Date: 2015
+
+- Calibration now shows a preview of the target you're configuring in the opening dialog
+
+-------------------------------------------------
 Version 1.6
-Date: 2014-9-21
+Date: 2015-9-21
 
 - Calibration now checks to see if the target specified has a valid number of rows/columns
   * Before it would just crash

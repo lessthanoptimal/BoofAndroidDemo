@@ -1,22 +1,20 @@
 package org.boofcv.android;
 
 import android.app.Activity;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
-import android.view.SurfaceView;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+
+import org.boofcv.android.fiducials.DrawCalibrationFiducial;
 
 /**
  * Displays instructions and tips for the user
  *
  * @author Peter Abeles
  */
-public class CalibrationHelpActivity extends Activity {
+public class CalibrationHelpActivity extends Activity implements DrawCalibrationFiducial.Owner {
 
 	private static final String text = "<p>Calibration requires a calibration grid to work.  "+
 			"The expected calibration target is shown below.  "+
@@ -40,82 +38,22 @@ public class CalibrationHelpActivity extends Activity {
 
 		FrameLayout preview = (FrameLayout) findViewById(R.id.target_frame);
 
-		DrawTarget vis = new DrawTarget(this);
+		DrawCalibrationFiducial vis = new DrawCalibrationFiducial(this,this);
 		preview.addView(vis);
 	}
 
-	private class DrawTarget extends SurfaceView {
+	@Override
+	public int getGridColumns() {
+		return CalibrationActivity.numCols;
+	}
 
-		private Paint paintBlack = new Paint();
+	@Override
+	public int getGridRows() {
+		return CalibrationActivity.numRows;
+	}
 
-		Activity activity;
-
-		// how wide a black square is
-		int squareWidth;
-		// size of rendered grid
-		int gridWidth,gridHeight;
-
-		public DrawTarget(Activity context) {
-			super(context);
-			this.activity = context;
-
-			paintBlack.setColor(Color.BLACK);
-			// This call is necessary, or else the
-			// draw method will not be called.
-			setWillNotDraw(false);
-			setBackgroundColor(Color.WHITE);
-		}
-
-		@Override
-		protected void onSizeChanged (int w, int h, int oldw, int oldh) {
-			super.onSizeChanged(w,h,oldw,oldh);
-
-			int numCols = CalibrationActivity.numCols;
-			int numRows= CalibrationActivity.numRows;
-
-			// the smallest side in the view area
-			int smallest = Math.min(w,h);
-
-			// how wide a black square is
-			squareWidth = smallest / (Math.max(numCols, numRows));
-
-			gridWidth = squareWidth*numCols;
-			gridHeight = squareWidth*numRows;
-		}
-
-		@Override
-		protected void onDraw(Canvas canvas){
-			super.onDraw(canvas);
-
-			int numCols = CalibrationActivity.numCols;
-			int numRows= CalibrationActivity.numRows;
-
-			// center the grid
-			canvas.translate((getWidth()-gridWidth)/2,(getHeight()-gridHeight)/2);
-
-			for( int i = 0; i < numRows; i += 2 ) {
-				int y0 = i*squareWidth;
-				int y1 = y0+squareWidth;
-				for( int j = 0; j < numCols; j += 2 ) {
-					int x0 = j*squareWidth;
-					int x1 = x0+squareWidth;
-
-					canvas.drawRect(x0,y0,x1,y1,paintBlack);
-				}
-			}
-
-			if( CalibrationActivity.targetType == 0 ) {
-				for( int i = 1; i < numRows; i += 2 ) {
-					int y0 = i*squareWidth;
-					int y1 = y0+squareWidth;
-					for( int j = 1; j < numCols-1; j += 2) {
-						int x0 = j*squareWidth;
-						int x1 = x0+squareWidth;
-
-						canvas.drawRect(x0,y0,x1,y1,paintBlack);
-					}
-				}
-			}
-		}
+	@Override
+	public int getGridType() {
+		return CalibrationActivity.targetType;
 	}
 }
