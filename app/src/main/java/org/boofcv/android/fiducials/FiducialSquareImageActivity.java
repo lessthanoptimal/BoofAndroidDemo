@@ -10,6 +10,8 @@ import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.misc.PixelMath;
 import boofcv.factory.fiducial.ConfigFiducialImage;
 import boofcv.factory.fiducial.FactoryFiducial;
+import boofcv.factory.filter.binary.ConfigThreshold;
+import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.struct.image.ImageUInt8;
 
 /**
@@ -52,11 +54,13 @@ public class FiducialSquareImageActivity extends FiducialSquareActivity
 		config.maxErrorFraction = 0.20;
 
 		synchronized ( lock ) {
+			ConfigThreshold configThreshold;
 			if (robust) {
-				detector = FactoryFiducial.squareImageRobust(config, 6, ImageUInt8.class);
+				configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_SQUARE, 6);
 			} else {
-				detector = FactoryFiducial.squareImageFast(config, binaryThreshold, ImageUInt8.class);
+				configThreshold = ConfigThreshold.fixed(binaryThreshold);
 			}
+			detector = FactoryFiducial.squareImage(config, configThreshold, ImageUInt8.class);
 		}
 
 		for (int i = 0; i < list.size(); i++) {

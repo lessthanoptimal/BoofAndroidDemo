@@ -6,20 +6,16 @@
     </shared>
   </component>
   <component name="AndroidLogFilters">
-    <option name="TOOL_WINDOW_CUSTOM_FILTER" value="DrawCalibrationFiducial" />
     <option name="TOOL_WINDOW_CONFIGURED_FILTER" value="Show only selected application" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0b38ae85-c06e-4b98-b5b3-2f3c57e7e132" name="Default" comment="- final for BoofCV v0.19 &#10;- app version 1.6">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/DrawCalibrationFiducial.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/SelectCalibrationFiducial.java" />
+    <list default="true" id="0b38ae85-c06e-4b98-b5b3-2f3c57e7e132" name="Default" comment="- Calibration shows a preview of the target you're detecting">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/CalibrationActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/CalibrationActivity.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/CalibrationHelpActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/CalibrationHelpActivity.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/DetectBlackPolygonActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/DetectBlackPolygonActivity.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/FiducialSquareBinaryActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/FiducialSquareBinaryActivity.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/FiducialSquareImageActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/FiducialSquareImageActivity.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/ThresholdDisplayActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/ThresholdDisplayActivity.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/app.iml" afterPath="$PROJECT_DIR$/app/app.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/build.gradle" afterPath="$PROJECT_DIR$/app/build.gradle" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/res/layout/calibration_configure.xml" afterPath="$PROJECT_DIR$/app/src/main/res/layout/calibration_configure.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/change.txt" afterPath="$PROJECT_DIR$/change.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/res/layout/preference_activity.xml" afterPath="$PROJECT_DIR$/app/src/main/res/layout/preference_activity.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="BoofAndroidDemo.iws" />
@@ -61,132 +57,150 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
+      <file leaf-file-name="build.gradle" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/build.gradle">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="11" column="27" selection-start-line="11" selection-start-column="27" selection-end-line="11" selection-end-column="27" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="DetectBlackPolygonActivity.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/org/boofcv/android/DetectBlackPolygonActivity.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="259" column="72" selection-start-line="259" selection-start-column="72" selection-end-line="259" selection-end-column="72" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ThresholdDisplayActivity.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/org/boofcv/android/ThresholdDisplayActivity.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="135" column="59" selection-start-line="135" selection-start-column="59" selection-end-line="135" selection-end-column="59" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="BinaryPolygonConvexDetector.java" pinned="false" current-in-tab="false">
+        <entry file="jar://$MAVEN_REPOSITORY$/org/boofcv/feature/0.20-SNAPSHOT/feature-0.20-SNAPSHOT-sources.jar!/boofcv/alg/shapes/polygon/BinaryPolygonConvexDetector.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="237" column="0" selection-start-line="237" selection-start-column="0" selection-end-line="237" selection-end-column="0" />
+              <folding>
+                <element signature="e#0#15175#0" expanded="false" />
+                <element signature="imports" expanded="false" />
+                <element signature="e#14097#14098#0" expanded="false" />
+                <element signature="e#14118#14119#0" expanded="false" />
+                <element signature="e#14157#14158#0" expanded="false" />
+                <element signature="e#14186#14187#0" expanded="false" />
+                <element signature="e#14445#14446#0" expanded="false" />
+                <element signature="e#14468#14469#0" expanded="false" />
+                <element signature="e#14522#14523#0" expanded="false" />
+                <element signature="e#14563#14564#0" expanded="false" />
+                <element signature="e#14599#14600#0" expanded="false" />
+                <element signature="e#14626#14627#0" expanded="false" />
+                <element signature="e#14670#14671#0" expanded="false" />
+                <element signature="e#14699#14700#0" expanded="false" />
+                <element signature="e#14738#14739#0" expanded="false" />
+                <element signature="e#14767#14768#0" expanded="false" />
+                <element signature="e#15126#15127#0" expanded="false" />
+                <element signature="e#15171#15172#0" expanded="false" />
+                <marker date="1444099554000" expanded="true" signature="14409:14411" placeholder="{...}" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="CalibrationActivity.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/org/boofcv/android/CalibrationActivity.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="176" column="29" selection-start-line="176" selection-start-column="29" selection-end-line="176" selection-end-column="29" />
+              <caret line="273" column="77" selection-start-line="273" selection-start-column="77" selection-end-line="273" selection-end-column="77" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="FiducialSquareImageActivity.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/FiducialSquareImageActivity.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="56" column="0" selection-start-line="56" selection-start-column="0" selection-end-line="61" selection-end-column="13" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="FiducialSquareBinaryActivity.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/FiducialSquareBinaryActivity.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.6306306">
+              <caret line="35" column="75" selection-start-line="35" selection-start-column="75" selection-end-line="35" selection-end-column="75" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/.gitignore">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PolygonEdgeScore.java" pinned="false" current-in-tab="false">
+        <entry file="jar://$MAVEN_REPOSITORY$/org/boofcv/feature/0.20-SNAPSHOT/feature-0.20-SNAPSHOT-sources.jar!/boofcv/alg/shapes/edge/PolygonEdgeScore.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="121" column="0" selection-start-line="121" selection-start-column="0" selection-end-line="121" selection-end-column="0" />
               <folding>
-                <element signature="e#4869#4870#0" expanded="true" />
-                <element signature="e#4899#4900#0" expanded="true" />
-                <element signature="e#4942#4943#0" expanded="true" />
-                <element signature="e#4971#4972#0" expanded="true" />
-                <element signature="e#5424#5425#0" expanded="true" />
+                <element signature="e#0#4842#0" expanded="false" />
+                <element signature="imports" expanded="false" />
+                <element signature="e#3125#3126#0" expanded="false" />
+                <element signature="e#3165#3166#0" expanded="false" />
+                <element signature="e#4304#4305#0" expanded="false" />
+                <element signature="e#4330#4331#0" expanded="false" />
+                <element signature="e#4383#4384#0" expanded="false" />
+                <element signature="e#4422#4423#0" expanded="false" />
+                <element signature="e#4461#4462#0" expanded="false" />
+                <element signature="e#4490#4491#0" expanded="false" />
+                <element signature="e#4549#4550#0" expanded="false" />
+                <element signature="e#4594#4595#0" expanded="false" />
+                <element signature="e#4632#4633#0" expanded="false" />
+                <element signature="e#4660#4661#0" expanded="false" />
+                <element signature="e#4717#4718#0" expanded="false" />
+                <element signature="e#4760#4761#0" expanded="false" />
+                <element signature="e#4804#4805#0" expanded="false" />
+                <element signature="e#4838#4839#0" expanded="false" />
+                <marker date="1444366088000" expanded="true" signature="3169:3223" placeholder="/**...*/" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="PointTrackerDisplayActivity.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/org/boofcv/android/PointTrackerDisplayActivity.java">
+      <file leaf-file-name="ScoreLineSegmentEdge.java" pinned="false" current-in-tab="false">
+        <entry file="jar://$MAVEN_REPOSITORY$/org/boofcv/feature/0.20-SNAPSHOT/feature-0.20-SNAPSHOT-sources.jar!/boofcv/alg/shapes/edge/ScoreLineSegmentEdge.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="25" column="60" selection-start-line="25" selection-start-column="60" selection-end-line="25" selection-end-column="60" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="DemoVideoDisplayActivity.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/org/boofcv/android/DemoVideoDisplayActivity.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="12" column="58" selection-start-line="12" selection-start-column="58" selection-end-line="12" selection-end-column="58" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="VideoDisplayActivity.java" pinned="false" current-in-tab="false">
-        <entry file="jar://$MAVEN_REPOSITORY$/org/boofcv/android/0.20-SNAPSHOT/android-0.20-SNAPSHOT-sources.jar!/boofcv/android/gui/VideoDisplayActivity.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="38" column="59" selection-start-line="38" selection-start-column="51" selection-end-line="38" selection-end-column="59" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="change.txt" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/change.txt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.17910448">
-              <caret line="8" column="88" selection-start-line="8" selection-start-column="88" selection-end-line="8" selection-end-column="88" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="SelectCalibrationFiducial.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/SelectCalibrationFiducial.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="78" column="85" selection-start-line="78" selection-start-column="85" selection-end-line="78" selection-end-column="85" />
+              <caret line="97" column="0" selection-start-line="97" selection-start-column="0" selection-end-line="97" selection-end-column="0" />
               <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#1489#2181#0" expanded="true" />
-                <element signature="e#2180#2181#0" expanded="true" />
-                <element signature="e#4210#4211#0" expanded="true" />
-                <element signature="e#4231#4232#0" expanded="true" />
-                <element signature="e#4271#4272#0" expanded="true" />
-                <element signature="e#4292#4293#0" expanded="true" />
-                <element signature="e#4332#4333#0" expanded="true" />
-                <element signature="e#4356#4357#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="calibration_configure.xml" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/calibration_configure.xml">
-          <provider editor-type-id="android-designer">
-            <state />
-          </provider>
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-18.75">
-              <caret line="35" column="44" selection-start-line="35" selection-start-column="35" selection-end-line="35" selection-end-column="44" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="fiducial_help.xml" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/fiducial_help.xml">
-          <provider editor-type-id="android-designer">
-            <state />
-          </provider>
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-7.5">
-              <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="CalibrationHelpActivity.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/org/boofcv/android/CalibrationHelpActivity.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="40" column="46" selection-start-line="40" selection-start-column="46" selection-end-line="40" selection-end-column="46" />
-              <folding>
-                <element signature="e#1675#1676#0" expanded="true" />
-                <element signature="e#1716#1717#0" expanded="true" />
-                <element signature="e#1756#1757#0" expanded="true" />
-                <element signature="e#1797#1798#0" expanded="true" />
-                <element signature="e#1837#1838#0" expanded="true" />
-                <element signature="e#1881#1882#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="DrawCalibrationFiducial.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/DrawCalibrationFiducial.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="60" column="12" selection-start-line="60" selection-start-column="12" selection-end-line="60" selection-end-column="12" />
-              <folding>
-                <element signature="imports" expanded="true" />
+                <element signature="e#0#4409#0" expanded="false" />
+                <element signature="imports" expanded="false" />
+                <element signature="e#4300#4301#0" expanded="false" />
+                <element signature="e#4324#4325#0" expanded="false" />
+                <element signature="e#4370#4371#0" expanded="false" />
+                <element signature="e#4405#4406#0" expanded="false" />
+                <marker date="1444366088000" expanded="true" signature="2654:2708" placeholder="/**...*/" />
+                <marker date="1444366088000" expanded="true" signature="4266:4270" placeholder="{...}" />
               </folding>
             </state>
           </provider>
@@ -1329,15 +1343,15 @@
                             <option value="$MAVEN_REPOSITORY$/org/boofcv/all/0.20-SNAPSHOT/all-0.20-SNAPSHOT.jar" />
                             <option value="/opt/android-sdk-linux/extras/android/m2repository/com/android/support/appcompat-v7/21.0.2/appcompat-v7-21.0.2.aar" />
                             <option value="$MAVEN_REPOSITORY$/org/georegression/georegression/0.9-SNAPSHOT/georegression-0.9-SNAPSHOT.jar" />
-                            <option value="$MAVEN_REPOSITORY$/org/boofcv/ip/0.20-SNAPSHOT/ip-0.20-SNAPSHOT.jar" />
-                            <option value="$MAVEN_REPOSITORY$/org/boofcv/geo/0.20-SNAPSHOT/geo-0.20-SNAPSHOT.jar" />
                             <option value="$MAVEN_REPOSITORY$/org/boofcv/calibration/0.20-SNAPSHOT/calibration-0.20-SNAPSHOT.jar" />
+                            <option value="$MAVEN_REPOSITORY$/org/boofcv/geo/0.20-SNAPSHOT/geo-0.20-SNAPSHOT.jar" />
+                            <option value="$MAVEN_REPOSITORY$/org/boofcv/ip/0.20-SNAPSHOT/ip-0.20-SNAPSHOT.jar" />
                             <option value="$MAVEN_REPOSITORY$/org/boofcv/feature/0.20-SNAPSHOT/feature-0.20-SNAPSHOT.jar" />
+                            <option value="$MAVEN_REPOSITORY$/org/boofcv/recognition/0.20-SNAPSHOT/recognition-0.20-SNAPSHOT.jar" />
                             <option value="$MAVEN_REPOSITORY$/org/boofcv/io/0.20-SNAPSHOT/io-0.20-SNAPSHOT.jar" />
                             <option value="$MAVEN_REPOSITORY$/org/boofcv/learning/0.20-SNAPSHOT/learning-0.20-SNAPSHOT.jar" />
-                            <option value="$MAVEN_REPOSITORY$/org/boofcv/recognition/0.20-SNAPSHOT/recognition-0.20-SNAPSHOT.jar" />
-                            <option value="$MAVEN_REPOSITORY$/org/boofcv/sfm/0.20-SNAPSHOT/sfm-0.20-SNAPSHOT.jar" />
                             <option value="$MAVEN_REPOSITORY$/org/boofcv/visualize/0.20-SNAPSHOT/visualize-0.20-SNAPSHOT.jar" />
+                            <option value="$MAVEN_REPOSITORY$/org/boofcv/sfm/0.20-SNAPSHOT/sfm-0.20-SNAPSHOT.jar" />
                             <option value="/opt/android-sdk-linux/extras/android/m2repository/com/android/support/support-v4/21.0.2/support-v4-21.0.2.aar" />
                             <option value="$MAVEN_REPOSITORY$/org/ddogleg/ddogleg/0.8-SNAPSHOT/ddogleg-0.8-SNAPSHOT.jar" />
                             <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.thoughtworks.xstream/xstream/1.4.7/bce3282142b63068260f021fcbe48b72e8d71a1a/xstream-1.4.7.jar" />
@@ -1473,13 +1487,10 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/app/src/main/res/layout/dialog_fiducial_accept.xml" />
-        <option value="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/FiducialDetector.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/BinaryDisplayActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/blur_controls.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/BlurDisplayActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/StaticMotionDisplayActivity.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/ThresholdDisplayActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/background_controls.xml" />
         <option value="$MAVEN_REPOSITORY$/org/boofcv/ip/0.19-SNAPSHOT/ip-0.19-SNAPSHOT-sources.jar!/boofcv/factory/distort/FactoryDistort.java" />
         <option value="$MAVEN_REPOSITORY$/org/boofcv/android/0.19-SNAPSHOT/android-0.19-SNAPSHOT-sources.jar!/boofcv/android/ConvertBitmap.java" />
@@ -1498,22 +1509,16 @@
         <option value="$PROJECT_DIR$/app/src/main/res/layout-land/black_polygon_help.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/DetectBlackPolygonHelpActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/misc/MiscUtil.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/FiducialSquareBinaryActivity.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/DetectBlackPolygonActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/fiducial_select_help.xml" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/fiducial_help.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/FiducialLearnActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/fiducial_image_library.xml" />
-        <option value="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout-land/fiducial_help.xml" />
-        <option value="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/DemoMain.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/FiducialManager.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/FiducialImageLibraryAcitivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/FiducialSelectHelpActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/FiducialSquareBinaryHelpActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/FiducialSquareImageHelpActivity.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/FiducialSquareImageActivity.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/FiducialSquareActivity.java" />
         <option value="$PROJECT_DIR$/todo.txt" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/preference_activity.xml" />
         <option value="$PROJECT_DIR$/app/build.gradle" />
@@ -1521,9 +1526,18 @@
         <option value="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/CalibrationHelpActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/calibration_configure.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/DrawCalibrationFiducial.java" />
+        <option value="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" />
+        <option value="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/DemoMain.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/SelectCalibrationFiducial.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/CalibrationActivity.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/FiducialSquareActivity.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/FiducialCalibrationActivity.java" />
         <option value="$PROJECT_DIR$/change.txt" />
+        <option value="$MAVEN_REPOSITORY$/org/boofcv/feature/0.20-SNAPSHOT/feature-0.20-SNAPSHOT-sources.jar!/boofcv/alg/shapes/polygon/BinaryPolygonConvexDetector.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/DetectBlackPolygonActivity.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/ThresholdDisplayActivity.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/CalibrationActivity.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/FiducialSquareImageActivity.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/FiducialSquareBinaryActivity.java" />
       </list>
     </option>
   </component>
@@ -1569,6 +1583,8 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="Scratches" />
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -1590,8 +1606,6 @@
         </subPane>
       </pane>
       <pane id="Scope" />
-      <pane id="Scratches" />
-      <pane id="PackagesPane" />
       <pane id="AndroidView">
         <subPane>
           <PATH>
@@ -1608,10 +1622,6 @@
             <PATH_ELEMENT>
               <option name="myItemId" value="BoofAndroidDemo" />
               <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="app" />
-              <option name="myItemType" value="com.android.tools.idea.navigator.nodes.AndroidModuleNode" />
             </PATH_ELEMENT>
           </PATH>
         </subPane>
@@ -1635,7 +1645,7 @@
     <property name="OverrideImplement.combined" value="true" />
     <property name="OverrideImplement.overriding.sorted" value="false" />
     <property name="ANDROID_EXTENDED_DEVICE_CHOOSER_AVD" value="Nexus_5_API_21_x86" />
-    <property name="last_opened_file_path" value="$USER_HOME$/personal/encryption_keys/android_play" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../spvtracking/SPVAndroid" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth0" value="107" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder0" value="0" />
     <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth1" value="119" />
@@ -1676,6 +1686,7 @@
     <configuration default="false" name="DemoMain" type="AndroidRunConfigurationType" factoryName="Android Application" temporary="true">
       <module name="app" />
       <option name="ACTIVITY_CLASS" value="org.boofcv.android.DemoMain" />
+      <option name="ACTIVITY_EXTRA_FLAGS" value="" />
       <option name="MODE" value="specific_activity" />
       <option name="DEPLOY" value="true" />
       <option name="ARTIFACT_NAME" value="" />
@@ -1690,7 +1701,8 @@
       <option name="NETWORK_LATENCY" value="none" />
       <option name="CLEAR_LOGCAT" value="false" />
       <option name="SHOW_LOGCAT_AUTOMATICALLY" value="true" />
-      <option name="FILTER_LOGCAT_AUTOMATICALLY" value="true" />
+      <option name="SKIP_NOOP_APK_INSTALLATIONS" value="true" />
+      <option name="FORCE_STOP_RUNNING_APP" value="true" />
       <option name="SELECTED_CLOUD_MATRIX_CONFIGURATION_ID" value="0" />
       <option name="SELECTED_CLOUD_MATRIX_PROJECT_ID" value="" />
       <option name="SELECTED_CLOUD_DEVICE_CONFIGURATION_ID" value="0" />
@@ -1705,6 +1717,7 @@
     <configuration default="false" name="DetectBlackPolygonActivity" type="AndroidRunConfigurationType" factoryName="Android Application" temporary="true">
       <module name="app" />
       <option name="ACTIVITY_CLASS" value="org.boofcv.android.DetectBlackPolygonActivity" />
+      <option name="ACTIVITY_EXTRA_FLAGS" value="" />
       <option name="MODE" value="specific_activity" />
       <option name="DEPLOY" value="true" />
       <option name="ARTIFACT_NAME" value="" />
@@ -1719,7 +1732,8 @@
       <option name="NETWORK_LATENCY" value="none" />
       <option name="CLEAR_LOGCAT" value="false" />
       <option name="SHOW_LOGCAT_AUTOMATICALLY" value="true" />
-      <option name="FILTER_LOGCAT_AUTOMATICALLY" value="true" />
+      <option name="SKIP_NOOP_APK_INSTALLATIONS" value="true" />
+      <option name="FORCE_STOP_RUNNING_APP" value="true" />
       <option name="SELECTED_CLOUD_MATRIX_CONFIGURATION_ID" value="0" />
       <option name="SELECTED_CLOUD_MATRIX_PROJECT_ID" value="" />
       <option name="SELECTED_CLOUD_DEVICE_CONFIGURATION_ID" value="0" />
@@ -1734,6 +1748,7 @@
     <configuration default="true" type="AndroidRunConfigurationType" factoryName="Android Application">
       <module name="" />
       <option name="ACTIVITY_CLASS" value="" />
+      <option name="ACTIVITY_EXTRA_FLAGS" value="" />
       <option name="MODE" value="default_activity" />
       <option name="DEPLOY" value="true" />
       <option name="ARTIFACT_NAME" value="" />
@@ -1748,7 +1763,8 @@
       <option name="NETWORK_LATENCY" value="none" />
       <option name="CLEAR_LOGCAT" value="false" />
       <option name="SHOW_LOGCAT_AUTOMATICALLY" value="true" />
-      <option name="FILTER_LOGCAT_AUTOMATICALLY" value="true" />
+      <option name="SKIP_NOOP_APK_INSTALLATIONS" value="true" />
+      <option name="FORCE_STOP_RUNNING_APP" value="true" />
       <option name="SELECTED_CLOUD_MATRIX_CONFIGURATION_ID" value="0" />
       <option name="SELECTED_CLOUD_MATRIX_PROJECT_ID" value="" />
       <option name="SELECTED_CLOUD_DEVICE_CONFIGURATION_ID" value="0" />
@@ -1778,7 +1794,8 @@
       <option name="NETWORK_LATENCY" value="none" />
       <option name="CLEAR_LOGCAT" value="false" />
       <option name="SHOW_LOGCAT_AUTOMATICALLY" value="true" />
-      <option name="FILTER_LOGCAT_AUTOMATICALLY" value="true" />
+      <option name="SKIP_NOOP_APK_INSTALLATIONS" value="true" />
+      <option name="FORCE_STOP_RUNNING_APP" value="true" />
       <option name="SELECTED_CLOUD_MATRIX_CONFIGURATION_ID" value="0" />
       <option name="SELECTED_CLOUD_MATRIX_PROJECT_ID" value="" />
       <option name="SELECTED_CLOUD_DEVICE_CONFIGURATION_ID" value="0" />
@@ -1895,6 +1912,7 @@
     <configuration default="false" name="app" type="AndroidRunConfigurationType" factoryName="Android Application">
       <module name="app" />
       <option name="ACTIVITY_CLASS" value="" />
+      <option name="ACTIVITY_EXTRA_FLAGS" value="" />
       <option name="MODE" value="default_activity" />
       <option name="DEPLOY" value="true" />
       <option name="ARTIFACT_NAME" value="" />
@@ -1909,7 +1927,8 @@
       <option name="NETWORK_LATENCY" value="none" />
       <option name="CLEAR_LOGCAT" value="false" />
       <option name="SHOW_LOGCAT_AUTOMATICALLY" value="true" />
-      <option name="FILTER_LOGCAT_AUTOMATICALLY" value="true" />
+      <option name="SKIP_NOOP_APK_INSTALLATIONS" value="true" />
+      <option name="FORCE_STOP_RUNNING_APP" value="true" />
       <option name="SELECTED_CLOUD_MATRIX_CONFIGURATION_ID" value="0" />
       <option name="SELECTED_CLOUD_MATRIX_PROJECT_ID" value="" />
       <option name="SELECTED_CLOUD_DEVICE_CONFIGURATION_ID" value="0" />
@@ -2036,7 +2055,19 @@
       <option name="project" value="LOCAL" />
       <updated>1442852401053</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="- Calibration shows a preview of the target you're detecting">
+      <created>1443405420767</created>
+      <option name="number" value="00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1443405420767</updated>
+    </task>
+    <task id="LOCAL-00016" summary="- Added calibration fiducials to fiducial menu">
+      <created>1443408172520</created>
+      <option name="number" value="00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1443408172520</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
@@ -2053,18 +2084,17 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.6340755" sideWeight="0.50692225" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Android Monitor" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32913843" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32913843" sideWeight="0.49361023" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3281704" sideWeight="0.4978701" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Captures" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Android" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3252662" sideWeight="0.49307775" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3287858" sideWeight="0.5025674" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.26783812" sideWeight="0.49080348" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3281704" sideWeight="0.49743262" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32991013" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.26783812" sideWeight="0.49080348" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32960597" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Android Model" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39883834" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -2077,7 +2107,10 @@
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Documentation" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" x="96" y="99" width="1406" height="677" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Android" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3252662" sideWeight="0.49307775" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Memory Monitor" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3281704" sideWeight="0.49743262" order="1" side_tool="false" content_ui="tabs" />
     </layout>
     <layout-to-restore>
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -2145,7 +2178,9 @@
     <MESSAGE value="- final for BoofCV v0.19 &#10;- app version 1.6" />
     <MESSAGE value="opps" />
     <MESSAGE value="jkjkjk" />
-    <option name="LAST_COMMIT_MESSAGE" value="jkjkjk" />
+    <MESSAGE value="- Calibration shows a preview of the target you're detecting" />
+    <MESSAGE value="- Added calibration fiducials to fiducial menu" />
+    <option name="LAST_COMMIT_MESSAGE" value="- Added calibration fiducials to fiducial menu" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
   <component name="XDebuggerManager">
@@ -2159,55 +2194,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar://$MAVEN_REPOSITORY$/org/boofcv/feature/0.19-SNAPSHOT/feature-0.19-SNAPSHOT-sources.jar!/boofcv/alg/shapes/polygon/BinaryPolygonConvexDetector.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="308" column="0" selection-start-line="308" selection-start-column="0" selection-end-line="308" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/boofcv/android/misc/MiscUtil.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="37" column="55" selection-start-line="37" selection-start-column="55" selection-end-line="37" selection-end-column="55" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/org/boofcv/feature/0.19-SNAPSHOT/feature-0.19-SNAPSHOT-sources.jar!/boofcv/factory/shape/ConfigPolygonDetector.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="77" column="46" selection-start-line="77" selection-start-column="18" selection-end-line="77" selection-end-column="46" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/org/boofcv/recognition/0.19-SNAPSHOT/recognition-0.19-SNAPSHOT-sources.jar!/boofcv/factory/fiducial/FactoryFiducial.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="88" column="61" selection-start-line="88" selection-start-column="61" selection-end-line="88" selection-end-column="61" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/org/boofcv/recognition/0.19-SNAPSHOT/recognition-0.19-SNAPSHOT-sources.jar!/boofcv/alg/fiducial/DetectFiducialSquareBinary.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="47" column="21" selection-start-line="47" selection-start-column="21" selection-end-line="47" selection-end-column="21" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/org/boofcv/recognition/0.19-SNAPSHOT/recognition-0.19-SNAPSHOT-sources.jar!/boofcv/alg/fiducial/BaseDetectFiducialSquare.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="96" column="16" selection-start-line="96" selection-start-column="16" selection-end-line="96" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/org/boofcv/recognition/0.19-SNAPSHOT/recognition-0.19-SNAPSHOT-sources.jar!/boofcv/alg/fiducial/QuadPoseEstimator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="376" column="22" selection-start-line="376" selection-start-column="22" selection-end-line="376" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/org/boofcv/recognition/0.19-SNAPSHOT/recognition-0.19-SNAPSHOT-sources.jar!/boofcv/factory/fiducial/ConfigFiducialImage.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -2219,20 +2205,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="40" column="18" selection-start-line="40" selection-start-column="18" selection-end-line="40" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/FiducialSquareBinaryActivity.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="24" column="30" selection-start-line="24" selection-start-column="30" selection-end-line="24" selection-end-column="30" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/boofcv/android/DetectBlackPolygonActivity.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="141" column="61" selection-start-line="141" selection-start-column="61" selection-end-line="141" selection-end-column="61" />
         </state>
       </provider>
     </entry>
@@ -2263,36 +2235,29 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/fiducial_image_library.xml">
-      <provider editor-type-id="android-designer">
-        <state />
-      </provider>
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-28.392857">
           <caret line="53" column="39" selection-start-line="53" selection-start-column="39" selection-end-line="53" selection-end-column="39" />
         </state>
       </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout-land/fiducial_help.xml">
       <provider editor-type-id="android-designer">
         <state />
       </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout-land/fiducial_help.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-9.642858">
           <caret line="18" column="47" selection-start-line="18" selection-start-column="47" selection-end-line="18" selection-end-column="47" />
         </state>
+      </provider>
+      <provider editor-type-id="android-designer">
+        <state />
       </provider>
     </entry>
     <entry file="file:///opt/android-sdk-linux/sources/android-21/android/text/Html.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="16" column="8" selection-start-line="16" selection-start-column="8" selection-end-line="16" selection-end-column="20" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/boofcv/android/DemoMain.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="124" column="54" selection-start-line="124" selection-start-column="54" selection-end-line="124" selection-end-column="54" />
         </state>
       </provider>
     </entry>
@@ -2338,20 +2303,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/FiducialSquareImageActivity.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="39" column="0" selection-start-line="39" selection-start-column="0" selection-end-line="39" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/FiducialSquareActivity.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="116" column="5" selection-start-line="116" selection-start-column="5" selection-end-line="116" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/gradle.properties">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -2373,39 +2324,14 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/todo.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="7" column="26" selection-start-line="7" selection-start-column="26" selection-end-line="7" selection-end-column="26" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/preference_activity.xml">
-      <provider editor-type-id="android-designer">
-        <state />
-      </provider>
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-17.214285">
           <caret line="37" column="12" selection-start-line="37" selection-start-column="12" selection-end-line="37" selection-end-column="12" />
-          <folding />
         </state>
       </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/build.gradle">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="20" column="0" selection-start-line="20" selection-start-column="0" selection-end-line="20" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/AndroidManifest.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="22" column="27" selection-start-line="22" selection-start-column="27" selection-end-line="22" selection-end-column="27" />
-          <folding />
-        </state>
+      <provider editor-type-id="android-designer">
+        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/settings.gradle">
@@ -2420,15 +2346,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/build.gradle">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="11" column="26" selection-start-line="11" selection-start-column="26" selection-end-line="11" selection-end-column="26" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2436,7 +2353,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="52" column="17" selection-start-line="52" selection-start-column="17" selection-end-line="52" selection-end-column="17" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2444,7 +2360,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="133" column="0" selection-start-line="133" selection-start-column="0" selection-end-line="133" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2452,65 +2367,43 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="22" column="13" selection-start-line="22" selection-start-column="13" selection-end-line="22" selection-end-column="13" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/calibration_help.xml">
-      <provider editor-type-id="android-designer">
-        <state />
-      </provider>
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-8.035714">
           <caret line="15" column="0" selection-start-line="15" selection-start-column="0" selection-end-line="19" selection-end-column="39" />
-          <folding />
         </state>
+      </provider>
+      <provider editor-type-id="android-designer">
+        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/fiducial_help.xml">
-      <provider editor-type-id="android-designer">
-        <state />
-      </provider>
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-7.5">
           <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/calibration_configure.xml">
       <provider editor-type-id="android-designer">
         <state />
       </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/calibration_configure.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-18.75">
           <caret line="35" column="44" selection-start-line="35" selection-start-column="35" selection-end-line="35" selection-end-column="44" />
-          <folding />
         </state>
       </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/DrawCalibrationFiducial.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="60" column="12" selection-start-line="60" selection-start-column="12" selection-end-line="60" selection-end-column="12" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
+      <provider editor-type-id="android-designer">
+        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/org/boofcv/android/CalibrationHelpActivity.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="40" column="46" selection-start-line="40" selection-start-column="46" selection-end-line="40" selection-end-column="46" />
-          <folding>
-            <element signature="e#1675#1676#0" expanded="true" />
-            <element signature="e#1716#1717#0" expanded="true" />
-            <element signature="e#1756#1757#0" expanded="true" />
-            <element signature="e#1797#1798#0" expanded="true" />
-            <element signature="e#1837#1838#0" expanded="true" />
-            <element signature="e#1881#1882#0" expanded="true" />
-          </folding>
+          <caret line="36" column="46" selection-start-line="36" selection-start-column="46" selection-end-line="36" selection-end-column="46" />
         </state>
       </provider>
     </entry>
@@ -2518,62 +2411,224 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="25" column="60" selection-start-line="25" selection-start-column="60" selection-end-line="25" selection-end-column="60" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/org/boofcv/android/DemoVideoDisplayActivity.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="12" column="58" selection-start-line="12" selection-start-column="58" selection-end-line="12" selection-end-column="58" />
-          <folding />
+          <caret line="12" column="13" selection-start-line="12" selection-start-column="13" selection-end-line="12" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/AndroidManifest.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="64" column="55" selection-start-line="64" selection-start-column="55" selection-end-line="64" selection-end-column="55" />
+          <folding>
+            <element signature="e#834#852#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/boofcv/android/DemoMain.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="127" column="68" selection-start-line="127" selection-start-column="68" selection-end-line="127" selection-end-column="68" />
         </state>
       </provider>
     </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/org/boofcv/android/0.20-SNAPSHOT/android-0.20-SNAPSHOT-sources.jar!/boofcv/android/gui/VideoDisplayActivity.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="38" column="59" selection-start-line="38" selection-start-column="51" selection-end-line="38" selection-end-column="59" />
-          <folding />
+          <caret line="66" column="16" selection-start-line="66" selection-start-column="16" selection-end-line="66" selection-end-column="16" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/SelectCalibrationFiducial.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="78" column="85" selection-start-line="78" selection-start-column="85" selection-end-line="78" selection-end-column="85" />
+          <caret line="38" column="34" selection-start-line="38" selection-start-column="34" selection-end-line="38" selection-end-column="34" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/DrawCalibrationFiducial.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="21" column="0" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/FiducialSquareActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="157" column="39" selection-start-line="157" selection-start-column="39" selection-end-line="157" selection-end-column="39" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/boofcv/feature/0.20-SNAPSHOT/feature-0.20-SNAPSHOT-sources.jar!/boofcv/factory/shape/ConfigPolygonDetector.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="79" column="19" selection-start-line="79" selection-start-column="19" selection-end-line="79" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/FiducialCalibrationActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="56" column="80" selection-start-line="56" selection-start-column="80" selection-end-line="56" selection-end-column="80" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/change.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="9" column="46" selection-start-line="9" selection-start-column="46" selection-end-line="9" selection-end-column="46" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/todo.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="7" column="26" selection-start-line="7" selection-start-column="26" selection-end-line="7" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build.gradle">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="25" column="18" selection-start-line="25" selection-start-column="18" selection-end-line="25" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/build.gradle">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="11" column="27" selection-start-line="11" selection-start-column="27" selection-end-line="11" selection-end-column="27" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/boofcv/feature/0.20-SNAPSHOT/feature-0.20-SNAPSHOT-sources.jar!/boofcv/alg/shapes/edge/ScoreLineSegmentEdge.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="97" column="0" selection-start-line="97" selection-start-column="0" selection-end-line="97" selection-end-column="0" />
           <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#1489#2181#0" expanded="true" />
-            <element signature="e#2180#2181#0" expanded="true" />
-            <element signature="e#4210#4211#0" expanded="true" />
-            <element signature="e#4231#4232#0" expanded="true" />
-            <element signature="e#4271#4272#0" expanded="true" />
-            <element signature="e#4292#4293#0" expanded="true" />
-            <element signature="e#4332#4333#0" expanded="true" />
-            <element signature="e#4356#4357#0" expanded="true" />
+            <element signature="e#0#4409#0" expanded="false" />
+            <element signature="imports" expanded="false" />
+            <element signature="e#4300#4301#0" expanded="false" />
+            <element signature="e#4324#4325#0" expanded="false" />
+            <element signature="e#4370#4371#0" expanded="false" />
+            <element signature="e#4405#4406#0" expanded="false" />
+            <marker date="1444366088000" expanded="true" signature="2654:2708" placeholder="/**...*/" />
+            <marker date="1444366088000" expanded="true" signature="4266:4270" placeholder="{...}" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/boofcv/feature/0.20-SNAPSHOT/feature-0.20-SNAPSHOT-sources.jar!/boofcv/alg/shapes/edge/PolygonEdgeScore.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="121" column="0" selection-start-line="121" selection-start-column="0" selection-end-line="121" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#4842#0" expanded="false" />
+            <element signature="imports" expanded="false" />
+            <element signature="e#3125#3126#0" expanded="false" />
+            <element signature="e#3165#3166#0" expanded="false" />
+            <element signature="e#4304#4305#0" expanded="false" />
+            <element signature="e#4330#4331#0" expanded="false" />
+            <element signature="e#4383#4384#0" expanded="false" />
+            <element signature="e#4422#4423#0" expanded="false" />
+            <element signature="e#4461#4462#0" expanded="false" />
+            <element signature="e#4490#4491#0" expanded="false" />
+            <element signature="e#4549#4550#0" expanded="false" />
+            <element signature="e#4594#4595#0" expanded="false" />
+            <element signature="e#4632#4633#0" expanded="false" />
+            <element signature="e#4660#4661#0" expanded="false" />
+            <element signature="e#4717#4718#0" expanded="false" />
+            <element signature="e#4760#4761#0" expanded="false" />
+            <element signature="e#4804#4805#0" expanded="false" />
+            <element signature="e#4838#4839#0" expanded="false" />
+            <marker date="1444366088000" expanded="true" signature="3169:3223" placeholder="/**...*/" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/boofcv/feature/0.20-SNAPSHOT/feature-0.20-SNAPSHOT-sources.jar!/boofcv/alg/shapes/polygon/BinaryPolygonConvexDetector.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="237" column="0" selection-start-line="237" selection-start-column="0" selection-end-line="237" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#15175#0" expanded="false" />
+            <element signature="imports" expanded="false" />
+            <element signature="e#14097#14098#0" expanded="false" />
+            <element signature="e#14118#14119#0" expanded="false" />
+            <element signature="e#14157#14158#0" expanded="false" />
+            <element signature="e#14186#14187#0" expanded="false" />
+            <element signature="e#14445#14446#0" expanded="false" />
+            <element signature="e#14468#14469#0" expanded="false" />
+            <element signature="e#14522#14523#0" expanded="false" />
+            <element signature="e#14563#14564#0" expanded="false" />
+            <element signature="e#14599#14600#0" expanded="false" />
+            <element signature="e#14626#14627#0" expanded="false" />
+            <element signature="e#14670#14671#0" expanded="false" />
+            <element signature="e#14699#14700#0" expanded="false" />
+            <element signature="e#14738#14739#0" expanded="false" />
+            <element signature="e#14767#14768#0" expanded="false" />
+            <element signature="e#15126#15127#0" expanded="false" />
+            <element signature="e#15171#15172#0" expanded="false" />
+            <marker date="1444099554000" expanded="true" signature="14409:14411" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/boofcv/android/DetectBlackPolygonActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="259" column="72" selection-start-line="259" selection-start-column="72" selection-end-line="259" selection-end-column="72" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/boofcv/android/ThresholdDisplayActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="135" column="59" selection-start-line="135" selection-start-column="59" selection-end-line="135" selection-end-column="59" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/org/boofcv/android/CalibrationActivity.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="176" column="29" selection-start-line="176" selection-start-column="29" selection-end-line="176" selection-end-column="29" />
-          <folding>
-            <element signature="e#4869#4870#0" expanded="true" />
-            <element signature="e#4899#4900#0" expanded="true" />
-            <element signature="e#4942#4943#0" expanded="true" />
-            <element signature="e#4971#4972#0" expanded="true" />
-            <element signature="e#5424#5425#0" expanded="true" />
-          </folding>
+          <caret line="273" column="77" selection-start-line="273" selection-start-column="77" selection-end-line="273" selection-end-column="77" />
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/change.txt">
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/FiducialSquareImageActivity.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.17910448">
-          <caret line="8" column="88" selection-start-line="8" selection-start-column="88" selection-end-line="8" selection-end-column="88" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="56" column="0" selection-start-line="56" selection-start-column="0" selection-end-line="61" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/FiducialSquareBinaryActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.6306306">
+          <caret line="35" column="75" selection-start-line="35" selection-start-column="75" selection-end-line="35" selection-end-column="75" />
           <folding />
         </state>
       </provider>

@@ -139,7 +139,6 @@ public class DetectBlackPolygonActivity extends DemoVideoDisplayActivity
 	protected void onResume() {
 		super.onResume();
 		ConfigPolygonDetector configPoly = new ConfigPolygonDetector(createSideArray());
-		configPoly.contour2Poly_splitDistanceFraction = 0.03;
 
 		detector = FactoryShapeDetector.polygon(configPoly,ImageUInt8.class);
 		setSelection(spinnerThresholder.getSelectedItemPosition());
@@ -199,7 +198,7 @@ public class DetectBlackPolygonActivity extends DemoVideoDisplayActivity
 				break;
 
 			case 1:
-				inputToBinary = FactoryThresholdBinary.adaptiveSquare(10,0,true,ImageUInt8.class);
+				inputToBinary = FactoryThresholdBinary.localSquare(10,0,true,ImageUInt8.class);
 				break;
 
 			default:
@@ -258,7 +257,7 @@ public class DetectBlackPolygonActivity extends DemoVideoDisplayActivity
 
 			Canvas canvas = new Canvas(output);
 
-			FastQueue<Polygon2D_F64> found = detector.getFound();
+			FastQueue<Polygon2D_F64> found = detector.getFoundPolygons();
 
 			for( Polygon2D_F64 s : found.toList() )  {
 				paint.setColor(colors[s.size()-MIN_SIDES]);

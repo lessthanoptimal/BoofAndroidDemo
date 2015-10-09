@@ -267,11 +267,11 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 					if( detector instanceof PlanarDetectorChessboard) {
 						DetectChessboardFiducial<ImageFloat32> alg = ((PlanarDetectorChessboard) detector).getAlg();
 						VisualizeImageData.binaryToBitmap(alg.getBinary(), false, bitmap, storage);
-						extractQuads(alg.getFindSeeds().getDetectorSquare().getFound());
+						extractQuads(alg.getFindSeeds().getDetectorSquare().getFoundPolygons());
 					} else if( detector instanceof PlanarDetectorSquareGrid) {
 						DetectSquareGridFiducial<ImageFloat32> alg = ((PlanarDetectorSquareGrid) detector).getDetect();
 						VisualizeImageData.binaryToBitmap(alg.getBinary(), false ,bitmap, storage);
-						extractQuads(alg.getDetectorSquare().getFound());
+						extractQuads(alg.getDetectorSquare().getFoundPolygons());
 					}
 				}
 			}
