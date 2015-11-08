@@ -16,9 +16,7 @@ public class DetectBlackPolygonHelpActivity extends Activity {
 	private static final String text = "<p>Demonstration of a black convex polygon detector. "+
 			" This is used as the first step for detecting calibration targets "+
 			"and square fiducials.  It initially detects shapes in a binary image, then refines " +
-			"their sides to within pixel accuracy using a gray scale image.  It does a very good " +
-			"job of detecting squares, but it is a little bit less reliable at detecting other " +
-			"polygons.  Still room for improvement at reducing false positives.</p>"+
+			"their sides to within subpixel accuracy using a gray scale image.</p>"+
 			"<br>" +
 			"* Tap to see the binary image<br>" +
 			"* Global uses a global adaptive threshold<br>"+

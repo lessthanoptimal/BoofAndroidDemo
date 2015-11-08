@@ -20,8 +20,9 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
-import boofcv.abst.calib.CalibrateMonoPlanar;
-import boofcv.abst.calib.ImageResults;
+import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
+import boofcv.abst.geo.calibration.ImageResults;
+import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.calibration.CalibrationPlanarGridZhang99;
 import boofcv.alg.geo.calibration.Zhang99ParamAll;
 import boofcv.android.BoofAndroidFiles;
@@ -146,7 +147,7 @@ public class CalibrationComputeActivity extends Activity {
 		@Override
 		public void run() {
 			write("Processing images.  Could take a bit.");
-			List<List<Point2D_F64>> points = new ArrayList<List<Point2D_F64>>();
+			List<CalibrationObservation> points = new ArrayList<CalibrationObservation>();
 			for( CalibrationImageInfo c : images ) {
 				points.add( c.calibPoints );
 			}

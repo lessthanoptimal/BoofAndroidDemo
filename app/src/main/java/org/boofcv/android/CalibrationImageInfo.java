@@ -1,10 +1,7 @@
 package org.boofcv.android;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.struct.image.ImageFloat32;
-import georegression.struct.point.Point2D_F64;
 
 /**
  * Contains calibration information provide by an image
@@ -13,13 +10,10 @@ import georegression.struct.point.Point2D_F64;
  */
 public class CalibrationImageInfo {
 	ImageFloat32 image;
-	List<Point2D_F64> calibPoints;
+	CalibrationObservation calibPoints = new CalibrationObservation();
 
-	public CalibrationImageInfo(ImageFloat32 image, List<Point2D_F64> calibPoints) {
+	public CalibrationImageInfo(ImageFloat32 image, CalibrationObservation observations) {
 		this.image = image.clone();
-		this.calibPoints = new ArrayList<Point2D_F64>();
-		for( Point2D_F64 p : calibPoints ) {
-			this.calibPoints.add(p.copy());
-		}
+		this.calibPoints.setTo(observations);
 	}
 }

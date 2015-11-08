@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import boofcv.abst.filter.binary.InputToBinary;
-import boofcv.alg.fiducial.BaseDetectFiducialSquare;
-import boofcv.alg.fiducial.FoundFiducial;
+import boofcv.alg.fiducial.square.BaseDetectFiducialSquare;
+import boofcv.alg.fiducial.square.FoundFiducial;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.FactoryShapeDetector;
@@ -28,7 +28,7 @@ public class FiducialDetector extends BaseDetectFiducialSquare<ImageUInt8> {
 	private final static int w=32;
 	private final static int squareLength=w*4; // this must be a multiple of 16
 
-	private InputToBinary<ImageFloat32> threshold = FactoryThresholdBinary.globalOtsu(0,256,true,ImageFloat32.class);
+	private InputToBinary<ImageFloat32> threshold = FactoryThresholdBinary.globalOtsu(0,255,true,ImageFloat32.class);
 	private ImageFloat32 grayNoBorder = new ImageFloat32();
 
 	// All the images inside which it found
@@ -36,8 +36,8 @@ public class FiducialDetector extends BaseDetectFiducialSquare<ImageUInt8> {
 
 	public FiducialDetector() {
 		super(FactoryThresholdBinary.globalOtsu(0, 255, true, ImageUInt8.class),FactoryShapeDetector.polygon(
-				new ConfigPolygonDetector(false, 4), ImageUInt8.class)
-				, squareLength + squareLength, ImageUInt8.class);
+				new ConfigPolygonDetector(false, 4,4), ImageUInt8.class),
+				0.25, squareLength + squareLength, ImageUInt8.class);
 
 		foundBinary = new FastQueue<ImageUInt8>(ImageUInt8.class,true) {
 			@Override

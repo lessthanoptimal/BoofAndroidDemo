@@ -121,19 +121,19 @@ public class ThresholdDisplayActivity extends DemoVideoDisplayActivity
 
 		switch (selectedAlg) {
 			case 0:
-				return FactoryThresholdBinary.globalOtsu(0,256,down,ImageUInt8.class);
+				return FactoryThresholdBinary.globalOtsu(0,255,down,ImageUInt8.class);
 
 			case 1:
-				return FactoryThresholdBinary.globalEntropy(0, 256, down, ImageUInt8.class);
+				return FactoryThresholdBinary.globalEntropy(0, 255, down, ImageUInt8.class);
 
 			case 2:
-				return FactoryThresholdBinary.localSquare(radius,0,down,ImageUInt8.class);
+				return FactoryThresholdBinary.localSquare(radius,0.95,down,ImageUInt8.class);
 
 			case 3:
-				return FactoryThresholdBinary.localGaussian(radius,0,down,ImageUInt8.class);
+				return FactoryThresholdBinary.localGaussian(radius,0.95,down,ImageUInt8.class);
 
 			case 4:
-				return FactoryThresholdBinary.localSauvola(radius,0,down,ImageUInt8.class);
+				return FactoryThresholdBinary.localSauvola(radius,0.3f,down,ImageUInt8.class);
 		}
 
 		throw new RuntimeException("Unknown selection "+selectedAlg);

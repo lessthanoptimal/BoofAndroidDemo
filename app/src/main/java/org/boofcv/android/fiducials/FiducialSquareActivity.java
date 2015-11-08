@@ -230,7 +230,7 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 		 * Draws a flat cube to show where the square fiducial is on the image
 		 *
 		 */
-		public void drawCube( int number , Se3_F64 targetToCamera , IntrinsicParameters intrinsic , double width ,
+		public void drawCube( long number , Se3_F64 targetToCamera , IntrinsicParameters intrinsic , double width ,
 							  Canvas canvas )
 		{
 			double r = width/2.0;

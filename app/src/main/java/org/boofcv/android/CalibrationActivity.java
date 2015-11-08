@@ -22,13 +22,14 @@ import org.ddogleg.struct.FastQueue;
 import java.util.ArrayList;
 import java.util.List;
 
-import boofcv.abst.calib.ConfigChessboard;
-import boofcv.abst.calib.ConfigSquareGrid;
-import boofcv.abst.calib.PlanarCalibrationDetector;
-import boofcv.abst.calib.PlanarDetectorChessboard;
-import boofcv.abst.calib.PlanarDetectorSquareGrid;
-import boofcv.alg.feature.detect.chess.DetectChessboardFiducial;
-import boofcv.alg.feature.detect.grid.DetectSquareGridFiducial;
+import boofcv.abst.fiducial.calib.CalibrationDetectorChessboard;
+import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
+import boofcv.abst.fiducial.calib.ConfigChessboard;
+import boofcv.abst.fiducial.calib.ConfigSquareGrid;
+import boofcv.abst.geo.calibration.CalibrationDetector;
+import boofcv.alg.fiducial.calib.chess.DetectChessboardFiducial;
+import boofcv.alg.fiducial.calib.grid.DetectSquareGridFiducial;
+import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
 import boofcv.android.gui.VideoRenderProcessing;
@@ -129,7 +130,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 	 * Configures the detector, configures target description for calibration and starts the detector thread.
 	 */
 	private void startVideoProcessing() {
-		PlanarCalibrationDetector detector;
+		CalibrationDetector detector;
 
 		if( targetType == 0 ) {
 			ConfigChessboard config = new ConfigChessboard(numCols,numRows, 30);
@@ -207,7 +208,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 
 	private class DetectTarget extends VideoRenderProcessing<ImageFloat32> {
 
-		PlanarCalibrationDetector detector;
+		CalibrationDetector detector;
 
 		FastQueue<Point2D_F64> pointsGui = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
 
@@ -216,7 +217,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 		Bitmap bitmap;
 		byte[] storage;
 
-		protected DetectTarget( PlanarCalibrationDetector detector ) {
+		protected DetectTarget( CalibrationDetector detector ) {
 			super(ImageType.single(ImageFloat32.class));
 			this.detector = detector;
 		}
@@ -259,17 +260,17 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 				pointsGui.reset();
 				debugQuads.clear();
 				if( detected ) {
-					List<Point2D_F64> found = detector.getDetectedPoints();
-					for( Point2D_F64 p : found )
-						pointsGui.grow().set(p);
+					CalibrationObservation found = detector.getDetectedPoints();
+					for( CalibrationObservation.Point p : found.points )
+						pointsGui.grow().set(p.pixel);
 				} else if( showDetectDebug ) {
 					// show binary image to aid in debugging and detected rectangles
-					if( detector instanceof PlanarDetectorChessboard) {
-						DetectChessboardFiducial<ImageFloat32> alg = ((PlanarDetectorChessboard) detector).getAlg();
+					if( detector instanceof CalibrationDetectorChessboard) {
+						DetectChessboardFiducial<ImageFloat32> alg = ((CalibrationDetectorChessboard) detector).getAlgorithm();
 						VisualizeImageData.binaryToBitmap(alg.getBinary(), false, bitmap, storage);
 						extractQuads(alg.getFindSeeds().getDetectorSquare().getFoundPolygons());
-					} else if( detector instanceof PlanarDetectorSquareGrid) {
-						DetectSquareGridFiducial<ImageFloat32> alg = ((PlanarDetectorSquareGrid) detector).getDetect();
+					} else if( detector instanceof CalibrationDetectorSquareGrid) {
+						DetectSquareGridFiducial<ImageFloat32> alg = ((CalibrationDetectorSquareGrid) detector).getAlgorithm();
 						VisualizeImageData.binaryToBitmap(alg.getBinary(), false ,bitmap, storage);
 						extractQuads(alg.getDetectorSquare().getFoundPolygons());
 					}

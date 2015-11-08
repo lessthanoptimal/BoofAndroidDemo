@@ -40,6 +40,13 @@
 			  android:layout_height="wrap_content"
 			  android:inputType="number"/>
 
+	<ToggleButton android:id="@+id/toggle_convex"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:textOn="convex"
+		android:textOff="concave"
+		android:checked="true"/>
+
 	<Button
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"

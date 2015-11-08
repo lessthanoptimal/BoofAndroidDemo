@@ -3,9 +3,9 @@ package org.boofcv.android.fiducials;
 import android.app.Dialog;
 import android.os.Bundle;
 
-import boofcv.abst.calib.ConfigChessboard;
-import boofcv.abst.calib.ConfigSquareGrid;
 import boofcv.abst.fiducial.FiducialDetector;
+import boofcv.abst.fiducial.calib.ConfigChessboard;
+import boofcv.abst.fiducial.calib.ConfigSquareGrid;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.struct.image.ImageUInt8;
 

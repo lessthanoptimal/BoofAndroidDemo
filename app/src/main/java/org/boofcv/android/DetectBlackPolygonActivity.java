@@ -17,12 +17,13 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import org.ddogleg.struct.FastQueue;
 
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.color.ColorHsv;
-import boofcv.alg.shapes.polygon.BinaryPolygonConvexDetector;
+import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
 import boofcv.android.gui.VideoImageProcessing;
@@ -42,7 +43,7 @@ import georegression.struct.shapes.Polygon2D_F64;
 public class DetectBlackPolygonActivity extends DemoVideoDisplayActivity
 		implements AdapterView.OnItemSelectedListener , View.OnTouchListener {
 
-	static final int MAX_SIDES = 8;
+	static final int MAX_SIDES = 20;
 	static final int MIN_SIDES = 3;
 
 	Paint paint;
@@ -50,6 +51,7 @@ public class DetectBlackPolygonActivity extends DemoVideoDisplayActivity
 	EditText editMin;
 	EditText editMax;
 	Spinner spinnerThresholder;
+	ToggleButton toggleConvex;
 
 	// which algorithm is processing the image
 	int active = -1;
@@ -58,10 +60,11 @@ public class DetectBlackPolygonActivity extends DemoVideoDisplayActivity
 	int minSides = 3;
 	int maxSides = 5;
 	boolean sidesUpdated = false;
+	boolean convex;
 
 	boolean showInput = true;
 
-	BinaryPolygonConvexDetector<ImageUInt8> detector;
+	BinaryPolygonDetector<ImageUInt8> detector;
 	InputToBinary<ImageUInt8> inputToBinary;
 
 	ImageUInt8 binary = new ImageUInt8(1,1);
@@ -125,20 +128,24 @@ public class DetectBlackPolygonActivity extends DemoVideoDisplayActivity
 		editMax.setText("" + maxSides);
 		editMax.setOnEditorActionListener(listener);
 
-	}
-
-	private int[] createSideArray() {
-		int out[] = new int[maxSides-minSides+1];
-		for (int i = 0; i < out.length; i++) {
-			out[i] = minSides+i;
-		}
-		return out;
+		toggleConvex = (ToggleButton) controls.findViewById(R.id.toggle_convex);
+		convex = toggleConvex.isChecked();
+		toggleConvex.setOnClickListener(new ToggleButton.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				convex = toggleConvex.isChecked();
+				synchronized ( DetectBlackPolygonActivity.this ) {
+					detector.setConvex(convex);
+				}
+			}
+		});
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-		ConfigPolygonDetector configPoly = new ConfigPolygonDetector(createSideArray());
+		ConfigPolygonDetector configPoly = new ConfigPolygonDetector(minSides,maxSides);
+		configPoly.convex = convex;
 
 		detector = FactoryShapeDetector.polygon(configPoly,ImageUInt8.class);
 		setSelection(spinnerThresholder.getSelectedItemPosition());
@@ -183,7 +190,7 @@ public class DetectBlackPolygonActivity extends DemoVideoDisplayActivity
 		this.maxSides = max;
 
 		synchronized ( this ) {
-			detector.setNumberOfSides(createSideArray());
+			detector.setNumberOfSides(minSides,maxSides);
 		}
 	}
 
@@ -194,11 +201,11 @@ public class DetectBlackPolygonActivity extends DemoVideoDisplayActivity
 
 		switch( active ) {
 			case 0 :
-				inputToBinary = FactoryThresholdBinary.globalEntropy(0,255,true,ImageUInt8.class);
+				inputToBinary = FactoryThresholdBinary.globalOtsu(0, 255, true, ImageUInt8.class);
 				break;
 
 			case 1:
-				inputToBinary = FactoryThresholdBinary.localSquare(10,0,true,ImageUInt8.class);
+				inputToBinary = FactoryThresholdBinary.localSquare(10,0.95,true,ImageUInt8.class);
 				break;
 
 			default:
@@ -240,7 +247,7 @@ public class DetectBlackPolygonActivity extends DemoVideoDisplayActivity
 		protected void process(ImageUInt8 image, Bitmap output, byte[] storage) {
 			if( sidesUpdated ) {
 				sidesUpdated = false;
-				detector.setNumberOfSides(createSideArray());
+				detector.setNumberOfSides(minSides,maxSides);
 			}
 
 			synchronized ( this ) {
