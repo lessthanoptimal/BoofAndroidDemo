@@ -5,6 +5,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -42,9 +44,13 @@ public class ScalePointDisplayActivity extends DemoVideoDisplayActivity
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		DisplayMetrics dm = getResources().getDisplayMetrics();
+
 		paintMax = new Paint();
 		paintMax.setColor(Color.RED);
 		paintMax.setStyle(Paint.Style.STROKE);
+		float strokeWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 0.5f, dm);
+		paintMax.setStrokeWidth(strokeWidth);
 
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.detect_point_controls,null);
