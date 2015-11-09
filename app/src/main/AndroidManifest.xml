@@ -50,7 +50,7 @@
         <activity android:name=".ShapeFitDisplayActivity" android:screenOrientation="landscape"/>
         <activity android:name=".ImageTransformActivity" android:screenOrientation="landscape"/>
         <activity android:name=".ObjectTrackerActivity" android:screenOrientation="landscape"/>
-        <activity android:name=".ShapeFittingActivity" android:screenOrientation="landscape"/>
+        <activity android:name=".ContourShapeFittingActivity" android:screenOrientation="landscape"/>
         <activity android:name=".CannyEdgeActivity" android:screenOrientation="landscape"/>
         <activity android:name=".UndistortDisplayActivity" android:screenOrientation="landscape"/>
         <activity android:name=".SegmentationDisplayActivity" android:screenOrientation="landscape"/>

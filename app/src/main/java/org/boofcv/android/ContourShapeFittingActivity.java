@@ -10,25 +10,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.ToggleButton;
 
 import java.util.List;
 
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
+import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.alg.filter.binary.LinearContourLabelChang2004;
 import boofcv.alg.filter.binary.ThresholdImageOps;
-import boofcv.alg.filter.derivative.GImageDerivativeOps;
-import boofcv.alg.misc.GPixelMath;
-import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.shapes.FitData;
 import boofcv.alg.shapes.ShapeFittingOps;
 import boofcv.android.VisualizeImageData;
 import boofcv.android.gui.VideoImageProcessing;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.PointIndex_I32;
-import boofcv.struct.image.ImageSInt16;
 import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
@@ -41,18 +40,20 @@ import georegression.struct.shapes.EllipseRotated_F64;
  *
  * @author Peter Abeles
  */
-public class ShapeFittingActivity extends DemoVideoDisplayActivity
+public class ContourShapeFittingActivity extends DemoVideoDisplayActivity
 		implements AdapterView.OnItemSelectedListener
 {
 
 	Spinner spinnerView;
+
+	volatile boolean down;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		LayoutInflater inflater = getLayoutInflater();
-		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.select_algorithm,null);
+		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.shape_fitting_controls,null);
 
 		LinearLayout parent = getViewContent();
 		parent.addView(controls);
@@ -63,6 +64,16 @@ public class ShapeFittingActivity extends DemoVideoDisplayActivity
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinnerView.setAdapter(adapter);
 		spinnerView.setOnItemSelectedListener(this);
+
+		ToggleButton toggle = (ToggleButton)controls.findViewById(R.id.toggle_threshold);
+		down = toggle.isChecked();
+
+		toggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				down = isChecked;
+			}
+		});
 	}
 
 	@Override
@@ -96,7 +107,6 @@ public class ShapeFittingActivity extends DemoVideoDisplayActivity
 	public void onNothingSelected(AdapterView<?> adapterView) {}
 
 	protected abstract class BaseProcessing extends VideoImageProcessing<ImageUInt8> {
-		ImageSInt16 edge;
 		ImageUInt8 binary;
 		ImageUInt8 filtered1;
 		ImageSInt32 contourOutput;
@@ -112,7 +122,6 @@ public class ShapeFittingActivity extends DemoVideoDisplayActivity
 		protected void declareImages( int width , int height ) {
 			super.declareImages(width, height);
 
-			edge = new ImageSInt16(width,height);
 			binary = new ImageUInt8(width,height);
 			filtered1 = new ImageUInt8(width,height);
 			contourOutput = new ImageSInt32(width,height);
@@ -125,14 +134,11 @@ public class ShapeFittingActivity extends DemoVideoDisplayActivity
 		@Override
 		protected void process(ImageUInt8 input, Bitmap output, byte[] storage) {
 
-			GImageDerivativeOps.laplace(input,edge);
-			GPixelMath.abs(edge,edge);
-
-			// use the mean value to threshold the image
-			int mean = (int)ImageStatistics.mean(edge)*2;
+			// Select a reasonable threshold
+			int mean = GThresholdImageOps.computeOtsu(input,0,255);
 
 			// create a binary image by thresholding
-			ThresholdImageOps.threshold(edge, binary, mean, false);
+			ThresholdImageOps.threshold(input, binary, mean, down);
 
 			// reduce noise with some filtering
 			BinaryImageOps.removePointNoise(binary, filtered1);
@@ -189,7 +195,7 @@ public class ShapeFittingActivity extends DemoVideoDisplayActivity
 		@Override
 		protected void fitShape(List<Point2D_I32> contour, Canvas canvas) {
 			// TODO unroll and recycle this function
-			List<PointIndex_I32> poly = ShapeFittingOps.fitPolygon(contour, true, 4, 0.3f, 0);
+			List<PointIndex_I32> poly = ShapeFittingOps.fitPolygon(contour, true, 0.05, 0.025f, 10);
 
 			for( int i = 1; i < poly.size(); i++ ) {
 				PointIndex_I32 a = poly.get(i-1);
