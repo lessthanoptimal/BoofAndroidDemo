@@ -24,7 +24,6 @@ public class FiducialSquareBinaryActivity extends FiducialSquareActivity
 
 		FiducialDetector<ImageUInt8> detector;
 		ConfigFiducialBinary config = new ConfigFiducialBinary(0.1);
-		config.ambiguousThreshold = 0.75;
 
 		synchronized ( lock ) {
 			ConfigThreshold configThreshold;

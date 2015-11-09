@@ -51,7 +51,6 @@ public class FiducialSquareImageActivity extends FiducialSquareActivity
 
 		SquareImage_to_FiducialDetector<ImageUInt8> detector;
 		ConfigFiducialImage config = new ConfigFiducialImage();
-		config.maxErrorFraction = 0.20;
 
 		synchronized ( lock ) {
 			ConfigThreshold configThreshold;

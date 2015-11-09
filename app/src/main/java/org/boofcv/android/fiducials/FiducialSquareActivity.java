@@ -8,8 +8,10 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.Toast;
@@ -20,9 +22,15 @@ import org.boofcv.android.DemoVideoDisplayActivity;
 import org.boofcv.android.R;
 import org.boofcv.android.misc.MiscUtil;
 
+import boofcv.abst.fiducial.BaseSquare_FiducialDetector;
+import boofcv.abst.fiducial.CalibrationFiducialDetector;
 import boofcv.abst.fiducial.FiducialDetector;
+import boofcv.abst.fiducial.calib.CalibrationDetectorChessboard;
+import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
+import boofcv.abst.geo.calibration.CalibrationDetector;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.android.ConvertBitmap;
+import boofcv.android.VisualizeImageData;
 import boofcv.android.gui.VideoImageProcessing;
 import boofcv.core.image.ConvertImage;
 import boofcv.struct.calib.IntrinsicParameters;
@@ -42,6 +50,7 @@ import georegression.transform.se.SePointOps_F64;
  * @author Peter Abeles
  */
 public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
+		implements View.OnTouchListener
 {
 	public static final String TAG = "FiducialSquareActivity";
 
@@ -58,6 +67,11 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 	// this text is displayed
 	String drawText = "";
 
+	// true for showinginput image or false for debug information
+	boolean showInput = true;
+
+	protected boolean disableControls = false;
+
 	FiducialSquareActivity(Class help) {
 		this.help = help;
 	}
@@ -72,43 +86,51 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 		LinearLayout parent = getViewContent();
 		parent.addView(controls);
 
-		ToggleButton toggle = (ToggleButton)controls.findViewById(R.id.toggle_robust);
-		final SeekBar seek = (SeekBar)controls.findViewById(R.id.slider_threshold);
+		FrameLayout iv = getViewPreview();
+		iv.setOnTouchListener(this);
 
-		robust = toggle.isChecked();
-		binaryThreshold = seek.getProgress();
+		final ToggleButton toggle = (ToggleButton) controls.findViewById(R.id.toggle_robust);
+		final SeekBar seek = (SeekBar) controls.findViewById(R.id.slider_threshold);
 
-		seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-			@Override
-			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-				synchronized (lock) {
-					changed = true;
-					binaryThreshold = progress;
-				}
-			}
+		if( disableControls ) {
+			toggle.setEnabled(false);
+			seek.setEnabled(false);
+		} else {
+			robust = toggle.isChecked();
+			binaryThreshold = seek.getProgress();
 
-			@Override
-			public void onStartTrackingTouch(SeekBar seekBar) {
-			}
-
-			@Override
-			public void onStopTrackingTouch(SeekBar seekBar) {
-			}
-		});
-		toggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				synchronized (lock) {
-					changed = true;
-					robust = isChecked;
-					if( robust ) {
-						seek.setEnabled(false);
-					} else {
-						seek.setEnabled(true);
+			seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+				@Override
+				public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+					synchronized (lock) {
+						changed = true;
+						binaryThreshold = progress;
 					}
 				}
-			}
-		});
+
+				@Override
+				public void onStartTrackingTouch(SeekBar seekBar) {
+				}
+
+				@Override
+				public void onStopTrackingTouch(SeekBar seekBar) {
+				}
+			});
+			toggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+				@Override
+				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+					synchronized (lock) {
+						changed = true;
+						robust = isChecked;
+						if (robust) {
+							seek.setEnabled(false);
+						} else {
+							seek.setEnabled(true);
+						}
+					}
+				}
+			});
+		}
 	}
 
 	public void pressedHelp( View view ) {
@@ -125,6 +147,15 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 		if( DemoMain.preference.intrinsic == null ) {
 			Toast.makeText(FiducialSquareActivity.this, "Calibrate camera for better results!", Toast.LENGTH_LONG).show();
 		}
+	}
+
+	@Override
+	public boolean onTouch(View v, MotionEvent event) {
+		if( MotionEvent.ACTION_DOWN == event.getActionMasked()) {
+			showInput = !showInput;
+			return true;
+		}
+		return false;
 	}
 
 	protected void startDetector() {
@@ -195,7 +226,6 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 					input = detector.getInputType().createImage(1, 1);
 				}
 			}
-			ConvertBitmap.multiToBitmap(color, output, storage);
 
 			if( detector == null  ) {
 				return;
@@ -210,6 +240,23 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 			}
 
 			detector.detect(input);
+
+			if( showInput ) {
+				ConvertBitmap.multiToBitmap(color, output, storage);
+			} else {
+				ImageUInt8 binary = null;
+				if( detector instanceof CalibrationFiducialDetector) {
+					CalibrationDetector a = ((CalibrationFiducialDetector) detector).getDetector();
+					if( a instanceof CalibrationDetectorChessboard) {
+						binary = ((CalibrationDetectorChessboard)a).getAlgorithm().getBinary();
+					} else {
+						binary = ((CalibrationDetectorSquareGrid)a).getAlgorithm().getBinary();
+					}
+				} else {
+					binary = ((BaseSquare_FiducialDetector) detector).getAlgorithm().getBinary();
+				}
+				VisualizeImageData.binaryToBitmap(binary, false, output, storage);
+			}
 
 			Canvas canvas = new Canvas(output);
 

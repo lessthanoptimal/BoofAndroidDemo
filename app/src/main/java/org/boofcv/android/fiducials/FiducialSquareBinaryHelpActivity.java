@@ -22,7 +22,8 @@ public class FiducialSquareBinaryHelpActivity extends Activity {
 			"and place them on a flat surface.  See below for an example."+
 			"For detailed instructions go to the following webpage: "+
 			"<a href=\"http://boofcv.org/index.php?title=Tutorial_Fiducials\">Tutorial Fiducials</a></p><br>"+
-			"</p>";
+			"</p><br>" +
+			"<p>Hint, tap the screen to see thresholded image.  Useful when debugging.</p>";
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

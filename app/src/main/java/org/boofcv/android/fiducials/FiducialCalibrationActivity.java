@@ -21,9 +21,11 @@ public class FiducialCalibrationActivity extends FiducialSquareActivity {
 	public static int numCols = 7;
 
 	public FiducialCalibrationActivity() {
-		super(FiducialSquareBinaryHelpActivity.class);
+		super(FiducialCalibrationHelpActivity.class);
+		disableControls = true;
 	}
 
+	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
@@ -43,6 +45,7 @@ public class FiducialCalibrationActivity extends FiducialSquareActivity {
 						numRows = dialog.getGridRows();
 						targetType = dialog.getGridType();
 
+						changed = true;
 						FiducialCalibrationActivity.this.startDetector();
 					}
 				});

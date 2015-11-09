@@ -25,7 +25,8 @@ public class FiducialSquareImageHelpActivity extends Activity {
 			"follow the instructions there.  You will need to make a fiducial then take a " +
 			"picture of it.</p>" +
 			"<p>The tutorial below has some fiducials you can use:<br>" +
-			"<a href=\"http://boofcv.org/index.php?title=Tutorial_Fiducials\">Tutorial Fiducials</a></p>";
+			"<a href=\"http://boofcv.org/index.php?title=Tutorial_Fiducials\">Tutorial Fiducials</a></p><br>" +
+			"<p>Hint, tap the screen to see thresholded image.  Useful when debugging.</p>";;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

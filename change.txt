@@ -8,6 +8,7 @@ Date: 2015
 
 - Calibration now shows a preview of the target you're configuring in the opening dialog
 - Added calibration fiducials to fiducial menu
+- Tap fiducials and you will see binary image
 
 -------------------------------------------------
 Version 1.6
