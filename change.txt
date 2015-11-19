@@ -4,11 +4,13 @@ Change Log for BoofCV Demonstration App
 
 -------------------------------------------------
 Version 1.7
-Date: 2015
+Date: 2015-11-18
 
+- Updated to BoofCV v0.20
 - Calibration now shows a preview of the target you're configuring in the opening dialog
 - Added calibration fiducials to fiducial menu
 - Tap fiducials and you will see binary image
+- reset button in disparity activity
 
 -------------------------------------------------
 Version 1.6
