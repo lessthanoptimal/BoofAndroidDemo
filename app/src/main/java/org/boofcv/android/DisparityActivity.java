@@ -49,6 +49,7 @@ public class DisparityActivity extends DemoVideoDisplayActivity
 	volatile int touchEventType = 0;
 	volatile int touchX;
 	volatile int touchY;
+	volatile boolean reset = false;
 
 	private GestureDetector mDetector;
 
@@ -125,6 +126,10 @@ public class DisparityActivity extends DemoVideoDisplayActivity
 
 	@Override
 	public void onNothingSelected(AdapterView<?> adapterView) {}
+
+	public void resetPressed( View view ) {
+		reset = true;
+	}
 
 	protected class MyGestureDetector extends GestureDetector.SimpleOnGestureListener
 	{
@@ -242,6 +247,18 @@ public class DisparityActivity extends DemoVideoDisplayActivity
 
 			// process GUI interactions
 			synchronized ( lockGui ) {
+				if( reset ) {
+					reset = false;
+					visualize.setSource(null);
+					visualize.setDestination(null);
+					runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							spinnerView.setSelection(0);
+						}
+					});
+
+				}
 				if( touchEventType == 1 ) {
 					// first see if there are any features to select
 					if( !visualize.setTouch(touchX,touchY) ) {
