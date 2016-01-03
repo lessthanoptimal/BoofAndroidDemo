@@ -2,6 +2,7 @@ package org.boofcv.android;
 
 import boofcv.abst.feature.describe.ConfigBrief;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
+import boofcv.abst.feature.detdesc.ConfigCompleteSift;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.detect.interest.ConfigFast;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
@@ -41,10 +42,11 @@ public class CreateDetectorDescriptor {
 	public static final int DESC_NCC = 3;
 
 	public static DetectDescribePoint create( int detect , int describe , Class imageType ) {
+
 		if( detect == DETECT_FH && describe == DESC_SURF ) {
 			return FactoryDetectDescribe.surfFast(confDetectFH(), null, null, imageType);
 		} else if( detect == DETECT_SIFT && describe == DESC_SIFT ) {
-			return FactoryDetectDescribe.sift(null, confDetectSift(), null, null );
+			return FactoryDetectDescribe.sift( confSift() );
 		} else {
 			boolean ss = isScaleSpace(detect);
 
@@ -61,7 +63,7 @@ public class CreateDetectorDescriptor {
 		if( isScaleSpace(detect)) {
 			Class integralType = GIntegralImageOps.getIntegralType(imageType);
 			OrientationIntegral orientationII = FactoryOrientationAlgs.sliding_ii(null, integralType);
-			return FactoryOrientation.convertImage(orientationII,imageType);
+			return FactoryOrientation.convertImage(orientationII, imageType);
 		} else {
 			return null;
 		}
@@ -80,7 +82,7 @@ public class CreateDetectorDescriptor {
 				return FactoryInterestPoint.fastHessian(confDetectFH());
 
 			case DETECT_SIFT:
-				return FactoryInterestPoint.siftDetector(null,confDetectSift());
+				return FactoryInterestPoint.sift(null,confDetectSift(),imageType);
 
 			case DETECT_SHITOMASI:
 				general = FactoryDetectPoint.createShiTomasi(confCorner(),false,derivType);
@@ -105,10 +107,10 @@ public class CreateDetectorDescriptor {
 	public static DescribeRegionPoint createDescriptor( int describe , boolean scaleSpace , Class imageType ) {
 		switch( describe ) {
 			case DESC_SURF:
-				return FactoryDescribeRegionPoint.surfFast(null,imageType);
+				return FactoryDescribeRegionPoint.surfFast(null, imageType);
 
 			case DESC_SIFT:
-				return FactoryDescribeRegionPoint.sift(null,null);
+				return FactoryDescribeRegionPoint.sift(null,null,imageType);
 
 			case DESC_BRIEF:
 				return FactoryDescribeRegionPoint.brief(new ConfigBrief(!scaleSpace),imageType);
@@ -139,10 +141,16 @@ public class CreateDetectorDescriptor {
 		return conf;
 	}
 
+	private static ConfigCompleteSift confSift() {
+		ConfigCompleteSift config = new ConfigCompleteSift();
+		config.detector = confDetectSift();
+		return config;
+	}
+
 	private static  ConfigSiftDetector confDetectSift() {
 		ConfigSiftDetector conf = new ConfigSiftDetector();
-		conf.extractRadius = 3;
-		conf.detectThreshold = 2;
+		conf.extract.radius = 3;
+		conf.extract.threshold = 2;
 		conf.maxFeaturesPerScale = 120;
 		return conf;
 	}

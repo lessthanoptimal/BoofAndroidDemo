@@ -33,7 +33,7 @@ import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
 import boofcv.android.gui.VideoRenderProcessing;
-import boofcv.factory.calib.FactoryPlanarCalibrationTarget;
+import boofcv.factory.calib.FactoryCalibrationTarget;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
@@ -134,11 +134,11 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 
 		if( targetType == 0 ) {
 			ConfigChessboard config = new ConfigChessboard(numCols,numRows, 30);
-			detector = FactoryPlanarCalibrationTarget.detectorChessboard(config);
+			detector = FactoryCalibrationTarget.detectorChessboard(config);
 
 		} else {
 			ConfigSquareGrid config = new ConfigSquareGrid(numCols,numRows, 30 , 30);
-			detector = FactoryPlanarCalibrationTarget.detectorSquareGrid(config);
+			detector = FactoryCalibrationTarget.detectorSquareGrid(config);
 		}
 		CalibrationComputeActivity.targetLayout = detector.getLayout();
 		setProcessing(new DetectTarget(detector));

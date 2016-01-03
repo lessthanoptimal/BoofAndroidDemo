@@ -35,9 +35,9 @@ public class FiducialDetector extends BaseDetectFiducialSquare<ImageUInt8> {
 	private FastQueue<ImageUInt8> foundBinary;
 
 	public FiducialDetector() {
-		super(FactoryThresholdBinary.globalOtsu(0, 255, true, ImageUInt8.class),FactoryShapeDetector.polygon(
-				new ConfigPolygonDetector(false, 4,4), ImageUInt8.class),
-				0.25, squareLength + squareLength, ImageUInt8.class);
+		super(FactoryThresholdBinary.globalOtsu(0, 255, true, ImageUInt8.class), FactoryShapeDetector.polygon(
+						new ConfigPolygonDetector(false, 4, 4), ImageUInt8.class),
+				0.25, 0.5, squareLength + squareLength, ImageUInt8.class);
 
 		foundBinary = new FastQueue<ImageUInt8>(ImageUInt8.class,true) {
 			@Override
@@ -77,7 +77,7 @@ public class FiducialDetector extends BaseDetectFiducialSquare<ImageUInt8> {
 	}
 
 	@Override
-	protected boolean processSquare(ImageFloat32 gray, Result result) {
+	protected boolean processSquare(ImageFloat32 gray, Result result , double edgeInside, double edgeOutside) {
 		ImageUInt8 binary = foundBinary.grow();
 		int off = (gray.width-binary.width)/2;
 		gray.subimage(off, off, gray.width - off, gray.width - off, grayNoBorder);

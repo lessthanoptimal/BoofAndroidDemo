@@ -27,7 +27,7 @@ import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.feature.disparity.DisparityAlgorithms;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
-import boofcv.struct.feature.SurfFeature;
+import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageType;
 
@@ -188,7 +188,7 @@ public class DisparityActivity extends DemoVideoDisplayActivity
 
 	protected class DisparityProcessing extends VideoRenderProcessing<ImageFloat32> {
 
-		DisparityCalculation<SurfFeature> disparity;
+		DisparityCalculation<BrightFeature> disparity;
 
 		ImageFloat32 disparityImage;
 		int disparityMin,disparityMax;
@@ -196,14 +196,14 @@ public class DisparityActivity extends DemoVideoDisplayActivity
 		public DisparityProcessing() {
 			super(ImageType.single(ImageFloat32.class));
 
-			DetectDescribePoint<ImageFloat32, SurfFeature> detDesc =
+			DetectDescribePoint<ImageFloat32, BrightFeature> detDesc =
 					FactoryDetectDescribe.surfFast(null,null,null,ImageFloat32.class);
 
-			ScoreAssociation<SurfFeature> score = FactoryAssociation.defaultScore(SurfFeature.class);
-			AssociateDescription<SurfFeature> associate =
+			ScoreAssociation<BrightFeature> score = FactoryAssociation.defaultScore(BrightFeature.class);
+			AssociateDescription<BrightFeature> associate =
 					FactoryAssociation.greedy(score,Double.MAX_VALUE,true);
 
-			disparity = new DisparityCalculation<SurfFeature>(detDesc,associate,DemoMain.preference.intrinsic);
+			disparity = new DisparityCalculation<BrightFeature>(detDesc,associate,DemoMain.preference.intrinsic);
 		}
 
 		@Override

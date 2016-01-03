@@ -21,10 +21,8 @@ import boofcv.abst.feature.detect.interest.ConfigSiftDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.gui.VideoRenderProcessing;
-import boofcv.core.image.ConvertImage;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.struct.feature.ScalePoint;
-import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_F64;
@@ -91,10 +89,8 @@ public class ScalePointDisplayActivity extends DemoVideoDisplayActivity
 				break;
 
 			case 1:
-				ConfigSiftDetector configSift = new ConfigSiftDetector(3,10,-1,5);
-				InterestPointDetector<ImageFloat32> detectorF =
-						FactoryInterestPoint.siftDetector(null,configSift);
-				detector = new ConvertDetector(detectorF);
+				ConfigSiftDetector configSift = new ConfigSiftDetector(200);
+				detector = FactoryInterestPoint.sift(null, configSift, ImageUInt8.class);
 				break;
 
 			default:
@@ -142,8 +138,8 @@ public class ScalePointDisplayActivity extends DemoVideoDisplayActivity
 				int N = detector.getNumberOfFeatures();
 				for( int i = 0; i < N; i++ ) {
 					Point2D_F64 p = detector.getLocation(i);
-					double scale = detector.getScale(i);
-					foundGUI.grow().set(p.x, p.y, scale);
+					double radius = detector.getRadius(i);
+					foundGUI.grow().set(p.x, p.y, radius);
 				}
 			}
 		}
@@ -154,56 +150,8 @@ public class ScalePointDisplayActivity extends DemoVideoDisplayActivity
 
 			for( int i = 0; i < foundGUI.size(); i++ ) {
 				ScalePoint p = foundGUI.get(i);
-				float r = (float)(p.scale*3.0);
-				canvas.drawCircle((float)p.x,(float)p.y,r,paintMax);
+				canvas.drawCircle((float)p.x,(float)p.y,(float)p.scale,paintMax);
 			}
-		}
-	}
-
-	private static class ConvertDetector implements InterestPointDetector<ImageUInt8> {
-
-		ImageFloat32 storage = new ImageFloat32(1,1);
-		InterestPointDetector<ImageFloat32> detector;
-
-		private ConvertDetector(InterestPointDetector<ImageFloat32> detector) {
-			this.detector = detector;
-		}
-
-		@Override
-		public void detect(ImageUInt8 input) {
-			storage.reshape(input.width, input.height);
-			ConvertImage.convert(input,storage);
-			detector.detect(storage);
-		}
-
-		@Override
-		public boolean hasScale() {
-			return detector.hasScale();
-		}
-
-		@Override
-		public boolean hasOrientation() {
-			return detector.hasOrientation();
-		}
-
-		@Override
-		public int getNumberOfFeatures() {
-			return detector.getNumberOfFeatures();
-		}
-
-		@Override
-		public Point2D_F64 getLocation(int featureIndex) {
-			return detector.getLocation(featureIndex);
-		}
-
-		@Override
-		public double getScale(int featureIndex) {
-			return detector.getScale(featureIndex);
-		}
-
-		@Override
-		public double getOrientation(int featureIndex) {
-			return detector.getOrientation(featureIndex);
 		}
 	}
 }
