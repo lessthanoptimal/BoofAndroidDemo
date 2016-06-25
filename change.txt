@@ -6,7 +6,7 @@ Change Log for BoofCV Demonstration App
 Version 1.7
 Date: 2016
 
-- Updated to BoofCV v0.21
+- Updated to BoofCV v0.24.1
   * This includes a fix for inverted camera on the Nexus 5x
 
 -------------------------------------------------

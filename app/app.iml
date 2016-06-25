@@ -88,27 +88,27 @@
     </content>
     <orderEntry type="jdk" jdkName="Android API 21 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" exported="" name="calibration-0.20" level="project" />
-    <orderEntry type="library" exported="" name="feature-0.20" level="project" />
-    <orderEntry type="library" exported="" name="ddogleg-0.8" level="project" />
+    <orderEntry type="library" exported="" name="visualize-0.24.1" level="project" />
+    <orderEntry type="library" exported="" name="ddogleg-0.9" level="project" />
+    <orderEntry type="library" exported="" name="recognition-0.24.1" level="project" />
     <orderEntry type="library" exported="" name="support-v4-21.0.2" level="project" />
-    <orderEntry type="library" exported="" name="all-0.20" level="project" />
-    <orderEntry type="library" exported="" name="georegression-0.9" level="project" />
-    <orderEntry type="library" exported="" name="visualize-0.20" level="project" />
-    <orderEntry type="library" exported="" name="equation-0.28" level="project" />
-    <orderEntry type="library" exported="" name="io-0.20" level="project" />
-    <orderEntry type="library" exported="" name="dense64-0.28" level="project" />
+    <orderEntry type="library" exported="" name="calibration-0.24.1" level="project" />
+    <orderEntry type="library" exported="" name="dense64-0.29" level="project" />
+    <orderEntry type="library" exported="" name="equation-0.29" level="project" />
+    <orderEntry type="library" exported="" name="learning-0.24.1" level="project" />
+    <orderEntry type="library" exported="" name="core-0.24.1" level="project" />
     <orderEntry type="library" exported="" name="xpp3_min-1.1.4c" level="project" />
-    <orderEntry type="library" exported="" name="geo-0.20" level="project" />
-    <orderEntry type="library" exported="" name="simple-0.28" level="project" />
+    <orderEntry type="library" exported="" name="simple-0.29" level="project" />
+    <orderEntry type="library" exported="" name="geo-0.24.1" level="project" />
+    <orderEntry type="library" exported="" name="georegression-0.11" level="project" />
     <orderEntry type="library" exported="" name="xstream-1.4.7" level="project" />
-    <orderEntry type="library" exported="" name="learning-0.20" level="project" />
+    <orderEntry type="library" exported="" name="android-0.24.1" level="project" />
+    <orderEntry type="library" exported="" name="sfm-0.24.1" level="project" />
+    <orderEntry type="library" exported="" name="feature-0.24.1" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-21.0.2" level="project" />
-    <orderEntry type="library" exported="" name="core-0.28" level="project" />
-    <orderEntry type="library" exported="" name="sfm-0.20" level="project" />
-    <orderEntry type="library" exported="" name="recognition-0.20" level="project" />
-    <orderEntry type="library" exported="" name="android-0.20" level="project" />
-    <orderEntry type="library" exported="" name="ip-0.20" level="project" />
+    <orderEntry type="library" exported="" name="core-0.29" level="project" />
+    <orderEntry type="library" exported="" name="ip-0.24.1" level="project" />
+    <orderEntry type="library" exported="" name="io-0.24.1" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-21.0.2" level="project" />
   </component>
 </module>
