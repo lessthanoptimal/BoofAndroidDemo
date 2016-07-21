@@ -28,9 +28,9 @@ import boofcv.android.VisualizeImageData;
 import boofcv.android.gui.VideoImageProcessing;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.PointIndex_I32;
-import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.EllipseRotated_F64;
@@ -98,7 +98,7 @@ public class ContourShapeFittingActivity extends DemoVideoDisplayActivity
 				break;
 //
 //			case 2:
-//				setProcessing(new BlurProcessing(FactoryBlurFilter.median(ImageUInt8.class,2)) );
+//				setProcessing(new BlurProcessing(FactoryBlurFilter.median(GrayU8.class,2)) );
 //				break;
 		}
 	}
@@ -106,25 +106,25 @@ public class ContourShapeFittingActivity extends DemoVideoDisplayActivity
 	@Override
 	public void onNothingSelected(AdapterView<?> adapterView) {}
 
-	protected abstract class BaseProcessing extends VideoImageProcessing<ImageUInt8> {
-		ImageUInt8 binary;
-		ImageUInt8 filtered1;
-		ImageSInt32 contourOutput;
+	protected abstract class BaseProcessing extends VideoImageProcessing<GrayU8> {
+		GrayU8 binary;
+		GrayU8 filtered1;
+		GrayS32 contourOutput;
 		Paint paint = new Paint();
 		RectF r = new RectF();
 		LinearContourLabelChang2004 findContours = new LinearContourLabelChang2004(ConnectRule.EIGHT);
 
 		protected BaseProcessing() {
-			super(ImageType.single(ImageUInt8.class));
+			super(ImageType.single(GrayU8.class));
 		}
 
 		@Override
 		protected void declareImages( int width , int height ) {
 			super.declareImages(width, height);
 
-			binary = new ImageUInt8(width,height);
-			filtered1 = new ImageUInt8(width,height);
-			contourOutput = new ImageSInt32(width,height);
+			binary = new GrayU8(width,height);
+			filtered1 = new GrayU8(width,height);
+			contourOutput = new GrayS32(width,height);
 
 			paint.setStyle(Paint.Style.STROKE);
 			paint.setStrokeWidth(3f);
@@ -132,7 +132,7 @@ public class ContourShapeFittingActivity extends DemoVideoDisplayActivity
 		}
 
 		@Override
-		protected void process(ImageUInt8 input, Bitmap output, byte[] storage) {
+		protected void process(GrayU8 input, Bitmap output, byte[] storage) {
 
 			// Select a reasonable threshold
 			int mean = GThresholdImageOps.computeOtsu(input,0,255);

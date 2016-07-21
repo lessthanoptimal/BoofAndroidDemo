@@ -23,8 +23,8 @@ import boofcv.android.ConvertBitmap;
 import boofcv.android.gui.VideoRenderProcessing;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.struct.feature.ScalePoint;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_F64;
 
 /**
@@ -81,7 +81,7 @@ public class ScalePointDisplayActivity extends DemoVideoDisplayActivity
 			return;
 		active = which;
 
-		InterestPointDetector<ImageUInt8> detector;
+		InterestPointDetector<GrayU8> detector;
 
 		switch( which ) {
 			case 0:
@@ -90,7 +90,7 @@ public class ScalePointDisplayActivity extends DemoVideoDisplayActivity
 
 			case 1:
 				ConfigSiftDetector configSift = new ConfigSiftDetector(200);
-				detector = FactoryInterestPoint.sift(null, configSift, ImageUInt8.class);
+				detector = FactoryInterestPoint.sift(null, configSift, GrayU8.class);
 				break;
 
 			default:
@@ -108,16 +108,16 @@ public class ScalePointDisplayActivity extends DemoVideoDisplayActivity
 	@Override
 	public void onNothingSelected(AdapterView<?> adapterView) {}
 
-	protected class PointProcessing extends VideoRenderProcessing<ImageUInt8> {
-		InterestPointDetector<ImageUInt8> detector;
+	protected class PointProcessing extends VideoRenderProcessing<GrayU8> {
+		InterestPointDetector<GrayU8> detector;
 
 		Bitmap bitmap;
 		byte[] storage;
 
 		FastQueue<ScalePoint> foundGUI = new FastQueue<ScalePoint>(ScalePoint.class,true);
 
-		public PointProcessing(InterestPointDetector<ImageUInt8> detector) {
-			super(ImageType.single(ImageUInt8.class));
+		public PointProcessing(InterestPointDetector<GrayU8> detector) {
+			super(ImageType.single(GrayU8.class));
 			this.detector = detector;
 		}
 
@@ -129,7 +129,7 @@ public class ScalePointDisplayActivity extends DemoVideoDisplayActivity
 		}
 
 		@Override
-		protected void process(ImageUInt8 gray) {
+		protected void process(GrayU8 gray) {
 			detector.detect(gray);
 			synchronized ( lockGui ) {
 				ConvertBitmap.grayToBitmap(gray,bitmap,storage);

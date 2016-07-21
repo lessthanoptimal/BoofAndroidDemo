@@ -22,11 +22,11 @@ import boofcv.core.image.ConvertImage;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.factory.transform.wavelet.FactoryWaveletTransform;
 import boofcv.factory.transform.wavelet.GFactoryWavelet;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageDimension;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageSInt32;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import boofcv.struct.image.InterleavedF32;
 import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.struct.wavelet.WaveletDescription;
@@ -91,25 +91,25 @@ public class ImageTransformActivity extends DemoVideoDisplayActivity
 		}
 	}
 
-	protected class FourierProcessing extends VideoImageProcessing<ImageUInt8> {
-		DiscreteFourierTransform<ImageFloat32,InterleavedF32> dft = DiscreteFourierTransformOps.createTransformF32();
-		ImageFloat32 grayF;
+	protected class FourierProcessing extends VideoImageProcessing<GrayU8> {
+		DiscreteFourierTransform<GrayF32,InterleavedF32> dft = DiscreteFourierTransformOps.createTransformF32();
+		GrayF32 grayF;
 		InterleavedF32 transform;
 
 		protected FourierProcessing() {
-			super(ImageType.single(ImageUInt8.class));
+			super(ImageType.single(GrayU8.class));
 		}
 
 		@Override
 		protected void declareImages( int width , int height ) {
 			super.declareImages(width, height);
 
-			grayF = new ImageFloat32(width,height);
+			grayF = new GrayF32(width,height);
 			transform = new InterleavedF32(width,height,2);
 		}
 
 		@Override
-		protected void process(ImageUInt8 input, Bitmap output, byte[] storage) {
+		protected void process(GrayU8 input, Bitmap output, byte[] storage) {
 			ConvertImage.convert(input, grayF);
 			PixelMath.divide(grayF,255.0f,grayF);
 			dft.forward(grayF, transform);
@@ -123,26 +123,26 @@ public class ImageTransformActivity extends DemoVideoDisplayActivity
 	}
 
 	protected class PyramidProcessing<C extends WlCoef>
-			extends VideoImageProcessing<ImageUInt8>
+			extends VideoImageProcessing<GrayU8>
 	{
-		ImagePyramid<ImageUInt8> pyramid = FactoryPyramid.discreteGaussian(new int[]{2,4,8,16},-1,2,false,ImageUInt8.class);
+		ImagePyramid<GrayU8> pyramid = FactoryPyramid.discreteGaussian(new int[]{2,4,8,16},-1,2,false,GrayU8.class);
 
-		ImageUInt8 output;
-		ImageUInt8 sub = new ImageUInt8();
+		GrayU8 output;
+		GrayU8 sub = new GrayU8();
 
 		protected PyramidProcessing() {
-			super(ImageType.single(ImageUInt8.class));
+			super(ImageType.single(GrayU8.class));
 		}
 
 		@Override
 		protected void declareImages( int width , int height ) {
 			super.declareImages(width, height);
 
-			output = new ImageUInt8(width,height);
+			output = new GrayU8(width,height);
 		}
 
 		@Override
-		protected void process(ImageUInt8 input, Bitmap output, byte[] storage) {
+		protected void process(GrayU8 input, Bitmap output, byte[] storage) {
 
 			pyramid.process(input);
 
@@ -150,7 +150,7 @@ public class ImageTransformActivity extends DemoVideoDisplayActivity
 			int height = 0;
 			int width = pyramid.getLayer(0).getWidth();
 			for( int i = 1; i < pyramid.getNumLayers(); i++ ) {
-				ImageUInt8 l = pyramid.getLayer(i);
+				GrayU8 l = pyramid.getLayer(i);
 				draw(width, height, l);
 				height += l.getHeight();
 			}
@@ -158,22 +158,22 @@ public class ImageTransformActivity extends DemoVideoDisplayActivity
 			ConvertBitmap.grayToBitmap(this.output, output, storage);
 		}
 
-		private void draw( int x0 , int y0 , ImageUInt8 layer ) {
+		private void draw( int x0 , int y0 , GrayU8 layer ) {
 			output.subimage(x0,y0,x0+layer.width,y0+layer.height,sub);
 			sub.setTo(layer);
 		}
 	}
 
 	protected class WaveletProcessing<C extends WlCoef>
-			extends VideoImageProcessing<ImageUInt8>
+			extends VideoImageProcessing<GrayU8>
 	{
-		WaveletDescription<C> desc = GFactoryWavelet.haar(ImageUInt8.class);
-		WaveletTransform<ImageUInt8,ImageSInt32,C> waveletTran =
-				FactoryWaveletTransform.create(ImageUInt8.class, desc, 3, 0, 255);
-		ImageSInt32 transform;
+		WaveletDescription<C> desc = GFactoryWavelet.haar(GrayU8.class);
+		WaveletTransform<GrayU8,GrayS32,C> waveletTran =
+				FactoryWaveletTransform.create(GrayU8.class, desc, 3, 0, 255);
+		GrayS32 transform;
 
 		protected WaveletProcessing() {
-			super(ImageType.single(ImageUInt8.class));
+			super(ImageType.single(GrayU8.class));
 		}
 
 		@Override
@@ -182,11 +182,11 @@ public class ImageTransformActivity extends DemoVideoDisplayActivity
 
 
 			ImageDimension d = UtilWavelet.transformDimension(width, height, waveletTran.getLevels() );
-			transform = new ImageSInt32(d.width,d.height);
+			transform = new GrayS32(d.width,d.height);
 		}
 
 		@Override
-		protected void process(ImageUInt8 input, Bitmap output, byte[] storage) {
+		protected void process(GrayU8 input, Bitmap output, byte[] storage) {
 
 			waveletTran.transform(input,transform);
 			System.out.println("BOOF: num levels " + waveletTran.getLevels());
@@ -194,7 +194,7 @@ public class ImageTransformActivity extends DemoVideoDisplayActivity
 			UtilWavelet.adjustForDisplay(transform, waveletTran.getLevels(), 255);
 
 			// if needed, crop the transform for visualization
-			ImageSInt32 transform = this.transform;
+			GrayS32 transform = this.transform;
 			if( transform.width != output.getWidth() || transform.height != output.getHeight() )
 			    transform = transform.subimage(0,0,output.getWidth(),output.getHeight(),null);
 

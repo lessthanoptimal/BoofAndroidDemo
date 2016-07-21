@@ -23,9 +23,9 @@ import boofcv.core.image.border.BorderType;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.distort.PointTransform_F32;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.Planar;
 
 /**
  * After the camera has been calibrated the user can display a distortion free image
@@ -42,7 +42,7 @@ public class UndistortDisplayActivity extends DemoVideoDisplayActivity
 	boolean isDistorted = false;
 	boolean isColor = false;
 
-	ImageDistort<ImageUInt8,ImageUInt8> removeDistortion;
+	ImageDistort<GrayU8,GrayU8> removeDistortion;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -66,11 +66,11 @@ public class UndistortDisplayActivity extends DemoVideoDisplayActivity
 			// define the transform.  Cache the results for quick rendering later on
 			PointTransform_F32 fullView = LensDistortionOps.transform_F32(AdjustmentType.FULL_VIEW,
 					DemoMain.preference.intrinsic, null, false);
-			InterpolatePixelS<ImageUInt8> interp = FactoryInterpolation.
-					bilinearPixelS(ImageUInt8.class, BorderType.VALUE);
+			InterpolatePixelS<GrayU8> interp = FactoryInterpolation.
+					bilinearPixelS(GrayU8.class, BorderType.ZERO);
 			// for some reason not caching is faster on a low end phone.  Maybe it has to do with CPU memory
 			// cache misses when looking up a point?
-			removeDistortion = FactoryDistort.distortSB(false,interp,ImageUInt8.class);
+			removeDistortion = FactoryDistort.distortSB(false,interp,GrayU8.class);
 			removeDistortion.setModel(new PointToPixelTransform_F32(fullView));
 		}
 	}
@@ -95,22 +95,22 @@ public class UndistortDisplayActivity extends DemoVideoDisplayActivity
 		}
 	}
 
-	protected class UndistortProcessing extends VideoImageProcessing<MultiSpectral<ImageUInt8>> {
-		MultiSpectral<ImageUInt8> undistorted;
+	protected class UndistortProcessing extends VideoImageProcessing<Planar<GrayU8>> {
+		Planar<GrayU8> undistorted;
 
 		public UndistortProcessing() {
-			super(ImageType.ms(3,ImageUInt8.class));
+			super(ImageType.pl(3,GrayU8.class));
 		}
 
 		@Override
 		protected void declareImages( int width , int height ) {
 			super.declareImages(width, height);
 
-			undistorted = new MultiSpectral<ImageUInt8>(ImageUInt8.class,width,height,3);
+			undistorted = new Planar<GrayU8>(GrayU8.class,width,height,3);
 		}
 
 		@Override
-		protected void process(MultiSpectral<ImageUInt8> input, Bitmap output, byte[] storage) {
+		protected void process(Planar<GrayU8> input, Bitmap output, byte[] storage) {
 			if( DemoMain.preference.intrinsic == null ) {
 				Canvas canvas = new Canvas(output);
 				Paint paint = new Paint();

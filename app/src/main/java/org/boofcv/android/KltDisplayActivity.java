@@ -5,8 +5,8 @@ import android.os.Bundle;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
-import boofcv.struct.image.ImageSInt16;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
 
 /**
  * Displays KLT tracks.
@@ -29,8 +29,8 @@ public class KltDisplayActivity extends PointTrackerDisplayActivity {
 		config.threshold = 40;
 		config.radius = 3;
 
-		PointTracker<ImageUInt8> tracker =
-				FactoryPointTracker.klt(new int[]{1,2,4},config,3,ImageUInt8.class, ImageSInt16.class);
+		PointTracker<GrayU8> tracker =
+				FactoryPointTracker.klt(new int[]{1,2,4},config,3,GrayU8.class, GrayS16.class);
 
 		setProcessing(new PointProcessing(tracker));
 	}

@@ -26,10 +26,10 @@ import boofcv.factory.segmentation.ConfigSlic;
 import boofcv.factory.segmentation.FactoryImageSegmentation;
 import boofcv.factory.segmentation.FactorySegmentationAlg;
 import boofcv.struct.feature.ColorQueue_F32;
-import boofcv.struct.image.ImageSInt32;
+import boofcv.struct.image.GrayS32;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.Planar;
 
 /**
  * Displays the results of image segmentation after the user clicks on an image
@@ -93,7 +93,7 @@ public class SegmentationDisplayActivity extends DemoVideoDisplayActivity
 		mode = Mode.VIEW_VIDEO;
 		hasSegment = false;
 
-		ImageType<MultiSpectral<ImageUInt8>> type = ImageType.ms(3,ImageUInt8.class);
+		ImageType<Planar<GrayU8>> type = ImageType.pl(3, GrayU8.class);
 
 		switch (pos) {
 			case 0:
@@ -139,17 +139,17 @@ public class SegmentationDisplayActivity extends DemoVideoDisplayActivity
 		}
 	}
 
-	protected class SegmentationProcessing extends VideoImageProcessing<MultiSpectral<ImageUInt8>> {
-		ImageSInt32 pixelToRegion;
-		ImageSuperpixels<MultiSpectral<ImageUInt8>> segmentation;
-		MultiSpectral<ImageUInt8> background;
+	protected class SegmentationProcessing extends VideoImageProcessing<Planar<GrayU8>> {
+		GrayS32 pixelToRegion;
+		ImageSuperpixels<Planar<GrayU8>> segmentation;
+		Planar<GrayU8> background;
 
 		ComputeRegionMeanColor colorize;
 		FastQueue<float[]> segmentColor = new ColorQueue_F32(3);
 		GrowQueue_I32 regionMemberCount = new GrowQueue_I32();
 
-		public SegmentationProcessing(ImageSuperpixels<MultiSpectral<ImageUInt8>> segmentation) {
-			super(ImageType.ms(3,ImageUInt8.class));
+		public SegmentationProcessing(ImageSuperpixels<Planar<GrayU8>> segmentation) {
+			super(ImageType.pl(3, GrayU8.class));
 			this.segmentation = segmentation;
 			this.colorize = FactorySegmentationAlg.regionMeanColor(segmentation.getImageType());
 		}
@@ -158,12 +158,12 @@ public class SegmentationDisplayActivity extends DemoVideoDisplayActivity
 		protected void declareImages( int width , int height ) {
 			super.declareImages(width, height);
 
-			pixelToRegion = new ImageSInt32(width,height);
-			background = new MultiSpectral<ImageUInt8>(ImageUInt8.class,width,height,3);
+			pixelToRegion = new GrayS32(width,height);
+			background = new Planar<GrayU8>(GrayU8.class,width,height,3);
 		}
 
 		@Override
-		protected void process(MultiSpectral<ImageUInt8> input, Bitmap output, byte[] storage) {
+		protected void process(Planar<GrayU8> input, Bitmap output, byte[] storage) {
 
 			// TODO if the user tries to exit while computing a segmentation things get weird
 			if( mode != Mode.VIEW_VIDEO ) {

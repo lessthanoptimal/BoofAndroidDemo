@@ -26,11 +26,11 @@ import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.background.ConfigBackgroundBasic;
 import boofcv.factory.background.ConfigBackgroundGaussian;
 import boofcv.factory.background.FactoryBackgroundModel;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageDataType;
-import boofcv.struct.image.ImageSingleBand;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 
 /**
  * Motion detection using static video images
@@ -137,7 +137,7 @@ public class StaticBackgroundMotionActivity extends DemoVideoDisplayActivity
 		switch( selected ) {
 			case 0:
 				model = FactoryBackgroundModel.stationaryBasic(
-						configBasic,ImageType.single(ImageUInt8.class));
+						configBasic,ImageType.single(GrayU8.class));
 				break;
 
 			case 1:
@@ -145,7 +145,7 @@ public class StaticBackgroundMotionActivity extends DemoVideoDisplayActivity
 				break;
 
 			case 2:
-				model = FactoryBackgroundModel.stationaryGaussian(configGaussian, ImageType.single(ImageUInt8.class));
+				model = FactoryBackgroundModel.stationaryGaussian(configGaussian, ImageType.single(GrayU8.class));
 				break;
 
 			case 3:
@@ -171,10 +171,10 @@ public class StaticBackgroundMotionActivity extends DemoVideoDisplayActivity
 	protected class BackgroundProcessing<T extends ImageBase> extends VideoImageProcessing<T> {
 		BackgroundModelStationary<T> model;
 
-		ImageUInt8 binary = new ImageUInt8(1,1);
+		GrayU8 binary = new GrayU8(1,1);
 		T scaled;
 
-		ImageSingleBand work;
+		ImageGray work;
 		FDistort shrink;
 
 		public BackgroundProcessing(BackgroundModelStationary<T> model ) {

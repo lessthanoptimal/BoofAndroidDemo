@@ -13,9 +13,9 @@ import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.android.VisualizeImageData;
 import boofcv.android.gui.VideoImageProcessing;
 import boofcv.factory.filter.derivative.FactoryDerivative;
-import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 
 /**
  * Displays the gradient of a gray scale image.  The gradient is colorized so that x and y directions are visible.
@@ -29,8 +29,8 @@ implements AdapterView.OnItemSelectedListener
 
 	Spinner spinnerGradient;
 
-	Class imageType = ImageUInt8.class;
-	Class derivType = ImageSInt16.class;
+	Class imageType = GrayU8.class;
+	Class derivType = GrayS16.class;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -92,13 +92,13 @@ implements AdapterView.OnItemSelectedListener
 	@Override
 	public void onNothingSelected(AdapterView<?> adapterView) {}
 
-	protected class GradientProcessing extends VideoImageProcessing<ImageUInt8> {
-		ImageSInt16 derivX;
-		ImageSInt16 derivY;
-		ImageGradient<ImageUInt8,ImageSInt16> gradient;
+	protected class GradientProcessing extends VideoImageProcessing<GrayU8> {
+		GrayS16 derivX;
+		GrayS16 derivY;
+		ImageGradient<GrayU8,GrayS16> gradient;
 
-		public GradientProcessing(ImageGradient<ImageUInt8,ImageSInt16> gradient) {
-			super(ImageType.single(ImageUInt8.class));
+		public GradientProcessing(ImageGradient<GrayU8,GrayS16> gradient) {
+			super(ImageType.single(GrayU8.class));
 			this.gradient = gradient;
 		}
 
@@ -106,12 +106,12 @@ implements AdapterView.OnItemSelectedListener
 		protected void declareImages( int width , int height ) {
 			super.declareImages(width, height);
 
-			derivX = new ImageSInt16(width,height);
-			derivY = new ImageSInt16(width,height);
+			derivX = new GrayS16(width,height);
+			derivY = new GrayS16(width,height);
 		}
 
 		@Override
-		protected void process(ImageUInt8 input, Bitmap output, byte[] storage) {
+		protected void process(GrayU8 input, Bitmap output, byte[] storage) {
 			gradient.process(input,derivX,derivY);
 			VisualizeImageData.colorizeGradient(derivX,derivY,-1,output,storage);
 		}

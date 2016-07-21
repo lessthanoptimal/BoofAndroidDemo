@@ -16,9 +16,9 @@ import boofcv.alg.misc.ImageStatistics;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.gui.VideoImageProcessing;
 import boofcv.core.image.ConvertImage;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.Planar;
 
 /**
  * Blurs the input video image using different algorithms.
@@ -111,35 +111,35 @@ public class EnhanceDisplayActivity extends DemoVideoDisplayActivity
 		startBlurProcess(spinnerView.getSelectedItemPosition(),isChecked);
 	}
 
-	protected abstract class EnhanceProcessing extends VideoImageProcessing<ImageUInt8> {
-		ImageUInt8 enhanced;
+	protected abstract class EnhanceProcessing extends VideoImageProcessing<GrayU8> {
+		GrayU8 enhanced;
 
 		protected EnhanceProcessing() {
-			super(ImageType.single(ImageUInt8.class));
+			super(ImageType.single(GrayU8.class));
 		}
 
 		@Override
 		protected void declareImages( int width , int height ) {
 			super.declareImages(width, height);
 
-			enhanced = new ImageUInt8(width,height);
+			enhanced = new GrayU8(width,height);
 		}
 	}
 
-	protected abstract class EnhanceProcessingColor extends VideoImageProcessing<MultiSpectral<ImageUInt8>> {
-		MultiSpectral<ImageUInt8> enhanced;
-		ImageUInt8 gray;
+	protected abstract class EnhanceProcessingColor extends VideoImageProcessing<Planar<GrayU8>> {
+		Planar<GrayU8> enhanced;
+		GrayU8 gray;
 
 		public EnhanceProcessingColor() {
-			super(ImageType.ms(3,ImageUInt8.class));
+			super(ImageType.pl(3, GrayU8.class));
 		}
 
 		@Override
 		protected void declareImages( int width , int height ) {
 			super.declareImages(width, height);
 
-			gray = new ImageUInt8(width,height);
-			enhanced = new MultiSpectral<ImageUInt8>(ImageUInt8.class,width,height,3);
+			gray = new GrayU8(width,height);
+			enhanced = new Planar<GrayU8>(GrayU8.class,width,height,3);
 		}
 	}
 
@@ -149,7 +149,7 @@ public class EnhanceDisplayActivity extends DemoVideoDisplayActivity
 
 
 		@Override
-		protected void process(ImageUInt8 input, Bitmap output, byte[] storage) {
+		protected void process(GrayU8 input, Bitmap output, byte[] storage) {
 			ImageStatistics.histogram(input, histogram);
 			EnhanceImageOps.equalize(histogram, transform);
 			EnhanceImageOps.applyTransform(input, transform, enhanced);
@@ -162,7 +162,7 @@ public class EnhanceDisplayActivity extends DemoVideoDisplayActivity
 		int transform[] = new int[256];
 
 		@Override
-		protected void process(MultiSpectral<ImageUInt8> input, Bitmap output, byte[] storage) {
+		protected void process(Planar<GrayU8> input, Bitmap output, byte[] storage) {
 			ConvertImage.average(input,gray);
 			ImageStatistics.histogram(gray, histogram);
 			EnhanceImageOps.equalize(histogram, transform);
@@ -177,7 +177,7 @@ public class EnhanceDisplayActivity extends DemoVideoDisplayActivity
 		int transform[] = new int[256];
 
 		@Override
-		protected void process(ImageUInt8 input, Bitmap output, byte[] storage) {
+		protected void process(GrayU8 input, Bitmap output, byte[] storage) {
 			EnhanceImageOps.equalizeLocal(input, 50, enhanced, histogram, transform);
 			ConvertBitmap.grayToBitmap(enhanced,output,storage);
 		}
@@ -188,7 +188,7 @@ public class EnhanceDisplayActivity extends DemoVideoDisplayActivity
 		int transform[] = new int[256];
 
 		@Override
-		protected void process(MultiSpectral<ImageUInt8> input, Bitmap output, byte[] storage) {
+		protected void process(Planar<GrayU8> input, Bitmap output, byte[] storage) {
 			for( int i = 0; i < 3; i++ )
 				EnhanceImageOps.equalizeLocal(input.getBand(i), 50, enhanced.getBand(i), histogram, transform);
 			ConvertBitmap.multiToBitmap(enhanced,output,storage);
@@ -204,7 +204,7 @@ public class EnhanceDisplayActivity extends DemoVideoDisplayActivity
 		}
 
 		@Override
-		protected void process(ImageUInt8 input, Bitmap output, byte[] storage) {
+		protected void process(GrayU8 input, Bitmap output, byte[] storage) {
 			if( which == 4 )
 				EnhanceImageOps.sharpen4(input, enhanced);
 			else
@@ -222,7 +222,7 @@ public class EnhanceDisplayActivity extends DemoVideoDisplayActivity
 		}
 
 		@Override
-		protected void process( MultiSpectral<ImageUInt8> input, Bitmap output, byte[] storage) {
+		protected void process( Planar<GrayU8> input, Bitmap output, byte[] storage) {
 			for( int i = 0; i < 3; i++ ) {
 				if( which == 4 )
 					EnhanceImageOps.sharpen4(input.getBand(i), enhanced.getBand(i));
@@ -236,7 +236,7 @@ public class EnhanceDisplayActivity extends DemoVideoDisplayActivity
 	protected class NoneProcessing extends EnhanceProcessing {
 
 		@Override
-		protected void process(ImageUInt8 input, Bitmap output, byte[] storage) {
+		protected void process(GrayU8 input, Bitmap output, byte[] storage) {
 			ConvertBitmap.grayToBitmap(input,output,storage);
 		}
 	}
@@ -244,7 +244,7 @@ public class EnhanceDisplayActivity extends DemoVideoDisplayActivity
 	protected class NoneProcessingColor extends EnhanceProcessingColor {
 
 		@Override
-		protected void process(MultiSpectral<ImageUInt8> input, Bitmap output, byte[] storage) {
+		protected void process(Planar<GrayU8> input, Bitmap output, byte[] storage) {
 			ConvertBitmap.multiToBitmap(input, output, storage);
 		}
 	}

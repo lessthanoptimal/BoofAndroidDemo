@@ -28,9 +28,9 @@ import boofcv.android.gui.VideoRenderProcessing;
 import boofcv.factory.feature.detect.line.ConfigHoughFoot;
 import boofcv.factory.feature.detect.line.ConfigHoughPolar;
 import boofcv.factory.feature.detect.line.FactoryDetectLineAlgs;
-import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import georegression.struct.line.LineParametric2D_F32;
 import georegression.struct.line.LineSegment2D_F32;
 
@@ -110,18 +110,18 @@ public class LineDisplayActivity extends DemoVideoDisplayActivity
 	}
 
 	private void createLineDetector() {
-		DetectLine<ImageUInt8> detector = null;
-		DetectLineSegment<ImageUInt8> detectorSegment = null;
+		DetectLine<GrayU8> detector = null;
+		DetectLineSegment<GrayU8> detectorSegment = null;
 
 		switch( active ) {
 			case 0:
 				detector = FactoryDetectLineAlgs.houghFoot(
-						new ConfigHoughFoot(5,6,5,40,numLines),ImageUInt8.class,ImageSInt16.class);
+						new ConfigHoughFoot(5,6,5,40,numLines),GrayU8.class,GrayS16.class);
 				break;
 
 			case 1:
 				detector = FactoryDetectLineAlgs.houghPolar(
-						new ConfigHoughPolar(5,6,2,Math.PI/120.0,40,numLines),ImageUInt8.class,ImageSInt16.class);
+						new ConfigHoughPolar(5,6,2,Math.PI/120.0,40,numLines),GrayU8.class,GrayS16.class);
 				break;
 
 			default:
@@ -161,22 +161,22 @@ public class LineDisplayActivity extends DemoVideoDisplayActivity
 	@Override
 	public void onNothingSelected(AdapterView<?> adapterView) {}
 
-	protected class LineProcessing extends VideoRenderProcessing<ImageUInt8> {
-		DetectLine<ImageUInt8> detector;
-		DetectLineSegment<ImageUInt8> detectorSegment = null;
+	protected class LineProcessing extends VideoRenderProcessing<GrayU8> {
+		DetectLine<GrayU8> detector;
+		DetectLineSegment<GrayU8> detectorSegment = null;
 
 		FastQueue<LineSegment2D_F32> lines = new FastQueue<LineSegment2D_F32>(LineSegment2D_F32.class,true);
 
 		Bitmap bitmap;
 		byte[] storage;
 
-		public LineProcessing(DetectLine<ImageUInt8> detector) {
-			super(ImageType.single(ImageUInt8.class));
+		public LineProcessing(DetectLine<GrayU8> detector) {
+			super(ImageType.single(GrayU8.class));
 			this.detector = detector;
 		}
 
-		public LineProcessing(DetectLineSegment<ImageUInt8> detectorSegment) {
-			super(ImageType.single(ImageUInt8.class));
+		public LineProcessing(DetectLineSegment<GrayU8> detectorSegment) {
+			super(ImageType.single(GrayU8.class));
 			this.detectorSegment = detectorSegment;
 		}
 
@@ -188,7 +188,7 @@ public class LineDisplayActivity extends DemoVideoDisplayActivity
 		}
 
 		@Override
-		protected void process(ImageUInt8 gray) {
+		protected void process(GrayU8 gray) {
 
 			if( detector != null ) {
 				List<LineParametric2D_F32> found = detector.detect(gray);

@@ -14,8 +14,8 @@ import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.gui.VideoImageProcessing;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 
 /**
  * Blurs the input video image using different algorithms.
@@ -85,15 +85,15 @@ public class BlurDisplayActivity extends DemoVideoDisplayActivity
 		int radius = Math.max(1,this.radius);
 		switch (pos) {
 			case 0:
-				processing = new BlurProcessing(FactoryBlurFilter.mean(ImageUInt8.class, radius));
+				processing = new BlurProcessing(FactoryBlurFilter.mean(GrayU8.class, radius));
 				break;
 
 			case 1:
-				processing = new BlurProcessing(FactoryBlurFilter.gaussian(ImageUInt8.class,-1,radius));
+				processing = new BlurProcessing(FactoryBlurFilter.gaussian(GrayU8.class,-1,radius));
 				break;
 
 			case 2:
-				processing = new BlurProcessing(FactoryBlurFilter.median(ImageUInt8.class,radius));
+				processing = new BlurProcessing(FactoryBlurFilter.median(GrayU8.class,radius));
 				break;
 		}
 
@@ -103,12 +103,12 @@ public class BlurDisplayActivity extends DemoVideoDisplayActivity
 	@Override
 	public void onNothingSelected(AdapterView<?> adapterView) {}
 
-	protected class BlurProcessing extends VideoImageProcessing<ImageUInt8> {
-		ImageUInt8 blurred;
-		final BlurFilter<ImageUInt8> filter;
+	protected class BlurProcessing extends VideoImageProcessing<GrayU8> {
+		GrayU8 blurred;
+		final BlurFilter<GrayU8> filter;
 
-		public BlurProcessing(BlurFilter<ImageUInt8> filter) {
-			super(ImageType.single(ImageUInt8.class));
+		public BlurProcessing(BlurFilter<GrayU8> filter) {
+			super(ImageType.single(GrayU8.class));
 			this.filter = filter;
 		}
 
@@ -116,11 +116,11 @@ public class BlurDisplayActivity extends DemoVideoDisplayActivity
 		protected void declareImages( int width , int height ) {
 			super.declareImages(width, height);
 
-			blurred = new ImageUInt8(width,height);
+			blurred = new GrayU8(width,height);
 		}
 
 		@Override
-		protected void process(ImageUInt8 input, Bitmap output, byte[] storage) {
+		protected void process(GrayU8 input, Bitmap output, byte[] storage) {
 			if( radius > 0 ) {
 				synchronized ( filter ) {
 					filter.process(input, blurred);

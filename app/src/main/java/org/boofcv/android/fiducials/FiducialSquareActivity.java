@@ -34,10 +34,10 @@ import boofcv.android.VisualizeImageData;
 import boofcv.android.gui.VideoImageProcessing;
 import boofcv.core.image.ConvertImage;
 import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.Planar;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -162,9 +162,9 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 		setProcessing(new FiducialProcessor() );
 	}
 
-	protected abstract FiducialDetector<ImageUInt8> createDetector();
+	protected abstract FiducialDetector<GrayU8> createDetector();
 
-	protected class FiducialProcessor<T extends ImageBase> extends VideoImageProcessing<MultiSpectral<ImageUInt8>>
+	protected class FiducialProcessor<T extends ImageBase> extends VideoImageProcessing<Planar<GrayU8>>
 	{
 		T input;
 
@@ -181,7 +181,7 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 		Rect bounds = new Rect();
 
 		protected FiducialProcessor() {
-			super(ImageType.ms(3, ImageUInt8.class));
+			super(ImageType.pl(3, GrayU8.class));
 
 			paintSelected.setColor(Color.argb(0xFF / 2, 0xFF, 0, 0));
 
@@ -216,7 +216,7 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 		}
 
 		@Override
-		protected void process(MultiSpectral<ImageUInt8> color, Bitmap output, byte[] storage)
+		protected void process(Planar<GrayU8> color, Bitmap output, byte[] storage)
 		{
 			if( changed && intrinsic != null ) {
 				changed = false;
@@ -232,9 +232,9 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 			}
 
 			ImageType inputType = detector.getInputType();
-			if( inputType.getFamily() == ImageType.Family.SINGLE_BAND ) {
+			if( inputType.getFamily() == ImageType.Family.GRAY ) {
 				input.reshape(color.width,color.height);
-				ConvertImage.average(color, (ImageUInt8) input);
+				ConvertImage.average(color, (GrayU8) input);
 			} else {
 				input = (T) color;
 			}
@@ -244,7 +244,7 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 			if( showInput ) {
 				ConvertBitmap.multiToBitmap(color, output, storage);
 			} else {
-				ImageUInt8 binary = null;
+				GrayU8 binary = null;
 				if( detector instanceof CalibrationFiducialDetector) {
 					CalibrationDetector a = ((CalibrationFiducialDetector) detector).getDetector();
 					if( a instanceof CalibrationDetectorChessboard) {

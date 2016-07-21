@@ -36,7 +36,8 @@ import boofcv.struct.distort.PointTransform_F64;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageType;
 import georegression.fitting.se.ModelManagerSe3_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
@@ -49,11 +50,11 @@ import georegression.struct.se.Se3_F64;
  */
 public class DisparityCalculation<Desc extends TupleDesc> {
 
-	DetectDescribePoint<ImageFloat32,Desc> detDesc;
+	DetectDescribePoint<GrayF32,Desc> detDesc;
 	AssociateDescription<Desc> associate;
 	IntrinsicParameters intrinsic;
 
-	StereoDisparity<ImageFloat32, ImageFloat32> disparityAlg;
+	StereoDisparity<GrayF32, GrayF32> disparityAlg;
 
 	FastQueue<Desc> listSrc;
 	FastQueue<Desc> listDst;
@@ -64,19 +65,19 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 
 	boolean directionLeftToRight;
 
-	ImageFloat32 distortedLeft;
-	ImageFloat32 distortedRight;
-	ImageFloat32 rectifiedLeft;
-	ImageFloat32 rectifiedRight;
+	GrayF32 distortedLeft;
+	GrayF32 distortedRight;
+	GrayF32 rectifiedLeft;
+	GrayF32 rectifiedRight;
 
 	// Laplacian that has been applied to rectified images
-	ImageFloat32 edgeLeft;
-	ImageFloat32 edgeRight;
+	GrayF32 edgeLeft;
+	GrayF32 edgeRight;
 
 	// has the disparity been computed
 	boolean computedDisparity = false;
 
-	public DisparityCalculation(DetectDescribePoint<ImageFloat32, Desc> detDesc,
+	public DisparityCalculation(DetectDescribePoint<GrayF32, Desc> detDesc,
 								AssociateDescription<Desc> associate ,
 								IntrinsicParameters intrinsic ) {
 		this.detDesc = detDesc;
@@ -87,27 +88,27 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 		listDst = UtilFeature.createQueue(detDesc, 10);
 	}
 
-	public void setDisparityAlg(StereoDisparity<ImageFloat32, ImageFloat32> disparityAlg) {
+	public void setDisparityAlg(StereoDisparity<GrayF32, GrayF32> disparityAlg) {
 		this.disparityAlg = disparityAlg;
 	}
 
 	public void init( int width , int height ) {
-		distortedLeft = new ImageFloat32(width,height);
-		distortedRight = new ImageFloat32(width,height);
-		rectifiedLeft = new ImageFloat32(width,height);
-		rectifiedRight = new ImageFloat32(width,height);
-		edgeLeft = new ImageFloat32(width,height);
-		edgeRight = new ImageFloat32(width,height);
+		distortedLeft = new GrayF32(width,height);
+		distortedRight = new GrayF32(width,height);
+		rectifiedLeft = new GrayF32(width,height);
+		rectifiedRight = new GrayF32(width,height);
+		edgeLeft = new GrayF32(width,height);
+		edgeRight = new GrayF32(width,height);
 	}
 
-	public void setSource( ImageFloat32 image ) {
+	public void setSource( GrayF32 image ) {
 		distortedLeft.setTo(image);
 		detDesc.detect(image);
 		describeImage(listSrc, locationSrc);
 		associate.setSource(listSrc);
 	}
 
-	public void setDestination( ImageFloat32 image ) {
+	public void setDestination( GrayF32 image ) {
 		distortedRight.setTo(image);
 		detDesc.detect(image);
 		describeImage(listDst, locationDst);
@@ -150,7 +151,7 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 			// the user took a picture from right to left instead of left to right
 			// so now everything needs to be swapped
 			leftToRight = leftToRight.invert(null);
-			ImageFloat32 tmp = distortedLeft;
+			GrayF32 tmp = distortedLeft;
 			distortedLeft = distortedRight;
 			distortedRight = tmp;
 			tmp = edgeLeft;
@@ -288,10 +289,10 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 //		RectifyImageOps.allInsideLeft(intrinsic, rect1, rect2, rectifiedK);
 
 		// undistorted and rectify images
-		ImageDistort<ImageFloat32,ImageFloat32> distortLeft =
-				RectifyImageOps.rectifyImage(intrinsic, rect1, BorderType.VALUE, ImageFloat32.class);
-		ImageDistort<ImageFloat32,ImageFloat32> distortRight =
-				RectifyImageOps.rectifyImage(intrinsic, rect2, BorderType.VALUE, ImageFloat32.class);
+		ImageDistort<GrayF32,GrayF32> distortLeft =
+				RectifyImageOps.rectifyImage(intrinsic, rect1, BorderType.ZERO, ImageType.single(GrayF32.class));
+		ImageDistort<GrayF32,GrayF32> distortRight =
+				RectifyImageOps.rectifyImage(intrinsic, rect2, BorderType.ZERO, ImageType.single(GrayF32.class));
 
 		// Apply the Laplacian for some lighting invariance
 		ImageMiscOps.fill(rectifiedLeft,0);
@@ -307,11 +308,11 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 		return inliersPixel;
 	}
 
-	public ImageFloat32 getDisparity() {
+	public GrayF32 getDisparity() {
 		return disparityAlg.getDisparity();
 	}
 
-	public StereoDisparity<ImageFloat32, ImageFloat32> getDisparityAlg() {
+	public StereoDisparity<GrayF32, GrayF32> getDisparityAlg() {
 		return disparityAlg;
 	}
 

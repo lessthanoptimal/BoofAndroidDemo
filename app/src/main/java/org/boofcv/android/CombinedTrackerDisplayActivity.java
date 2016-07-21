@@ -19,7 +19,7 @@ import boofcv.alg.tracker.klt.PkltConfig;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.struct.feature.TupleDesc_B;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 
 import static org.boofcv.android.CreateDetectorDescriptor.DESC_BRIEF;
 import static org.boofcv.android.CreateDetectorDescriptor.DESC_NCC;
@@ -90,14 +90,14 @@ public class CombinedTrackerDisplayActivity extends PointTrackerDisplayActivity
 	protected void onResume() {
 		super.onResume();
 
-		PointTracker<ImageUInt8> tracker = createTracker(selectedDetector,selectedDescriptor);
+		PointTracker<GrayU8> tracker = createTracker(selectedDetector,selectedDescriptor);
 		setProcessing(new PointProcessing(tracker));
 	}
 
 
-	private PointTracker<ImageUInt8> createTracker( int detector , int descriptor  )
+	private PointTracker<GrayU8> createTracker( int detector , int descriptor  )
 	{
-		DetectDescribePoint detDesc = create(tableDet[detector],tableDesc[descriptor],ImageUInt8.class);
+		DetectDescribePoint detDesc = create(tableDet[detector],tableDesc[descriptor],GrayU8.class);
 
 		ScoreAssociation score = FactoryAssociation.defaultScore(detDesc.getDescriptionType());
 
@@ -107,7 +107,7 @@ public class CombinedTrackerDisplayActivity extends PointTrackerDisplayActivity
 		config.templateRadius = 3;
 		config.pyramidScaling = new int[]{1,2,4};
 
-		return FactoryPointTracker.combined(detDesc,association,config,75,ImageUInt8.class);
+		return FactoryPointTracker.combined(detDesc,association,config,75,GrayU8.class);
 	}
 
 	@Override
@@ -122,7 +122,7 @@ public class CombinedTrackerDisplayActivity extends PointTrackerDisplayActivity
 			selectedDetector = spinnerDet.getSelectedItemPosition();
 		}
 
-		PointTracker<ImageUInt8> tracker = createTracker(selectedDetector,selectedDescriptor);
+		PointTracker<GrayU8> tracker = createTracker(selectedDetector,selectedDescriptor);
 		setProcessing(new PointProcessing(tracker));
 	}
 

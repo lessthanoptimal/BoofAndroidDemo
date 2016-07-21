@@ -24,9 +24,9 @@ import boofcv.android.ConvertBitmap;
 import boofcv.android.gui.VideoRenderProcessing;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.factory.sfm.FactoryMotion2D;
-import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -70,7 +70,7 @@ implements CompoundButton.OnCheckedChangeListener
 		seek.setOnCheckedChangeListener(this);
 
 
-		StitchingFromMotion2D<ImageUInt8,Affine2D_F64> distortAlg = createStabilization();
+		StitchingFromMotion2D<GrayU8,Affine2D_F64> distortAlg = createStabilization();
 
 		setProcessing(new PointProcessing(distortAlg));
 	}
@@ -78,7 +78,7 @@ implements CompoundButton.OnCheckedChangeListener
 	@Override
 	protected void onResume() {
 		super.onResume();
-		StitchingFromMotion2D<ImageUInt8,Affine2D_F64> distortAlg = createStabilization();
+		StitchingFromMotion2D<GrayU8,Affine2D_F64> distortAlg = createStabilization();
 		setProcessing(new PointProcessing(distortAlg));
 	}
 
@@ -86,20 +86,20 @@ implements CompoundButton.OnCheckedChangeListener
 		resetRequested = true;
 	}
 
-	private StitchingFromMotion2D<ImageUInt8,Affine2D_F64> createStabilization() {
+	private StitchingFromMotion2D<GrayU8,Affine2D_F64> createStabilization() {
 
 		ConfigGeneralDetector config = new ConfigGeneralDetector();
 		config.maxFeatures = 150;
 		config.threshold = 40;
 		config.radius = 3;
 
-		PointTracker<ImageUInt8> tracker = FactoryPointTracker.
-				klt(new int[]{1, 2,4}, config, 3, ImageUInt8.class, ImageSInt16.class);
+		PointTracker<GrayU8> tracker = FactoryPointTracker.
+				klt(new int[]{1, 2,4}, config, 3, GrayU8.class, GrayS16.class);
 
-		ImageMotion2D<ImageUInt8,Affine2D_F64> motion = FactoryMotion2D.createMotion2D(100, 1.5, 2, 40,
+		ImageMotion2D<GrayU8,Affine2D_F64> motion = FactoryMotion2D.createMotion2D(100, 1.5, 2, 40,
 				0.5, 0.6, false, tracker, new Affine2D_F64());
 
-		return FactoryMotion2D.createVideoStitch(0.2,motion,ImageUInt8.class);
+		return FactoryMotion2D.createVideoStitch(0.2,motion,GrayU8.class);
 	}
 
 	@Override
@@ -107,8 +107,8 @@ implements CompoundButton.OnCheckedChangeListener
 		showFeatures = b;
 	}
 
-	protected class PointProcessing extends VideoRenderProcessing<ImageUInt8> {
-		StitchingFromMotion2D<ImageUInt8,Affine2D_F64> alg;
+	protected class PointProcessing extends VideoRenderProcessing<GrayU8> {
+		StitchingFromMotion2D<GrayU8,Affine2D_F64> alg;
 		Homography2D_F64 imageToDistorted = new Homography2D_F64();
 		Homography2D_F64 distortedToImage = new Homography2D_F64();
 
@@ -121,8 +121,8 @@ implements CompoundButton.OnCheckedChangeListener
 		FastQueue<Point2D_F64> inliersGui = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
 		FastQueue<Point2D_F64> outliersGui = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
 
-		public PointProcessing( StitchingFromMotion2D<ImageUInt8,Affine2D_F64> alg  ) {
-			super(ImageType.single(ImageUInt8.class));
+		public PointProcessing( StitchingFromMotion2D<GrayU8,Affine2D_F64> alg  ) {
+			super(ImageType.single(GrayU8.class));
 			this.alg = alg;
 		}
 
@@ -135,7 +135,7 @@ implements CompoundButton.OnCheckedChangeListener
 		}
 
 		@Override
-		protected void process(ImageUInt8 gray) {
+		protected void process(GrayU8 gray) {
 			if( !resetRequested && alg.process(gray) ) {
 				synchronized ( lockGui ) {
 					alg.getImageCorners(gray.width,gray.height,corners);

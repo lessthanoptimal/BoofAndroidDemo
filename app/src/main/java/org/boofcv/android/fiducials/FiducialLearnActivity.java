@@ -31,8 +31,8 @@ import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
 import boofcv.android.gui.VideoRenderProcessing;
 import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import georegression.metric.Area2D_F64;
 import georegression.metric.Intersection2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -51,7 +51,7 @@ public class FiducialLearnActivity extends DemoVideoDisplayActivity
 
 	boolean touched = false;
 	Point2D_F64 touch = new Point2D_F64();
-	ImageUInt8 touchedFiducial = new ImageUInt8(1,1);
+	GrayU8 touchedFiducial = new GrayU8(1,1);
 	boolean dialogActive = false;
 
 	FiducialManager manager;
@@ -88,7 +88,7 @@ public class FiducialLearnActivity extends DemoVideoDisplayActivity
 		return true;
 	}
 
-	protected class FiducialProcessor extends VideoRenderProcessing<ImageUInt8> {
+	protected class FiducialProcessor extends VideoRenderProcessing<GrayU8> {
 
 		final FiducialDetector detector = new FiducialDetector();
 
@@ -105,7 +105,7 @@ public class FiducialLearnActivity extends DemoVideoDisplayActivity
 		GrowQueue_F64 area = new GrowQueue_F64();
 
 		public FiducialProcessor() {
-			super(ImageType.single(ImageUInt8.class));
+			super(ImageType.single(GrayU8.class));
 
 			paintBorder.setColor(Color.BLACK);
 			paintBorder.setStrokeWidth(6);
@@ -116,7 +116,7 @@ public class FiducialLearnActivity extends DemoVideoDisplayActivity
 			detected = new FiducialDetector.Detected[3];
 			for (int i = 0; i < detected.length; i++) {
 				detected[i] = new FiducialDetector.Detected();
-				detected[i].binary = new ImageUInt8(1,1);
+				detected[i].binary = new GrayU8(1,1);
 				detected[i].location = new Quadrilateral_F64();
 			}
 		}
@@ -147,7 +147,7 @@ public class FiducialLearnActivity extends DemoVideoDisplayActivity
 		}
 
 		@Override
-		protected void process(ImageUInt8 gray) {
+		protected void process(GrayU8 gray) {
 
 			detector.process(gray);
 

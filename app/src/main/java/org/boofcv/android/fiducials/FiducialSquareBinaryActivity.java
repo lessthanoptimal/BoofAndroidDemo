@@ -5,7 +5,7 @@ import boofcv.factory.fiducial.ConfigFiducialBinary;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.factory.filter.binary.ConfigThreshold;
 import boofcv.factory.filter.binary.ThresholdType;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 
 /**
  * Detects and shows square binary fiducials
@@ -20,9 +20,9 @@ public class FiducialSquareBinaryActivity extends FiducialSquareActivity
 	}
 
 	@Override
-	protected FiducialDetector<ImageUInt8> createDetector() {
+	protected FiducialDetector<GrayU8> createDetector() {
 
-		FiducialDetector<ImageUInt8> detector;
+		FiducialDetector<GrayU8> detector;
 		ConfigFiducialBinary config = new ConfigFiducialBinary(0.1);
 
 		synchronized ( lock ) {
@@ -32,7 +32,7 @@ public class FiducialSquareBinaryActivity extends FiducialSquareActivity
 			} else {
 				configThreshold = ConfigThreshold.fixed(binaryThreshold);
 			}
-			detector = FactoryFiducial.squareBinary(config, configThreshold, ImageUInt8.class);
+			detector = FactoryFiducial.squareBinary(config, configThreshold, GrayU8.class);
 		}
 
 		return detector;

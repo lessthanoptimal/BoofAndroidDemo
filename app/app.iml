@@ -89,13 +89,13 @@
     <orderEntry type="jdk" jdkName="Android API 21 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="visualize-0.24.1" level="project" />
-    <orderEntry type="library" exported="" name="ddogleg-0.9" level="project" />
     <orderEntry type="library" exported="" name="recognition-0.24.1" level="project" />
+    <orderEntry type="library" exported="" name="ddogleg-0.9" level="project" />
     <orderEntry type="library" exported="" name="support-v4-21.0.2" level="project" />
     <orderEntry type="library" exported="" name="calibration-0.24.1" level="project" />
-    <orderEntry type="library" exported="" name="dense64-0.29" level="project" />
     <orderEntry type="library" exported="" name="equation-0.29" level="project" />
     <orderEntry type="library" exported="" name="learning-0.24.1" level="project" />
+    <orderEntry type="library" exported="" name="dense64-0.29" level="project" />
     <orderEntry type="library" exported="" name="core-0.24.1" level="project" />
     <orderEntry type="library" exported="" name="xpp3_min-1.1.4c" level="project" />
     <orderEntry type="library" exported="" name="simple-0.29" level="project" />

@@ -7,7 +7,7 @@ import boofcv.abst.fiducial.FiducialDetector;
 import boofcv.abst.fiducial.calib.ConfigChessboard;
 import boofcv.abst.fiducial.calib.ConfigSquareGrid;
 import boofcv.factory.fiducial.FactoryFiducial;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 
 /**
  * Detects calibration target fiducials
@@ -54,13 +54,13 @@ public class FiducialCalibrationActivity extends FiducialSquareActivity {
 	}
 
 	@Override
-	protected FiducialDetector<ImageUInt8> createDetector() {
+	protected FiducialDetector<GrayU8> createDetector() {
 
 		if( targetType == 0 ) {
 			ConfigChessboard config = new ConfigChessboard(numCols, numRows, 1);
-			return FactoryFiducial.calibChessboard(config, ImageUInt8.class);
+			return FactoryFiducial.calibChessboard(config, GrayU8.class);
 		} else {
-			return FactoryFiducial.calibSquareGrid(new ConfigSquareGrid(numCols, numRows, 1,1), ImageUInt8.class);
+			return FactoryFiducial.calibSquareGrid(new ConfigSquareGrid(numCols, numRows, 1,1), GrayU8.class);
 		}
 	}
 }

@@ -16,8 +16,8 @@ import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.android.VisualizeImageData;
 import boofcv.android.gui.VideoImageProcessing;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 
 /**
  * Automatic thresholding
@@ -115,47 +115,47 @@ public class ThresholdDisplayActivity extends DemoVideoDisplayActivity
 		setProcessing(new ThresholdingProcessing());
 	}
 
-	private InputToBinary<ImageUInt8> createFilter() {
+	private InputToBinary<GrayU8> createFilter() {
 
 		int radius = this.radius + 1;
 
 		switch (selectedAlg) {
 			case 0:
-				return FactoryThresholdBinary.globalOtsu(0,255,down,ImageUInt8.class);
+				return FactoryThresholdBinary.globalOtsu(0,255,down,GrayU8.class);
 
 			case 1:
-				return FactoryThresholdBinary.globalEntropy(0, 255, down, ImageUInt8.class);
+				return FactoryThresholdBinary.globalEntropy(0, 255, down, GrayU8.class);
 
 			case 2:
-				return FactoryThresholdBinary.localSquare(radius,0.95,down,ImageUInt8.class);
+				return FactoryThresholdBinary.localSquare(radius,0.95,down,GrayU8.class);
 
 			case 3:
-				return FactoryThresholdBinary.localGaussian(radius,0.95,down,ImageUInt8.class);
+				return FactoryThresholdBinary.localGaussian(radius,0.95,down,GrayU8.class);
 
 			case 4:
-				return FactoryThresholdBinary.localSauvola(radius,0.3f,down,ImageUInt8.class);
+				return FactoryThresholdBinary.localSauvola(radius,0.3f,down,GrayU8.class);
 		}
 
 		throw new RuntimeException("Unknown selection "+selectedAlg);
 	}
 
-	protected class ThresholdingProcessing extends VideoImageProcessing<ImageUInt8> {
-		ImageUInt8 binary;
-		InputToBinary<ImageUInt8> filter;
+	protected class ThresholdingProcessing extends VideoImageProcessing<GrayU8> {
+		GrayU8 binary;
+		InputToBinary<GrayU8> filter;
 
 		public ThresholdingProcessing() {
-			super(ImageType.single(ImageUInt8.class));
+			super(ImageType.single(GrayU8.class));
 		}
 
 		@Override
 		protected void declareImages( int width , int height ) {
 			super.declareImages(width, height);
 
-			binary = new ImageUInt8(width,height);
+			binary = new GrayU8(width,height);
 		}
 
 		@Override
-		protected void process(ImageUInt8 input, Bitmap output, byte[] storage) {
+		protected void process(GrayU8 input, Bitmap output, byte[] storage) {
 
 			synchronized ( lock ) {
 				if (changed) {

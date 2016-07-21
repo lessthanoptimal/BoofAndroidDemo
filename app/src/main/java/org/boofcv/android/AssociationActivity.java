@@ -25,7 +25,7 @@ import boofcv.android.gui.VideoRenderProcessing;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 
@@ -114,7 +114,7 @@ public class AssociationActivity extends DemoVideoDisplayActivity
 	}
 
 	private void startAssociationProcessing() {
-		DetectDescribePoint detDesc = CreateDetectorDescriptor.create(selectedDet, selectedDesc, ImageFloat32.class);
+		DetectDescribePoint detDesc = CreateDetectorDescriptor.create(selectedDet, selectedDesc, GrayF32.class);
 
 		ScoreAssociation score = FactoryAssociation.defaultScore(detDesc.getDescriptionType());
 		AssociateDescription assoc = FactoryAssociation.greedy(score,Double.MAX_VALUE,true);
@@ -162,8 +162,8 @@ public class AssociationActivity extends DemoVideoDisplayActivity
 	}
 
 
-	protected class AssociationProcessing<Desc extends TupleDesc> extends VideoRenderProcessing<ImageFloat32> {
-		DetectDescribePoint<ImageFloat32,Desc> detDesc;
+	protected class AssociationProcessing<Desc extends TupleDesc> extends VideoRenderProcessing<GrayF32> {
+		DetectDescribePoint<GrayF32,Desc> detDesc;
 		AssociateDescription<Desc> associate;
 
 		FastQueue<Desc> listSrc;
@@ -171,9 +171,9 @@ public class AssociationActivity extends DemoVideoDisplayActivity
 		FastQueue<Point2D_F64> locationSrc = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
 		FastQueue<Point2D_F64> locationDst = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
 
-		public AssociationProcessing( DetectDescribePoint<ImageFloat32,Desc> detDesc ,
+		public AssociationProcessing( DetectDescribePoint<GrayF32,Desc> detDesc ,
 									  AssociateDescription<Desc> associate  ) {
-			super(ImageType.single(ImageFloat32.class));
+			super(ImageType.single(GrayF32.class));
 			this.detDesc = detDesc;
 			this.associate = associate;
 
@@ -193,7 +193,7 @@ public class AssociationActivity extends DemoVideoDisplayActivity
 		}
 
 		@Override
-		protected void process(ImageFloat32 gray) {
+		protected void process(GrayF32 gray) {
 			boolean computedFeatures = false;
 
 			int target = 0;

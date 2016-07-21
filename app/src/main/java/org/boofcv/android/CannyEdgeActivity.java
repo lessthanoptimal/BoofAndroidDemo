@@ -16,9 +16,9 @@ import boofcv.alg.feature.detect.edge.EdgeContour;
 import boofcv.android.VisualizeImageData;
 import boofcv.android.gui.VideoImageProcessing;
 import boofcv.factory.feature.detect.edge.FactoryEdgeDetectors;
-import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 
 /**
  * Displays results from the canny edge detector
@@ -83,16 +83,16 @@ public class CannyEdgeActivity extends DemoVideoDisplayActivity
 		colorize = b;
 	}
 
-	protected class CannyProcessing extends VideoImageProcessing<ImageUInt8> {
-		CannyEdge<ImageUInt8,ImageSInt16> canny;
+	protected class CannyProcessing extends VideoImageProcessing<GrayU8> {
+		CannyEdge<GrayU8,GrayS16> canny;
 
 		public CannyProcessing() {
-			super(ImageType.single(ImageUInt8.class));
-			this.canny = FactoryEdgeDetectors.canny(2, true, true, ImageUInt8.class, ImageSInt16.class);
+			super(ImageType.single(GrayU8.class));
+			this.canny = FactoryEdgeDetectors.canny(2, true, true, GrayU8.class, GrayS16.class);
 		}
 
 		@Override
-		protected void process(ImageUInt8 input, Bitmap output, byte[] storage) {
+		protected void process(GrayU8 input, Bitmap output, byte[] storage) {
 
 			// make sure it doesn't get too low
 			if( threshold <= 0.03f )

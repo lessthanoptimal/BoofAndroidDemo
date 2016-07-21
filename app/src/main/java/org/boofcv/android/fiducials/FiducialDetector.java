@@ -11,8 +11,8 @@ import boofcv.alg.fiducial.square.FoundFiducial;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.FactoryShapeDetector;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
 import georegression.struct.shapes.Quadrilateral_F64;
 
 /**
@@ -20,7 +20,7 @@ import georegression.struct.shapes.Quadrilateral_F64;
  *
  * @author Peter Abeles
  */
-public class FiducialDetector extends BaseDetectFiducialSquare<ImageUInt8> {
+public class FiducialDetector extends BaseDetectFiducialSquare<GrayU8> {
 
 	private static final String TAG = "FiducialDetector";
 
@@ -28,27 +28,27 @@ public class FiducialDetector extends BaseDetectFiducialSquare<ImageUInt8> {
 	private final static int w=32;
 	private final static int squareLength=w*4; // this must be a multiple of 16
 
-	private InputToBinary<ImageFloat32> threshold = FactoryThresholdBinary.globalOtsu(0,255,true,ImageFloat32.class);
-	private ImageFloat32 grayNoBorder = new ImageFloat32();
+	private InputToBinary<GrayF32> threshold = FactoryThresholdBinary.globalOtsu(0,255,true,GrayF32.class);
+	private GrayF32 grayNoBorder = new GrayF32();
 
 	// All the images inside which it found
-	private FastQueue<ImageUInt8> foundBinary;
+	private FastQueue<GrayU8> foundBinary;
 
 	public FiducialDetector() {
-		super(FactoryThresholdBinary.globalOtsu(0, 255, true, ImageUInt8.class), FactoryShapeDetector.polygon(
-						new ConfigPolygonDetector(false, 4, 4), ImageUInt8.class),
-				0.25, 0.5, squareLength + squareLength, ImageUInt8.class);
+		super(FactoryThresholdBinary.globalOtsu(0, 255, true, GrayU8.class), FactoryShapeDetector.polygon(
+						new ConfigPolygonDetector(false, 4, 4), GrayU8.class),
+				0.25, 0.5, squareLength + squareLength, GrayU8.class);
 
-		foundBinary = new FastQueue<ImageUInt8>(ImageUInt8.class,true) {
+		foundBinary = new FastQueue<GrayU8>(GrayU8.class,true) {
 			@Override
-			protected ImageUInt8 createInstance() {
-				return new ImageUInt8(squareLength,squareLength);
+			protected GrayU8 createInstance() {
+				return new GrayU8(squareLength,squareLength);
 			}
 		};
 	}
 
 	@Override
-	public void process(ImageUInt8 gray) {
+	public void process(GrayU8 gray) {
 		foundBinary.reset();
 		super.process(gray);
 	}
@@ -77,8 +77,8 @@ public class FiducialDetector extends BaseDetectFiducialSquare<ImageUInt8> {
 	}
 
 	@Override
-	protected boolean processSquare(ImageFloat32 gray, Result result , double edgeInside, double edgeOutside) {
-		ImageUInt8 binary = foundBinary.grow();
+	protected boolean processSquare(GrayF32 gray, Result result , double edgeInside, double edgeOutside) {
+		GrayU8 binary = foundBinary.grow();
 		int off = (gray.width-binary.width)/2;
 		gray.subimage(off, off, gray.width - off, gray.width - off, grayNoBorder);
 
@@ -87,7 +87,7 @@ public class FiducialDetector extends BaseDetectFiducialSquare<ImageUInt8> {
 	}
 
 	public static class Detected {
-		public ImageUInt8 binary;
+		public GrayU8 binary;
 		public Quadrilateral_F64 location;
 	}
 }

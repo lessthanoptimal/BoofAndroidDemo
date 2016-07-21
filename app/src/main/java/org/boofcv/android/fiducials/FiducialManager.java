@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 
 /**
  * Used to load and save the list of fiducials.  Also loads individual fiducial images.  A
@@ -54,7 +54,7 @@ public class FiducialManager {
 		}
 	}
 
-	public void addFiducial( ImageUInt8 image , double sideLength , UnitsDistance units ,
+	public void addFiducial( GrayU8 image , double sideLength , UnitsDistance units ,
 							 String name ) {
 
 		Info info = new Info();
@@ -189,7 +189,7 @@ public class FiducialManager {
 		return where;
 	}
 
-	private void saveImage(ImageUInt8 image, int id ) {
+	private void saveImage(GrayU8 image, int id ) {
 		try {
 			File directory = owner.getApplicationContext().getDir(DIRECTORY_NAME,Context.MODE_PRIVATE);
 			PrintStream out = new PrintStream(new File(directory,id+""));
@@ -209,7 +209,7 @@ public class FiducialManager {
 		}
 	}
 
-	public ImageUInt8 loadBinaryImage(int id) {
+	public GrayU8 loadBinaryImage(int id) {
 		try {
 			File directory = owner.getApplicationContext().getDir(DIRECTORY_NAME,Context.MODE_PRIVATE);
 			BufferedReader input = new BufferedReader(new FileReader(new File(directory,id+"")));
@@ -219,7 +219,7 @@ public class FiducialManager {
 			int width = Integer.parseInt(words[0]);
 			int height = Integer.parseInt(words[1]);
 
-			ImageUInt8 image = new ImageUInt8(width,height);
+			GrayU8 image = new GrayU8(width,height);
 			for (int y = 0; y < image.height; y++) {
 				String line = input.readLine();
 				if( line.length() != width )

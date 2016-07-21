@@ -28,7 +28,7 @@ import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.feature.disparity.DisparityAlgorithms;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.struct.feature.BrightFeature;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 
 /**
@@ -186,18 +186,18 @@ public class DisparityActivity extends DemoVideoDisplayActivity
 	}
 
 
-	protected class DisparityProcessing extends VideoRenderProcessing<ImageFloat32> {
+	protected class DisparityProcessing extends VideoRenderProcessing<GrayF32> {
 
 		DisparityCalculation<BrightFeature> disparity;
 
-		ImageFloat32 disparityImage;
+		GrayF32 disparityImage;
 		int disparityMin,disparityMax;
 
 		public DisparityProcessing() {
-			super(ImageType.single(ImageFloat32.class));
+			super(ImageType.single(GrayF32.class));
 
-			DetectDescribePoint<ImageFloat32, BrightFeature> detDesc =
-					FactoryDetectDescribe.surfFast(null,null,null,ImageFloat32.class);
+			DetectDescribePoint<GrayF32, BrightFeature> detDesc =
+					FactoryDetectDescribe.surfFast(null,null,null,GrayF32.class);
 
 			ScoreAssociation<BrightFeature> score = FactoryAssociation.defaultScore(BrightFeature.class);
 			AssociateDescription<BrightFeature> associate =
@@ -210,7 +210,7 @@ public class DisparityActivity extends DemoVideoDisplayActivity
 		protected void declareImages(int width, int height) {
 			super.declareImages(width, height);
 
-			disparityImage = new ImageFloat32(width,height);
+			disparityImage = new GrayF32(width,height);
 
 			visualize.initializeImages( width, height );
 			outputWidth = visualize.getOutputWidth();
@@ -219,7 +219,7 @@ public class DisparityActivity extends DemoVideoDisplayActivity
 			disparity.init(width,height);
 		}
 
-		private StereoDisparity<ImageFloat32, ImageFloat32> createDisparity() {
+		private StereoDisparity<GrayF32, GrayF32> createDisparity() {
 
 			DisparityAlgorithms which;
 			switch( changeDisparityAlg ) {
@@ -237,11 +237,11 @@ public class DisparityActivity extends DemoVideoDisplayActivity
 
 
 			return FactoryStereoDisparity.regionSubpixelWta(which,
-					5, 40, 5, 5, 100, 1, 0.1, ImageFloat32.class);
+					5, 40, 5, 5, 100, 1, 0.1, GrayF32.class);
 		}
 
 		@Override
-		protected void process(ImageFloat32 gray) {
+		protected void process(GrayF32 gray) {
 
 			int target = 0;
 

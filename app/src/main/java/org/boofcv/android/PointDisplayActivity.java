@@ -23,9 +23,9 @@ import boofcv.android.gui.VideoRenderProcessing;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
 import boofcv.struct.QueueCorner;
-import boofcv.struct.image.ImageSInt16;
+import boofcv.struct.image.GrayS16;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_I16;
 
 /**
@@ -96,20 +96,20 @@ public class PointDisplayActivity extends DemoVideoDisplayActivity
 			return;
 		active = which;
 
-		GeneralFeatureIntensity<ImageUInt8, ImageSInt16> intensity;
+		GeneralFeatureIntensity<GrayU8, GrayS16> intensity;
 		NonMaxSuppression nonmax = nonmaxMax;
 
 		switch( which ) {
 			case 0:
-				intensity = FactoryIntensityPoint.shiTomasi(2,false,ImageSInt16.class);
+				intensity = FactoryIntensityPoint.shiTomasi(2,false,GrayS16.class);
 				break;
 
 			case 1:
-				intensity = FactoryIntensityPoint.harris(2, 0.04f, false, ImageSInt16.class);
+				intensity = FactoryIntensityPoint.harris(2, 0.04f, false, GrayS16.class);
 				break;
 
 			case 2:
-				intensity = FactoryIntensityPoint.fast(25,9,ImageUInt8.class);
+				intensity = FactoryIntensityPoint.fast(25,9,GrayU8.class);
 				nonmax = nonmaxCandidate;
 				break;
 
@@ -119,15 +119,15 @@ public class PointDisplayActivity extends DemoVideoDisplayActivity
 				break;
 
 			case 4:
-				intensity = FactoryIntensityPoint.kitros(ImageSInt16.class);
+				intensity = FactoryIntensityPoint.kitros(GrayS16.class);
 				break;
 
 			case 5:
-				intensity = FactoryIntensityPoint.hessian(HessianBlobIntensity.Type.DETERMINANT,ImageSInt16.class);
+				intensity = FactoryIntensityPoint.hessian(HessianBlobIntensity.Type.DETERMINANT,GrayS16.class);
 				break;
 
 			case 6:
-				intensity = FactoryIntensityPoint.hessian(HessianBlobIntensity.Type.TRACE,ImageSInt16.class);
+				intensity = FactoryIntensityPoint.hessian(HessianBlobIntensity.Type.TRACE,GrayS16.class);
 				nonmax = nonmaxMinMax;
 				break;
 
@@ -146,8 +146,8 @@ public class PointDisplayActivity extends DemoVideoDisplayActivity
 	@Override
 	public void onNothingSelected(AdapterView<?> adapterView) {}
 
-	protected class PointProcessing extends VideoRenderProcessing<ImageUInt8> {
-		EasyGeneralFeatureDetector<ImageUInt8,ImageSInt16> detector;
+	protected class PointProcessing extends VideoRenderProcessing<GrayU8> {
+		EasyGeneralFeatureDetector<GrayU8,GrayS16> detector;
 
 		NonMaxSuppression nonmax;
 
@@ -159,13 +159,13 @@ public class PointDisplayActivity extends DemoVideoDisplayActivity
 		QueueCorner minimumsGUI = new QueueCorner();
 
 
-		public PointProcessing(GeneralFeatureIntensity<ImageUInt8, ImageSInt16> intensity,
+		public PointProcessing(GeneralFeatureIntensity<GrayU8, GrayS16> intensity,
 							   NonMaxSuppression nonmax) {
-			super(ImageType.single(ImageUInt8.class));
-			GeneralFeatureDetector<ImageUInt8,ImageSInt16> general =
-			new GeneralFeatureDetector<ImageUInt8, ImageSInt16>(intensity,nonmax);
+			super(ImageType.single(GrayU8.class));
+			GeneralFeatureDetector<GrayU8,GrayS16> general =
+			new GeneralFeatureDetector<GrayU8, GrayS16>(intensity,nonmax);
 
-			detector = new EasyGeneralFeatureDetector<ImageUInt8,ImageSInt16>(general,ImageUInt8.class,ImageSInt16.class);
+			detector = new EasyGeneralFeatureDetector<GrayU8,GrayS16>(general,GrayU8.class,GrayS16.class);
 			this.nonmax = nonmax;
 		}
 
@@ -177,7 +177,7 @@ public class PointDisplayActivity extends DemoVideoDisplayActivity
 		}
 
 		@Override
-		protected void process(ImageUInt8 gray) {
+		protected void process(GrayU8 gray) {
 			// adjust the non-max region based on image size
 			nonmax.setSearchRadius( 3*gray.width/320 );
 			detector.getDetector().setMaxFeatures( 200*gray.width/320 );

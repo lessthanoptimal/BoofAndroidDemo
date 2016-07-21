@@ -34,7 +34,7 @@ import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
 import boofcv.android.gui.VideoRenderProcessing;
 import boofcv.factory.calib.FactoryCalibrationTarget;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
@@ -206,7 +206,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 		}
 	}
 
-	private class DetectTarget extends VideoRenderProcessing<ImageFloat32> {
+	private class DetectTarget extends VideoRenderProcessing<GrayF32> {
 
 		CalibrationDetector detector;
 
@@ -218,7 +218,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 		byte[] storage;
 
 		protected DetectTarget( CalibrationDetector detector ) {
-			super(ImageType.single(ImageFloat32.class));
+			super(ImageType.single(GrayF32.class));
 			this.detector = detector;
 		}
 
@@ -230,7 +230,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 		}
 
 		@Override
-		protected void process(ImageFloat32 gray) {
+		protected void process(GrayF32 gray) {
 			// User requested that the most recently processed image be removed
 			if( removeRequested ) {
 				removeRequested = false;
@@ -266,11 +266,11 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 				} else if( showDetectDebug ) {
 					// show binary image to aid in debugging and detected rectangles
 					if( detector instanceof CalibrationDetectorChessboard) {
-						DetectChessboardFiducial<ImageFloat32> alg = ((CalibrationDetectorChessboard) detector).getAlgorithm();
+						DetectChessboardFiducial<GrayF32> alg = ((CalibrationDetectorChessboard) detector).getAlgorithm();
 						VisualizeImageData.binaryToBitmap(alg.getBinary(), false, bitmap, storage);
 						extractQuads(alg.getFindSeeds().getDetectorSquare().getFoundPolygons());
 					} else if( detector instanceof CalibrationDetectorSquareGrid) {
-						DetectSquareGridFiducial<ImageFloat32> alg = ((CalibrationDetectorSquareGrid) detector).getAlgorithm();
+						DetectSquareGridFiducial<GrayF32> alg = ((CalibrationDetectorSquareGrid) detector).getAlgorithm();
 						VisualizeImageData.binaryToBitmap(alg.getBinary(), false ,bitmap, storage);
 						extractQuads(alg.getDetectorSquare().getFoundPolygons());
 					}
@@ -298,7 +298,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 		 * Detect calibration targets in the image and save the results.  Pause the display so the
 		 * user can see the results]
 		 */
-		private boolean collectMeasurement(ImageFloat32 gray) {
+		private boolean collectMeasurement(GrayF32 gray) {
 
 
 			boolean success = detector.process(gray);
@@ -328,7 +328,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 			});
 		}
 
-		private boolean detectTarget(ImageFloat32 gray) {
+		private boolean detectTarget(GrayF32 gray) {
 			if( detector.process(gray) ) {
 				return true;
 			} else {

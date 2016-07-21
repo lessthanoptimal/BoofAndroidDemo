@@ -30,8 +30,8 @@ import boofcv.android.gui.VideoImageProcessing;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.FactoryShapeDetector;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 
@@ -64,10 +64,10 @@ public class DetectBlackPolygonActivity extends DemoVideoDisplayActivity
 
 	boolean showInput = true;
 
-	BinaryPolygonDetector<ImageUInt8> detector;
-	InputToBinary<ImageUInt8> inputToBinary;
+	BinaryPolygonDetector<GrayU8> detector;
+	InputToBinary<GrayU8> inputToBinary;
 
-	ImageUInt8 binary = new ImageUInt8(1,1);
+	GrayU8 binary = new GrayU8(1,1);
 
 	int colors[] = new int[ MAX_SIDES - MIN_SIDES + 1];
 
@@ -147,7 +147,7 @@ public class DetectBlackPolygonActivity extends DemoVideoDisplayActivity
 		ConfigPolygonDetector configPoly = new ConfigPolygonDetector(minSides,maxSides);
 		configPoly.convex = convex;
 
-		detector = FactoryShapeDetector.polygon(configPoly,ImageUInt8.class);
+		detector = FactoryShapeDetector.polygon(configPoly,GrayU8.class);
 		setSelection(spinnerThresholder.getSelectedItemPosition());
 		setProcessing(new PolygonProcessing());
 	}
@@ -201,11 +201,11 @@ public class DetectBlackPolygonActivity extends DemoVideoDisplayActivity
 
 		switch( active ) {
 			case 0 :
-				inputToBinary = FactoryThresholdBinary.globalOtsu(0, 255, true, ImageUInt8.class);
+				inputToBinary = FactoryThresholdBinary.globalOtsu(0, 255, true, GrayU8.class);
 				break;
 
 			case 1:
-				inputToBinary = FactoryThresholdBinary.localSquare(10,0.95,true,ImageUInt8.class);
+				inputToBinary = FactoryThresholdBinary.localSquare(10,0.95,true,GrayU8.class);
 				break;
 
 			default:
@@ -231,10 +231,10 @@ public class DetectBlackPolygonActivity extends DemoVideoDisplayActivity
 		return false;
 	}
 
-	protected class PolygonProcessing extends VideoImageProcessing<ImageUInt8> {
+	protected class PolygonProcessing extends VideoImageProcessing<GrayU8> {
 
 		protected PolygonProcessing() {
-			super(ImageType.single(ImageUInt8.class));
+			super(ImageType.single(GrayU8.class));
 		}
 
 		@Override
@@ -244,7 +244,7 @@ public class DetectBlackPolygonActivity extends DemoVideoDisplayActivity
 		}
 
 		@Override
-		protected void process(ImageUInt8 image, Bitmap output, byte[] storage) {
+		protected void process(GrayU8 image, Bitmap output, byte[] storage) {
 			if( sidesUpdated ) {
 				sidesUpdated = false;
 				detector.setNumberOfSides(minSides,maxSides);

@@ -13,7 +13,7 @@ import java.util.Random;
 
 import boofcv.android.ConvertBitmap;
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import georegression.struct.point.Point2D_F64;
 
 /**
@@ -36,8 +36,8 @@ public class AssociationVisualize {
 	boolean hasLeft = false;
 	boolean hasRight = false;
 
-	ImageFloat32 graySrc;
-	ImageFloat32 grayDst;
+	GrayF32 graySrc;
+	GrayF32 grayDst;
 	Bitmap bitmapSrc;
 	Bitmap bitmapDst;
 	byte[] storage;
@@ -77,8 +77,8 @@ public class AssociationVisualize {
 		if( graySrc != null && graySrc.width == width && graySrc.height == height )
 			return;
 
-		graySrc = new ImageFloat32(width,height);
-		grayDst = new ImageFloat32(width,height);
+		graySrc = new GrayF32(width,height);
+		grayDst = new GrayF32(width,height);
 
 		bitmapSrc = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 		bitmapDst = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
@@ -146,7 +146,7 @@ public class AssociationVisualize {
 	/**
 	 * Set the source (left) image
 	 */
-	public void setSource( ImageFloat32 image ) {
+	public void setSource( GrayF32 image ) {
 		locationSrc.clear();
 		locationDst.clear();
 
@@ -162,7 +162,7 @@ public class AssociationVisualize {
 	/**
 	 * Set the destination (right) image
 	 */
-	public void setDestination( ImageFloat32 image ) {
+	public void setDestination( GrayF32 image ) {
 		locationSrc.clear();
 		locationDst.clear();
 

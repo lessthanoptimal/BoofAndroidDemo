@@ -24,10 +24,10 @@ import boofcv.android.ConvertBitmap;
 import boofcv.android.gui.VideoImageProcessing;
 import boofcv.core.image.ConvertImage;
 import boofcv.factory.tracker.FactoryTrackerObjectQuad;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
-import boofcv.struct.image.MultiSpectral;
+import boofcv.struct.image.Planar;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
 import georegression.struct.shapes.Quadrilateral_F64;
@@ -93,36 +93,36 @@ public class ObjectTrackerActivity extends DemoVideoDisplayActivity
 
 		switch (pos) {
 			case 0:
-				imageType = ImageType.single(ImageUInt8.class);
-				tracker = FactoryTrackerObjectQuad.circulant(null,ImageUInt8.class);
+				imageType = ImageType.single(GrayU8.class);
+				tracker = FactoryTrackerObjectQuad.circulant(null,GrayU8.class);
 				break;
 
 			case 1:
-				imageType = ImageType.ms(3, ImageUInt8.class);
+				imageType = ImageType.pl(3, GrayU8.class);
 				tracker = FactoryTrackerObjectQuad.meanShiftComaniciu2003(new ConfigComaniciu2003(false),imageType);
 				break;
 
 			case 2:
-				imageType = ImageType.ms(3, ImageUInt8.class);
+				imageType = ImageType.pl(3, GrayU8.class);
 				tracker = FactoryTrackerObjectQuad.meanShiftComaniciu2003(new ConfigComaniciu2003(true),imageType);
 				break;
 
 			case 3:
-				imageType = ImageType.ms(3, ImageUInt8.class);
+				imageType = ImageType.pl(3, GrayU8.class);
 				tracker = FactoryTrackerObjectQuad.meanShiftLikelihood(30,5,256, MeanShiftLikelihoodType.HISTOGRAM,imageType);
 				break;
 
 			case 4:{
-				imageType = ImageType.single(ImageUInt8.class);
+				imageType = ImageType.single(GrayU8.class);
 				SfotConfig config = new SfotConfig();
 				config.numberOfSamples = 10;
 				config.robustMaxError = 30;
-				tracker = FactoryTrackerObjectQuad.sparseFlow(config,ImageUInt8.class,null);
+				tracker = FactoryTrackerObjectQuad.sparseFlow(config,GrayU8.class,null);
 			}break;
 
 			case 5:
-				imageType = ImageType.single(ImageUInt8.class);
-				tracker = FactoryTrackerObjectQuad.tld(new ConfigTld(false),ImageUInt8.class);
+				imageType = ImageType.single(GrayU8.class);
+				tracker = FactoryTrackerObjectQuad.tld(new ConfigTld(false),GrayU8.class);
 				break;
 
 			default:
@@ -157,7 +157,7 @@ public class ObjectTrackerActivity extends DemoVideoDisplayActivity
 		mode = 0;
 	}
 
-	protected class TrackingProcessing<T extends ImageBase> extends VideoImageProcessing<MultiSpectral<ImageUInt8>>
+	protected class TrackingProcessing<T extends ImageBase> extends VideoImageProcessing<Planar<GrayU8>>
 	{
 
 		T input;
@@ -176,10 +176,10 @@ public class ObjectTrackerActivity extends DemoVideoDisplayActivity
 		private Paint textPaint = new Paint();
 
 		protected TrackingProcessing(TrackerObjectQuad tracker , ImageType<T> inputType) {
-			super(ImageType.ms(3,ImageUInt8.class));
+			super(ImageType.pl(3, GrayU8.class));
 			this.inputType = inputType;
 
-			if( inputType.getFamily() == ImageType.Family.SINGLE_BAND ) {
+			if( inputType.getFamily() == ImageType.Family.GRAY ) {
 				input = inputType.createImage(1,1);
 			}
 
@@ -204,16 +204,16 @@ public class ObjectTrackerActivity extends DemoVideoDisplayActivity
 		}
 
 		@Override
-		protected void process(MultiSpectral<ImageUInt8> input, Bitmap output, byte[] storage)
+		protected void process(Planar<GrayU8> input, Bitmap output, byte[] storage)
 		{
 			updateTracker(input);
 			visualize(input, output, storage);
 		}
 
-		private void updateTracker(MultiSpectral<ImageUInt8> color) {
-			if( inputType.getFamily() == ImageType.Family.SINGLE_BAND ) {
+		private void updateTracker(Planar<GrayU8> color) {
+			if( inputType.getFamily() == ImageType.Family.GRAY ) {
 				input.reshape(color.width,color.height);
-				ConvertImage.average(color,(ImageUInt8)input);
+				ConvertImage.average(color,(GrayU8)input);
 			} else {
 				input = (T)color;
 			}
@@ -249,7 +249,7 @@ public class ObjectTrackerActivity extends DemoVideoDisplayActivity
 			}
 		}
 
-		private void visualize(MultiSpectral<ImageUInt8> color, Bitmap output, byte[] storage) {
+		private void visualize(Planar<GrayU8> color, Bitmap output, byte[] storage) {
 			ConvertBitmap.multiToBitmap(color, output, storage);
 			Canvas canvas = new Canvas(output);
 

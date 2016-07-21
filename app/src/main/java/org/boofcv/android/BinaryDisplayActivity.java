@@ -16,8 +16,8 @@ import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.android.VisualizeImageData;
 import boofcv.android.gui.VideoImageProcessing;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 
 /**
  * Converts camera image into a binary image and lets the user control the threshold/filters.
@@ -90,24 +90,24 @@ public class BinaryDisplayActivity extends DemoVideoDisplayActivity
 	@Override
 	public void onNothingSelected(AdapterView<?> adapterView) {}
 
-	protected class ThresholdProcessing extends VideoImageProcessing<ImageUInt8> {
-		ImageUInt8 binary;
-		ImageUInt8 afterOps;
+	protected class ThresholdProcessing extends VideoImageProcessing<GrayU8> {
+		GrayU8 binary;
+		GrayU8 afterOps;
 
 		protected ThresholdProcessing() {
-			super(ImageType.single(ImageUInt8.class));
+			super(ImageType.single(GrayU8.class));
 		}
 
 		@Override
 		protected void declareImages( int width , int height ) {
 			super.declareImages(width, height);
 
-			binary = new ImageUInt8(width,height);
-			afterOps = new ImageUInt8(width,height);
+			binary = new GrayU8(width,height);
+			afterOps = new GrayU8(width,height);
 		}
 
 		@Override
-		protected void process(ImageUInt8 input, Bitmap output, byte[] storage) {
+		protected void process(GrayU8 input, Bitmap output, byte[] storage) {
 			GThresholdImageOps.threshold(input,binary,threshold, down);
 
 			switch( action ) {

@@ -14,8 +14,8 @@ import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.gui.VideoRenderProcessing;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.ImageUInt8;
 import georegression.struct.point.Point2D_F64;
 
 /**
@@ -39,8 +39,8 @@ public class PointTrackerDisplayActivity extends DemoVideoDisplayActivity {
 		paintBlue.setStyle(Paint.Style.FILL);
 	}
 
-	protected class PointProcessing extends VideoRenderProcessing<ImageUInt8> {
-		PointTracker<ImageUInt8> tracker;
+	protected class PointProcessing extends VideoRenderProcessing<GrayU8> {
+		PointTracker<GrayU8> tracker;
 
 		long tick;
 
@@ -57,8 +57,8 @@ public class PointTrackerDisplayActivity extends DemoVideoDisplayActivity {
 		FastQueue<Point2D_F64> trackSpawn = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
 
 
-		public PointProcessing( PointTracker<ImageUInt8> tracker ) {
-			super(ImageType.single(ImageUInt8.class));
+		public PointProcessing( PointTracker<GrayU8> tracker ) {
+			super(ImageType.single(GrayU8.class));
 			this.tracker = tracker;
 		}
 
@@ -70,7 +70,7 @@ public class PointTrackerDisplayActivity extends DemoVideoDisplayActivity {
 		}
 
 		@Override
-		protected void process(ImageUInt8 gray) {
+		protected void process(GrayU8 gray) {
 			tracker.process(gray);
 
 			// drop tracks which are no longer being used

@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import boofcv.android.VisualizeImageData;
-import boofcv.struct.image.ImageUInt8;
+import boofcv.struct.image.GrayU8;
 
 /**
  * Activity which displays all the saved image fiducials.  From here the user can get information
@@ -174,7 +174,7 @@ public class FiducialImageLibraryAcitivity extends Activity {
 
 			FiducialManager.Info info = list.get(position);
 
-			ImageUInt8 image = fiducialManager.loadBinaryImage(info.id);
+			GrayU8 image = fiducialManager.loadBinaryImage(info.id);
 			if( image == null ) {
 				throw new RuntimeException("BUG!");
 			}
