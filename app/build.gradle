@@ -8,8 +8,8 @@ android {
         applicationId "org.boofcv.android"
         minSdkVersion 13
         targetSdkVersion 21
-        versionCode 9
-        versionName "1.6.1"
+        versionCode 10
+        versionName "1.7"
     }
 //    signingConfigs {
 //        release {
