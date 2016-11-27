@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.os.Bundle;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
@@ -23,12 +24,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import boofcv.abst.fiducial.calib.CalibrationDetectorChessboard;
+import boofcv.abst.fiducial.calib.CalibrationDetectorCircleAsymmGrid;
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
+import boofcv.abst.fiducial.calib.CalibrationPatterns;
 import boofcv.abst.fiducial.calib.ConfigChessboard;
 import boofcv.abst.fiducial.calib.ConfigCircleAsymmetricGrid;
 import boofcv.abst.fiducial.calib.ConfigSquareGrid;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.alg.fiducial.calib.chess.DetectChessboardFiducial;
+import boofcv.alg.fiducial.calib.circle.DetectAsymmetricCircleGrid;
 import boofcv.alg.fiducial.calib.grid.DetectSquareGridFiducial;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.android.ConvertBitmap;
@@ -38,8 +42,10 @@ import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
+import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
+import georegression.struct.shapes.EllipseRotated_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 
 /**
@@ -52,7 +58,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 {
 	public static final int TARGET_DIALOG = 10;
 
-	public static int targetType = 0;
+	public static CalibrationPatterns targetType = CalibrationPatterns.CHESSBOARD;
 	public static int numRows = 5;
 	public static int numCols = 7;
 
@@ -134,16 +140,17 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 	private void startVideoProcessing() {
 		DetectorFiducialCalibration detector;
 
-		if( targetType == 0 ) {
+		if( targetType == CalibrationPatterns.CHESSBOARD ) {
 			ConfigChessboard config = new ConfigChessboard(numCols,numRows, 30);
 			detector = FactoryFiducialCalibration.chessboard(config);
-
-		} else if( targetType == 1 ) {
+		} else if( targetType == CalibrationPatterns.SQUARE_GRID ) {
 			ConfigSquareGrid config = new ConfigSquareGrid(numCols,numRows, 30 , 30);
 			detector = FactoryFiducialCalibration.squareGrid(config);
-		} else {
+		} else if( targetType == CalibrationPatterns.CIRCLE_ASYMMETRIC_GRID ){
 			ConfigCircleAsymmetricGrid config = new ConfigCircleAsymmetricGrid(numCols,numRows, 1 , 6);
 			detector = FactoryFiducialCalibration.circleAsymmGrid(config);
+		} else {
+			throw new RuntimeException("Unknown targetType "+targetType);
 		}
 		CalibrationComputeActivity.targetLayout = detector.getLayout();
 		setProcessing(new DetectTarget(detector));
@@ -217,7 +224,9 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 
 		FastQueue<Point2D_F64> pointsGui = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
 
-		List<List<Point2D_I32>> debugQuads = new ArrayList<List<Point2D_I32>>();
+		List<List<Point2D_I32>> debugQuads = new ArrayList<>();
+		List<EllipseRotated_F64> debugEllipses = new ArrayList<>();
+
 
 		Bitmap bitmap;
 		byte[] storage;
@@ -264,6 +273,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 				ConvertBitmap.grayToBitmap(gray,bitmap,storage);
 				pointsGui.reset();
 				debugQuads.clear();
+				debugEllipses.clear();
 				if( detected ) {
 					CalibrationObservation found = detector.getDetectedPoints();
 					for( PointIndex2D_F64 p : found.points )
@@ -278,12 +288,18 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 						DetectSquareGridFiducial<GrayF32> alg = ((CalibrationDetectorSquareGrid) detector).getAlgorithm();
 						VisualizeImageData.binaryToBitmap(alg.getBinary(), false ,bitmap, storage);
 						extractQuads(alg.getDetectorSquare().getFoundPolygons());
+					} else if( detector instanceof CalibrationDetectorCircleAsymmGrid) {
+						DetectAsymmetricCircleGrid<GrayF32> alg = ((CalibrationDetectorCircleAsymmGrid) detector).getDetector();
+						VisualizeImageData.binaryToBitmap(alg.getBinary(), false ,bitmap, storage);
+
+						debugEllipses.clear();
+						debugEllipses.addAll(alg.getEllipseDetector().getFoundEllipses().toList());
 					}
 				}
 			}
 		}
 
-		protected void extractQuads(  FastQueue<Polygon2D_F64> squares ) {
+		protected void extractQuads( FastQueue<Polygon2D_F64> squares ) {
 			debugQuads.clear();
 
 			if( squares != null ) {
@@ -361,6 +377,22 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 					Point2D_I32 c0 = l.get(0);
 					Point2D_I32 c1 = l.get(l.size()-1);
 					canvas.drawLine(c0.x,c0.y,c1.x,c1.y,paintFailed);
+				}
+
+				for( EllipseRotated_F64 e : debugEllipses ) {
+
+					float phi = (float) UtilAngle.radianToDegree(e.phi);
+
+					float x0 = (float)(e.center.x - e.a);
+					float y0 = (float)(e.center.y - e.b);
+					float x1 = (float)(e.center.x + e.a);
+					float y1 = (float)(e.center.y + e.b);
+
+					canvas.rotate(phi, (float)e.center.x, (float)e.center.y);
+//					r.set(cx-w,cy-h,cx+w+1,cy+h+1);
+					canvas.drawOval(new RectF(x0,y0,x1,y1),paintFailed);
+//					canvas.drawOval(r,paint);
+					canvas.rotate(-phi, (float)e.center.x, (float)e.center.y);
 				}
 
 				// draw detected calibration points

@@ -9,6 +9,8 @@ import android.widget.TextView;
 
 import org.boofcv.android.R;
 
+import boofcv.abst.fiducial.calib.CalibrationPatterns;
+
 /**
  * Displays instructions and tips for the user
  *
@@ -44,7 +46,7 @@ public class FiducialCalibrationHelpActivity extends Activity {
 			}
 
 			@Override
-			public int getGridType() {
+			public CalibrationPatterns getGridType() {
 				return FiducialCalibrationActivity.targetType;
 			}
 		}));

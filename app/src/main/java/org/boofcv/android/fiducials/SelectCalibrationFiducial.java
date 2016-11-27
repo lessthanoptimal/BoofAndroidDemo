@@ -17,6 +17,8 @@ import android.widget.Toast;
 
 import org.boofcv.android.R;
 
+import boofcv.abst.fiducial.calib.CalibrationPatterns;
+
 /**
  * Opens a dialog which lets the user configure the type of calibration fiducial it will look for.
  */
@@ -25,11 +27,12 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 	EditText textRows;
 	EditText textCols;
 
-	int numRows,numCols,targetType;
+	int numRows,numCols;
+	CalibrationPatterns targetType;
 
 	Activity activity;
 
-	public SelectCalibrationFiducial(int numRows, int numCols , int targetType) {
+	public SelectCalibrationFiducial(int numRows, int numCols , CalibrationPatterns targetType) {
 		this.numRows = numRows;
 		this.numCols = numCols;
 		this.targetType = targetType;
@@ -55,10 +58,10 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 			public void onClick(DialogInterface dialogInterface, int i) {
 				numCols = Integer.parseInt(textCols.getText().toString());
 				numRows = Integer.parseInt(textRows.getText().toString());
-				targetType = spinnerTarget.getSelectedItemPosition();
+				targetType = indexToCalib(spinnerTarget.getSelectedItemPosition());
 
 				// ensure the chessboard has an odd number of rows and columns
-				if (targetType == 1) {
+				if (targetType == CalibrationPatterns.CHESSBOARD) {
 					if (numCols % 2 == 0)
 						numCols--;
 					if (numRows % 2 == 0)
@@ -108,7 +111,7 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 				try {
-					targetType = spinnerTarget.getSelectedItemPosition();
+					targetType = indexToCalib(spinnerTarget.getSelectedItemPosition());
 					vis.invalidate();
 				} catch( NumberFormatException ignore ){}
 			}
@@ -133,8 +136,19 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		adapter.add("Chessboard");
 		adapter.add("Square Grid");
+		adapter.add("Circle Asymm");
 
 		spinnerTarget.setAdapter(adapter);
+	}
+
+	private CalibrationPatterns indexToCalib( int index ) {
+		switch( index ) {
+			case 0: return CalibrationPatterns.CHESSBOARD;
+			case 1: return CalibrationPatterns.SQUARE_GRID;
+			case 2: return CalibrationPatterns.CIRCLE_ASYMMETRIC_GRID;
+			case 3: return CalibrationPatterns.BINARY_GRID;
+		}
+		throw new RuntimeException("Egads");
 	}
 
 	@Override
@@ -148,7 +162,7 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 	}
 
 	@Override
-	public int getGridType() {
+	public CalibrationPatterns getGridType() {
 		return targetType;
 	}
 }
