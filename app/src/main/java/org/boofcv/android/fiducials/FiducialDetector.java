@@ -68,7 +68,7 @@ public class FiducialDetector extends BaseDetectFiducialSquare<GrayU8> {
 
 			Detected detected = new Detected();
 			detected.binary = foundBinary.get(i);
-			detected.location = f.location;
+			detected.location = f.distortedPixels;
 
 			detections.add( detected );
 		}

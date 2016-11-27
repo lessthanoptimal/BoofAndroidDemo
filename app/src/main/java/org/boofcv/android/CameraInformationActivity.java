@@ -15,8 +15,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.List;
 
-import boofcv.android.BoofAndroidFiles;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.io.calibration.CalibrationIO;
+import boofcv.struct.calib.CameraPinholeRadial;
 
 /**
  * Displays information on the camera(s) in a text view.
@@ -95,7 +95,7 @@ public class CameraInformationActivity extends Activity {
 		try {
 			FileInputStream fos = openFileInput("cam"+which+".txt");
 			Reader reader = new InputStreamReader(fos);
-			IntrinsicParameters intrinsic = BoofAndroidFiles.readIntrinsic(reader);
+			CameraPinholeRadial intrinsic = CalibrationIO.load(reader);
 			write("Found intrinsic for camera "+which);
 			write(String.format("  Dimension %d %d",intrinsic.width,intrinsic.height));
 			write(String.format("  fx = %6.1f fy = %6.1f",intrinsic.fx,intrinsic.fy));

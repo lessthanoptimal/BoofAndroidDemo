@@ -25,8 +25,8 @@ import boofcv.abst.geo.calibration.ImageResults;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.calibration.CalibrationPlanarGridZhang99;
 import boofcv.alg.geo.calibration.Zhang99ParamAll;
-import boofcv.android.BoofAndroidFiles;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.io.calibration.CalibrationIO;
+import boofcv.struct.calib.CameraPinholeRadial;
 import georegression.struct.point.Point2D_F64;
 
 /**
@@ -41,7 +41,7 @@ public class CalibrationComputeActivity extends Activity {
 	// image information which is to be processed
 	public static List<CalibrationImageInfo> images;
 	public static List<Point2D_F64> targetLayout;
-	public static IntrinsicParameters intrinsic;
+	public static CameraPinholeRadial intrinsic;
 
 	TextView text;
 	Button buttonOK;
@@ -96,7 +96,7 @@ public class CalibrationComputeActivity extends Activity {
 			// save to disk
 			FileOutputStream fos = openFileOutput(name, Context.MODE_PRIVATE);
 			Writer writer = new OutputStreamWriter(fos);
-			BoofAndroidFiles.write(intrinsic,writer);
+			CalibrationIO.save(intrinsic, writer);
 			fos.close();
 
 			// let it know that it needs to reload intrinsic parameters

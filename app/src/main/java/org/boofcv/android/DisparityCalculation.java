@@ -31,8 +31,8 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.geo.EnumEpipolar;
 import boofcv.factory.geo.FactoryMultiView;
-import boofcv.struct.calib.IntrinsicParameters;
-import boofcv.struct.distort.PointTransform_F64;
+import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.geo.AssociatedPair;
@@ -52,7 +52,7 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 
 	DetectDescribePoint<GrayF32,Desc> detDesc;
 	AssociateDescription<Desc> associate;
-	IntrinsicParameters intrinsic;
+	CameraPinholeRadial intrinsic;
 
 	StereoDisparity<GrayF32, GrayF32> disparityAlg;
 
@@ -79,7 +79,7 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 
 	public DisparityCalculation(DetectDescribePoint<GrayF32, Desc> detDesc,
 								AssociateDescription<Desc> associate ,
-								IntrinsicParameters intrinsic ) {
+								CameraPinholeRadial intrinsic ) {
 		this.detDesc = detDesc;
 		this.associate = associate;
 		this.intrinsic = intrinsic;
@@ -184,7 +184,7 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 	 */
 	public List<AssociatedPair> convertToNormalizedCoordinates() {
 
-		PointTransform_F64 tran = LensDistortionOps.transformPoint(intrinsic).undistort_F64(true,false);
+		Point2Transform2_F64 tran = LensDistortionOps.transformPoint(intrinsic).undistort_F64(true,false);
 
 		List<AssociatedPair> calibratedFeatures = new ArrayList<AssociatedPair>();
 

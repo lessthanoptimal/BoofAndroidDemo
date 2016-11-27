@@ -101,7 +101,7 @@ implements CompoundButton.OnCheckedChangeListener
 		ImageMotion2D<GrayU8,Affine2D_F64> motion = FactoryMotion2D.createMotion2D(100, 1.5, 2, 40,
 				0.5, 0.6, false,tracker, new Affine2D_F64());
 
-		return FactoryMotion2D.createVideoStitch(0.2,motion,GrayU8.class);
+		return FactoryMotion2D.createVideoStitch(0.2,motion, ImageType.single(GrayU8.class));
 	}
 
 	@Override

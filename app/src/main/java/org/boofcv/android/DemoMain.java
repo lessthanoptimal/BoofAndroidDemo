@@ -1,11 +1,16 @@
 package org.boofcv.android;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -29,7 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import boofcv.android.BoofAndroidFiles;
+import boofcv.io.calibration.CalibrationIO;
 
 public class DemoMain extends Activity implements ExpandableListView.OnChildClickListener {
 
@@ -43,9 +48,8 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 
 	List<Group> groups = new ArrayList<Group>();
 
-	public DemoMain() {
-		loadCameraSpecs();
-	}
+	boolean waitingCameraPermissions = true;
+
 
 	/**
 	 * Called when the activity is first created.
@@ -55,6 +59,7 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
+		loadCameraSpecs();
 		createGroups();
 
 		ExpandableListView listView = (ExpandableListView) findViewById(R.id.DemoListView);
@@ -79,11 +84,13 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if( preference == null ) {
-			preference = new DemoPreference();
-			setDefaultPreferences();
-		} else if( changedPreferences ) {
-			loadIntrinsic();
+		if( !waitingCameraPermissions ) {
+			if (preference == null) {
+				preference = new DemoPreference();
+				setDefaultPreferences();
+			} else if (changedPreferences) {
+				loadIntrinsic();
+			}
 		}
 	}
 
@@ -174,19 +181,47 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 	}
 
 	private void loadCameraSpecs() {
-		int numberOfCameras = Camera.getNumberOfCameras();
-		for (int i = 0; i < numberOfCameras; i++) {
-			CameraSpecs c = new CameraSpecs();
-			specs.add(c);
+		int permissionCheck = ContextCompat.checkSelfPermission(this,
+				Manifest.permission.CAMERA);
 
-			Camera.getCameraInfo(i, c.info);
-			Camera camera = Camera.open(i);
-			Camera.Parameters params = camera.getParameters();
-			c.horizontalViewAngle = params.getHorizontalViewAngle();
-			c.verticalViewAngle = params.getVerticalViewAngle();
-			c.sizePreview.addAll(params.getSupportedPreviewSizes());
-			c.sizePicture.addAll(params.getSupportedPictureSizes());
-			camera.release();
+		if( permissionCheck != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+			ActivityCompat.requestPermissions(this,
+					new String[]{Manifest.permission.CAMERA},
+					0);
+		} else {
+			waitingCameraPermissions = false;
+			int numberOfCameras = Camera.getNumberOfCameras();
+			for (int i = 0; i < numberOfCameras; i++) {
+				CameraSpecs c = new CameraSpecs();
+				specs.add(c);
+
+				Camera.getCameraInfo(i, c.info);
+				Camera camera = Camera.open(i);
+				Camera.Parameters params = camera.getParameters();
+				c.horizontalViewAngle = params.getHorizontalViewAngle();
+				c.verticalViewAngle = params.getVerticalViewAngle();
+				c.sizePreview.addAll(params.getSupportedPreviewSizes());
+				c.sizePicture.addAll(params.getSupportedPictureSizes());
+				camera.release();
+			}
+		}
+	}
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode,
+										   String permissions[], int[] grantResults) {
+		switch (requestCode) {
+			case 0: {
+				// If request is cancelled, the result arrays are empty.
+				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+					loadCameraSpecs();
+					preference = new DemoPreference();
+					setDefaultPreferences();
+				} else {
+					dialogNoCameraPermission();
+				}
+				return;
+			}
 		}
 	}
 
@@ -212,12 +247,14 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 			}
 		}
 
-		CameraSpecs camera = specs.get(preference.cameraId);
-		preference.preview = UtilVarious.closest(camera.sizePreview,320,240);
-		preference.picture = UtilVarious.closest(camera.sizePicture,640,480);
+		if( !specs.isEmpty() ) {
+			CameraSpecs camera = specs.get(preference.cameraId);
+			preference.preview = UtilVarious.closest(camera.sizePreview, 320, 240);
+			preference.picture = UtilVarious.closest(camera.sizePicture, 640, 480);
 
-		// see if there are any intrinsic parameters to load
-		loadIntrinsic();
+			// see if there are any intrinsic parameters to load
+			loadIntrinsic();
+		}
 	}
 
 	private void dialogNoCamera() {
@@ -233,12 +270,25 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		alert.show();
 	}
 
+	private void dialogNoCameraPermission() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage("Denied access to the camera! Exiting.")
+				.setCancelable(false)
+				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						System.exit(0);
+					}
+				});
+		AlertDialog alert = builder.create();
+		alert.show();
+	}
+
 	private void loadIntrinsic() {
 		preference.intrinsic = null;
 		try {
 			FileInputStream fos = openFileInput("cam"+preference.cameraId+".txt");
 			Reader reader = new InputStreamReader(fos);
-			preference.intrinsic = BoofAndroidFiles.readIntrinsic(reader);
+			preference.intrinsic = CalibrationIO.load(reader);
 		} catch (FileNotFoundException e) {
 
 		} catch (IOException e) {

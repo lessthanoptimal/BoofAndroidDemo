@@ -27,10 +27,12 @@ import org.ddogleg.struct.GrowQueue_I32;
 
 import java.util.List;
 
+import boofcv.alg.distort.LensDistortionNarrowFOV;
+import boofcv.alg.distort.LensDistortionOps;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
 import boofcv.android.gui.VideoRenderProcessing;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import georegression.metric.Area2D_F64;
@@ -124,8 +126,9 @@ public class FiducialLearnActivity extends DemoVideoDisplayActivity
 		@Override
 		protected void declareImages(int width, int height) {
 			super.declareImages(width, height);
-			IntrinsicParameters intrinsic = MiscUtil.checkThenInventIntrinsic();
-			detector.configure(intrinsic, true);
+			CameraPinholeRadial intrinsic = MiscUtil.checkThenInventIntrinsic();
+			LensDistortionNarrowFOV distort = LensDistortionOps.transformPoint(intrinsic);
+			detector.configure(distort, intrinsic.width, intrinsic.height, true);
 			bitmap = Bitmap.createBitmap(width,height,Bitmap.Config.ARGB_8888);
 			storage = ConvertBitmap.declareStorage(bitmap, storage);
 			numDetected = 0;

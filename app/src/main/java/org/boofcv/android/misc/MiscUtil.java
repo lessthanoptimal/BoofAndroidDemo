@@ -5,7 +5,7 @@ import android.hardware.Camera;
 import org.boofcv.android.CameraSpecs;
 import org.boofcv.android.DemoMain;
 
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.CameraPinholeRadial;
 import georegression.metric.UtilAngle;
 
 /**
@@ -16,9 +16,9 @@ public class MiscUtil {
 	 * Either loads the current intrinsic parameters or makes one up from camera information
 	 * if it doesn't exist
 	 */
-	public static IntrinsicParameters checkThenInventIntrinsic() {
+	public static CameraPinholeRadial checkThenInventIntrinsic() {
 
-		IntrinsicParameters intrinsic;
+		CameraPinholeRadial intrinsic;
 
 		// make sure the camera is calibrated first
 		if( DemoMain.preference.intrinsic == null ) {
@@ -26,7 +26,7 @@ public class MiscUtil {
 
 			Camera.Size size = specs.sizePreview.get( DemoMain.preference.preview);
 
-			intrinsic = new IntrinsicParameters();
+			intrinsic = new CameraPinholeRadial();
 
 			double hfov = UtilAngle.degreeToRadian(specs.horizontalViewAngle);
 			double vfov = UtilAngle.degreeToRadian(specs.verticalViewAngle);

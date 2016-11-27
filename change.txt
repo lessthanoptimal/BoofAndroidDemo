@@ -3,6 +3,13 @@ Change Log for BoofCV Demonstration App
 (year)-(month)-(day)
 
 -------------------------------------------------
+Version 1.8
+Date: 2016
+
+- Updated to BoofCV v0.25
+
+
+-------------------------------------------------
 Version 1.7
 Date: 2016
 

@@ -22,18 +22,19 @@ import org.boofcv.android.DemoVideoDisplayActivity;
 import org.boofcv.android.R;
 import org.boofcv.android.misc.MiscUtil;
 
-import boofcv.abst.fiducial.BaseSquare_FiducialDetector;
 import boofcv.abst.fiducial.CalibrationFiducialDetector;
 import boofcv.abst.fiducial.FiducialDetector;
+import boofcv.abst.fiducial.SquareBase_to_FiducialDetector;
 import boofcv.abst.fiducial.calib.CalibrationDetectorChessboard;
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
-import boofcv.abst.geo.calibration.CalibrationDetector;
+import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
+import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
 import boofcv.android.gui.VideoImageProcessing;
 import boofcv.core.image.ConvertImage;
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
@@ -60,7 +61,7 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 	volatile int binaryThreshold = 100;
 
 	Se3_F64 targetToCamera = new Se3_F64();
-	IntrinsicParameters intrinsic;
+	CameraPinholeRadial intrinsic;
 
 	Class help;
 
@@ -221,7 +222,7 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 			if( changed && intrinsic != null ) {
 				changed = false;
 				detector = (FiducialDetector)createDetector();
-				detector.setIntrinsic(intrinsic);
+				detector.setLensDistortion(LensDistortionOps.transformPoint(intrinsic));
 				if( input == null || input.getImageType() != detector.getInputType() ) {
 					input = detector.getInputType().createImage(1, 1);
 				}
@@ -246,14 +247,14 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 			} else {
 				GrayU8 binary = null;
 				if( detector instanceof CalibrationFiducialDetector) {
-					CalibrationDetector a = ((CalibrationFiducialDetector) detector).getDetector();
+					DetectorFiducialCalibration a = ((CalibrationFiducialDetector) detector).getCalibDetector();
 					if( a instanceof CalibrationDetectorChessboard) {
 						binary = ((CalibrationDetectorChessboard)a).getAlgorithm().getBinary();
 					} else {
 						binary = ((CalibrationDetectorSquareGrid)a).getAlgorithm().getBinary();
 					}
 				} else {
-					binary = ((BaseSquare_FiducialDetector) detector).getAlgorithm().getBinary();
+					binary = ((SquareBase_to_FiducialDetector) detector).getAlgorithm().getBinary();
 				}
 				VisualizeImageData.binaryToBitmap(binary, false, output, storage);
 			}
@@ -277,7 +278,7 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 		 * Draws a flat cube to show where the square fiducial is on the image
 		 *
 		 */
-		public void drawCube( long number , Se3_F64 targetToCamera , IntrinsicParameters intrinsic , double width ,
+		public void drawCube( long number , Se3_F64 targetToCamera , CameraPinholeRadial intrinsic , double width ,
 							  Canvas canvas )
 		{
 			double r = width/2.0;

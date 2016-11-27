@@ -25,15 +25,17 @@ import java.util.List;
 import boofcv.abst.fiducial.calib.CalibrationDetectorChessboard;
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
 import boofcv.abst.fiducial.calib.ConfigChessboard;
+import boofcv.abst.fiducial.calib.ConfigCircleAsymmetricGrid;
 import boofcv.abst.fiducial.calib.ConfigSquareGrid;
-import boofcv.abst.geo.calibration.CalibrationDetector;
+import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.alg.fiducial.calib.chess.DetectChessboardFiducial;
 import boofcv.alg.fiducial.calib.grid.DetectSquareGridFiducial;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
 import boofcv.android.gui.VideoRenderProcessing;
-import boofcv.factory.calib.FactoryCalibrationTarget;
+import boofcv.factory.fiducial.FactoryFiducialCalibration;
+import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
@@ -130,15 +132,18 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 	 * Configures the detector, configures target description for calibration and starts the detector thread.
 	 */
 	private void startVideoProcessing() {
-		CalibrationDetector detector;
+		DetectorFiducialCalibration detector;
 
 		if( targetType == 0 ) {
 			ConfigChessboard config = new ConfigChessboard(numCols,numRows, 30);
-			detector = FactoryCalibrationTarget.detectorChessboard(config);
+			detector = FactoryFiducialCalibration.chessboard(config);
 
-		} else {
+		} else if( targetType == 1 ) {
 			ConfigSquareGrid config = new ConfigSquareGrid(numCols,numRows, 30 , 30);
-			detector = FactoryCalibrationTarget.detectorSquareGrid(config);
+			detector = FactoryFiducialCalibration.squareGrid(config);
+		} else {
+			ConfigCircleAsymmetricGrid config = new ConfigCircleAsymmetricGrid(numCols,numRows, 1 , 6);
+			detector = FactoryFiducialCalibration.circleAsymmGrid(config);
 		}
 		CalibrationComputeActivity.targetLayout = detector.getLayout();
 		setProcessing(new DetectTarget(detector));
@@ -208,7 +213,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 
 	private class DetectTarget extends VideoRenderProcessing<GrayF32> {
 
-		CalibrationDetector detector;
+		DetectorFiducialCalibration detector;
 
 		FastQueue<Point2D_F64> pointsGui = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
 
@@ -217,7 +222,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 		Bitmap bitmap;
 		byte[] storage;
 
-		protected DetectTarget( CalibrationDetector detector ) {
+		protected DetectTarget( DetectorFiducialCalibration detector ) {
 			super(ImageType.single(GrayF32.class));
 			this.detector = detector;
 		}
@@ -261,8 +266,8 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 				debugQuads.clear();
 				if( detected ) {
 					CalibrationObservation found = detector.getDetectedPoints();
-					for( CalibrationObservation.Point p : found.points )
-						pointsGui.grow().set(p.pixel);
+					for( PointIndex2D_F64 p : found.points )
+						pointsGui.grow().set(p);
 				} else if( showDetectDebug ) {
 					// show binary image to aid in debugging and detected rectangles
 					if( detector instanceof CalibrationDetectorChessboard) {

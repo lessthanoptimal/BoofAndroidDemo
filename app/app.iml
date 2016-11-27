@@ -32,12 +32,14 @@
       <sourceFolder url="file://$MODULE_DIR$/build/generated/source/aidl/debug" isTestSource="false" generated="true" />
       <sourceFolder url="file://$MODULE_DIR$/build/generated/source/buildConfig/debug" isTestSource="false" generated="true" />
       <sourceFolder url="file://$MODULE_DIR$/build/generated/source/rs/debug" isTestSource="false" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/apt/debug" isTestSource="false" generated="true" />
       <sourceFolder url="file://$MODULE_DIR$/build/generated/res/rs/debug" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/build/generated/res/resValues/debug" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/build/generated/source/r/androidTest/debug" isTestSource="true" generated="true" />
       <sourceFolder url="file://$MODULE_DIR$/build/generated/source/aidl/androidTest/debug" isTestSource="true" generated="true" />
       <sourceFolder url="file://$MODULE_DIR$/build/generated/source/buildConfig/androidTest/debug" isTestSource="true" generated="true" />
       <sourceFolder url="file://$MODULE_DIR$/build/generated/source/rs/androidTest/debug" isTestSource="true" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/apt/androidTest/debug" isTestSource="true" generated="true" />
       <sourceFolder url="file://$MODULE_DIR$/build/generated/res/rs/androidTest/debug" type="java-test-resource" />
       <sourceFolder url="file://$MODULE_DIR$/build/generated/res/resValues/androidTest/debug" type="java-test-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/debug/res" type="java-resource" />
@@ -82,47 +84,71 @@
       <sourceFolder url="file://$MODULE_DIR$/src/androidTest/shaders" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/assets" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/blame" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/bundles" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/classes" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/dependency-cache" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/dex" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/appcompat-v7/21.0.2/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.2/jars" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/animated-vector-drawable/25.0.1/jars" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/appcompat-v7/25.0.1/jars" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/support-compat/25.0.1/jars" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/support-core-ui/25.0.1/jars" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/support-core-utils/25.0.1/jars" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/support-fragment/25.0.1/jars" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/support-media-compat/25.0.1/jars" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/support-v4/25.0.1/jars" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/support-vector-drawable/25.0.1/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/incremental" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/incremental-safeguard" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/jniLibs" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/manifests" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/pre-dexed" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/res" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/resources" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/rs" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/shaders" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/symbols" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/tmp" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/transforms" />
       <excludeFolder url="file://$MODULE_DIR$/build/outputs" />
       <excludeFolder url="file://$MODULE_DIR$/build/tmp" />
     </content>
-    <orderEntry type="jdk" jdkName="Android API 21 Platform" jdkType="Android SDK" />
+    <orderEntry type="jdk" jdkName="Android API 25 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" exported="" name="visualize-0.24.1" level="project" />
-    <orderEntry type="library" exported="" name="ddogleg-0.9" level="project" />
-    <orderEntry type="library" exported="" name="recognition-0.24.1" level="project" />
-    <orderEntry type="library" exported="" name="support-v4-21.0.2" level="project" />
-    <orderEntry type="library" exported="" name="calibration-0.24.1" level="project" />
-    <orderEntry type="library" exported="" name="equation-0.29" level="project" />
-    <orderEntry type="library" exported="" name="dense64-0.29" level="project" />
-    <orderEntry type="library" exported="" name="learning-0.24.1" level="project" />
-    <orderEntry type="library" exported="" name="core-0.24.1" level="project" />
+    <orderEntry type="library" exported="" name="core-0.30" level="project" />
+    <orderEntry type="library" exported="" name="main-0.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" exported="" name="commons-io-2.1" level="project" />
+    <orderEntry type="library" exported="" name="android-0.25-SNAPSHOT" level="project" />
+    <orderEntry type="library" exported="" name="threads-0.0.12" level="project" />
     <orderEntry type="library" exported="" name="xpp3_min-1.1.4c" level="project" />
-    <orderEntry type="library" exported="" name="simple-0.29" level="project" />
-    <orderEntry type="library" exported="" name="georegression-0.11" level="project" />
-    <orderEntry type="library" exported="" name="geo-0.24.1" level="project" />
+    <orderEntry type="library" exported="" name="equation-0.30" level="project" />
+    <orderEntry type="library" exported="" name="support-fragment-25.0.1" level="project" />
+    <orderEntry type="library" exported="" name="io-0.25-SNAPSHOT" level="project" />
     <orderEntry type="library" exported="" name="xstream-1.4.7" level="project" />
-    <orderEntry type="library" exported="" name="android-0.24.1" level="project" />
-    <orderEntry type="library" exported="" name="sfm-0.24.1" level="project" />
-    <orderEntry type="library" exported="" name="feature-0.24.1" level="project" />
-    <orderEntry type="library" exported="" name="support-annotations-21.0.2" level="project" />
-    <orderEntry type="library" exported="" name="core-0.29" level="project" />
-    <orderEntry type="library" exported="" name="ip-0.24.1" level="project" />
-    <orderEntry type="library" exported="" name="io-0.24.1" level="project" />
-    <orderEntry type="library" exported="" name="appcompat-v7-21.0.2" level="project" />
+    <orderEntry type="library" exported="" name="dense64-0.30" level="project" />
+    <orderEntry type="library" exported="" name="models-0.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" exported="" name="support-core-ui-25.0.1" level="project" />
+    <orderEntry type="library" exported="" name="wget-1.2.19" level="project" />
+    <orderEntry type="library" exported="" name="simple-0.30" level="project" />
+    <orderEntry type="library" exported="" name="geo-0.25-SNAPSHOT" level="project" />
+    <orderEntry type="library" exported="" name="io-0.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" exported="" name="support-core-utils-25.0.1" level="project" />
+    <orderEntry type="library" exported="" name="support-annotations-25.0.1" level="project" />
+    <orderEntry type="library" exported="" name="feature-0.25-SNAPSHOT" level="project" />
+    <orderEntry type="library" exported="" name="learning-0.25-SNAPSHOT" level="project" />
+    <orderEntry type="library" exported="" name="sfm-0.25-SNAPSHOT" level="project" />
+    <orderEntry type="library" exported="" name="learning-0.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" exported="" name="ddogleg-0.10-SNAPSHOT" level="project" />
+    <orderEntry type="library" exported="" name="jarchivelib-0.5.0" level="project" />
+    <orderEntry type="library" exported="" name="visualize-0.25-SNAPSHOT" level="project" />
+    <orderEntry type="library" exported="" name="calibration-0.25-SNAPSHOT" level="project" />
+    <orderEntry type="library" exported="" name="georegression-0.12-SNAPSHOT" level="project" />
+    <orderEntry type="library" exported="" name="support-compat-25.0.1" level="project" />
+    <orderEntry type="library" exported="" name="animated-vector-drawable-25.0.1" level="project" />
+    <orderEntry type="library" exported="" name="support-v4-25.0.1" level="project" />
+    <orderEntry type="library" exported="" name="protobuf-java-2.6.1" level="project" />
+    <orderEntry type="library" exported="" name="snakeyaml-1.17" level="project" />
+    <orderEntry type="library" exported="" name="recognition-0.25-SNAPSHOT" level="project" />
+    <orderEntry type="library" exported="" name="zip4j-1.3.2" level="project" />
+    <orderEntry type="library" exported="" name="support-media-compat-25.0.1" level="project" />
+    <orderEntry type="library" exported="" name="ip-0.25-SNAPSHOT" level="project" />
+    <orderEntry type="library" exported="" name="support-vector-drawable-25.0.1" level="project" />
+    <orderEntry type="library" exported="" name="core-0.25-SNAPSHOT" level="project" />
+    <orderEntry type="library" exported="" name="appcompat-v7-25.0.1" level="project" />
   </component>
 </module>

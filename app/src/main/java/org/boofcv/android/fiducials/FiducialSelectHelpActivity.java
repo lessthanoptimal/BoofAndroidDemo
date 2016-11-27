@@ -45,7 +45,7 @@ public class FiducialSelectHelpActivity extends Activity {
 
 		BitmapFactory.Options options = new BitmapFactory.Options();
 		options.inScaled = false;
-		Bitmap input = BitmapFactory.decodeResource(getResources(), R.drawable.fiducial_select, options);
+		Bitmap input = BitmapFactory.decodeResource(getResources(), R.drawable.fiducial_square_binary, options);
 
 		ImageView view = (ImageView) findViewById(R.id.imageView);
 		view.setImageBitmap(input);

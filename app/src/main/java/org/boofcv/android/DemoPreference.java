@@ -1,6 +1,6 @@
 package org.boofcv.android;
 
-import boofcv.struct.calib.IntrinsicParameters;
+import boofcv.struct.calib.CameraPinholeRadial;
 
 /**
  * @author Peter Abeles
@@ -10,5 +10,5 @@ public class DemoPreference {
 	public int preview;
 	public int picture;
 	public boolean showFps;
-	public IntrinsicParameters intrinsic;
+	public CameraPinholeRadial intrinsic;
 }

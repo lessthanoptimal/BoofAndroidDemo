@@ -22,7 +22,7 @@ import boofcv.core.image.ConvertImage;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
-import boofcv.struct.distort.PointTransform_F32;
+import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
@@ -64,7 +64,7 @@ public class UndistortDisplayActivity extends DemoVideoDisplayActivity
 
 		if( DemoMain.preference.intrinsic != null ) {
 			// define the transform.  Cache the results for quick rendering later on
-			PointTransform_F32 fullView = LensDistortionOps.transform_F32(AdjustmentType.FULL_VIEW,
+			Point2Transform2_F32 fullView = LensDistortionOps.transform_F32(AdjustmentType.FULL_VIEW,
 					DemoMain.preference.intrinsic, null, false);
 			InterpolatePixelS<GrayU8> interp = FactoryInterpolation.
 					bilinearPixelS(GrayU8.class, BorderType.ZERO);
