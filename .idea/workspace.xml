@@ -6,14 +6,10 @@
     </shared>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b4998957-b39b-4008-830d-654c450f360e" name="Default" comment="">
+    <list default="true" id="b4998957-b39b-4008-830d-654c450f360e" name="Default" comment="- added circle asymmetric grid calibration support">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/CalibrationActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/CalibrationActivity.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/CalibrationHelpActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/CalibrationHelpActivity.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/DrawCalibrationFiducial.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/DrawCalibrationFiducial.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/FiducialCalibrationActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/FiducialCalibrationActivity.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/FiducialCalibrationHelpActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/FiducialCalibrationHelpActivity.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/SelectCalibrationFiducial.java" afterPath="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/SelectCalibrationFiducial.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/app.iml" afterPath="$PROJECT_DIR$/app/app.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/build.gradle" afterPath="$PROJECT_DIR$/app/build.gradle" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/change.txt" afterPath="$PROJECT_DIR$/change.txt" />
     </list>
     <ignored path="BoofAndroidDemo.iws" />
@@ -49,33 +45,107 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="CalibrationActivity.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="CalibrationActivity.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/org/boofcv/android/CalibrationActivity.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="161">
+            <state relative-caret-position="3345">
               <caret line="275" column="38" selection-start-line="275" selection-start-column="38" selection-end-line="275" selection-end-column="38" />
+              <folding>
+                <element signature="imports" expanded="false" />
+                <element signature="e#5428#5429#0" expanded="false" />
+                <element signature="e#5458#5459#0" expanded="false" />
+                <element signature="e#5501#5502#0" expanded="false" />
+                <element signature="e#5530#5531#0" expanded="false" />
+                <element signature="e#6787#6788#0" expanded="false" />
+                <element signature="e#6806#6807#0" expanded="false" />
+                <element signature="e#10990#10991#0" expanded="false" />
+                <element signature="e#11029#11030#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="readme.txt" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/readme.txt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ShapeFitDisplayActivity.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/org/boofcv/android/ShapeFitDisplayActivity.java">
+      <file leaf-file-name="change.txt" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/change.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="135">
-              <caret line="10" column="13" selection-start-line="10" selection-start-column="13" selection-end-line="10" selection-end-column="13" />
+            <state relative-caret-position="195">
+              <caret line="13" column="46" selection-start-line="13" selection-start-column="46" selection-end-line="13" selection-end-column="46" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ContourShapeFittingActivity.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/java/org/boofcv/android/ContourShapeFittingActivity.java">
+      <file leaf-file-name="build.gradle" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/build.gradle">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="365">
-              <caret line="187" column="28" selection-start-line="187" selection-start-column="28" selection-end-line="187" selection-end-column="28" />
+            <state relative-caret-position="315">
+              <caret line="21" column="13" selection-start-line="21" selection-start-column="13" selection-end-line="21" selection-end-column="13" />
               <folding />
             </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="AndroidManifest.xml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/AndroidManifest.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="480">
+              <caret line="32" column="22" selection-start-line="32" selection-start-column="22" selection-end-line="32" selection-end-column="22" />
+              <folding />
+            </state>
+          </provider>
+          <provider editor-type-id="android-manifest">
+            <state />
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="build.gradle" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/build.gradle">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="410">
+              <caret line="38" column="0" selection-start-line="38" selection-start-column="0" selection-end-line="38" selection-end-column="72" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="DemoMain.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/app/src/main/java/org/boofcv/android/DemoMain.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="145">
+              <caret line="84" column="0" selection-start-line="84" selection-start-column="0" selection-end-line="85" selection-end-column="25" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="black_polygons.png" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable/black_polygons.png">
+          <provider selected="true" editor-type-id="images">
+            <state />
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="fiducial_square_binary.png" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable/fiducial_square_binary.png">
+          <provider selected="true" editor-type-id="images">
+            <state />
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="fiducial_square_image.png" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable/fiducial_square_image.png">
+          <provider selected="true" editor-type-id="images">
+            <state />
           </provider>
         </entry>
       </file>
@@ -1435,7 +1505,7 @@
     </option>
     <option name="modificationStamps">
       <map>
-        <entry key="$PROJECT_DIR$" value="4440637785812" />
+        <entry key="$PROJECT_DIR$" value="4444103976901" />
       </map>
     </option>
     <option name="projectBuildClasspath">
@@ -1713,7 +1783,6 @@
         <option value="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/FiducialDetector.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/FiducialLearnActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/MosaicDisplayActivity.java" />
-        <option value="$PROJECT_DIR$/app/build.gradle" />
         <option value="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/DemoMain.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/AssociationVisualize.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/DisparityActivity.java" />
@@ -1722,9 +1791,10 @@
         <option value="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/FiducialCalibrationActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/CalibrationHelpActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/DrawCalibrationFiducial.java" />
-        <option value="$PROJECT_DIR$/change.txt" />
         <option value="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/SelectCalibrationFiducial.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/org/boofcv/android/CalibrationActivity.java" />
+        <option value="$PROJECT_DIR$/change.txt" />
+        <option value="$PROJECT_DIR$/app/build.gradle" />
       </list>
     </option>
   </component>
@@ -1758,7 +1828,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -1864,10 +1933,11 @@
         </subPane>
       </pane>
       <pane id="PackagesPane" />
+      <pane id="Scope" />
+      <pane id="Scratches" />
       <pane id="AndroidView">
         <subPane />
       </pane>
-      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -1892,6 +1962,7 @@
     <property name="device.picker.selection" value="004fb53312c24e77" />
     <property name="settings.editor.selected.configurable" value="gradle.compiler" />
     <property name="settings.editor.splitter.proportion" value="0.2" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../boofcv/integration/android/examples/video" />
   </component>
   <component name="RunManager" selected="Android App.app">
     <configuration default="true" type="AndroidRunConfigurationType" factoryName="Android App">
@@ -2187,6 +2258,9 @@
   <component name="ShelveChangesManager" show_recycled="false">
     <option name="remove_strategy" value="false" />
   </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="b4998957-b39b-4008-830d-654c450f360e" name="Default" comment="" />
@@ -2202,7 +2276,14 @@
       <option name="project" value="LOCAL" />
       <updated>1480220573575</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="- added circle asymmetric grid calibration support">
+      <created>1480223970245</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1480223970245</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -2224,13 +2305,12 @@
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32991013" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3287858" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Captures" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.34146342" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.34146342" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3287858" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -2241,88 +2321,40 @@
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32991013" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
     </layout>
+  </component>
+  <component name="UpdateCopyrightCheckinHandler">
+    <option name="UPDATE_COPYRIGHT" value="true" />
+  </component>
+  <component name="Vcs.Log.UiProperties">
+    <option name="RECENTLY_FILTERED_USER_GROUPS">
+      <collection />
+    </option>
+    <option name="RECENTLY_FILTERED_BRANCH_GROUPS">
+      <collection />
+    </option>
   </component>
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
+    <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
+    <option name="CHECK_NEW_TODO" value="false" />
     <MESSAGE value="- updated for changes in BoofCV and android&#10;- checks and askes for camera permission" />
-    <option name="LAST_COMMIT_MESSAGE" value="- updated for changes in BoofCV and android&#10;- checks and askes for camera permission" />
+    <MESSAGE value="- added circle asymmetric grid calibration support" />
+    <option name="LAST_COMMIT_MESSAGE" value="- added circle asymmetric grid calibration support" />
+    <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar://$USER_HOME$/.m2/repository/org/boofcv/recognition/0.25-SNAPSHOT/recognition-0.25-SNAPSHOT-sources.jar!/boofcv/alg/fiducial/square/BaseDetectFiducialSquare.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1860">
-          <caret line="166" column="16" selection-start-line="166" selection-start-column="16" selection-end-line="166" selection-end-column="16" />
-          <folding>
-            <element signature="e#0#15178#0" expanded="false" />
-            <element signature="imports" expanded="false" />
-            <element signature="e#13829#13830#0" expanded="false" />
-            <element signature="e#13848#13849#0" expanded="false" />
-            <element signature="e#14523#14524#0" expanded="false" />
-            <element signature="e#14552#14553#0" expanded="false" />
-            <element signature="e#14605#14606#0" expanded="false" />
-            <element signature="e#14633#14634#0" expanded="false" />
-            <element signature="e#14663#14664#0" expanded="false" />
-            <element signature="e#14683#14684#0" expanded="false" />
-            <element signature="e#14718#14719#0" expanded="false" />
-            <element signature="e#14741#14742#0" expanded="false" />
-            <element signature="e#14784#14785#0" expanded="false" />
-            <element signature="e#14817#14818#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/boofcv/android/StabilizeDisplayActivity.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1035">
-          <caret line="101" column="91" selection-start-line="101" selection-start-column="91" selection-end-line="101" selection-end-column="91" />
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#2505#2506#0" expanded="false" />
-            <element signature="e#2533#2534#0" expanded="false" />
-            <element signature="e#3194#3195#0" expanded="false" />
-            <element signature="e#3217#3218#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$USER_HOME$/.m2/repository/org/boofcv/recognition/0.25-SNAPSHOT/recognition-0.25-SNAPSHOT-sources.jar!/boofcv/abst/fiducial/calib/CalibrationDetectorChessboard.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="39" column="42" selection-start-line="39" selection-start-column="13" selection-end-line="39" selection-end-column="42" />
-          <folding>
-            <element signature="e#0#4473#0" expanded="false" />
-            <element signature="imports" expanded="false" />
-            <element signature="e#2876#2877#0" expanded="false" />
-            <element signature="e#2898#2899#0" expanded="false" />
-            <element signature="e#2950#2951#0" expanded="false" />
-            <element signature="e#2976#2977#0" expanded="false" />
-            <element signature="e#3092#3093#0" expanded="false" />
-            <element signature="e#3119#3120#0" expanded="false" />
-            <element signature="e#3244#3245#0" expanded="false" />
-            <element signature="e#3274#3275#0" expanded="false" />
-            <element signature="e#3335#3336#0" expanded="false" />
-            <element signature="e#3352#3353#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/org/boofcv/android/fiducials/FiducialSquareActivity.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="3135">
           <caret line="256" column="61" selection-start-line="256" selection-start-column="31" selection-end-line="256" selection-end-column="61" />
-          <folding>
-            <element signature="e#2440#2441#0" expanded="false" />
-            <element signature="e#2463#2464#0" expanded="false" />
-            <element signature="e#4621#4622#0" expanded="false" />
-            <element signature="e#4667#4668#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -2330,10 +2362,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="615">
           <caret line="66" column="28" selection-start-line="66" selection-start-column="28" selection-end-line="66" selection-end-column="28" />
-          <folding>
-            <element signature="e#3408#3409#0" expanded="false" />
-            <element signature="e#3452#3453#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -2341,7 +2369,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="3105">
           <caret line="240" column="54" selection-start-line="240" selection-start-column="54" selection-end-line="240" selection-end-column="54" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2349,11 +2376,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="915">
           <caret line="76" column="5" selection-start-line="76" selection-start-column="5" selection-end-line="76" selection-end-column="5" />
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#1563#1564#0" expanded="false" />
-            <element signature="e#1618#1619#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -2361,30 +2383,16 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1350">
           <caret line="130" column="40" selection-start-line="130" selection-start-column="40" selection-end-line="130" selection-end-column="40" />
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#2238#2239#0" expanded="false" />
-            <element signature="e#2283#2284#0" expanded="false" />
-            <element signature="e#8845#8846#0" expanded="false" />
-            <element signature="e#8880#8881#0" expanded="false" />
-            <element signature="e#9020#9021#0" expanded="false" />
-            <element signature="e#9055#9056#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/fiducial_help.xml">
-      <provider editor-type-id="android-designer2">
-        <state />
-      </provider>
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="300">
           <caret line="20" column="48" selection-start-line="20" selection-start-column="48" selection-end-line="20" selection-end-column="48" />
         </state>
       </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable/fiducial_square_image.png">
-      <provider selected="true" editor-type-id="images">
+      <provider editor-type-id="android-designer2">
         <state />
       </provider>
     </entry>
@@ -2406,7 +2414,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2442,12 +2449,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="3135">
           <caret line="256" column="61" selection-start-line="256" selection-start-column="31" selection-end-line="256" selection-end-column="61" />
-          <folding>
-            <element signature="e#2440#2441#0" expanded="false" />
-            <element signature="e#2463#2464#0" expanded="false" />
-            <element signature="e#4621#4622#0" expanded="false" />
-            <element signature="e#4667#4668#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -2455,10 +2456,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="615">
           <caret line="66" column="28" selection-start-line="66" selection-start-column="28" selection-end-line="66" selection-end-column="28" />
-          <folding>
-            <element signature="e#3408#3409#0" expanded="false" />
-            <element signature="e#3452#3453#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -2466,11 +2463,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="915">
           <caret line="76" column="5" selection-start-line="76" selection-start-column="5" selection-end-line="76" selection-end-column="5" />
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#1563#1564#0" expanded="false" />
-            <element signature="e#1618#1619#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -2478,15 +2470,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1350">
           <caret line="130" column="40" selection-start-line="130" selection-start-column="40" selection-end-line="130" selection-end-column="40" />
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#2238#2239#0" expanded="false" />
-            <element signature="e#2283#2284#0" expanded="false" />
-            <element signature="e#8845#8846#0" expanded="false" />
-            <element signature="e#8880#8881#0" expanded="false" />
-            <element signature="e#9020#9021#0" expanded="false" />
-            <element signature="e#9055#9056#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -2494,15 +2477,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1005">
           <caret line="103" column="71" selection-start-line="103" selection-start-column="71" selection-end-line="103" selection-end-column="71" />
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#2480#2481#0" expanded="false" />
-            <element signature="e#2508#2509#0" expanded="false" />
-            <element signature="e#2551#2552#0" expanded="false" />
-            <element signature="e#2600#2601#0" expanded="false" />
-            <element signature="e#3260#3261#0" expanded="false" />
-            <element signature="e#3283#3284#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -2510,10 +2484,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="3795">
           <caret line="284" column="41" selection-start-line="284" selection-start-column="18" selection-end-line="284" selection-end-column="41" />
-          <folding>
-            <element signature="e#0#14245#0" expanded="false" />
-            <element signature="imports" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -2521,22 +2491,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1860">
           <caret line="166" column="16" selection-start-line="166" selection-start-column="16" selection-end-line="166" selection-end-column="16" />
-          <folding>
-            <element signature="e#0#15178#0" expanded="false" />
-            <element signature="imports" expanded="false" />
-            <element signature="e#13829#13830#0" expanded="false" />
-            <element signature="e#13848#13849#0" expanded="false" />
-            <element signature="e#14523#14524#0" expanded="false" />
-            <element signature="e#14552#14553#0" expanded="false" />
-            <element signature="e#14605#14606#0" expanded="false" />
-            <element signature="e#14633#14634#0" expanded="false" />
-            <element signature="e#14663#14664#0" expanded="false" />
-            <element signature="e#14683#14684#0" expanded="false" />
-            <element signature="e#14718#14719#0" expanded="false" />
-            <element signature="e#14741#14742#0" expanded="false" />
-            <element signature="e#14784#14785#0" expanded="false" />
-            <element signature="e#14817#14818#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -2544,13 +2498,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1035">
           <caret line="101" column="91" selection-start-line="101" selection-start-column="91" selection-end-line="101" selection-end-column="91" />
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#2505#2506#0" expanded="false" />
-            <element signature="e#2533#2534#0" expanded="false" />
-            <element signature="e#3194#3195#0" expanded="false" />
-            <element signature="e#3217#3218#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -2558,28 +2505,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="165">
           <caret line="39" column="42" selection-start-line="39" selection-start-column="13" selection-end-line="39" selection-end-column="42" />
-          <folding>
-            <element signature="e#0#4473#0" expanded="false" />
-            <element signature="imports" expanded="false" />
-            <element signature="e#2876#2877#0" expanded="false" />
-            <element signature="e#2898#2899#0" expanded="false" />
-            <element signature="e#2950#2951#0" expanded="false" />
-            <element signature="e#2976#2977#0" expanded="false" />
-            <element signature="e#3092#3093#0" expanded="false" />
-            <element signature="e#3119#3120#0" expanded="false" />
-            <element signature="e#3244#3245#0" expanded="false" />
-            <element signature="e#3274#3275#0" expanded="false" />
-            <element signature="e#3335#3336#0" expanded="false" />
-            <element signature="e#3352#3353#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/boofcv/android/DemoMain.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="217">
-          <caret line="217" column="54" selection-start-line="217" selection-start-column="54" selection-end-line="217" selection-end-column="54" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2587,7 +2512,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="137">
           <caret line="47" column="16" selection-start-line="47" selection-start-column="16" selection-end-line="47" selection-end-column="16" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2595,7 +2519,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="365">
           <caret line="274" column="0" selection-start-line="274" selection-start-column="0" selection-end-line="274" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2603,7 +2526,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="330">
           <caret line="303" column="22" selection-start-line="303" selection-start-column="22" selection-end-line="303" selection-end-column="22" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2611,7 +2533,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="170">
           <caret line="355" column="28" selection-start-line="355" selection-start-column="28" selection-end-line="355" selection-end-column="28" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2619,7 +2540,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-584">
           <caret line="279" column="0" selection-start-line="279" selection-start-column="0" selection-end-line="279" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2627,7 +2547,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="160">
           <caret line="205" column="0" selection-start-line="205" selection-start-column="0" selection-end-line="205" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2635,7 +2554,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="316">
           <caret line="95" column="51" selection-start-line="95" selection-start-column="51" selection-end-line="95" selection-end-column="51" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2643,10 +2561,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="421">
           <caret line="144" column="37" selection-start-line="144" selection-start-column="11" selection-end-line="144" selection-end-column="37" />
-          <folding>
-            <element signature="e#4539#4540#0" expanded="false" />
-            <element signature="e#4561#4562#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -2654,61 +2568,23 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="135">
           <caret line="14" column="13" selection-start-line="14" selection-start-column="13" selection-end-line="14" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/AndroidManifest.xml">
-      <provider editor-type-id="android-manifest">
-        <state />
-      </provider>
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-216">
-          <caret line="20" column="51" selection-start-line="20" selection-start-column="51" selection-end-line="20" selection-end-column="51" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/build.gradle">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/build.gradle">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="8" column="24" selection-start-line="8" selection-start-column="24" selection-end-line="8" selection-end-column="24" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/calibration_configure.xml">
-      <provider editor-type-id="android-designer2">
-        <state />
-      </provider>
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="137">
           <caret line="21" column="28" selection-start-line="21" selection-start-column="28" selection-end-line="21" selection-end-column="28" />
-          <folding />
         </state>
+      </provider>
+      <provider editor-type-id="android-designer2">
+        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/org/boofcv/android/CalibrationComputeActivity.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="155">
           <caret line="42" column="36" selection-start-line="42" selection-start-column="36" selection-end-line="42" selection-end-column="36" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/change.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="10" column="46" selection-start-line="10" selection-start-column="46" selection-end-line="10" selection-end-column="46" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2716,10 +2592,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="525">
           <caret line="48" column="26" selection-start-line="48" selection-start-column="26" selection-end-line="48" selection-end-column="26" />
-          <folding>
-            <element signature="e#1554#1555#0" expanded="true" />
-            <element signature="e#1610#1611#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -2727,7 +2599,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="665">
           <caret line="60" column="45" selection-start-line="60" selection-start-column="26" selection-end-line="60" selection-end-column="45" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2735,7 +2606,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="395">
           <caret line="129" column="41" selection-start-line="129" selection-start-column="36" selection-end-line="129" selection-end-column="41" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2743,10 +2613,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="482">
           <caret line="139" column="0" selection-start-line="139" selection-start-column="0" selection-end-line="139" selection-end-column="0" />
-          <folding>
-            <element signature="e#5034#5035#0" expanded="true" />
-            <element signature="e#5058#5059#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -2754,7 +2620,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="135">
           <caret line="42" column="13" selection-start-line="42" selection-start-column="13" selection-end-line="42" selection-end-column="13" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -2762,10 +2627,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="571">
           <caret line="57" column="30" selection-start-line="57" selection-start-column="30" selection-end-line="57" selection-end-column="30" />
-          <folding>
-            <element signature="e#1782#1783#0" expanded="true" />
-            <element signature="e#1826#1827#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -2779,16 +2640,98 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/org/boofcv/android/ContourShapeFittingActivity.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="365">
+        <state relative-caret-position="2250">
           <caret line="187" column="28" selection-start-line="187" selection-start-column="28" selection-end-line="187" selection-end-column="28" />
-          <folding />
+          <folding>
+            <element signature="imports" expanded="false" />
+            <element signature="e#2476#2477#0" expanded="false" />
+            <element signature="e#2503#2504#0" expanded="false" />
+            <element signature="e#3481#3482#0" expanded="false" />
+            <element signature="e#3527#3528#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/org/boofcv/android/CalibrationActivity.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="161">
+        <state relative-caret-position="3345">
           <caret line="275" column="38" selection-start-line="275" selection-start-column="38" selection-end-line="275" selection-end-column="38" />
+          <folding>
+            <element signature="imports" expanded="false" />
+            <element signature="e#5428#5429#0" expanded="false" />
+            <element signature="e#5458#5459#0" expanded="false" />
+            <element signature="e#5501#5502#0" expanded="false" />
+            <element signature="e#5530#5531#0" expanded="false" />
+            <element signature="e#6787#6788#0" expanded="false" />
+            <element signature="e#6806#6807#0" expanded="false" />
+            <element signature="e#10990#10991#0" expanded="false" />
+            <element signature="e#11029#11030#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/readme.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable/black_polygons.png">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable/fiducial_square_binary.png">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable/fiducial_square_image.png">
+      <provider selected="true" editor-type-id="images">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/change.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="13" column="46" selection-start-line="13" selection-start-column="46" selection-end-line="13" selection-end-column="46" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/AndroidManifest.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="480">
+          <caret line="32" column="22" selection-start-line="32" selection-start-column="22" selection-end-line="32" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+      <provider editor-type-id="android-manifest">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build.gradle">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="315">
+          <caret line="21" column="13" selection-start-line="21" selection-start-column="13" selection-end-line="21" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/build.gradle">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="410">
+          <caret line="38" column="0" selection-start-line="38" selection-start-column="0" selection-end-line="38" selection-end-column="72" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/org/boofcv/android/DemoMain.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="145">
+          <caret line="84" column="0" selection-start-line="84" selection-start-column="0" selection-end-line="85" selection-end-column="25" />
           <folding />
         </state>
       </provider>

@@ -8,7 +8,10 @@ Date: 2016
 
 - Updated to BoofCV v0.25
 - Updated how square grid calibration is specified
-- Added circle asymmetric grid for calibration
+- Added circle asymmetric grid for calibration and fiducials
+- Added black ellipse detector TODO
+- Added Image Classifiers TODO
+- Added Equirectangular to Pinhole camera TODO
 
 -------------------------------------------------
 Version 1.7
