@@ -1,4 +1,4 @@
-package org.boofcv.android.fiducials;
+package org.boofcv.android.recognition;
 
 import android.os.Bundle;
 

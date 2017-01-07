@@ -8,7 +8,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import org.boofcv.android.R;
-import org.boofcv.android.fiducials.DrawCalibrationFiducial;
+import org.boofcv.android.recognition.DrawCalibrationFiducial;
 
 import boofcv.abst.fiducial.calib.CalibrationPatterns;
 

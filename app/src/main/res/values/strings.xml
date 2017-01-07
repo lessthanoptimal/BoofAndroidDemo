@@ -1,138 +1,147 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string name="app_name">BoofDemo</string>
-	<string-array name="binary_filters">
-		<item>None</item>
-		<item>Dilate-4</item>
-		<item>Dilate-8</item>
-		<item>Erode-4</item>
-		<item>Erode-8</item>
-		<item>Edge-4</item>
-		<item>Edge-8</item>
-		<item>Denoise</item>
-		<item>Thin</item>
-	</string-array>
+    <string name="app_name">BoofDemo</string>
+    <string-array name="binary_filters">
+        <item>None</item>
+        <item>Dilate-4</item>
+        <item>Dilate-8</item>
+        <item>Erode-4</item>
+        <item>Erode-8</item>
+        <item>Edge-4</item>
+        <item>Edge-8</item>
+        <item>Denoise</item>
+        <item>Thin</item>
+    </string-array>
 
-	<string-array name="blurs">
-		<item>Mean</item>
-		<item>Gaussian</item>
-		<item>Median</item>
-	</string-array>
+    <string-array name="blurs">
+        <item>Mean</item>
+        <item>Gaussian</item>
+        <item>Median</item>
+    </string-array>
 
-	<string-array name="thresholding">
-		<item>Global: Otsu</item>
-		<item>Global: Entropy</item>
-		<item>Adaptive: Square</item>
-		<item>Adaptive: Gaussian</item>
-		<item>Adaptive: Sauvola</item>
-	</string-array>
+    <string-array name="thresholding">
+        <item>Global: Otsu</item>
+        <item>Global: Entropy</item>
+        <item>Adaptive: Square</item>
+        <item>Adaptive: Gaussian</item>
+        <item>Adaptive: Sauvola</item>
+    </string-array>
 
-	<string-array name="background_models">
-		<item>Basic: Grey</item>
-		<item>Basic: Color</item>
-		<item>Gaussian: Grey</item>
-		<item>Gaussian: Color</item>
-	</string-array>
+    <string-array name="background_models">
+        <item>Basic: Grey</item>
+        <item>Basic: Color</item>
+        <item>Gaussian: Grey</item>
+        <item>Gaussian: Color</item>
+    </string-array>
 
-	<string-array name="fiducials">
-		<item>Square Binary</item>
-		<item>Square Image</item>
-		<item>Chessboard</item>
-		<item>Square Grid</item>
-	</string-array>
+    <string-array name="fiducials">
+        <item>Square Binary</item>
+        <item>Square Image</item>
+        <item>Chessboard</item>
+        <item>Square Grid</item>
+    </string-array>
 
-	<string-array name="shapes">
-		<item>Ellipse</item>
-		<item>Polygon</item>
-	</string-array>
+    <string-array name="shapes">
+        <item>Ellipse</item>
+        <item>Polygon</item>
+    </string-array>
 
-	<string-array name="tracking_objects">
-		<item>Circulant</item>
-		<item>Mean-Shift</item>
-		<item>Mean-Shift Scale</item>
-		<item>Mean-Shift Likelihood</item>
-		<item>Sparse Flow</item>
-		<item>TLD</item>
-	</string-array>
+    <string-array name="tracking_objects">
+        <item>Circulant</item>
+        <item>Mean-Shift</item>
+        <item>Mean-Shift Scale</item>
+        <item>Mean-Shift Likelihood</item>
+        <item>Sparse Flow</item>
+        <item>TLD</item>
+    </string-array>
 
-	<string-array name="transforms">
-		<item>DFT</item>
-		<item>Pyramid</item>
-		<item>Wavelet</item>
-	</string-array>
+    <string-array name="transforms">
+        <item>DFT</item>
+        <item>Pyramid</item>
+        <item>Wavelet</item>
+    </string-array>
 
-	<string-array name="enhance">
-		<item>Histogram Global</item>
-		<item>Histogram Local</item>
-		<item>Sharpen-4</item>
-		<item>Sharpen-8</item>
-		<item>None</item>
-	</string-array>
+    <string-array name="enhance">
+        <item>Histogram Global</item>
+        <item>Histogram Local</item>
+        <item>Sharpen-4</item>
+        <item>Sharpen-8</item>
+        <item>None</item>
+    </string-array>
 
-	<string-array name="gradients">
-		<item>Three</item>
-		<item>Sobel</item>
-		<item>Prewitt</item>
-		<item>two-0</item>
-		<item>two-1</item>
-	</string-array>
+    <string-array name="gradients">
+        <item>Three</item>
+        <item>Sobel</item>
+        <item>Prewitt</item>
+        <item>two-0</item>
+        <item>two-1</item>
+    </string-array>
 
-	<string-array name="point_features">
-		<item>Shi-Tomasi</item>
-		<item>Harris</item>
-		<item>FAST</item>
-		<item>Laplacian</item>
-		<item>KitRos</item>
-		<item>Hessian Det</item>
-		<item>Hessian Trace</item>
-	</string-array>
+    <string-array name="image_classifiers">
+        <item>VGG</item>
+        <item>NIN</item>
+    </string-array>
 
-	<string-array name="scale_features">
-		<item>SURF</item>
-		<item>SIFT</item>
-	</string-array>
+    <string-array name="point_features">
+        <item>Shi-Tomasi</item>
+        <item>Harris</item>
+        <item>FAST</item>
+        <item>Laplacian</item>
+        <item>KitRos</item>
+        <item>Hessian Det</item>
+        <item>Hessian Trace</item>
+    </string-array>
 
-	<string-array name="line_features">
-		<item>Hough Foot</item>
-		<item>Hough Polar</item>
-	</string-array>
+    <string-array name="scale_features">
+        <item>SURF</item>
+        <item>SIFT</item>
+    </string-array>
 
-	<string-array name="threshold_styles">
-		<item>global</item>
-		<item>local</item>
-	</string-array>
+    <string-array name="line_features">
+        <item>Hough Foot</item>
+        <item>Hough Polar</item>
+    </string-array>
 
-	<string-array name="detectors">
-		<item>Fast-Hessian</item>
-		<item>SIFT</item>
-		<item>Shi-Tomasi</item>
-		<item>Harris</item>
-		<item>FAST</item>
-	</string-array>
+    <string-array name="threshold_styles">
+        <item>global</item>
+        <item>local</item>
+    </string-array>
 
-	<string-array name="descriptors">
-		<item>SURF</item>
-		<item>SIFT</item>
-		<item>BRIEF</item>
-		<item>NCC</item>
-	</string-array>
+    <string-array name="detectors">
+        <item>Fast-Hessian</item>
+        <item>SIFT</item>
+        <item>Shi-Tomasi</item>
+        <item>Harris</item>
+        <item>FAST</item>
+    </string-array>
 
-	<string-array name="disparity_views">
-		<item>Association</item>
-		<item>Rectification</item>
-		<item>Disparity</item>
-	</string-array>
+    <string-array name="descriptors">
+        <item>SURF</item>
+        <item>SIFT</item>
+        <item>BRIEF</item>
+        <item>NCC</item>
+    </string-array>
 
-	<string-array name="disparity_algs">
-		<item>Rect</item>
-		<item>5-Rect</item>
-	</string-array>
+    <string-array name="disparity_views">
+        <item>Association</item>
+        <item>Rectification</item>
+        <item>Disparity</item>
+    </string-array>
 
-	<string-array name="segmentation_algs">
-		<item>Watershed</item>
-		<item>Felzenszwalb-Huttenloche</item>
-		<item>SLIC</item>
-		<item>Mean-Shift</item>
-	</string-array>
+    <string-array name="disparity_algs">
+        <item>Rect</item>
+        <item>5-Rect</item>
+    </string-array>
+
+    <string-array name="segmentation_algs">
+        <item>Watershed</item>
+        <item>Felzenszwalb-Huttenloche</item>
+        <item>SLIC</item>
+        <item>Mean-Shift</item>
+    </string-array>
+
+    <string name="title_activity_image_recognition">ImageRecognition</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
 
 </resources>

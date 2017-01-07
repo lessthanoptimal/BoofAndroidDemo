@@ -1,4 +1,4 @@
-package org.boofcv.android.fiducials;
+package org.boofcv.android.recognition;
 
 import boofcv.abst.fiducial.FiducialDetector;
 import boofcv.factory.fiducial.ConfigFiducialBinary;

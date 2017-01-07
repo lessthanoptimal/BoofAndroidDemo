@@ -27,16 +27,17 @@ import org.boofcv.android.detect.DetectBlackPolygonActivity;
 import org.boofcv.android.detect.LineDisplayActivity;
 import org.boofcv.android.detect.PointDisplayActivity;
 import org.boofcv.android.detect.ScalePointDisplayActivity;
-import org.boofcv.android.fiducials.FiducialCalibrationActivity;
-import org.boofcv.android.fiducials.FiducialImageLibraryAcitivity;
-import org.boofcv.android.fiducials.FiducialSquareBinaryActivity;
-import org.boofcv.android.fiducials.FiducialSquareImageActivity;
 import org.boofcv.android.ip.BinaryDisplayActivity;
 import org.boofcv.android.ip.BlurDisplayActivity;
 import org.boofcv.android.ip.EnhanceDisplayActivity;
 import org.boofcv.android.ip.GradientDisplayActivity;
 import org.boofcv.android.ip.ImageTransformActivity;
 import org.boofcv.android.ip.ThresholdDisplayActivity;
+import org.boofcv.android.recognition.FiducialCalibrationActivity;
+import org.boofcv.android.recognition.FiducialImageLibraryAcitivity;
+import org.boofcv.android.recognition.FiducialSquareBinaryActivity;
+import org.boofcv.android.recognition.FiducialSquareImageActivity;
+import org.boofcv.android.recognition.ImageClassificationActivity;
 import org.boofcv.android.sfm.DisparityActivity;
 import org.boofcv.android.sfm.MosaicDisplayActivity;
 import org.boofcv.android.sfm.StabilizeDisplayActivity;
@@ -120,9 +121,9 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		Group detect = new Group("Detection");
 		Group assoc = new Group("Association");
 		Group tracker = new Group("Tracking");
-		Group fiducials = new Group("Fiducials");
 		Group calib = new Group("Calibration");
 		Group sfm = new Group("Structure From Motion");
+		Group recognition = new Group("Recognition");
 
 		ip.addChild("Blur",BlurDisplayActivity.class);
 		ip.addChild("Gradient",GradientDisplayActivity.class);
@@ -149,10 +150,11 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 //		tracker.addChild("Point: Det-Desc-Assoc", DdaTrackerDisplayActivity.class);
 //		tracker.addChild("Point: Combined", CombinedTrackerDisplayActivity.class);
 
-		fiducials.addChild("Square Binary",FiducialSquareBinaryActivity.class);
-		fiducials.addChild("Square Image",FiducialSquareImageActivity.class);
-		fiducials.addChild("Square Image Library",FiducialImageLibraryAcitivity.class);
-		fiducials.addChild("Calibration",FiducialCalibrationActivity.class);
+		recognition.addChild("Image Classification", ImageClassificationActivity.class);
+		recognition.addChild("Square Binary",FiducialSquareBinaryActivity.class);
+		recognition.addChild("Square Image",FiducialSquareImageActivity.class);
+		recognition.addChild("Square Image Library",FiducialImageLibraryAcitivity.class);
+		recognition.addChild("Calibration",FiducialCalibrationActivity.class);
 
 		calib.addChild("Calibrate",CalibrationActivity.class);
 		calib.addChild("Undistort",UndistortDisplayActivity.class);
@@ -161,11 +163,13 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		sfm.addChild("Stabilization",StabilizeDisplayActivity.class);
 		sfm.addChild("Mosaic",MosaicDisplayActivity.class);
 
+
+
 		groups.add(ip);
 		groups.add(detect);
 		groups.add(assoc);
 		groups.add(tracker);
-		groups.add(fiducials);
+		groups.add(recognition);
 		groups.add(calib);
 		groups.add(sfm);
 	}

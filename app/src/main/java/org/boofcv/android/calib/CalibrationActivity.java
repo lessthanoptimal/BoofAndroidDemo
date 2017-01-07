@@ -19,7 +19,7 @@ import android.widget.Toast;
 
 import org.boofcv.android.DemoMain;
 import org.boofcv.android.R;
-import org.boofcv.android.fiducials.SelectCalibrationFiducial;
+import org.boofcv.android.recognition.SelectCalibrationFiducial;
 import org.boofcv.android.tracker.PointTrackerDisplayActivity;
 import org.ddogleg.struct.FastQueue;
 
