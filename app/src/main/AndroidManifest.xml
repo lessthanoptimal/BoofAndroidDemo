@@ -138,6 +138,10 @@
             android:screenOrientation="landscape" />
         <activity android:name=".detect.DetectBlackPolygonHelpActivity" />
         <activity
+            android:name=".detect.DetectBlackEllipseActivity"
+            android:screenOrientation="landscape" />
+        <!--<activity android:name=".detect.DetectBlackEllipseHelpActivity" />-->
+        <activity
             android:name=".recognition.ImageClassificationActivity"
             android:screenOrientation="landscape" /><!-- ATTENTION: This was auto-generated to add Google Play services to your project for
      App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information. -->

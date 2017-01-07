@@ -23,6 +23,7 @@ import org.boofcv.android.calib.CalibrationActivity;
 import org.boofcv.android.calib.UndistortDisplayActivity;
 import org.boofcv.android.detect.CannyEdgeActivity;
 import org.boofcv.android.detect.ContourShapeFittingActivity;
+import org.boofcv.android.detect.DetectBlackEllipseActivity;
 import org.boofcv.android.detect.DetectBlackPolygonActivity;
 import org.boofcv.android.detect.LineDisplayActivity;
 import org.boofcv.android.detect.PointDisplayActivity;
@@ -138,6 +139,7 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		detect.addChild("Canny Edge",CannyEdgeActivity.class);
 		detect.addChild("Contour Shapes",ContourShapeFittingActivity.class);
 		detect.addChild("Black Polygon",DetectBlackPolygonActivity.class);
+		detect.addChild("Black Ellipse",DetectBlackEllipseActivity.class);
 		// segmentation is just too slow right now
 //		detect.addChild("Segmentation",SegmentationDisplayActivity.class);
 
@@ -154,7 +156,7 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		recognition.addChild("Square Binary",FiducialSquareBinaryActivity.class);
 		recognition.addChild("Square Image",FiducialSquareImageActivity.class);
 		recognition.addChild("Square Image Library",FiducialImageLibraryAcitivity.class);
-		recognition.addChild("Calibration",FiducialCalibrationActivity.class);
+		recognition.addChild("Calib Targets",FiducialCalibrationActivity.class);
 
 		calib.addChild("Calibrate",CalibrationActivity.class);
 		calib.addChild("Undistort",UndistortDisplayActivity.class);
