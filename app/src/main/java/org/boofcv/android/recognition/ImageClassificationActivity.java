@@ -19,6 +19,7 @@ import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
@@ -110,6 +111,16 @@ public class ImageClassificationActivity extends DemoVideoDisplayActivity
 
     }
 
+    public void pressedDeleteModel( View view ) {
+        ClassifierProcessing active = this.active;
+        if( active == null )
+            return;
+
+        if( active.status == Status.IDLE || active.status == Status.ERROR ) {
+            deleteModelData();
+        }
+    }
+
     protected class MyGestureDetector extends GestureDetector.SimpleOnGestureListener
     {
         @Override
@@ -191,6 +202,7 @@ public class ImageClassificationActivity extends DemoVideoDisplayActivity
         private Paint dimPaint = new Paint();
 
         Planar<GrayF32> workImage;
+        long startTime;
 
 
         public ClassifierProcessing(ClassifierAndSource cas) {
@@ -226,6 +238,7 @@ public class ImageClassificationActivity extends DemoVideoDisplayActivity
             if( screenTouched == true  ) {
                 screenTouched = false;
                 if (status == Status.IDLE) {
+                    startTime = System.currentTimeMillis();
                     status = Status.PROCESSING;
                     workImage.setTo(input);
                     deactiveControls();
@@ -245,27 +258,56 @@ public class ImageClassificationActivity extends DemoVideoDisplayActivity
                 List<ImageClassifier.Score> scores = classifier.getAllResults();
                 List<String> categories = classifier.getCategories();
 
-                int N = Math.min(4,scores.size());
+                int N = Math.min(4, scores.size());
 
                 int y = 30;
                 int x = 5;
 
                 ImageClassifier.Score best = scores.get(0);
 
-                canvas.drawRect(0,0,canvas.getWidth(),y+10+(N+1)*20,dimPaint);
-                canvas.drawText(String.format("%12s %8.1e ",categories.get(best.category),best.score), x, y, bestPaint);
+                canvas.drawRect(0, 0, canvas.getWidth(), y + 10 + (N + 1) * 20, dimPaint);
+                canvas.drawText(String.format("%12s %8.1e ", categories.get(best.category), best.score), x, y, bestPaint);
                 for (int i = 1; i < N; i++) {
                     ImageClassifier.Score s = scores.get(i);
                     String which = categories.get(s.category);
 
-                    canvas.drawText(String.format("%12s %8.1e ",which,s.score), x+10, y+10+i*20, textPaint);
+                    canvas.drawText(String.format("%12s %8.1e ", which, s.score), x + 10, y + 10 + i * 20, textPaint);
 
                 }
+
+            } else if( status == Status.PROCESSING ) {
+                long ellapsed = System.currentTimeMillis()-startTime;
+                canvas.drawText(String.format("Processing Image %03d s",ellapsed/1000), 50, 50, textPaint);
+                canvas.drawText("CNN still needs to be optimized", 50, 80, textPaint);
 
             } else {
                 canvas.drawText("Status " + status, 50, 50, textPaint);
             }
         }
+    }
+
+    /**
+     * Deletes the model data
+     */
+    private void deleteModelData() {
+        File initialPath = getDir(MODEL_PATH, MODE_PRIVATE);
+        File decompressedPath = new File(initialPath, modelName);
+
+        if( decompressedPath.exists() ) {
+            Toast.makeText(this, "Deleting "+modelName,Toast.LENGTH_SHORT);
+
+            deleteDir(decompressedPath);
+        }
+    }
+
+    void deleteDir(File file) {
+        File[] contents = file.listFiles();
+        if (contents != null) {
+            for (File f : contents) {
+                deleteDir(f);
+            }
+        }
+        file.delete();
     }
 
     /**
@@ -301,7 +343,7 @@ public class ImageClassificationActivity extends DemoVideoDisplayActivity
 
                 // this will be useful so that you can show a tipical 0-100%
                 // progress bar
-                int lenghtOfFile = conection.getContentLength();
+                final int fileSize = conection.getContentLength();
 
                 // Output stream
                 initialPath = getDir(MODEL_PATH, MODE_PRIVATE);
@@ -329,7 +371,8 @@ public class ImageClassificationActivity extends DemoVideoDisplayActivity
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        pDialog.setMessage("Downloading "+fileName);
+                        int sizeMB = fileSize/1024/1024;
+                        pDialog.setMessage("Downloading "+fileName+" "+sizeMB+" MB");
                     }
                 });
 
@@ -347,7 +390,7 @@ public class ImageClassificationActivity extends DemoVideoDisplayActivity
                     total += count;
                     // publishing the progress....
                     // After this onProgressUpdate will be called
-                    publishProgress("" + (int) ((total * 100) / lenghtOfFile));
+                    publishProgress("" + (int) ((total * 100) / fileSize));
 
                     // writing data to file
                     output.write(data, 0, count);
@@ -376,6 +419,9 @@ public class ImageClassificationActivity extends DemoVideoDisplayActivity
                 });
 
                 setStatus(ImageClassificationActivity.Status.DECOMPRESSING);
+
+                deleteModelData(); // clean up first
+
                 ZipFile zipFile = new ZipFile(destinationZip);
                 zipFile.extractAll(initialPath.getAbsolutePath());
                 if( !destinationZip.delete() ) {
