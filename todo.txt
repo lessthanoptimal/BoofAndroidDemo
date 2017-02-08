@@ -1,4 +1,5 @@
-TODO:  Webpage with grid for calibration.  Add link in app description
+TODO: Added Equirectangular to Pinhole camera
+TODO: Webpage with grid for calibration.  Add link in app description
 TODO: See if mosaic can be improved with a different tracker
 TODO: nv21ToMsRgb_U8 crashes for some input image sizes on old cell phone
    - width and width/2 seem to work better for the stride

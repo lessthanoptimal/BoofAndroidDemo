@@ -51,8 +51,6 @@ import boofcv.struct.image.Planar;
  * Displays a video stream until the user clicks the window.  It then attempts to classify what
  * is currently in view.  Results are rendered and the static frame is shown until tapped again
  */
-// TODO handle person leaving the task while the a download or classify thread is still running
-// TODO add a delete model button as a way to clean up and for a new download
 public class ImageClassificationActivity extends DemoVideoDisplayActivity
         implements AdapterView.OnItemSelectedListener {
     public static final String MODEL_PATH = "classifier_models";
@@ -167,7 +165,6 @@ public class ImageClassificationActivity extends DemoVideoDisplayActivity
         });
     }
 
-    // TODO handle cancel
     @Override
     protected Dialog onCreateDialog(int id) {
         switch (id) {
@@ -185,7 +182,6 @@ public class ImageClassificationActivity extends DemoVideoDisplayActivity
         }
     }
 
-    // TODO handle case where a classifier is currently being loaded/processing an image
     private void startClassifier(int which) {
 
         ClassifierAndSource selected;
