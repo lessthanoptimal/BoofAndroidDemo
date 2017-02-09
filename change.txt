@@ -3,6 +3,12 @@ Change Log for BoofCV Demonstration App
 (year)-(month)-(day)
 
 -------------------------------------------------
+Version 1.8.1
+Date: 2016-02-08
+
+- Work around so that calibration files being in old format are ignored and don't cause a crash
+
+-------------------------------------------------
 Version 1.8
 Date: 2016-02-08
 

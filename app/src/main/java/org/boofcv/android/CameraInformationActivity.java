@@ -9,7 +9,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -101,7 +100,7 @@ public class CameraInformationActivity extends Activity {
 			write(String.format("  fx = %6.1f fy = %6.1f",intrinsic.fx,intrinsic.fy));
 			write(String.format("  cx = %6.1f cy = %6.1f",intrinsic.cx,intrinsic.cy));
 			write(String.format("  skew = %8.3f",intrinsic.skew));
-		} catch (FileNotFoundException e) {
+		} catch (RuntimeException e) {
 			write("Intrinsic not known for camera "+which);
 		} catch (IOException e) {
 			write("IOException: "+e.getMessage());

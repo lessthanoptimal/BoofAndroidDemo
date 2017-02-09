@@ -10,13 +10,13 @@ import android.hardware.Camera;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
-import android.widget.Toast;
 
 import org.boofcv.android.assoc.AssociationActivity;
 import org.boofcv.android.calib.CalibrationActivity;
@@ -48,7 +48,6 @@ import org.boofcv.android.tracker.StaticBackgroundMotionActivity;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
@@ -315,10 +314,10 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 			FileInputStream fos = openFileInput("cam"+preference.cameraId+".txt");
 			Reader reader = new InputStreamReader(fos);
 			preference.intrinsic = CalibrationIO.load(reader);
-		} catch (FileNotFoundException e) {
-
-		} catch (IOException e) {
-			Toast.makeText(this, "Failed to load intrinsic parameters", Toast.LENGTH_SHORT).show();
+		} catch (RuntimeException e) {
+			Log.w("DemoMain", "Failed to load intrinsic parameters: "+e.getClass().getSimpleName());
+			e.printStackTrace();
+		} catch (FileNotFoundException ignore) {
 		}
 	}
 
