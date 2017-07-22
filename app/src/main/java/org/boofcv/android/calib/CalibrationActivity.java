@@ -35,7 +35,7 @@ import boofcv.abst.fiducial.calib.ConfigCircleAsymmetricGrid;
 import boofcv.abst.fiducial.calib.ConfigSquareGrid;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.alg.fiducial.calib.chess.DetectChessboardFiducial;
-import boofcv.alg.fiducial.calib.circle.DetectAsymmetricCircleGrid;
+import boofcv.alg.fiducial.calib.circle.DetectCircleAsymmetricGrid;
 import boofcv.alg.fiducial.calib.grid.DetectSquareGridFiducial;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.android.ConvertBitmap;
@@ -292,7 +292,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 						VisualizeImageData.binaryToBitmap(alg.getBinary(), false ,bitmap, storage);
 						extractQuads(alg.getDetectorSquare().getFoundPolygons());
 					} else if( detector instanceof CalibrationDetectorCircleAsymmGrid) {
-						DetectAsymmetricCircleGrid<GrayF32> alg = ((CalibrationDetectorCircleAsymmGrid) detector).getDetector();
+						DetectCircleAsymmetricGrid<GrayF32> alg = ((CalibrationDetectorCircleAsymmGrid) detector).getDetector();
 						VisualizeImageData.binaryToBitmap(alg.getBinary(), false ,bitmap, storage);
 
 						debugEllipses.clear();

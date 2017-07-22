@@ -8,7 +8,9 @@ import org.ddogleg.fitting.modelset.ModelManager;
 import org.ddogleg.fitting.modelset.ModelMatcher;
 import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.ddogleg.struct.FastQueue;
-import org.ejml.data.DenseMatrix64F;
+import org.ejml.data.DMatrixRMaj;
+import org.ejml.data.FMatrixRMaj;
+import org.ejml.ops.ConvertMatrixData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +31,7 @@ import boofcv.alg.geo.robust.DistanceSe3SymmetricSq;
 import boofcv.alg.geo.robust.Se3FromEssentialGenerator;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderType;
-import boofcv.factory.geo.EnumEpipolar;
+import boofcv.factory.geo.EnumEssential;
 import boofcv.factory.geo.FactoryMultiView;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.Point2Transform2_F64;
@@ -162,7 +164,7 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 			directionLeftToRight = true;
 		}
 
-		DenseMatrix64F rectifiedK = new DenseMatrix64F(3,3);
+		DMatrixRMaj rectifiedK = new DMatrixRMaj(3,3);
 		rectifyImages(leftToRight, rectifiedK);
 
 		return true;
@@ -184,9 +186,9 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 	 */
 	public List<AssociatedPair> convertToNormalizedCoordinates() {
 
-		Point2Transform2_F64 tran = LensDistortionOps.transformPoint(intrinsic).undistort_F64(true,false);
+		Point2Transform2_F64 tran = LensDistortionOps.narrow(intrinsic).undistort_F64(true,false);
 
-		List<AssociatedPair> calibratedFeatures = new ArrayList<AssociatedPair>();
+		List<AssociatedPair> calibratedFeatures = new ArrayList<>();
 
 		FastQueue<AssociatedIndex> matches = associate.getMatches();
 		for( AssociatedIndex a : matches.toList() ) {
@@ -213,7 +215,7 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 	{
 		numInside++;
 		System.out.println("DISPARITY "+numInside);
-		Estimate1ofEpipolar essentialAlg = FactoryMultiView.computeFundamental_1(EnumEpipolar.ESSENTIAL_5_NISTER, 5);
+		Estimate1ofEpipolar essentialAlg = FactoryMultiView.computeEssential_1(EnumEssential.NISTER_5, 5);
 		TriangulateTwoViewsCalibrated triangulate = FactoryMultiView.triangulateTwoGeometric();
 		ModelGenerator<Se3_F64, AssociatedPair> generateEpipolarMotion =
 				new Se3FromEssentialGenerator(essentialAlg, triangulate);
@@ -270,17 +272,23 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 	 * @param rectifiedK     Output camera calibration matrix for rectified camera
 	 */
 	public void rectifyImages(Se3_F64 leftToRight,
-							  DenseMatrix64F rectifiedK) {
+							  DMatrixRMaj rectifiedK) {
 		RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();
 
 		// original camera calibration matrices
-		DenseMatrix64F K = PerspectiveOps.calibrationMatrix(intrinsic, null);
+		DMatrixRMaj K = PerspectiveOps.calibrationMatrix(intrinsic, (DMatrixRMaj)null);
 
 		rectifyAlg.process(K, new Se3_F64(), K, leftToRight);
 
 		// rectification matrix for each image
-		DenseMatrix64F rect1 = rectifyAlg.getRect1();
-		DenseMatrix64F rect2 = rectifyAlg.getRect2();
+		DMatrixRMaj rect1 = rectifyAlg.getRect1();
+		DMatrixRMaj rect2 = rectifyAlg.getRect2();
+
+		FMatrixRMaj rect1_f = new FMatrixRMaj(3,3);
+		FMatrixRMaj rect2_f = new FMatrixRMaj(3,3);
+
+		ConvertMatrixData.convert(rect1,rect1_f);
+		ConvertMatrixData.convert(rect2,rect2_f);
 
 		// New calibration matrix,
 		rectifiedK.set(rectifyAlg.getCalibrationMatrix());
@@ -290,9 +298,9 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 
 		// undistorted and rectify images
 		ImageDistort<GrayF32,GrayF32> distortLeft =
-				RectifyImageOps.rectifyImage(intrinsic, rect1, BorderType.ZERO, ImageType.single(GrayF32.class));
+				RectifyImageOps.rectifyImage(intrinsic, rect1_f, BorderType.ZERO, ImageType.single(GrayF32.class));
 		ImageDistort<GrayF32,GrayF32> distortRight =
-				RectifyImageOps.rectifyImage(intrinsic, rect2, BorderType.ZERO, ImageType.single(GrayF32.class));
+				RectifyImageOps.rectifyImage(intrinsic, rect2_f, BorderType.ZERO, ImageType.single(GrayF32.class));
 
 		// Apply the Laplacian for some lighting invariance
 		ImageMiscOps.fill(rectifiedLeft,0);

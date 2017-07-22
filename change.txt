@@ -3,10 +3,21 @@ Change Log for BoofCV Demonstration App
 (year)-(month)-(day)
 
 -------------------------------------------------
+Version 1.9
+Date: 2017-07
+
+- Updated to BoofCV v0.27
+- TODO Add distort MLS example
+- TODO Add equirectangular to pinhole viewer
+  * Provide example image.
+- TODO Added calibration regular grid support
+- TODO fixed issue where number pad was excessively large and out of view
+
+-------------------------------------------------
 Version 1.8.1
 Date: 2016-02-08
 
-- Work around so that calibration files being in old format are ignored and don't cause a crash
+- Work around so that if calibration files are in an old format they will be ignored and don't cause a crash
 
 -------------------------------------------------
 Version 1.8

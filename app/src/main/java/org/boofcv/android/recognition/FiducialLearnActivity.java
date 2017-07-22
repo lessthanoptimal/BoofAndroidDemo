@@ -127,7 +127,7 @@ public class FiducialLearnActivity extends DemoVideoDisplayActivity
 		protected void declareImages(int width, int height) {
 			super.declareImages(width, height);
 			CameraPinholeRadial intrinsic = MiscUtil.checkThenInventIntrinsic();
-			LensDistortionNarrowFOV distort = LensDistortionOps.transformPoint(intrinsic);
+			LensDistortionNarrowFOV distort = LensDistortionOps.narrow(intrinsic);
 			detector.configure(distort, intrinsic.width, intrinsic.height, true);
 			bitmap = Bitmap.createBitmap(width,height,Bitmap.Config.ARGB_8888);
 			storage = ConvertBitmap.declareStorage(bitmap, storage);

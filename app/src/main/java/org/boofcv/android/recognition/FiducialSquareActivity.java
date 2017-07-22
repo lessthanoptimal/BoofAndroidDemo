@@ -165,7 +165,7 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 
 	protected abstract FiducialDetector<GrayU8> createDetector();
 
-	protected class FiducialProcessor<T extends ImageBase> extends VideoImageProcessing<Planar<GrayU8>>
+	protected class FiducialProcessor<T extends ImageBase<T>> extends VideoImageProcessing<Planar<GrayU8>>
 	{
 		T input;
 
@@ -222,7 +222,7 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 			if( changed && intrinsic != null ) {
 				changed = false;
 				detector = (FiducialDetector)createDetector();
-				detector.setLensDistortion(LensDistortionOps.transformPoint(intrinsic));
+				detector.setLensDistortion(LensDistortionOps.narrow(intrinsic));
 				if( input == null || input.getImageType() != detector.getInputType() ) {
 					input = detector.getInputType().createImage(1, 1);
 				}

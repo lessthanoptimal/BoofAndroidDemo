@@ -128,7 +128,8 @@ public class ImageTransformActivity extends DemoVideoDisplayActivity
 	protected class PyramidProcessing<C extends WlCoef>
 			extends VideoImageProcessing<GrayU8>
 	{
-		ImagePyramid<GrayU8> pyramid = FactoryPyramid.discreteGaussian(new int[]{2,4,8,16},-1,2,false,GrayU8.class);
+		ImagePyramid<GrayU8> pyramid = FactoryPyramid.discreteGaussian(new int[]{2,4,8,16},-1,2,false,
+				ImageType.single(GrayU8.class));
 
 		GrayU8 output;
 		GrayU8 sub = new GrayU8();

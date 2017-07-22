@@ -9,7 +9,6 @@
     <facet type="android" name="Android">
       <configuration>
         <option name="SELECTED_BUILD_VARIANT" value="debug" />
-        <option name="SELECTED_TEST_ARTIFACT" value="_android_test_" />
         <option name="ASSEMBLE_TASK_NAME" value="assembleDebug" />
         <option name="COMPILE_JAVA_TASK_NAME" value="compileDebugSources" />
         <afterSyncTasks>
@@ -47,7 +46,6 @@
       <sourceFolder url="file://$MODULE_DIR$/src/debug/assets" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/debug/aidl" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/debug/java" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/debug/jni" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/debug/rs" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/debug/shaders" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/testDebug/res" type="java-test-resource" />
@@ -55,7 +53,6 @@
       <sourceFolder url="file://$MODULE_DIR$/src/testDebug/assets" type="java-test-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/testDebug/aidl" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/testDebug/java" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/src/testDebug/jni" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/testDebug/rs" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/testDebug/shaders" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/res" type="java-resource" />
@@ -63,7 +60,6 @@
       <sourceFolder url="file://$MODULE_DIR$/src/main/assets" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/aidl" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/main/jni" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/rs" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/shaders" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/androidTest/res" type="java-test-resource" />
@@ -71,7 +67,6 @@
       <sourceFolder url="file://$MODULE_DIR$/src/androidTest/assets" type="java-test-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/androidTest/aidl" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/androidTest/java" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/jni" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/androidTest/rs" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/androidTest/shaders" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/res" type="java-test-resource" />
@@ -79,13 +74,11 @@
       <sourceFolder url="file://$MODULE_DIR$/src/test/assets" type="java-test-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/aidl" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/src/test/jni" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/rs" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/shaders" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/assets" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/blame" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/classes" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/dependency-cache" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/animated-vector-drawable/25.1.0/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/appcompat-v7/25.1.0/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/multidex-instrumentation/1.0.1/jars" />
@@ -116,47 +109,44 @@
     </content>
     <orderEntry type="jdk" jdkName="Android API 25 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" exported="" name="core-0.30" level="project" />
     <orderEntry type="library" exported="" name="play-services-appindexing-8.4.0" level="project" />
-    <orderEntry type="library" exported="" name="sfm-0.26" level="project" />
-    <orderEntry type="library" exported="" name="feature-0.26" level="project" />
+    <orderEntry type="library" exported="" name="boofcv-core-0.27-SNAPSHOT" level="project" />
     <orderEntry type="library" exported="" name="play-services-base-8.4.0" level="project" />
-    <orderEntry type="library" exported="" name="xpp3_min-1.1.4c" level="project" />
-    <orderEntry type="library" exported="" name="main-0.3" level="project" />
-    <orderEntry type="library" exported="" name="equation-0.30" level="project" />
-    <orderEntry type="library" exported="" name="io-0.3" level="project" />
+    <orderEntry type="library" exported="" name="boofcv-feature-0.27-SNAPSHOT" level="project" />
     <orderEntry type="library" exported="" name="support-fragment-25.1.0" level="project" />
-    <orderEntry type="library" exported="" name="xstream-1.4.7" level="project" />
-    <orderEntry type="library" exported="" name="georegression-0.12" level="project" />
-    <orderEntry type="library" exported="" name="dense64-0.30" level="project" />
+    <orderEntry type="library" exported="" name="ejml-ddense-0.31" level="project" />
+    <orderEntry type="library" exported="" name="boofcv-io-0.27-SNAPSHOT" level="project" />
+    <orderEntry type="library" exported="" name="ejml-core-0.31" level="project" />
     <orderEntry type="library" exported="" name="support-core-ui-25.1.0" level="project" />
-    <orderEntry type="library" exported="" name="ddogleg-0.10" level="project" />
-    <orderEntry type="library" exported="" name="geo-0.26" level="project" />
-    <orderEntry type="library" exported="" name="learning-0.3" level="project" />
-    <orderEntry type="library" exported="" name="simple-0.30" level="project" />
+    <orderEntry type="library" exported="" name="ddogleg-0.11" level="project" />
+    <orderEntry type="library" exported="" name="models-0.4-SNAPSHOT" level="project" />
+    <orderEntry type="library" exported="" name="ejml-fdense-0.31" level="project" />
+    <orderEntry type="library" exported="" name="boofcv-android-0.27-SNAPSHOT" level="project" />
     <orderEntry type="library" exported="" name="support-core-utils-25.1.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="multidex-instrumentation-1.0.1" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-25.1.0" level="project" />
-    <orderEntry type="library" exported="" name="io-0.26" level="project" />
-    <orderEntry type="library" exported="" name="models-0.3" level="project" />
-    <orderEntry type="library" exported="" name="android-0.26" level="project" />
-    <orderEntry type="library" exported="" name="visualize-0.26" level="project" />
+    <orderEntry type="library" exported="" name="boofcv-recognition-0.27-SNAPSHOT" level="project" />
     <orderEntry type="library" exported="" name="jarchivelib-0.5.0" level="project" />
-    <orderEntry type="library" exported="" name="learning-0.26" level="project" />
+    <orderEntry type="library" exported="" name="boofcv-calibration-0.27-SNAPSHOT" level="project" />
+    <orderEntry type="library" exported="" name="main-0.4-SNAPSHOT" level="project" />
+    <orderEntry type="library" exported="" name="io-0.4-SNAPSHOT" level="project" />
+    <orderEntry type="library" exported="" name="ejml-simple-0.31" level="project" />
     <orderEntry type="library" exported="" name="support-compat-25.1.0" level="project" />
     <orderEntry type="library" exported="" name="animated-vector-drawable-25.1.0" level="project" />
     <orderEntry type="library" exported="" name="support-v4-25.1.0" level="project" />
     <orderEntry type="library" exported="" name="protobuf-java-2.6.1" level="project" />
     <orderEntry type="library" exported="" name="multidex-1.0.1" level="project" />
-    <orderEntry type="library" exported="" name="ip-0.26" level="project" />
+    <orderEntry type="library" exported="" name="boofcv-ip-0.27-SNAPSHOT" level="project" />
+    <orderEntry type="library" exported="" name="learning-0.4-SNAPSHOT" level="project" />
+    <orderEntry type="library" exported="" name="georegression-0.13-SNAPSHOT" level="project" />
     <orderEntry type="library" exported="" name="snakeyaml-1.17" level="project" />
     <orderEntry type="library" exported="" name="zip4j-1.3.2" level="project" />
-    <orderEntry type="library" exported="" name="recognition-0.26" level="project" />
     <orderEntry type="library" exported="" name="support-media-compat-25.1.0" level="project" />
-    <orderEntry type="library" exported="" name="core-0.26" level="project" />
+    <orderEntry type="library" exported="" name="boofcv-learning-0.27-SNAPSHOT" level="project" />
     <orderEntry type="library" exported="" name="support-vector-drawable-25.1.0" level="project" />
-    <orderEntry type="library" exported="" name="calibration-0.26" level="project" />
+    <orderEntry type="library" exported="" name="boofcv-geo-0.27-SNAPSHOT" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-25.1.0" level="project" />
+    <orderEntry type="library" exported="" name="boofcv-sfm-0.27-SNAPSHOT" level="project" />
     <orderEntry type="library" exported="" name="play-services-basement-8.4.0" level="project" />
   </component>
 </module>

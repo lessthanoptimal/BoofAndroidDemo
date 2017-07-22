@@ -153,7 +153,7 @@ public class EnhanceDisplayActivity extends DemoVideoDisplayActivity
 
 		@Override
 		protected void process(GrayU8 input, Bitmap output, byte[] storage) {
-			ImageStatistics.histogram(input, histogram);
+			ImageStatistics.histogram(input,0, histogram);
 			EnhanceImageOps.equalize(histogram, transform);
 			EnhanceImageOps.applyTransform(input, transform, enhanced);
 			ConvertBitmap.grayToBitmap(enhanced,output,storage);
@@ -167,7 +167,7 @@ public class EnhanceDisplayActivity extends DemoVideoDisplayActivity
 		@Override
 		protected void process(Planar<GrayU8> input, Bitmap output, byte[] storage) {
 			ConvertImage.average(input,gray);
-			ImageStatistics.histogram(gray, histogram);
+			ImageStatistics.histogram(gray,0, histogram);
 			EnhanceImageOps.equalize(histogram, transform);
 			for( int i = 0; i < 3; i++ )
 				EnhanceImageOps.applyTransform(input.getBand(i), transform, enhanced.getBand(i));

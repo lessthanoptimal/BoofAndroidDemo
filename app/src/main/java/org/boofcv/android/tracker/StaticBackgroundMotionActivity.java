@@ -171,7 +171,7 @@ public class StaticBackgroundMotionActivity extends DemoVideoDisplayActivity
 		return false;
 	}
 
-	protected class BackgroundProcessing<T extends ImageBase> extends VideoImageProcessing<T> {
+	protected class BackgroundProcessing<T extends ImageBase<T>> extends VideoImageProcessing<T> {
 		BackgroundModelStationary<T> model;
 
 		GrayU8 binary = new GrayU8(1,1);
