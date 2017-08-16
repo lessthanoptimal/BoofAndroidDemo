@@ -50,7 +50,7 @@ configurations {
 }
 
 dependencies {
-    ['boofcv-android', 'boofcv-core'].each { String a -> compile group: 'org.boofcv', name: a, version: '0.27-SNAPSHOT' }
+    ['boofcv-android', 'boofcv-core'].each { String a -> compile group: 'org.boofcv', name: a, version: '0.27' }
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:appcompat-v7:25.1.0'
     compile 'com.android.support:support-v4:25.1.0'
