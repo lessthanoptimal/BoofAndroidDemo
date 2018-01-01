@@ -7,11 +7,14 @@ Version 1.9
 Date: 2017-07
 
 - Updated to BoofCV v0.27
+- Calibration
+  * Scaled visuals to support higher resolutions better
+  * Moved calibration to an application public directory that can be accessed without rooting the phone
+- TODO fixed issue where number pad was excessively large and out of view
 - TODO Add distort MLS example
 - TODO Add equirectangular to pinhole viewer
   * Provide example image.
-- TODO Added calibration regular grid support
-- TODO fixed issue where number pad was excessively large and out of view
+- TODO Added calibration circle regular grid support
 
 -------------------------------------------------
 Version 1.8.1

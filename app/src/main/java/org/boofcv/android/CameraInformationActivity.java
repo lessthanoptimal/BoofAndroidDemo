@@ -8,6 +8,7 @@ import android.text.method.ScrollingMovementMethod;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -92,19 +93,26 @@ public class CameraInformationActivity extends Activity {
 
 	private void printIntrinsic( int which ) {
 		try {
-			FileInputStream fos = openFileInput("cam"+which+".txt");
-			Reader reader = new InputStreamReader(fos);
-			CameraPinholeRadial intrinsic = CalibrationIO.load(reader);
-			write("Found intrinsic for camera "+which);
-			write(String.format("  Dimension %d %d",intrinsic.width,intrinsic.height));
-			write(String.format("  fx = %6.1f fy = %6.1f",intrinsic.fx,intrinsic.fy));
-			write(String.format("  cx = %6.1f cy = %6.1f",intrinsic.cx,intrinsic.cy));
-			write(String.format("  skew = %8.3f",intrinsic.skew));
+			File file = new File(getExternalFilesDir(null),"calibration/cam"+which+".txt");
+			if( !file.exists() ) {
+				write("Camera "+which+" has not been calibrated");
+			} else {
+				FileInputStream fis = new FileInputStream(file);
+//			FileInputStream fos = openFileInput("cam"+which+".txt");
+				Reader reader = new InputStreamReader(fis);
+				CameraPinholeRadial intrinsic = CalibrationIO.load(reader);
+				write("Found intrinsic for camera " + which);
+				write(String.format("  Dimension %d %d", intrinsic.width, intrinsic.height));
+				write(String.format("  fx = %6.1f fy = %6.1f", intrinsic.fx, intrinsic.fy));
+				write(String.format("  cx = %6.1f cy = %6.1f", intrinsic.cx, intrinsic.cy));
+				write(String.format("  skew = %8.3f", intrinsic.skew));
+				write("  Path: "+file.getAbsolutePath());
+			}
 		} catch (RuntimeException e) {
 			write("Intrinsic not known for camera "+which);
 		} catch (IOException e) {
 			write("IOException: "+e.getMessage());
-			Toast toast = Toast.makeText(this, "Failed to load intrinsic parameters", 2000);
+			Toast toast = Toast.makeText(this, "Failed to load intrinsic parameters", Toast.LENGTH_LONG);
 			toast.show();
 		}
 	}

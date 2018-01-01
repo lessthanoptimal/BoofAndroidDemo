@@ -370,6 +370,10 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 			} else {
 				canvas.drawBitmap(bitmap,0,0,null);
 
+				// scale the visuals based on the image size
+				paintFailed.setStrokeWidth(5f*bitmap.getWidth()/640);
+				float radius = 5*bitmap.getWidth()/640;
+
 				// draw shapes for debugging purposes
 				for( List<Point2D_I32> l : debugQuads ) {
 					for( int i = 1; i < l.size(); i++ ) {
@@ -401,7 +405,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 				// draw detected calibration points
 				for( int i = 0; i < pointsGui.size(); i++ ) {
 					Point2D_F64 p = pointsGui.get(i);
-					canvas.drawCircle((float)p.x,(float)p.y,3,paintPoint);
+					canvas.drawCircle((float)p.x,(float)p.y,radius,paintPoint);
 				}
 			}
 		}

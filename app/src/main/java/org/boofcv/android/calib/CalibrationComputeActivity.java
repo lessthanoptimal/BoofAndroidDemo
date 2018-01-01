@@ -1,7 +1,6 @@
 package org.boofcv.android.calib;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.hardware.Camera;
@@ -16,6 +15,7 @@ import android.widget.Toast;
 import org.boofcv.android.DemoMain;
 import org.boofcv.android.R;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -94,10 +94,22 @@ public class CalibrationComputeActivity extends Activity {
 
 	public void pressedAccept( View v ) {
 		// save the found parameters to a file
-		String name = "cam"+ DemoMain.preference.cameraId+".txt";
+
 		try {
 			// save to disk
-			FileOutputStream fos = openFileOutput(name, Context.MODE_PRIVATE);
+			File directory = new File(getExternalFilesDir(null),"calibration");
+			if( !directory.exists() ) {
+				if( !directory.mkdir() ) {
+					Log.d("calibration","Failed to create output directory");
+					Toast toast = Toast.makeText(this, "Failed to create output directory", Toast.LENGTH_LONG);
+					toast.show();
+					return;
+				}
+			}
+			String name = "cam"+ DemoMain.preference.cameraId+".txt";
+			File file = new File(directory,name);
+			FileOutputStream fos = new FileOutputStream(file);
+//			FileOutputStream fos = openFileOutput(name, Context.MODE_PRIVATE);
 			Writer writer = new OutputStreamWriter(fos);
 			CalibrationIO.save(intrinsic, writer);
 			fos.close();
@@ -111,7 +123,8 @@ public class CalibrationComputeActivity extends Activity {
 			intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(intent);
 		} catch (IOException e) {
-			Log.d("calibration","Saving intrinsic failed");
+			e.printStackTrace();
+			Log.d("calibration","Saving intrinsic failed. "+e.getMessage());
 			Toast toast = Toast.makeText(this, "IOException when saving intrinsic!", Toast.LENGTH_LONG);
 			toast.show();
 		}
@@ -172,7 +185,7 @@ public class CalibrationComputeActivity extends Activity {
 				mCamera.release();
 
 				clearText();
-				write("Intrinsic Parameters");
+				write("Intrinsic Parameters: "+intrinsic.width+" "+intrinsic.height);
 				write(String.format("fx = %6.2f fy = %6.2f",intrinsic.fx,intrinsic.fy));
 				write(String.format("cx = %6.2f cy = %6.2f",intrinsic.cx,intrinsic.cy));
 				write(String.format("radial = [ %6.2e ][ %6.2e ]",intrinsic.radial[0],intrinsic.radial[1]));
