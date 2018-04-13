@@ -7,6 +7,9 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
+    <uses-feature android:name="android.hardware.camera2.full" />
+
+    <!--remove these after camera1 API is gone?-->
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
@@ -149,6 +152,10 @@
         <!--<activity android:name=".detect.DetectBlackEllipseHelpActivity" />-->
         <activity
             android:name=".recognition.ImageClassificationActivity"
+            android:screenOrientation="landscape" />
+
+        <activity
+            android:name="DisplayCamera2Activity"
             android:screenOrientation="landscape" />
     </application>
 
