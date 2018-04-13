@@ -23,7 +23,7 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.alg.misc.PixelMath;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
-import boofcv.android.gui.VideoImageProcessing;
+import boofcv.android.camera.VideoImageProcessing;
 import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.background.ConfigBackgroundBasic;
@@ -144,7 +144,7 @@ public class StaticBackgroundMotionActivity extends DemoVideoDisplayActivity
 				break;
 
 			case 1:
-				model = FactoryBackgroundModel.stationaryBasic(configBasic,ImageType.il(3, ImageDataType.U8));
+				model = FactoryBackgroundModel.stationaryBasic(configBasic,(ImageType)ImageType.il(3, ImageDataType.U8));
 				break;
 
 			case 2:
@@ -152,7 +152,7 @@ public class StaticBackgroundMotionActivity extends DemoVideoDisplayActivity
 				break;
 
 			case 3:
-				model = FactoryBackgroundModel.stationaryGaussian(configGaussian, ImageType.il(3, ImageDataType.U8));
+				model = FactoryBackgroundModel.stationaryGaussian(configGaussian, (ImageType)ImageType.il(3, ImageDataType.U8));
 				break;
 
 			default:

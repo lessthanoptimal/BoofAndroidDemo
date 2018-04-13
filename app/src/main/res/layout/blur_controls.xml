@@ -22,6 +22,6 @@
 			android:max="5"
 			android:progress="2"
 			android:secondaryProgress="0"
-			android:id="@+id/slider_radius"/>
+			android:id="@+id/slider_width"/>
 
 </LinearLayout>

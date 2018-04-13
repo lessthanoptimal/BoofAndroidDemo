@@ -21,17 +21,20 @@ import android.widget.ToggleButton;
 
 import org.boofcv.android.DemoVideoDisplayActivity;
 import org.boofcv.android.R;
-import org.ddogleg.struct.FastQueue;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.color.ColorHsv;
-import boofcv.alg.shapes.polygon.BinaryPolygonDetector;
+import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
-import boofcv.android.gui.VideoImageProcessing;
+import boofcv.android.camera.VideoImageProcessing;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.FactoryShapeDetector;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
@@ -66,7 +69,7 @@ public class DetectBlackPolygonActivity extends DemoVideoDisplayActivity
 
 	boolean showInput = true;
 
-	BinaryPolygonDetector<GrayU8> detector;
+	DetectPolygonBinaryGrayRefine<GrayU8> detector;
 	InputToBinary<GrayU8> inputToBinary;
 
 	GrayU8 binary = new GrayU8(1,1);
@@ -137,7 +140,7 @@ public class DetectBlackPolygonActivity extends DemoVideoDisplayActivity
 			public void onClick(View v) {
 				convex = toggleConvex.isChecked();
 				synchronized ( DetectBlackPolygonActivity.this ) {
-					detector.setConvex(convex);
+					detector.getDetector().setConvex(convex);
 				}
 			}
 		});
@@ -147,9 +150,9 @@ public class DetectBlackPolygonActivity extends DemoVideoDisplayActivity
 	protected void onResume() {
 		super.onResume();
 		ConfigPolygonDetector configPoly = new ConfigPolygonDetector(minSides,maxSides);
-		configPoly.convex = convex;
 
 		detector = FactoryShapeDetector.polygon(configPoly,GrayU8.class);
+		detector.getDetector().setConvex(convex);
 		setSelection(spinnerThresholder.getSelectedItemPosition());
 		setProcessing(new PolygonProcessing());
 	}
@@ -192,7 +195,7 @@ public class DetectBlackPolygonActivity extends DemoVideoDisplayActivity
 		this.maxSides = max;
 
 		synchronized ( this ) {
-			detector.setNumberOfSides(minSides,maxSides);
+			detector.getDetector().setNumberOfSides(minSides,maxSides);
 		}
 	}
 
@@ -207,7 +210,7 @@ public class DetectBlackPolygonActivity extends DemoVideoDisplayActivity
 				break;
 
 			case 1:
-				inputToBinary = FactoryThresholdBinary.localSquare(10,0.95,true,GrayU8.class);
+				inputToBinary = FactoryThresholdBinary.localMean(ConfigLength.fixed(10),0.95,true,GrayU8.class);
 				break;
 
 			default:
@@ -235,6 +238,8 @@ public class DetectBlackPolygonActivity extends DemoVideoDisplayActivity
 
 	protected class PolygonProcessing extends VideoImageProcessing<GrayU8> {
 
+		List<Polygon2D_F64> found = new ArrayList<>();
+
 		protected PolygonProcessing() {
 			super(ImageType.single(GrayU8.class));
 		}
@@ -249,7 +254,7 @@ public class DetectBlackPolygonActivity extends DemoVideoDisplayActivity
 		protected void process(GrayU8 image, Bitmap output, byte[] storage) {
 			if( sidesUpdated ) {
 				sidesUpdated = false;
-				detector.setNumberOfSides(minSides,maxSides);
+				detector.getDetector().setNumberOfSides(minSides,maxSides);
 			}
 
 			synchronized ( this ) {
@@ -266,9 +271,9 @@ public class DetectBlackPolygonActivity extends DemoVideoDisplayActivity
 
 			Canvas canvas = new Canvas(output);
 
-			FastQueue<Polygon2D_F64> found = detector.getFoundPolygons();
+			detector.getPolygons(found,null);
 
-			for( Polygon2D_F64 s : found.toList() )  {
+			for( Polygon2D_F64 s : found )  {
 				paint.setColor(colors[s.size()-MIN_SIDES]);
 
 				for (int i = 1; i < s.size(); i++) {

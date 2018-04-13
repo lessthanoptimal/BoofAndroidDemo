@@ -22,7 +22,7 @@ import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.alg.feature.detect.interest.EasyGeneralFeatureDetector;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.android.ConvertBitmap;
-import boofcv.android.gui.VideoRenderProcessing;
+import boofcv.android.camera.VideoRenderProcessing;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
 import boofcv.struct.QueueCorner;

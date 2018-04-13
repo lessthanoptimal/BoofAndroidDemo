@@ -55,7 +55,7 @@ public class FiducialSquareImageActivity extends FiducialSquareActivity
 		synchronized ( lock ) {
 			ConfigThreshold configThreshold;
 			if (robust) {
-				configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_SQUARE, 6);
+				configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN, 13);
 			} else {
 				configThreshold = ConfigThreshold.fixed(binaryThreshold);
 			}

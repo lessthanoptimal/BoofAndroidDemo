@@ -27,7 +27,7 @@ import boofcv.abst.feature.disparity.StereoDisparity;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
-import boofcv.android.gui.VideoRenderProcessing;
+import boofcv.android.camera.VideoRenderProcessing;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.feature.disparity.DisparityAlgorithms;

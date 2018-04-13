@@ -27,15 +27,12 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 	EditText textRows;
 	EditText textCols;
 
-	int numRows,numCols;
-	CalibrationPatterns targetType;
+	ConfigAllCalibration cc;
 
 	Activity activity;
 
-	public SelectCalibrationFiducial(int numRows, int numCols , CalibrationPatterns targetType) {
-		this.numRows = numRows;
-		this.numCols = numCols;
-		this.targetType = targetType;
+	public SelectCalibrationFiducial(ConfigAllCalibration configCalibration) {
+		this.cc = configCalibration;
 	}
 
 	/**
@@ -56,19 +53,13 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialogInterface, int i) {
-				numCols = Integer.parseInt(textCols.getText().toString());
-				numRows = Integer.parseInt(textRows.getText().toString());
-				targetType = indexToCalib(spinnerTarget.getSelectedItemPosition());
+				cc.targetType = indexToCalib(spinnerTarget.getSelectedItemPosition());
 
-				// ensure the chessboard has an odd number of rows and columns
-				if (targetType == CalibrationPatterns.CHESSBOARD) {
-					if (numCols % 2 == 0)
-						numCols--;
-					if (numRows % 2 == 0)
-						numRows--;
-				}
+				int numCols = Integer.parseInt(textCols.getText().toString());
+				int numRows = Integer.parseInt(textRows.getText().toString());
 
 				if (numCols > 0 && numRows > 0) {
+					setRowCol(numRows,numCols);
 					success.run();
 				} else {
 					Toast.makeText(SelectCalibrationFiducial.this.activity, "Invalid configuration!", Toast.LENGTH_SHORT).show();
@@ -80,10 +71,9 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 		textRows = (EditText) controls.findViewById(R.id.text_rows);
 		textCols = (EditText) controls.findViewById(R.id.text_cols);
 
-		textRows.setText("" + numRows);
-		textCols.setText("" + numCols);
+		updateWidgetValues();
 
-		final FrameLayout preview = (FrameLayout) controls.findViewById(R.id.target_frame);
+		final FrameLayout preview = controls.findViewById(R.id.target_frame);
 		final DrawCalibrationFiducial vis = new DrawCalibrationFiducial(activity,this);
 		preview.addView(vis);
 
@@ -96,8 +86,9 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				try {
-					numRows = Integer.parseInt(textRows.getText().toString());
-					numCols = Integer.parseInt(textCols.getText().toString());
+					int numRows = Integer.parseInt(textRows.getText().toString());
+					int numCols = Integer.parseInt(textCols.getText().toString());
+					setRowCol(numRows,numCols);
 					vis.invalidate();
 				} catch( NumberFormatException ignore ){}
 			}
@@ -111,7 +102,7 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 				try {
-					targetType = indexToCalib(spinnerTarget.getSelectedItemPosition());
+					cc.targetType = indexToCalib(spinnerTarget.getSelectedItemPosition());
 					vis.invalidate();
 				} catch( NumberFormatException ignore ){}
 			}
@@ -130,6 +121,63 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 		dialog.show();
 	}
 
+	private void setRowCol( int numRows , int numCols ) {
+		switch( cc.targetType ) {
+			case CHESSBOARD:{
+				cc.chessboard.numCols = numCols;
+				cc.chessboard.numRows = numRows;
+			} break;
+
+			case SQUARE_GRID:{
+				cc.squareGrid.numCols = numCols;
+				cc.squareGrid.numRows = numRows;
+			} break;
+
+			case CIRCLE_HEXAGONAL:{
+				cc.hexagonal.numCols = numCols;
+				cc.hexagonal.numRows = numRows;
+			} break;
+
+			case CIRCLE_GRID:{
+				cc.circleGrid.numCols = numCols;
+				cc.circleGrid.numRows = numRows;
+			} break;
+		}
+	}
+
+	private void updateWidgetValues() {
+		int numCols,numRows;
+
+		switch( cc.targetType ) {
+			case CHESSBOARD:{
+				numCols = cc.chessboard.numCols;
+				numRows = cc.chessboard.numRows;
+			} break;
+
+			case SQUARE_GRID:{
+				numCols = cc.squareGrid.numCols;
+				numRows = cc.squareGrid.numRows;
+			} break;
+
+			case CIRCLE_HEXAGONAL:{
+				numCols = cc.hexagonal.numCols;
+				numRows = cc.hexagonal.numRows;
+			} break;
+
+			case CIRCLE_GRID:{
+				numCols = cc.circleGrid.numCols;
+				numRows = cc.circleGrid.numRows;
+			} break;
+
+			default:
+				throw new RuntimeException("Unknown target type");
+		}
+
+		textRows.setText("" + numRows);
+		textCols.setText("" + numCols);
+
+	}
+
 	private void setupTargetSpinner() {
 		ArrayAdapter<CharSequence> adapter =
 				new ArrayAdapter<CharSequence>(activity, android.R.layout.simple_spinner_item);
@@ -145,24 +193,14 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 		switch( index ) {
 			case 0: return CalibrationPatterns.CHESSBOARD;
 			case 1: return CalibrationPatterns.SQUARE_GRID;
-			case 2: return CalibrationPatterns.CIRCLE_ASYMMETRIC_GRID;
-			case 3: return CalibrationPatterns.BINARY_GRID;
+			case 2: return CalibrationPatterns.CIRCLE_HEXAGONAL;
+			case 3: return CalibrationPatterns.CIRCLE_GRID;
 		}
 		throw new RuntimeException("Egads");
 	}
 
 	@Override
-	public int getGridColumns() {
-		return numCols;
-	}
-
-	@Override
-	public int getGridRows() {
-		return numRows;
-	}
-
-	@Override
-	public CalibrationPatterns getGridType() {
-		return targetType;
+	public ConfigAllCalibration getConfigAllCalibration() {
+		return cc;
 	}
 }

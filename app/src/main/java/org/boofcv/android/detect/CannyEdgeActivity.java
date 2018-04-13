@@ -17,7 +17,7 @@ import java.util.Random;
 import boofcv.alg.feature.detect.edge.CannyEdge;
 import boofcv.alg.feature.detect.edge.EdgeContour;
 import boofcv.android.VisualizeImageData;
-import boofcv.android.gui.VideoImageProcessing;
+import boofcv.android.camera.VideoImageProcessing;
 import boofcv.factory.feature.detect.edge.FactoryEdgeDetectors;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;

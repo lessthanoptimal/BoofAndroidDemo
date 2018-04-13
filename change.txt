@@ -6,7 +6,7 @@ Change Log for BoofCV Demonstration App
 Version 1.9
 Date: 2017-07
 
-- Updated to BoofCV v0.27
+- Updated to BoofCV v0.29
 - Calibration
   * Scaled visuals to support higher resolutions better
   * Moved calibration to an application public directory that can be accessed without rooting the phone

@@ -3,7 +3,6 @@ package org.boofcv.android.calib;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.hardware.Camera;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
@@ -27,7 +26,7 @@ import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
 import boofcv.abst.geo.calibration.ImageResults;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.calibration.CalibrationPlanarGridZhang99;
-import boofcv.alg.geo.calibration.Zhang99ParamAll;
+import boofcv.alg.geo.calibration.Zhang99AllParam;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.struct.calib.CameraPinholeRadial;
 import georegression.struct.point.Point2D_F64;
@@ -50,7 +49,7 @@ public class CalibrationComputeActivity extends Activity {
 	Button buttonOK;
 	Button buttonCancel;
 
-	CalibrationPlanarGridZhang99 calibrationAlg;
+	CalibrateMonoPlanar calibrationAlg;
 
 	CalibrationThread thread;
 	private volatile boolean threadRunning = false;
@@ -68,7 +67,8 @@ public class CalibrationComputeActivity extends Activity {
 		buttonOK = (Button) findViewById(R.id.button_accept);
 
 		// start a new process
-		calibrationAlg = new CalibrationPlanarGridZhang99(targetLayout,true,2,false);
+		calibrationAlg = new CalibrateMonoPlanar(targetLayout);
+		calibrationAlg.configurePinhole(true,2,false);
 		intrinsic = null;
 		threadRunning = true;
 		new CalibrationThread().start();
@@ -165,32 +165,21 @@ public class CalibrationComputeActivity extends Activity {
 			write("Processing images.  Could take a bit.");
 			List<CalibrationObservation> points = new ArrayList<CalibrationObservation>();
 			for( CalibrationImageInfo c : images ) {
-				points.add( c.calibPoints );
+				calibrationAlg.addImage(c.calibPoints);
 			}
-			calibrationAlg.setListener(this);
-			calibrationAlg.process(points);
+			// TODO uncomment in BoofCV 0.30
+//			calibrationAlg.getZhang99().setListener(this);
+			CameraPinholeRadial intrinsic = calibrationAlg.process();
+			Zhang99AllParam param = calibrationAlg.getZhangParam();
 
 			try {
-				Zhang99ParamAll zhangParam = calibrationAlg.getOptimized();
-
-				// need to open the camera to get its size
-				Camera mCamera = Camera.open(DemoMain.preference.cameraId);
-				Camera.Parameters param = mCamera.getParameters();
-				Camera.Size sizePreview = param.getSupportedPreviewSizes().get(DemoMain.preference.preview);
-
-				intrinsic = zhangParam.convertToIntrinsic();
-				intrinsic.width = sizePreview.width;
-				intrinsic.height = sizePreview.height;
-
-				mCamera.release();
-
 				clearText();
 				write("Intrinsic Parameters: "+intrinsic.width+" "+intrinsic.height);
 				write(String.format("fx = %6.2f fy = %6.2f",intrinsic.fx,intrinsic.fy));
 				write(String.format("cx = %6.2f cy = %6.2f",intrinsic.cx,intrinsic.cy));
 				write(String.format("radial = [ %6.2e ][ %6.2e ]",intrinsic.radial[0],intrinsic.radial[1]));
 				write("----------------------------");
-				List<ImageResults> results = CalibrateMonoPlanar.computeErrors(points, zhangParam, targetLayout);
+				List<ImageResults> results = CalibrateMonoPlanar.computeErrors(points, param, targetLayout);
 				double totalError = 0;
 				for( int i = 0; i < results.size(); i++ ) {
 					ImageResults r = results.get(i);
@@ -200,12 +189,10 @@ public class CalibrationComputeActivity extends Activity {
 				write("Average error = "+(totalError/results.size()));
 
 				// activate the buttons so the user can accept or reject the solution
-				runOnUiThread(new Runnable() {
-					public void run() {
-						buttonCancel.setEnabled(true);
-						buttonOK.setEnabled(true);
-					}
-				});
+				runOnUiThread(() -> {
+                    buttonCancel.setEnabled(true);
+                    buttonOK.setEnabled(true);
+                });
 			} catch( RuntimeException e ) {
 				// if a stop is requested a runtime exception is thrown
 				write("Calibration thread stopped");

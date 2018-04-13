@@ -23,7 +23,7 @@ import boofcv.alg.segmentation.ComputeRegionMeanColor;
 import boofcv.alg.segmentation.ImageSegmentationOps;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
-import boofcv.android.gui.VideoImageProcessing;
+import boofcv.android.camera.VideoImageProcessing;
 import boofcv.factory.segmentation.ConfigSlic;
 import boofcv.factory.segmentation.FactoryImageSegmentation;
 import boofcv.factory.segmentation.FactorySegmentationAlg;

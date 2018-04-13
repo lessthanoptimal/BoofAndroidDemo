@@ -3,7 +3,7 @@ package org.boofcv.android;
 import android.hardware.Camera;
 import android.os.Bundle;
 
-import boofcv.android.gui.VideoDisplayActivity;
+import boofcv.android.camera.VideoDisplayActivity;
 
 /**
  * Activity for displaying video results.

@@ -20,7 +20,7 @@ import boofcv.alg.transform.fft.DiscreteFourierTransformOps;
 import boofcv.alg.transform.wavelet.UtilWavelet;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
-import boofcv.android.gui.VideoImageProcessing;
+import boofcv.android.camera.VideoImageProcessing;
 import boofcv.core.image.ConvertImage;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.factory.transform.wavelet.FactoryWaveletTransform;

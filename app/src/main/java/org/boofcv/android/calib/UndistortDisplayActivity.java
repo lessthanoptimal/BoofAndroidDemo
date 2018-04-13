@@ -21,7 +21,7 @@ import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.android.ConvertBitmap;
-import boofcv.android.gui.VideoImageProcessing;
+import boofcv.android.camera.VideoImageProcessing;
 import boofcv.core.image.ConvertImage;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.distort.FactoryDistort;

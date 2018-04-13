@@ -28,7 +28,7 @@ import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.alg.shapes.FitData;
 import boofcv.alg.shapes.ShapeFittingOps;
 import boofcv.android.VisualizeImageData;
-import boofcv.android.gui.VideoImageProcessing;
+import boofcv.android.camera.VideoImageProcessing;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.PointIndex_I32;
 import boofcv.struct.image.GrayS32;
@@ -138,10 +138,10 @@ public class ContourShapeFittingActivity extends DemoVideoDisplayActivity
 		protected void process(GrayU8 input, Bitmap output, byte[] storage) {
 
 			// Select a reasonable threshold
-			int mean = GThresholdImageOps.computeOtsu(input,0,255);
+			double mean = GThresholdImageOps.computeOtsu(input,0,255);
 
 			// create a binary image by thresholding
-			ThresholdImageOps.threshold(input, binary, mean, down);
+			ThresholdImageOps.threshold(input, binary, (int)mean, down);
 
 			// reduce noise with some filtering
 			BinaryImageOps.removePointNoise(binary, filtered1);
@@ -151,7 +151,7 @@ public class ContourShapeFittingActivity extends DemoVideoDisplayActivity
 
 			// draw the ellipses
 			findContours.process(filtered1,contourOutput);
-			List<Contour> contours = findContours.getContours().toList();
+			List<Contour> contours = BinaryImageOps.contour(filtered1, ConnectRule.EIGHT,null);
 
 			Canvas canvas = new Canvas(output);
 
@@ -198,7 +198,7 @@ public class ContourShapeFittingActivity extends DemoVideoDisplayActivity
 		@Override
 		protected void fitShape(List<Point2D_I32> contour, Canvas canvas) {
 			// TODO unroll and recycle this function
-			List<PointIndex_I32> poly = ShapeFittingOps.fitPolygon(contour, true, 0.05, 0.025f, 10);
+			List<PointIndex_I32> poly = ShapeFittingOps.fitPolygon(contour, true, 3,0.25);
 
 			for( int i = 1; i < poly.size(); i++ ) {
 				PointIndex_I32 a = poly.get(i-1);

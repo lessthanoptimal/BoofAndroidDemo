@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import org.boofcv.android.DemoMain;
 import org.boofcv.android.R;
+import org.boofcv.android.recognition.ConfigAllCalibration;
 import org.boofcv.android.recognition.SelectCalibrationFiducial;
 import org.boofcv.android.tracker.PointTrackerDisplayActivity;
 import org.ddogleg.struct.FastQueue;
@@ -27,20 +28,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import boofcv.abst.fiducial.calib.CalibrationDetectorChessboard;
-import boofcv.abst.fiducial.calib.CalibrationDetectorCircleAsymmGrid;
+import boofcv.abst.fiducial.calib.CalibrationDetectorCircleHexagonalGrid;
+import boofcv.abst.fiducial.calib.CalibrationDetectorCircleRegularGrid;
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
 import boofcv.abst.fiducial.calib.CalibrationPatterns;
-import boofcv.abst.fiducial.calib.ConfigChessboard;
-import boofcv.abst.fiducial.calib.ConfigCircleAsymmetricGrid;
-import boofcv.abst.fiducial.calib.ConfigSquareGrid;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.alg.fiducial.calib.chess.DetectChessboardFiducial;
-import boofcv.alg.fiducial.calib.circle.DetectCircleAsymmetricGrid;
+import boofcv.alg.fiducial.calib.circle.DetectCircleHexagonalGrid;
+import boofcv.alg.fiducial.calib.circle.DetectCircleRegularGrid;
 import boofcv.alg.fiducial.calib.grid.DetectSquareGridFiducial;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
-import boofcv.android.gui.VideoRenderProcessing;
+import boofcv.android.camera.VideoRenderProcessing;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayF32;
@@ -61,10 +61,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 {
 	public static final int TARGET_DIALOG = 10;
 
-	public static CalibrationPatterns targetType = CalibrationPatterns.CHESSBOARD;
-	public static int numRows = 5;
-	public static int numCols = 7;
-
+	public static ConfigAllCalibration cc = new ConfigAllCalibration();
 	Paint paintPoint = new Paint();
 	Paint paintFailed = new Paint();
 
@@ -143,17 +140,16 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 	private void startVideoProcessing() {
 		DetectorFiducialCalibration detector;
 
-		if( targetType == CalibrationPatterns.CHESSBOARD ) {
-			ConfigChessboard config = new ConfigChessboard(numCols,numRows, 30);
-			detector = FactoryFiducialCalibration.chessboard(config);
-		} else if( targetType == CalibrationPatterns.SQUARE_GRID ) {
-			ConfigSquareGrid config = new ConfigSquareGrid(numCols,numRows, 30 , 30);
-			detector = FactoryFiducialCalibration.squareGrid(config);
-		} else if( targetType == CalibrationPatterns.CIRCLE_ASYMMETRIC_GRID ){
-			ConfigCircleAsymmetricGrid config = new ConfigCircleAsymmetricGrid(numCols,numRows, 1 , 6);
-			detector = FactoryFiducialCalibration.circleAsymmGrid(config);
+		if( cc.targetType == CalibrationPatterns.CHESSBOARD ) {
+			detector = FactoryFiducialCalibration.chessboard(cc.chessboard);
+		} else if( cc.targetType == CalibrationPatterns.SQUARE_GRID ) {
+			detector = FactoryFiducialCalibration.squareGrid(cc.squareGrid);
+		} else if( cc.targetType == CalibrationPatterns.CIRCLE_HEXAGONAL ){
+			detector = FactoryFiducialCalibration.circleHexagonalGrid(cc.hexagonal);
+		} else if( cc.targetType == CalibrationPatterns.CIRCLE_GRID ){
+			detector = FactoryFiducialCalibration.circleRegularGrid(cc.circleGrid);
 		} else {
-			throw new RuntimeException("Unknown targetType "+targetType);
+			throw new RuntimeException("Unknown targetType "+cc.targetType);
 		}
 		CalibrationComputeActivity.targetLayout = detector.getLayout();
 		setProcessing(new DetectTarget(detector));
@@ -176,18 +172,9 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 	protected Dialog onCreateDialog(int id) {
 		switch (id) {
 			case TARGET_DIALOG:
-				final SelectCalibrationFiducial dialog = new SelectCalibrationFiducial(numRows,numCols,targetType);
+				final SelectCalibrationFiducial dialog = new SelectCalibrationFiducial(cc);
 
-				dialog.create(this, new Runnable() {
-					@Override
-					public void run() {
-						numCols = dialog.getGridColumns();
-						numRows = dialog.getGridRows();
-						targetType = dialog.getGridType();
-
-						startVideoProcessing();
-					}
-				});
+				dialog.create(this, () -> startVideoProcessing());
 		}
 		return super.onCreateDialog(id);
 	}
@@ -286,27 +273,33 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 					if( detector instanceof CalibrationDetectorChessboard) {
 						DetectChessboardFiducial<GrayF32> alg = ((CalibrationDetectorChessboard) detector).getAlgorithm();
 						VisualizeImageData.binaryToBitmap(alg.getBinary(), false, bitmap, storage);
-						extractQuads(alg.getFindSeeds().getDetectorSquare().getFoundPolygons());
+						extractQuads(alg.getFindSeeds().getDetectorSquare().getPolygons(null,null));
 					} else if( detector instanceof CalibrationDetectorSquareGrid) {
 						DetectSquareGridFiducial<GrayF32> alg = ((CalibrationDetectorSquareGrid) detector).getAlgorithm();
 						VisualizeImageData.binaryToBitmap(alg.getBinary(), false ,bitmap, storage);
-						extractQuads(alg.getDetectorSquare().getFoundPolygons());
-					} else if( detector instanceof CalibrationDetectorCircleAsymmGrid) {
-						DetectCircleAsymmetricGrid<GrayF32> alg = ((CalibrationDetectorCircleAsymmGrid) detector).getDetector();
+						extractQuads(alg.getDetectorSquare().getPolygons(null,null));
+					} else if( detector instanceof CalibrationDetectorCircleHexagonalGrid) {
+						DetectCircleHexagonalGrid<GrayF32> alg = ((CalibrationDetectorCircleHexagonalGrid) detector).getDetector();
 						VisualizeImageData.binaryToBitmap(alg.getBinary(), false ,bitmap, storage);
 
 						debugEllipses.clear();
-						debugEllipses.addAll(alg.getEllipseDetector().getFoundEllipses().toList());
+						debugEllipses.addAll(alg.getEllipseDetector().getFoundEllipses(null));
+					} else if( detector instanceof CalibrationDetectorCircleRegularGrid) {
+						DetectCircleRegularGrid<GrayF32> alg = ((CalibrationDetectorCircleRegularGrid) detector).getDetector();
+						VisualizeImageData.binaryToBitmap(alg.getBinary(), false ,bitmap, storage);
+
+						debugEllipses.clear();
+						debugEllipses.addAll(alg.getEllipseDetector().getFoundEllipses(null));
 					}
 				}
 			}
 		}
 
-		protected void extractQuads( FastQueue<Polygon2D_F64> squares ) {
+		protected void extractQuads( List<Polygon2D_F64> squares ) {
 			debugQuads.clear();
 
 			if( squares != null ) {
-				for( Polygon2D_F64 b : squares.toList() ) {
+				for( Polygon2D_F64 b : squares ) {
 
 					List<Point2D_I32> l = new ArrayList<Point2D_I32>();
 					for( int i = 0; i < b.size(); i++ ) {

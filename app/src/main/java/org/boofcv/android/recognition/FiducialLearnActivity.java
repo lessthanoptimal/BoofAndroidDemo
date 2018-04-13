@@ -31,7 +31,7 @@ import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
-import boofcv.android.gui.VideoRenderProcessing;
+import boofcv.android.camera.VideoRenderProcessing;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;

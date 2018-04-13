@@ -32,7 +32,7 @@ import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
-import boofcv.android.gui.VideoImageProcessing;
+import boofcv.android.camera.VideoImageProcessing;
 import boofcv.core.image.ConvertImage;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.GrayU8;
@@ -222,7 +222,7 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 			if( changed && intrinsic != null ) {
 				changed = false;
 				detector = (FiducialDetector)createDetector();
-				detector.setLensDistortion(LensDistortionOps.narrow(intrinsic));
+				detector.setLensDistortion(LensDistortionOps.narrow(intrinsic),color.width,color.height);
 				if( input == null || input.getImageType() != detector.getInputType() ) {
 					input = detector.getInputType().createImage(1, 1);
 				}

@@ -40,7 +40,7 @@ import java.util.List;
 
 import boofcv.abst.scene.ImageClassifier;
 import boofcv.android.ConvertBitmap;
-import boofcv.android.gui.VideoImageProcessing;
+import boofcv.android.camera.VideoImageProcessing;
 import boofcv.factory.scene.ClassifierAndSource;
 import boofcv.factory.scene.FactoryImageClassifier;
 import boofcv.struct.image.GrayF32;

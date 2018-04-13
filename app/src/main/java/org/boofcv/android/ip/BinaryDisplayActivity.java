@@ -18,7 +18,7 @@ import org.boofcv.android.R;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.android.VisualizeImageData;
-import boofcv.android.gui.VideoImageProcessing;
+import boofcv.android.camera.VideoImageProcessing;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 

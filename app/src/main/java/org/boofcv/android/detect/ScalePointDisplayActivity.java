@@ -22,7 +22,7 @@ import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.ConfigSiftDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.android.ConvertBitmap;
-import boofcv.android.gui.VideoRenderProcessing;
+import boofcv.android.camera.VideoRenderProcessing;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.struct.feature.ScalePoint;
 import boofcv.struct.image.GrayU8;

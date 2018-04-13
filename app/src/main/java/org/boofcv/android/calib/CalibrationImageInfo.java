@@ -10,10 +10,10 @@ import boofcv.struct.image.GrayF32;
  */
 public class CalibrationImageInfo {
 	GrayF32 image;
-	CalibrationObservation calibPoints = new CalibrationObservation();
+	CalibrationObservation calibPoints;
 
 	public CalibrationImageInfo(GrayF32 image, CalibrationObservation observations) {
 		this.image = image.clone();
-		this.calibPoints.setTo(observations);
+		this.calibPoints = observations;
 	}
 }

@@ -26,7 +26,7 @@ import boofcv.abst.feature.detect.line.DetectLine;
 import boofcv.abst.feature.detect.line.DetectLineSegment;
 import boofcv.alg.feature.detect.line.LineImageOps;
 import boofcv.android.ConvertBitmap;
-import boofcv.android.gui.VideoRenderProcessing;
+import boofcv.android.camera.VideoRenderProcessing;
 import boofcv.factory.feature.detect.line.ConfigHoughFoot;
 import boofcv.factory.feature.detect.line.ConfigHoughPolar;
 import boofcv.factory.feature.detect.line.FactoryDetectLineAlgs;

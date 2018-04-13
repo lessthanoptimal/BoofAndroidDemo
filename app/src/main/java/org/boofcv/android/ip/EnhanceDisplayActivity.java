@@ -17,7 +17,7 @@ import org.boofcv.android.R;
 import boofcv.alg.enhance.EnhanceImageOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.android.ConvertBitmap;
-import boofcv.android.gui.VideoImageProcessing;
+import boofcv.android.camera.VideoImageProcessing;
 import boofcv.core.image.ConvertImage;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;

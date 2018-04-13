@@ -9,8 +9,6 @@ import android.widget.TextView;
 
 import org.boofcv.android.R;
 
-import boofcv.abst.fiducial.calib.CalibrationPatterns;
-
 /**
  * Displays instructions and tips for the user
  *
@@ -34,21 +32,6 @@ public class FiducialCalibrationHelpActivity extends Activity {
 		textView.setText(Html.fromHtml(text));
 
 		FrameLayout view = (FrameLayout) findViewById(R.id.target_frame);
-		view.addView(new DrawCalibrationFiducial(this, new DrawCalibrationFiducial.Owner() {
-			@Override
-			public int getGridColumns() {
-				return FiducialCalibrationActivity.numCols;
-			}
-
-			@Override
-			public int getGridRows() {
-				return FiducialCalibrationActivity.numRows;
-			}
-
-			@Override
-			public CalibrationPatterns getGridType() {
-				return FiducialCalibrationActivity.targetType;
-			}
-		}));
+		view.addView(new DrawCalibrationFiducial(this, () -> FiducialCalibrationActivity.cc));
 	}
 }

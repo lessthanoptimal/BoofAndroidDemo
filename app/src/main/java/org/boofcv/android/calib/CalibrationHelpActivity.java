@@ -8,9 +8,8 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import org.boofcv.android.R;
+import org.boofcv.android.recognition.ConfigAllCalibration;
 import org.boofcv.android.recognition.DrawCalibrationFiducial;
-
-import boofcv.abst.fiducial.calib.CalibrationPatterns;
 
 /**
  * Displays instructions and tips for the user
@@ -46,17 +45,7 @@ public class CalibrationHelpActivity extends Activity implements DrawCalibration
 	}
 
 	@Override
-	public int getGridColumns() {
-		return CalibrationActivity.numCols;
-	}
-
-	@Override
-	public int getGridRows() {
-		return CalibrationActivity.numRows;
-	}
-
-	@Override
-	public CalibrationPatterns getGridType() {
-		return CalibrationActivity.targetType;
+	public ConfigAllCalibration getConfigAllCalibration() {
+		return CalibrationActivity.cc;
 	}
 }

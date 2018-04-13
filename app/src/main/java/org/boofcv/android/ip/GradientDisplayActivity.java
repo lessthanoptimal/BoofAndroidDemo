@@ -14,7 +14,7 @@ import org.boofcv.android.R;
 
 import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.android.VisualizeImageData;
-import boofcv.android.gui.VideoImageProcessing;
+import boofcv.android.camera.VideoImageProcessing;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;

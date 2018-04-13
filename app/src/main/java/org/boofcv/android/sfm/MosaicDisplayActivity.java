@@ -24,7 +24,7 @@ import boofcv.abst.sfm.AccessPointTracks;
 import boofcv.abst.sfm.d2.ImageMotion2D;
 import boofcv.alg.sfm.d2.StitchingFromMotion2D;
 import boofcv.android.ConvertBitmap;
-import boofcv.android.gui.VideoRenderProcessing;
+import boofcv.android.camera.VideoRenderProcessing;
 import boofcv.factory.feature.tracker.FactoryPointTracker;
 import boofcv.factory.sfm.FactoryMotion2D;
 import boofcv.misc.BoofMiscOps;

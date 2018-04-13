@@ -24,7 +24,7 @@ import boofcv.abst.tracker.MeanShiftLikelihoodType;
 import boofcv.abst.tracker.TrackerObjectQuad;
 import boofcv.alg.tracker.sfot.SfotConfig;
 import boofcv.android.ConvertBitmap;
-import boofcv.android.gui.VideoImageProcessing;
+import boofcv.android.camera.VideoImageProcessing;
 import boofcv.core.image.ConvertImage;
 import boofcv.factory.tracker.FactoryTrackerObjectQuad;
 import boofcv.struct.image.GrayU8;

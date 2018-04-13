@@ -15,7 +15,7 @@ import org.boofcv.android.R;
 
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.android.ConvertBitmap;
-import boofcv.android.gui.VideoImageProcessing;
+import boofcv.android.camera.VideoImageProcessing;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
@@ -53,7 +53,7 @@ public class BlurDisplayActivity extends DemoVideoDisplayActivity
 		spinnerView.setAdapter(adapter);
 		spinnerView.setOnItemSelectedListener(this);
 
-		SeekBar seek = (SeekBar)controls.findViewById(R.id.slider_radius);
+		SeekBar seek = (SeekBar)controls.findViewById(R.id.slider_width);
 		radius = seek.getProgress();
 
 		seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {

@@ -27,9 +27,9 @@
 			android:layout_weight=".40"
 			android:gravity="center"
 			android:layout_gravity="center"
-			android:max="19"
-			android:progress="5"
+			android:max="40"
+			android:progress="10"
 			android:secondaryProgress="0"
-			android:id="@+id/slider_radius"/>
+			android:id="@+id/slider_width"/>
 
 </LinearLayout>

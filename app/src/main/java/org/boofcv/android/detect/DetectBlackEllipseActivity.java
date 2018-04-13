@@ -17,16 +17,18 @@ import android.widget.Spinner;
 
 import org.boofcv.android.DemoVideoDisplayActivity;
 import org.boofcv.android.R;
-import org.ddogleg.struct.FastQueue;
+
+import java.util.List;
 
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.shapes.ellipse.BinaryEllipseDetector;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
-import boofcv.android.gui.VideoImageProcessing;
+import boofcv.android.camera.VideoImageProcessing;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.ConfigEllipseDetector;
 import boofcv.factory.shape.FactoryShapeDetector;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import georegression.metric.UtilAngle;
@@ -115,7 +117,7 @@ public class DetectBlackEllipseActivity extends DemoVideoDisplayActivity
 				break;
 
 			case 1:
-				inputToBinary = FactoryThresholdBinary.localSquare(10,0.95,true,GrayU8.class);
+				inputToBinary = FactoryThresholdBinary.localMean(ConfigLength.fixed(10),0.95,true,GrayU8.class);
 				break;
 
 			default:
@@ -172,9 +174,9 @@ public class DetectBlackEllipseActivity extends DemoVideoDisplayActivity
 
 			Canvas canvas = new Canvas(output);
 
-			FastQueue<EllipseRotated_F64> found = detector.getFoundEllipses();
+			List<EllipseRotated_F64> found = detector.getFoundEllipses(null);
 
-			for( EllipseRotated_F64 ellipse : found.toList() )  {
+			for( EllipseRotated_F64 ellipse : found )  {
 
 				float phi = (float) UtilAngle.degree(ellipse.phi);
 				float cx =  (float)ellipse.center.x;

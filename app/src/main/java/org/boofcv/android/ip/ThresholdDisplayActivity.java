@@ -17,8 +17,9 @@ import org.boofcv.android.R;
 
 import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.android.VisualizeImageData;
-import boofcv.android.gui.VideoImageProcessing;
+import boofcv.android.camera.VideoImageProcessing;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
+import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 
@@ -35,7 +36,7 @@ public class ThresholdDisplayActivity extends DemoVideoDisplayActivity
 	final Object lock = new Object();
 	boolean changed = false;
 	boolean down;
-	int radius;
+	int width;
 	int selectedAlg;
 
 	@Override
@@ -55,20 +56,20 @@ public class ThresholdDisplayActivity extends DemoVideoDisplayActivity
 		spinnerView.setAdapter(adapter);
 
 		ToggleButton toggle = (ToggleButton)controls.findViewById(R.id.toggle_threshold);
-		final SeekBar seek = (SeekBar)controls.findViewById(R.id.slider_radius);
+		final SeekBar seek = (SeekBar)controls.findViewById(R.id.slider_width);
 
 		changed = true;
 		selectedAlg = spinnerView.getSelectedItemPosition();
 		adjustSeekEnabled(seek);
 		down = toggle.isChecked();
-		radius = seek.getProgress();
+		width = seek.getProgress();
 
 		seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 			@Override
 			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 				synchronized (lock) {
 					changed = true;
-					radius = progress;
+					width = progress;
 				}
 			}
 
@@ -120,7 +121,7 @@ public class ThresholdDisplayActivity extends DemoVideoDisplayActivity
 
 	private InputToBinary<GrayU8> createFilter() {
 
-		int radius = this.radius + 1;
+		int width = this.width + 3;
 
 		switch (selectedAlg) {
 			case 0:
@@ -130,13 +131,13 @@ public class ThresholdDisplayActivity extends DemoVideoDisplayActivity
 				return FactoryThresholdBinary.globalEntropy(0, 255, down, GrayU8.class);
 
 			case 2:
-				return FactoryThresholdBinary.localSquare(radius,0.95,down,GrayU8.class);
+				return FactoryThresholdBinary.localMean(ConfigLength.fixed(width),0.95,down,GrayU8.class);
 
 			case 3:
-				return FactoryThresholdBinary.localGaussian(radius,0.95,down,GrayU8.class);
+				return FactoryThresholdBinary.localGaussian(ConfigLength.fixed(width),0.95,down,GrayU8.class);
 
 			case 4:
-				return FactoryThresholdBinary.localSauvola(radius,0.3f,down,GrayU8.class);
+				return FactoryThresholdBinary.localSauvola(ConfigLength.fixed(width),0.3f,down,GrayU8.class);
 		}
 
 		throw new RuntimeException("Unknown selection "+selectedAlg);
