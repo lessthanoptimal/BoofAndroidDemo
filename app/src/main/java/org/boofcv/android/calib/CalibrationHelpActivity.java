@@ -33,12 +33,12 @@ public class CalibrationHelpActivity extends Activity implements DrawCalibration
 
 		setContentView(R.layout.calibration_help);
 
-		TextView textView = (TextView) findViewById(R.id.text_info);
+		TextView textView = findViewById(R.id.text_info);
 
 		textView.setMovementMethod(LinkMovementMethod.getInstance());
 		textView.setText(Html.fromHtml(text));
 
-		FrameLayout preview = (FrameLayout) findViewById(R.id.target_frame);
+		FrameLayout preview = findViewById(R.id.target_frame);
 
 		DrawCalibrationFiducial vis = new DrawCalibrationFiducial(this,this);
 		preview.addView(vis);

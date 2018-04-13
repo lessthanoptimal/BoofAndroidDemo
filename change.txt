@@ -4,18 +4,26 @@ Change Log for BoofCV Demonstration App
 
 -------------------------------------------------
 Version 1.9
-Date: 2017-07
+Date: 2018
 
 - Updated to BoofCV v0.29
 - Calibration
   * Scaled visuals to support higher resolutions better
   * Moved calibration to an application public directory that can be accessed without rooting the phone
-- TODO fixed issue where number pad was excessively large and out of view
-- TODO Add distort MLS example
-- TODO Add equirectangular to pinhole viewer
-  * Provide example image.
+  TODO update how calibration targets are rendered in preview
+  TODO support width and center distance in calib targets
 - TODO Added calibration circle regular grid support
 
+- TODO fixed issue where number pad was excessively large and out of view
+- TODO Add distort MLS example
+- TODO Add QR Code detector example
+- TODO Add equirectangular to pinhole viewer
+  * Provide example image.
+- TODO Update polygon fit for new parameters
+- TODO Add new binary thresholds
+
+- TODO Camera2 API
+- TODO Have each algorithm select if it wants low, medium, or high resolution
 -------------------------------------------------
 Version 1.8.1
 Date: 2016-02-08
