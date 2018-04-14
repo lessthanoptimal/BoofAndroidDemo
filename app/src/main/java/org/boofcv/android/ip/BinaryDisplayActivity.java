@@ -1,7 +1,9 @@
 package org.boofcv.android.ip;
 
-import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -12,13 +14,14 @@ import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.ToggleButton;
 
-import org.boofcv.android.DemoVideoDisplayActivity;
+import org.boofcv.android.DemoFilterCamera2Activity;
+import org.boofcv.android.DemoProcessing;
 import org.boofcv.android.R;
 
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.GThresholdImageOps;
+import boofcv.alg.misc.ImageStatistics;
 import boofcv.android.VisualizeImageData;
-import boofcv.android.camera.VideoImageProcessing;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 
@@ -27,7 +30,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class BinaryDisplayActivity extends DemoVideoDisplayActivity
+public class BinaryDisplayActivity extends DemoFilterCamera2Activity
 		implements SeekBar.OnSeekBarChangeListener ,
 		CompoundButton.OnCheckedChangeListener,
 		AdapterView.OnItemSelectedListener {
@@ -36,22 +39,24 @@ public class BinaryDisplayActivity extends DemoVideoDisplayActivity
 	double threshold;
 	int action;
 
-	public void onCreate(Bundle savedInstanceState) {
+	public BinaryDisplayActivity() {
+		super(Resolution.MEDIUM);
+	}
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.binary_controls,null);
 
-		LinearLayout parent = getViewContent();
-		parent.addView(controls);
-
-		SeekBar seek = (SeekBar)controls.findViewById(R.id.slider_threshold);
+		SeekBar seek = controls.findViewById(R.id.slider_threshold);
 		seek.setOnSeekBarChangeListener(this);
 
-		ToggleButton toggle = (ToggleButton)controls.findViewById(R.id.toggle_threshold);
+		ToggleButton toggle = controls.findViewById(R.id.toggle_threshold);
 		toggle.setOnCheckedChangeListener(this);
 
-		Spinner spinner = (Spinner)controls.findViewById(R.id.spinner_binary_ops);
+		Spinner spinner = controls.findViewById(R.id.spinner_binary_ops);
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
 				R.array.binary_filters, android.R.layout.simple_spinner_item);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -61,12 +66,14 @@ public class BinaryDisplayActivity extends DemoVideoDisplayActivity
 		down = toggle.isChecked();
 		threshold = seek.getProgress();
 		action = spinner.getSelectedItemPosition();
+
+		setControls(controls);
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-		setProcessing(new ThresholdProcessing() );
+		setProcessor(new ThresholdProcessing() );
 	}
 
 	@Override
@@ -93,24 +100,29 @@ public class BinaryDisplayActivity extends DemoVideoDisplayActivity
 	@Override
 	public void onNothingSelected(AdapterView<?> adapterView) {}
 
-	protected class ThresholdProcessing extends VideoImageProcessing<GrayU8> {
+	protected void convertToOutput(GrayU8 binary ) {
+		synchronized (bitmapLock) {
+			VisualizeImageData.binaryToBitmap(binary, false,bitmap, convertTmp);
+		}
+	}
+
+	protected class ThresholdProcessing implements DemoProcessing<GrayU8> {
 		GrayU8 binary;
 		GrayU8 afterOps;
 
-		protected ThresholdProcessing() {
-			super(ImageType.single(GrayU8.class));
+		@Override
+		public void initialize(int imageWidth, int imageHeight) {
+			binary = new GrayU8(imageWidth,imageHeight);
+			afterOps = new GrayU8(imageWidth,imageHeight);
 		}
 
 		@Override
-		protected void declareImages( int width , int height ) {
-			super.declareImages(width, height);
-
-			binary = new GrayU8(width,height);
-			afterOps = new GrayU8(width,height);
+		public void onDraw(Canvas canvas, Matrix imageToView) {
+			drawBitmap(canvas,imageToView);
 		}
 
 		@Override
-		protected void process(GrayU8 input, Bitmap output, byte[] storage) {
+		public void process(GrayU8 input) {
 			GThresholdImageOps.threshold(input,binary,threshold, down);
 
 			switch( action ) {
@@ -150,7 +162,24 @@ public class BinaryDisplayActivity extends DemoVideoDisplayActivity
 					afterOps.setTo(binary);
 			}
 
-			VisualizeImageData.binaryToBitmap(afterOps, false, output, storage);
+			Log.i("ASDSAD","total bin = "+ ImageStatistics.sum(binary));
+			Log.i("ASDSAD","total aft = "+ ImageStatistics.sum(afterOps));
+			convertToOutput(afterOps);
+		}
+
+		@Override
+		public void stop() {
+
+		}
+
+		@Override
+		public boolean isThreadSafe() {
+			return false;
+		}
+
+		@Override
+		public ImageType<GrayU8> getImageType() {
+			return ImageType.single(GrayU8.class);
 		}
 	}
 }

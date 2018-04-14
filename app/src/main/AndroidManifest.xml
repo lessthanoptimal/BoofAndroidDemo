@@ -54,8 +54,7 @@
             android:name=".ip.GradientDisplayActivity"
             android:screenOrientation="landscape" />
         <activity
-            android:name=".ip.BinaryDisplayActivity"
-            android:screenOrientation="landscape" />
+            android:name=".ip.BinaryDisplayActivity"/>
         <activity
             android:name=".detect.PointDisplayActivity"
             android:screenOrientation="landscape" />

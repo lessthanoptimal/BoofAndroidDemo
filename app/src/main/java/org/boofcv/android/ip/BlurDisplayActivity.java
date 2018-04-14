@@ -1,6 +1,5 @@
 package org.boofcv.android.ip;
 
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.os.Bundle;
@@ -9,17 +8,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 
-import org.boofcv.android.DemoCamera2Activity;
+import org.boofcv.android.DemoFilterCamera2Activity;
 import org.boofcv.android.DemoProcessing;
 import org.boofcv.android.R;
 
 import boofcv.abst.filter.blur.BlurFilter;
-import boofcv.android.ConvertBitmap;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
@@ -29,7 +26,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class BlurDisplayActivity extends DemoCamera2Activity
+public class BlurDisplayActivity extends DemoFilterCamera2Activity
 		implements AdapterView.OnItemSelectedListener
 {
 	private static final String TAG = "BlurActivity";
@@ -40,23 +37,15 @@ public class BlurDisplayActivity extends DemoCamera2Activity
 
 	public BlurDisplayActivity() {
 		super(Resolution.MEDIUM);
-
-		// this class will handle all manipulation of the bitmap image since the blurred
-		// image is shown and not the input
-		super.showBitmap = false;
 	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		setContentView(R.layout.standard_camera2);
-
-		LinearLayout parent = findViewById(R.id.root_layout);
 
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.blur_controls,null);
-		parent.addView(controls);
 
 		spinnerView = controls.findViewById(R.id.spinner_algs);
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
@@ -89,19 +78,7 @@ public class BlurDisplayActivity extends DemoCamera2Activity
 			public void onStopTrackingTouch(SeekBar seekBar) {}
 		});
 
-		FrameLayout surfaceLayout = findViewById(R.id.camera_frame_layout);
-//		TextureView texture = findViewById(R.id.texture);
-		startCamera(surfaceLayout,null);
-	}
-
-	@Override
-	protected void onCameraResolutionChange(int width, int height) {
-		super.onCameraResolutionChange(width, height);
-		synchronized (bitmapLock) {
-			if (bitmap.getWidth() != width || bitmap.getHeight() != height)
-				bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-			convertTmp = ConvertBitmap.declareStorage(bitmap, convertTmp);
-		}
+		setControls(controls);
 	}
 
 	@Override
@@ -142,18 +119,6 @@ public class BlurDisplayActivity extends DemoCamera2Activity
 	@Override
 	public void onNothingSelected(AdapterView<?> adapterView) {}
 
-	protected void renderBlurred( GrayU8 blurred ) {
-		synchronized (bitmapLock) {
-			ConvertBitmap.grayToBitmap(blurred, bitmap, convertTmp);
-		}
-	}
-
-	protected void drawBitmap(Canvas canvas, Matrix imageToView) {
-		synchronized (bitmapLock) {
-			canvas.drawBitmap(bitmap, imageToView, null);
-		}
-	}
-
 	protected class BlurProcessing implements DemoProcessing<GrayU8> {
 		GrayU8 blurred;
 		final BlurFilter<GrayU8> filter;
@@ -184,9 +149,9 @@ public class BlurDisplayActivity extends DemoCamera2Activity
 				synchronized ( filter ) {
 					filter.process(input, blurred);
 				}
-				renderBlurred(blurred);
+				convertToOutput(blurred);
 			} else {
-				renderBlurred(input);
+				convertToOutput(input);
 			}
 		}
 

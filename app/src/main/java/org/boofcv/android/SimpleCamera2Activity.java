@@ -123,7 +123,7 @@ public abstract class SimpleCamera2Activity extends AppCompatActivity {
                 mTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
             }
         } else if( mView != null ) {
-            if( mView.isShown()) {
+            if( mView.getWidth() != 0 && mView.getHeight() != 0 ) {
                 openCamera(mView.getWidth(), mView.getHeight());
             } else {
                 mView.addOnLayoutChangeListener(mViewLayoutChangeListeneer);
