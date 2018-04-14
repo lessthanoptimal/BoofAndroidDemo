@@ -3,7 +3,6 @@ package org.boofcv.android.ip;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -20,7 +19,6 @@ import org.boofcv.android.R;
 
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.GThresholdImageOps;
-import boofcv.alg.misc.ImageStatistics;
 import boofcv.android.VisualizeImageData;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
@@ -162,8 +160,6 @@ public class BinaryDisplayActivity extends DemoFilterCamera2Activity
 					afterOps.setTo(binary);
 			}
 
-			Log.i("ASDSAD","total bin = "+ ImageStatistics.sum(binary));
-			Log.i("ASDSAD","total aft = "+ ImageStatistics.sum(afterOps));
 			convertToOutput(afterOps);
 		}
 
