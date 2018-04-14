@@ -1,21 +1,25 @@
 package org.boofcv.android.ip;
 
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 
-import org.boofcv.android.DemoVideoDisplayActivity;
+import org.boofcv.android.DemoCamera2Activity;
+import org.boofcv.android.DemoProcessing;
 import org.boofcv.android.R;
 
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.android.ConvertBitmap;
-import boofcv.android.camera.VideoImageProcessing;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
@@ -25,43 +29,57 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class BlurDisplayActivity extends DemoVideoDisplayActivity
+public class BlurDisplayActivity extends DemoCamera2Activity
 		implements AdapterView.OnItemSelectedListener
 {
-
+	private static final String TAG = "BlurActivity";
 	Spinner spinnerView;
 
 	// amount of blur applied to the image
 	int radius;
 
-	BlurProcessing processing;
+	public BlurDisplayActivity() {
+		super(Resolution.MEDIUM);
+
+		// this class will handle all manipulation of the bitmap image since the blurred
+		// image is shown and not the input
+		super.showBitmap = false;
+	}
 
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		setContentView(R.layout.standard_camera2);
+
+		LinearLayout parent = findViewById(R.id.root_layout);
 
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.blur_controls,null);
-
-		LinearLayout parent = getViewContent();
 		parent.addView(controls);
 
-		spinnerView = (Spinner)controls.findViewById(R.id.spinner_algs);
+		spinnerView = controls.findViewById(R.id.spinner_algs);
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
 				R.array.blurs, android.R.layout.simple_spinner_item);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinnerView.setAdapter(adapter);
 		spinnerView.setOnItemSelectedListener(this);
 
-		SeekBar seek = (SeekBar)controls.findViewById(R.id.slider_width);
+		SeekBar seek = controls.findViewById(R.id.slider_width);
 		radius = seek.getProgress();
 
 		seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 			@Override
 			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 				radius = progress;
-				if( radius > 0 )
-					processing.setRadius(radius);
+				synchronized (lockProcessor) {
+					if( processor == null) {
+						Log.e(TAG,"onProgressChanged() and processing is NULL");
+						return;
+					}
+					if (radius > 0)
+						((BlurProcessing)processor).setRadius(radius);
+				}
 			}
 
 			@Override
@@ -70,6 +88,20 @@ public class BlurDisplayActivity extends DemoVideoDisplayActivity
 			@Override
 			public void onStopTrackingTouch(SeekBar seekBar) {}
 		});
+
+		FrameLayout surfaceLayout = findViewById(R.id.camera_frame_layout);
+//		TextureView texture = findViewById(R.id.texture);
+		startCamera(surfaceLayout,null);
+	}
+
+	@Override
+	protected void onCameraResolutionChange(int width, int height) {
+		super.onCameraResolutionChange(width, height);
+		synchronized (bitmapLock) {
+			if (bitmap.getWidth() != width || bitmap.getHeight() != height)
+				bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+			convertTmp = ConvertBitmap.declareStorage(bitmap, convertTmp);
+		}
 	}
 
 	@Override
@@ -86,6 +118,7 @@ public class BlurDisplayActivity extends DemoVideoDisplayActivity
 	private void startBlurProcess(int pos) {
 		// not sure what these do if the radius is set to 0
 		int radius = Math.max(1,this.radius);
+		BlurProcessing processing;
 		switch (pos) {
 			case 0:
 				processing = new BlurProcessing(FactoryBlurFilter.mean(GrayU8.class, radius));
@@ -98,46 +131,78 @@ public class BlurDisplayActivity extends DemoVideoDisplayActivity
 			case 2:
 				processing = new BlurProcessing(FactoryBlurFilter.median(GrayU8.class,radius));
 				break;
-		}
 
-		setProcessing(processing);
+			default:
+				throw new RuntimeException("Unknown");
+		}
+		processing.setRadius(radius);
+		setProcessor(processing);
 	}
 
 	@Override
 	public void onNothingSelected(AdapterView<?> adapterView) {}
 
-	protected class BlurProcessing extends VideoImageProcessing<GrayU8> {
+	protected void renderBlurred( GrayU8 blurred ) {
+		synchronized (bitmapLock) {
+			ConvertBitmap.grayToBitmap(blurred, bitmap, convertTmp);
+		}
+	}
+
+	protected void drawBitmap(Canvas canvas, Matrix imageToView) {
+		synchronized (bitmapLock) {
+			canvas.drawBitmap(bitmap, imageToView, null);
+		}
+	}
+
+	protected class BlurProcessing implements DemoProcessing<GrayU8> {
 		GrayU8 blurred;
 		final BlurFilter<GrayU8> filter;
 
 		public BlurProcessing(BlurFilter<GrayU8> filter) {
-			super(ImageType.single(GrayU8.class));
 			this.filter = filter;
-		}
-
-		@Override
-		protected void declareImages( int width , int height ) {
-			super.declareImages(width, height);
-
-			blurred = new GrayU8(width,height);
-		}
-
-		@Override
-		protected void process(GrayU8 input, Bitmap output, byte[] storage) {
-			if( radius > 0 ) {
-				synchronized ( filter ) {
-					filter.process(input, blurred);
-				}
-				ConvertBitmap.grayToBitmap(blurred, output, storage);
-			} else {
-				ConvertBitmap.grayToBitmap(input, output, storage);
-			}
 		}
 
 		public void setRadius( int radius ) {
 			synchronized ( filter ) {
 				filter.setRadius(radius);
 			}
+		}
+
+		@Override
+		public void initialize(int imageWidth, int imageHeight) {
+			blurred = new GrayU8(imageWidth,imageHeight);
+		}
+
+		@Override
+		public void onDraw(Canvas canvas, Matrix imageToView) {
+			drawBitmap(canvas,imageToView);
+		}
+
+		@Override
+		public void process(GrayU8 input) {
+			if( radius > 0 ) {
+				synchronized ( filter ) {
+					filter.process(input, blurred);
+				}
+				renderBlurred(blurred);
+			} else {
+				renderBlurred(input);
+			}
+		}
+
+		@Override
+		public void stop() {
+
+		}
+
+		@Override
+		public boolean isThreadSafe() {
+			return false;
+		}
+
+		@Override
+		public ImageType<GrayU8> getImageType() {
+			return filter.getInputType();
 		}
 	}
 }

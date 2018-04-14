@@ -1,0 +1,110 @@
+package org.boofcv.android;
+
+import android.graphics.Canvas;
+import android.util.Size;
+import android.view.SurfaceView;
+
+import boofcv.struct.image.ImageBase;
+
+/**
+ * Camera activity specifically designed for this demonstration. Image processing algorithms
+ * can be swapped in and out
+ */
+public class DemoCamera2Activity extends VisualizeCamera2Activity {
+
+    protected final Object lockProcessor = new Object();
+    protected DemoProcessing processor;
+
+    public DemoCamera2Activity(Resolution resolution) {
+        super.targetResolution = resolutionToPixels(resolution);
+
+        super.showBitmap = true;
+        super.visualizeOnlyMostRecent = true;
+    }
+
+    @Override
+    protected void onCameraResolutionChange( int width , int height ) {
+        super.onCameraResolutionChange(width,height);
+        DemoProcessing p = processor;
+        if( p != null ) {
+            p.initialize(width,height);
+        }
+    }
+
+    @Override
+    protected void processImage(ImageBase image) {
+        DemoProcessing processor;
+        synchronized (lockProcessor) {
+            processor = this.processor;
+        }
+
+        if( processor != null) {
+            if( !processor.isThreadSafe() && threadPool.getMaximumPoolSize() > 1 )
+                throw new RuntimeException("Process is not thread safe but the pool is larger than 1!");
+            processor.process(image);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        synchronized (lockProcessor) {
+            processor.stop();
+        }
+    }
+
+    /**
+     * Changes the processor used to process the video frames
+     */
+    public void setProcessor( DemoProcessing processor ) {
+        synchronized (lockProcessor) {
+            // shut down the previous processor
+            if( this.processor != null ) {
+                this.processor.stop();
+            }
+            // switch it over to the new one
+            setImageType(processor.getImageType());
+            this.processor = processor;
+
+            // If the camera has already started running initialize it now. otherwise it will
+            // be initialized when the size is set
+            Size s = this.mCameraSize;
+            if( s != null ) {
+                processor.initialize(s.getWidth(),s.getHeight());
+            }
+        }
+    }
+
+    @Override
+    protected void onDrawFrame(SurfaceView view , Canvas canvas ) {
+        super.onDrawFrame(view,canvas);
+
+        synchronized (lockProcessor) {
+            if( processor != null )
+                processor.onDraw(canvas, imageToView);
+        }
+    }
+
+    public int resolutionToPixels(Resolution resolution) {
+        switch (resolution) {
+            case LOW:
+                return 320*240;
+
+            case MEDIUM:
+                return 640*480;
+
+            case HIGH:
+                return 1024*768;
+
+            case MAX:
+                return Integer.MAX_VALUE;
+
+                default:
+                    throw new IllegalArgumentException("Unknown");
+        }
+    }
+
+    public enum Resolution {
+        LOW,MEDIUM,HIGH,MAX;
+    }
+}

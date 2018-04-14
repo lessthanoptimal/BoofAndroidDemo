@@ -20,6 +20,7 @@ import android.util.Log;
 import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
+import android.view.View;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Activity for viewing a camera preview using the camera2 API.
+ * Activity for collecting images from single camera on an Android device using the camera2 API.
  *
  * To start the camera invoke {@link #startCamera} inside your Activity's onCreate function.
  *
@@ -41,6 +42,11 @@ import java.util.concurrent.locks.ReentrantLock;
  *     <li>{@link #processFrame}</li>
  * </ul>
  *
+ * Configuration variables
+ * <ul>
+ *     <li>verbose</li>
+ * </ul>
+ *
  * Specify the following permissions and features in AndroidManifest.xml
  * <pre>
  * {@code
@@ -50,14 +56,15 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  * @author Peter Abeles
  */
-public abstract class BoofCamera2VideoActivity extends AppCompatActivity {
-    private static final String TAG = "BoofCamera2Activity";
+public abstract class SimpleCamera2Activity extends AppCompatActivity {
+    private static final String TAG = "SimpleCamera2";
 
     private CameraDevice mCameraDevice;
     private CameraCaptureSession mPreviewSession;
     protected TextureView mTextureView;
+    protected View mView;
     // size of camera preview
-    private Size mPreviewSize;
+    protected Size mCameraSize;
 
     protected int mSensorOrientation;
 
@@ -70,28 +77,66 @@ public abstract class BoofCamera2VideoActivity extends AppCompatActivity {
     private ImageReader mPreviewReader;
     private CaptureRequest.Builder mPreviewRequestBuilder;
 
-    private boolean verbose = true;
+    // If true there will be verbose outpput to Log
+    protected boolean verbose = true;
 
-    protected void startCamera( TextureView view ) {
+    /**
+     * After this function is called the camera will be start. It might not start immediately
+     * and there can be a delay.
+     * @param view The view the camera is displayed inside or null if not displayed
+     */
+    protected void startCameraTexture( TextureView view ) {
+        if( verbose )
+            Log.i(TAG,"startCamera(TextureView="+(view!=null)+")");
         this.mTextureView = view;
+        this.mView = null;
         this.mTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
     }
 
+    protected void startCameraView( View view) {
+        if( verbose )
+            Log.i(TAG,"startCamera(View="+(view!=null)+")");
+        this.mView = view;
+        this.mTextureView = null;
+        view.addOnLayoutChangeListener(mViewLayoutChangeListeneer);
+    }
+
+    protected void startCamera() {
+        if( verbose )
+            Log.i(TAG,"startCamera()");
+        this.mView = null;
+        this.mTextureView =null;
+        runOnUiThread(()->openCamera(0,0));
+    }
+
     @Override
-    public void onResume() {
+    protected void onResume() {
+        if( verbose )
+            Log.i(TAG,"onResume()");
         super.onResume();
 
-        if( mTextureView == null )
-            return;
-        if (mTextureView.isAvailable()) {
-            openCamera(mTextureView.getWidth(), mTextureView.getHeight());
-        } else {
-            mTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
+        // TODO this hasn't been well tested yet
+        if( mTextureView != null ) {
+            if (mTextureView.isAvailable()) {
+                openCamera(mTextureView.getWidth(), mTextureView.getHeight());
+            } else {
+                mTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
+            }
+        } else if( mView != null ) {
+            if( mView.isShown()) {
+                openCamera(mView.getWidth(), mView.getHeight());
+            } else {
+                mView.addOnLayoutChangeListener(mViewLayoutChangeListeneer);
+            }
+        } else if( mCameraSize == null ) {
+            startCamera();
         }
     }
 
     @Override
-    public void onPause() {
+    protected void onPause() {
+        if( verbose )
+            Log.i(TAG,"onPause()");
         closeCamera();
         super.onPause();
     }
@@ -101,9 +146,9 @@ public abstract class BoofCamera2VideoActivity extends AppCompatActivity {
      * resolution which best fits the texture's aspect ratio. If there's a tie the area is
      * maximized.
      *
-     * @param widthTexture Width of the texture the preview is displayed inside of
-     * @param heightTexture Height of the texture the preview is displayed inside of
-     * @param resolutions List of possible resolutions
+     * @param widthTexture Width of the texture the preview is displayed inside of. <= 0 if no view
+     * @param heightTexture Height of the texture the preview is displayed inside of. <= 0 if no view
+     * @param resolutions array of possible resolutions
      * @return index of the resolution
      */
     protected int selectResolution( int widthTexture, int heightTexture, Size[] resolutions  ) {
@@ -111,14 +156,14 @@ public abstract class BoofCamera2VideoActivity extends AppCompatActivity {
         double bestAspect = Double.MAX_VALUE;
         double bestArea = 0;
 
-        double textureAspect = widthTexture/(double)heightTexture;
+        double textureAspect = widthTexture > 0 ? widthTexture/(double)heightTexture:0;
 
         for( int i = 0; i < resolutions.length; i++ ) {
             Size s = resolutions[i];
             int width = s.getWidth();
             int height = s.getHeight();
 
-            double aspectScore = Math.abs(width - height*textureAspect)/width;
+            double aspectScore = widthTexture > 0 ? Math.abs(width - height*textureAspect)/width:1;
 
             if( aspectScore < bestAspect ) {
                 bestIndex = i;
@@ -179,7 +224,7 @@ public abstract class BoofCamera2VideoActivity extends AppCompatActivity {
     @SuppressWarnings("MissingPermission")
     private void openCamera(int widthTexture, int heightTexture) {
         if( verbose )
-            Log.i(TAG,"openCamera( texture "+widthTexture+" , "+heightTexture+")");
+            Log.i(TAG,"openCamera( texture: "+widthTexture+" , "+heightTexture+")");
         if (isFinishing()) {
             return;
         }
@@ -210,17 +255,17 @@ public abstract class BoofCamera2VideoActivity extends AppCompatActivity {
                 int which = selectResolution(widthTexture, heightTexture,sizes);
                 if( which < 0 || which >= sizes.length )
                     continue;
-                mPreviewSize = sizes[which];
+                mCameraSize = sizes[which];
                 this.cameraId = cameraId;
                 mSensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
 
                 if( verbose )
                     Log.i(TAG,"selected cameraId="+cameraId+" orientation="+mSensorOrientation);
 
-                onCameraResolutionChange( mPreviewSize.getWidth(), mPreviewSize.getHeight() );
+                onCameraResolutionChange( mCameraSize.getWidth(), mCameraSize.getHeight() );
                 try {
                     mPreviewReader = ImageReader.newInstance(
-                            mPreviewSize.getWidth(), mPreviewSize.getHeight(),
+                            mCameraSize.getWidth(), mCameraSize.getHeight(),
                             ImageFormat.YUV_420_888, 2);
                     mPreviewReader.setOnImageAvailableListener(onAvailableListener, null);
                     configureTransform(widthTexture, heightTexture);
@@ -249,7 +294,7 @@ public abstract class BoofCamera2VideoActivity extends AppCompatActivity {
 
     private void closeCamera() {
         if( verbose )
-            Log.i(TAG,"closeCamera");
+            Log.i(TAG,"closeCamera()");
         try {
             mCameraOpenCloseLock.lock();
             closePreviewSession();
@@ -257,6 +302,7 @@ public abstract class BoofCamera2VideoActivity extends AppCompatActivity {
                 mCameraDevice.close();
                 mCameraDevice = null;
             }
+            mCameraSize = null;
         } finally {
             mCameraOpenCloseLock.unlock();
         }
@@ -266,22 +312,24 @@ public abstract class BoofCamera2VideoActivity extends AppCompatActivity {
      * Start the camera preview.
      */
     private void startPreview() {
-        if (null == mCameraDevice || !mTextureView.isAvailable() || null == mPreviewSize) {
+        if (null == mCameraDevice || null == mCameraSize) {
             return;
         }
         try {
             closePreviewSession();
-            SurfaceTexture texture = mTextureView.getSurfaceTexture();
-            assert texture != null;
-            texture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
+            List<Surface> surfaces = new ArrayList<>();
             mPreviewRequestBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
 
-            List<Surface> surfaces = new ArrayList<>();
+            if( mTextureView != null && mTextureView.isAvailable() ) {
+                SurfaceTexture texture = mTextureView.getSurfaceTexture();
+                assert texture != null;
+                texture.setDefaultBufferSize(mCameraSize.getWidth(), mCameraSize.getHeight());
 
-            // Display the camera preview into this texture
-            Surface previewSurface = new Surface(texture);
-            surfaces.add(previewSurface);
-            mPreviewRequestBuilder.addTarget(previewSurface);
+                // Display the camera preview into this texture
+                Surface previewSurface = new Surface(texture);
+                surfaces.add(previewSurface);
+                mPreviewRequestBuilder.addTarget(previewSurface);
+            }
 
             // This is where the image for processing is extracted from
             Surface readerSurface = mPreviewReader.getSurface();
@@ -301,7 +349,7 @@ public abstract class BoofCamera2VideoActivity extends AppCompatActivity {
 
                         @Override
                         public void onConfigureFailed(@NonNull CameraCaptureSession session) {
-                            Toast.makeText(BoofCamera2VideoActivity.this, "Failed", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SimpleCamera2Activity.this, "Failed", Toast.LENGTH_SHORT).show();
                         }
                     }, null);
         } catch (CameraAccessException e) {
@@ -332,21 +380,21 @@ public abstract class BoofCamera2VideoActivity extends AppCompatActivity {
      * @param viewHeight The height of `mTextureView`
      */
     private void configureTransform(int viewWidth, int viewHeight) {
-        if (null == mTextureView || null == mPreviewSize) {
+        if (null == mTextureView || null == mCameraSize) {
             return;
         }
         int rotation = getWindowManager().getDefaultDisplay().getRotation();
         Matrix matrix = new Matrix();
         RectF viewRect = new RectF(0, 0, viewWidth, viewHeight);
-        RectF bufferRect = new RectF(0, 0, mPreviewSize.getHeight(), mPreviewSize.getWidth());
+        RectF bufferRect = new RectF(0, 0, mCameraSize.getHeight(), mCameraSize.getWidth());
         float centerX = viewRect.centerX();
         float centerY = viewRect.centerY();
         if (Surface.ROTATION_90 == rotation || Surface.ROTATION_270 == rotation) {
             bufferRect.offset(centerX - bufferRect.centerX(), centerY - bufferRect.centerY());
             matrix.setRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.FILL);
             float scale = Math.max(
-                    (float) viewHeight / mPreviewSize.getHeight(),
-                    (float) viewWidth / mPreviewSize.getWidth());
+                    (float) viewHeight / mCameraSize.getHeight(),
+                    (float) viewWidth / mCameraSize.getWidth());
             matrix.postScale(scale, scale, centerX, centerY);
             matrix.postRotate(90 * (rotation - 2), centerX, centerY);
         }
@@ -362,6 +410,22 @@ public abstract class BoofCamera2VideoActivity extends AppCompatActivity {
             mPreviewSession = null;
         }
     }
+
+    private View.OnLayoutChangeListener mViewLayoutChangeListeneer
+            = new View.OnLayoutChangeListener() {
+
+        @Override
+        public void onLayoutChange(View view, int left, int top, int right, int bottom,
+                                   int leftWas, int topWas, int rightWas, int bottomWas)
+        {
+            int width = right-left;
+            int height = bottom-top;
+            if( mCameraSize == null ) {
+                openCamera(width,height);
+            }
+            view.removeOnLayoutChangeListener(this);
+        }
+    };
 
     private TextureView.SurfaceTextureListener mSurfaceTextureListener
             = new TextureView.SurfaceTextureListener() {
@@ -393,7 +457,7 @@ public abstract class BoofCamera2VideoActivity extends AppCompatActivity {
         @Override
         public void onOpened(@NonNull CameraDevice cameraDevice) {
             if( verbose )
-                Log.i(TAG,"CameraDevice onOpened() id="+cameraDevice.getId());
+                Log.i(TAG,"CameraDevice Callback onOpened() id="+cameraDevice.getId());
             mCameraDevice = cameraDevice;
             startPreview();
             mCameraOpenCloseLock.unlock();
@@ -405,7 +469,7 @@ public abstract class BoofCamera2VideoActivity extends AppCompatActivity {
         @Override
         public void onDisconnected(@NonNull CameraDevice cameraDevice) {
             if( verbose )
-                Log.i(TAG,"CameraDevice onDisconnected() id="+cameraDevice.getId());
+                Log.i(TAG,"CameraDevice Callback onDisconnected() id="+cameraDevice.getId());
             mCameraOpenCloseLock.unlock();
             cameraDevice.close();
             mCameraDevice = null;
@@ -414,7 +478,7 @@ public abstract class BoofCamera2VideoActivity extends AppCompatActivity {
         @Override
         public void onError(@NonNull CameraDevice cameraDevice, int error) {
             if( verbose )
-                Log.e(TAG,"CameraDevice onError() error="+error);
+                Log.e(TAG,"CameraDevice Callback onError() error="+error);
             mCameraOpenCloseLock.unlock();
             cameraDevice.close();
             mCameraDevice = null;

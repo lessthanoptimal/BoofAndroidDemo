@@ -131,7 +131,6 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		ip.addChild("Binary Ops",BinaryDisplayActivity.class);
 		ip.addChild("Enhance",EnhanceDisplayActivity.class);
 		ip.addChild("Transform",ImageTransformActivity.class);
-		ip.addChild("DEBUG",DisplayCamera2Activity.class);
 
 		detect.addChild("Corner/Blob",PointDisplayActivity.class);
 		detect.addChild("Scale Space",ScalePointDisplayActivity.class);
