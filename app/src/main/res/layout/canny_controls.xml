@@ -21,6 +21,6 @@
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:text="Colorized"
-			android:checked="true"
+			android:checked="false"
 			android:id="@+id/check_colorize" android:layout_gravity="center"/>
 </LinearLayout>

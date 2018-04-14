@@ -4,7 +4,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.os.Bundle;
 import android.text.TextPaint;
 import android.view.LayoutInflater;
@@ -103,15 +102,14 @@ public class CannyEdgeActivity extends DemoCamera2Activity
 		Paint paintFade = new Paint();
 		TextPaint paintText = new TextPaint();
 		Paint paintLine = new Paint();
-		private Path path = new Path();
 
 		boolean lineLimit = false;
 
 		public CannyProcessing() {
 			this.canny = FactoryEdgeDetectors.canny(2, true, true, GrayU8.class, GrayS16.class);
 
-			paintLine.setStrokeWidth(2);
-			paintLine.setStyle(Paint.Style.STROKE);
+			paintLine.setStrokeWidth(1);
+			paintLine.setStyle(Paint.Style.FILL);
 
 			paintText.setColor(Color.WHITE);
 			paintText.setTextSize(20* getResources().getDisplayMetrics().density);
@@ -152,13 +150,12 @@ public class CannyEdgeActivity extends DemoCamera2Activity
 					if (length <= 0)
 						continue;
 
-					path.reset();
+					// Renders much faster drawing rects than a path
 					Point2D_I32 p = contours.get(where++);
-					path.moveTo(p.x, p.y);
+					canvas.drawRect(p.x,p.y,p.x+1,p.y+1,paintLine);
 					for (int j = 1; j < length; j++) {
 						p = contours.get(where++);
-						;
-						path.lineTo(p.x, p.y);
+						canvas.drawRect(p.x,p.y,p.x+1,p.y+1,paintLine);
 					}
 					if( colorize && i >= nextColor) {
 						// draw all points from the same shape
@@ -166,7 +163,6 @@ public class CannyEdgeActivity extends DemoCamera2Activity
 						paintLine.setColor(rand.nextInt());
 						nextColor += colorEdges.get(edgeIndex++);
 					}
-					canvas.drawPath(path, paintLine);
 				}
 			}
 		}
@@ -184,7 +180,7 @@ public class CannyEdgeActivity extends DemoCamera2Activity
 				contours.reset();
 				edgeLengths.reset();
 				colorEdges.reset();
-				escape:for (int i = 0; i < found.size(); i++) {
+				for (int i = 0; i < found.size(); i++) {
 					EdgeContour e = found.get(i);
 
 					for (int j = 0; j < e.segments.size(); j++) {
@@ -195,11 +191,11 @@ public class CannyEdgeActivity extends DemoCamera2Activity
 						}
 						edgeLengths.add(s.points.size());
 						// abort if there are too many points and rendering will get slow
-						if( contours.size > 5000 ) {
-							lineLimit = true;
-							colorEdges.add( j+1 );
-							break escape;
-						}
+//						if( contours.size > 5000 ) {
+//							lineLimit = true;
+//							colorEdges.add( j+1 );
+//							break escape;
+//						}
 					}
 					colorEdges.add( e.segments.size() );
 				}
