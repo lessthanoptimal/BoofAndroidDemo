@@ -59,8 +59,8 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
 
     private static final String TAG = "VisualizeCamera2";
 
-    TextureView textureView; // used to display camera preview directly to screen
-    DisplayView displayView; // used to render visuals
+    protected TextureView textureView; // used to display camera preview directly to screen
+    protected DisplayView displayView; // used to render visuals
 
     //---- START Owned By imagLock
     protected final Object imageLock = new Object();
@@ -71,7 +71,7 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
     //---- START owned by bitmapLock
     protected final Object bitmapLock = new Object();
     protected Bitmap bitmap = Bitmap.createBitmap(1,1, Bitmap.Config.ARGB_8888);
-    protected byte[] convertTmp =  new byte[1];
+    protected byte[] bitmapTmp =  new byte[1];
     //---- END
 
     LinkedBlockingQueue threadQueue = new LinkedBlockingQueue();
@@ -196,7 +196,7 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
             synchronized (bitmapLock) {
                 if (bitmap.getWidth() != width || bitmap.getHeight() != height)
                     bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-                convertTmp = ConvertBitmap.declareStorage(bitmap, convertTmp);
+                bitmapTmp = ConvertBitmap.declareStorage(bitmap, bitmapTmp);
             }
         }
         // Compute transform from bitmap to view coordinates
@@ -295,7 +295,7 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
             // Copy this frame
             if (showBitmap) {
                 synchronized (bitmapLock) {
-                    ConvertBitmap.grayToBitmap((GrayU8) image, bitmap, convertTmp);
+                    ConvertBitmap.grayToBitmap((GrayU8) image, bitmap, bitmapTmp);
                 }
             }
 
@@ -347,7 +347,7 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
     /**
      * Custom view for visualizing results
      */
-    private class DisplayView extends SurfaceView implements SurfaceHolder.Callback {
+    public class DisplayView extends SurfaceView implements SurfaceHolder.Callback {
 
         SurfaceHolder mHolder;
 

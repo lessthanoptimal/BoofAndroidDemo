@@ -1,11 +1,11 @@
 package org.boofcv.android.detect;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -13,14 +13,15 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-import org.boofcv.android.DemoVideoDisplayActivity;
+import org.boofcv.android.DemoFilterCamera2Activity;
+import org.boofcv.android.DemoProcessing;
 import org.boofcv.android.R;
+import org.ddogleg.struct.FastQueue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +31,6 @@ import boofcv.alg.color.ColorHsv;
 import boofcv.alg.shapes.polygon.DetectPolygonBinaryGrayRefine;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
-import boofcv.android.camera.VideoImageProcessing;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.FactoryShapeDetector;
@@ -45,7 +45,7 @@ import georegression.struct.shapes.Polygon2D_F64;
  *
  * @author Peter Abeles
  */
-public class DetectBlackPolygonActivity extends DemoVideoDisplayActivity
+public class DetectBlackPolygonActivity extends DemoFilterCamera2Activity
 		implements AdapterView.OnItemSelectedListener , View.OnTouchListener {
 
 	static final int MAX_SIDES = 20;
@@ -77,6 +77,9 @@ public class DetectBlackPolygonActivity extends DemoVideoDisplayActivity
 	int colors[] = new int[ MAX_SIDES - MIN_SIDES + 1];
 
 	public DetectBlackPolygonActivity() {
+		super(Resolution.MEDIUM);
+		super.showBitmap = true;
+
 		double rgb[] = new double[3];
 
 		for (int i = 0; i < colors.length; i++) {
@@ -102,48 +105,39 @@ public class DetectBlackPolygonActivity extends DemoVideoDisplayActivity
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.detect_black_polygon_controls,null);
 
-		LinearLayout parent = getViewContent();
-		parent.addView(controls);
-
-		FrameLayout iv = getViewPreview();
-		iv.setOnTouchListener(this);
-
-		spinnerThresholder = (Spinner)controls.findViewById(R.id.spinner_algs);
+		spinnerThresholder = controls.findViewById(R.id.spinner_algs);
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
 				R.array.threshold_styles, android.R.layout.simple_spinner_item);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinnerThresholder.setAdapter(adapter);
 		spinnerThresholder.setOnItemSelectedListener(this);
 
-		TextView.OnEditorActionListener listener = new EditText.OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					checkUpdateSides();
-				}
-				return false; // pass on to other listeners.
-			}
-		};
+		TextView.OnEditorActionListener listener = (v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                checkUpdateSides();
+            }
+            return false; // pass on to other listeners.
+        };
 
-		editMin = (EditText) controls.findViewById(R.id.sides_minimum);
+		editMin = controls.findViewById(R.id.sides_minimum);
 		editMin.setText("" + minSides);
 		editMin.setOnEditorActionListener(listener);
 
-		editMax = (EditText) controls.findViewById(R.id.sides_maximum);
+		editMax = controls.findViewById(R.id.sides_maximum);
 		editMax.setText("" + maxSides);
 		editMax.setOnEditorActionListener(listener);
 
-		toggleConvex = (ToggleButton) controls.findViewById(R.id.toggle_convex);
+		toggleConvex = controls.findViewById(R.id.toggle_convex);
 		convex = toggleConvex.isChecked();
-		toggleConvex.setOnClickListener(new ToggleButton.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				convex = toggleConvex.isChecked();
-				synchronized ( DetectBlackPolygonActivity.this ) {
-					detector.getDetector().setConvex(convex);
-				}
-			}
-		});
+		toggleConvex.setOnClickListener(v -> {
+            convex = toggleConvex.isChecked();
+            synchronized ( DetectBlackPolygonActivity.this ) {
+                detector.getDetector().setConvex(convex);
+            }
+        });
+
+		setControls(controls);
+		displayView.setOnTouchListener(this);
 	}
 
 	@Override
@@ -236,22 +230,48 @@ public class DetectBlackPolygonActivity extends DemoVideoDisplayActivity
 		return false;
 	}
 
-	protected class PolygonProcessing extends VideoImageProcessing<GrayU8> {
+	protected class PolygonProcessing implements DemoProcessing<GrayU8> {
 
-		List<Polygon2D_F64> found = new ArrayList<>();
+		final List<Polygon2D_F64> found = new ArrayList<>();
+		final FastQueue<Polygon2D_F64> copy = new FastQueue<>(Polygon2D_F64.class,true);
 
-		protected PolygonProcessing() {
-			super(ImageType.single(GrayU8.class));
+		Path path = new Path();
+
+		@Override
+		public void initialize(int imageWidth, int imageHeight) {
+			binary.reshape(imageWidth,imageHeight);
 		}
 
 		@Override
-		protected void declareImages(int width, int height) {
-			super.declareImages(width, height);
-			binary.reshape(width,height);
+		public void onDraw(Canvas canvas, Matrix imageToView) {
+			synchronized (bitmapLock) {
+				canvas.drawBitmap(bitmap, imageToView, null);
+			}
+
+			canvas.setMatrix(imageToView);
+			synchronized (copy) {
+				for( int i = 0; i < copy.size; i++ ) {
+					Polygon2D_F64 s = copy.get(i);
+					paint.setColor(colors[s.size() - MIN_SIDES]);
+
+
+					path.reset();
+					for (int j = 0; j < s.size(); j++) {
+						Point2D_F64 p = s.get(j);
+						if (j == 0)
+							path.moveTo((float) p.x, (float) p.y);
+						else
+							path.lineTo((float) p.x, (float) p.y);
+					}
+					Point2D_F64 p = s.get(0);
+					path.lineTo((float) p.x, (float) p.y);
+					canvas.drawPath(path, paint);
+				}
+			}
 		}
 
 		@Override
-		protected void process(GrayU8 image, Bitmap output, byte[] storage) {
+		public void process(GrayU8 image) {
 			if( sidesUpdated ) {
 				sidesUpdated = false;
 				detector.getDetector().setNumberOfSides(minSides,maxSides);
@@ -263,28 +283,36 @@ public class DetectBlackPolygonActivity extends DemoVideoDisplayActivity
 
 			detector.process(image,binary);
 
-			if( showInput ) {
-				ConvertBitmap.boofToBitmap(image,output,storage);
-			} else {
-				VisualizeImageData.binaryToBitmap(binary,false,output,storage);
-			}
-
-			Canvas canvas = new Canvas(output);
-
-			detector.getPolygons(found,null);
-
-			for( Polygon2D_F64 s : found )  {
-				paint.setColor(colors[s.size()-MIN_SIDES]);
-
-				for (int i = 1; i < s.size(); i++) {
-					Point2D_F64 a = s.get(i-1);
-					Point2D_F64 b = s.get(i);
-					canvas.drawLine((float)a.x,(float)a.y,(float)b.x,(float)b.y,paint);
+			synchronized (copy) {
+				copy.reset();
+				detector.getPolygons(found, null);
+				for (int i = 0; i < found.size(); i++) {
+					copy.grow().set(found.get(i));
 				}
-				Point2D_F64 a = s.get(s.size()-1);
-				Point2D_F64 b = s.get(0);
-				canvas.drawLine((float)a.x,(float)a.y,(float)b.x,(float)b.y,paint);
 			}
+
+			synchronized (bitmapLock) {
+				if (showInput) {
+					ConvertBitmap.boofToBitmap(image, bitmap,bitmapTmp );
+				} else {
+					VisualizeImageData.binaryToBitmap(binary, false, bitmap, bitmapTmp);
+				}
+			}
+		}
+
+		@Override
+		public void stop() {
+
+		}
+
+		@Override
+		public boolean isThreadSafe() {
+			return false;
+		}
+
+		@Override
+		public ImageType<GrayU8> getImageType() {
+			return ImageType.single(GrayU8.class);
 		}
 	}
 }

@@ -20,13 +20,13 @@ public class DemoFilterCamera2Activity extends DemoCamera2Activity {
         synchronized (bitmapLock) {
             if (bitmap.getWidth() != width || bitmap.getHeight() != height)
                 bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-            convertTmp = ConvertBitmap.declareStorage(bitmap, convertTmp);
+            bitmapTmp = ConvertBitmap.declareStorage(bitmap, bitmapTmp);
         }
     }
 
     protected void convertToOutput(GrayU8 blurred ) {
         synchronized (bitmapLock) {
-            ConvertBitmap.grayToBitmap(blurred, bitmap, convertTmp);
+            ConvertBitmap.grayToBitmap(blurred, bitmap, bitmapTmp);
         }
     }
 

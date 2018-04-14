@@ -100,7 +100,7 @@ public class BinaryDisplayActivity extends DemoFilterCamera2Activity
 
 	protected void convertToOutput(GrayU8 binary ) {
 		synchronized (bitmapLock) {
-			VisualizeImageData.binaryToBitmap(binary, false,bitmap, convertTmp);
+			VisualizeImageData.binaryToBitmap(binary, false,bitmap, bitmapTmp);
 		}
 	}
 

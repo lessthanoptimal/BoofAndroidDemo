@@ -140,8 +140,7 @@
             android:name=".tracker.StaticBackgroundMotionActivity"
             android:screenOrientation="landscape" />
         <activity
-            android:name=".detect.DetectBlackPolygonActivity"
-            android:screenOrientation="landscape" />
+            android:name=".detect.DetectBlackPolygonActivity"/>
         <activity android:name=".detect.DetectBlackPolygonHelpActivity" />
         <activity
             android:name=".detect.DetectBlackEllipseActivity"
