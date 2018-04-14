@@ -2,8 +2,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
+    <FrameLayout
+        android:id="@+id/camera_frame_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#000000"
+        android:orientation="vertical">
     <TextureView
         android:id="@+id/texture"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
+    </FrameLayout>
 </LinearLayout>

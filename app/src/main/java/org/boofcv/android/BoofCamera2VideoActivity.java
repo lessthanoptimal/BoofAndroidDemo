@@ -55,7 +55,7 @@ public abstract class BoofCamera2VideoActivity extends AppCompatActivity {
 
     private CameraDevice mCameraDevice;
     private CameraCaptureSession mPreviewSession;
-    private TextureView mTextureView;
+    protected TextureView mTextureView;
     // size of camera preview
     private Size mPreviewSize;
 
@@ -113,17 +113,24 @@ public abstract class BoofCamera2VideoActivity extends AppCompatActivity {
 
         double textureAspect = widthTexture/(double)heightTexture;
 
+        int rotation = getWindowManager().getDefaultDisplay().getRotation();
+        boolean swap = rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270;
+        swap = false;
+
         for( int i = 0; i < resolutions.length; i++ ) {
             Size s = resolutions[i];
-            double aspectScore = Math.abs(s.getWidth() - s.getHeight()*textureAspect)/s.getWidth();
+            int width = swap ? s.getHeight() : s.getWidth();
+            int height = swap ? s.getWidth() : s.getHeight();
+
+            double aspectScore = Math.abs(width - height*textureAspect)/width;
 
             if( aspectScore < bestAspect ) {
                 bestIndex = i;
                 bestAspect = aspectScore;
-                bestArea = s.getWidth()*s.getHeight();
+                bestArea = width*height;
             } else if( Math.abs(aspectScore-bestArea) <= 1e-8 ) {
                 bestIndex = i;
-                double area = s.getWidth()*s.getHeight();
+                double area = width*height;
                 if( area > bestArea ) {
                     bestArea = area;
                 }
@@ -142,6 +149,12 @@ public abstract class BoofCamera2VideoActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Override to do custom configuration of the camera's settings. By default the camera
+     * is put into auto mode.
+     *
+     * @param captureRequestBuilder used to configure the camera
+     */
     protected void configureCamera( CaptureRequest.Builder captureRequestBuilder ) {
         captureRequestBuilder.set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_AUTO);
     }
@@ -156,10 +169,10 @@ public abstract class BoofCamera2VideoActivity extends AppCompatActivity {
 
     /**
      * Process a single frame from the video feed. Image is automatically
-     * closed after this function exists. No need to manually close it.
+     * closed after this function exists. No need to invoke image.close() manually.
      *
-     * All implementations of this function must run very fast. if it takes
-     * long than a few milliseconds spawn a thread and process the
+     * All implementations of this function must run very fast. Less than 5 milliseconds is a good
+     * rule of thumb. If longer than that then you should spawn a thread and process the
      * image inside of that.
      */
     protected abstract void processFrame( Image image );

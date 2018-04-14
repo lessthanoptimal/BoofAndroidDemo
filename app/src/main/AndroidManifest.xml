@@ -155,8 +155,7 @@
             android:screenOrientation="landscape" />
 
         <activity
-            android:name="DisplayCamera2Activity"
-            android:screenOrientation="landscape" />
+            android:name="DisplayCamera2Activity"/>
     </application>
 
 </manifest>
