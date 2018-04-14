@@ -113,14 +113,10 @@ public abstract class BoofCamera2VideoActivity extends AppCompatActivity {
 
         double textureAspect = widthTexture/(double)heightTexture;
 
-        int rotation = getWindowManager().getDefaultDisplay().getRotation();
-        boolean swap = rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270;
-        swap = false;
-
         for( int i = 0; i < resolutions.length; i++ ) {
             Size s = resolutions[i];
-            int width = swap ? s.getHeight() : s.getWidth();
-            int height = swap ? s.getWidth() : s.getHeight();
+            int width = s.getWidth();
+            int height = s.getHeight();
 
             double aspectScore = Math.abs(width - height*textureAspect)/width;
 
