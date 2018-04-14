@@ -3,6 +3,8 @@ package org.boofcv.android;
 import android.graphics.Canvas;
 import android.util.Size;
 import android.view.SurfaceView;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 
 import boofcv.struct.image.ImageBase;
 
@@ -20,6 +22,15 @@ public class DemoCamera2Activity extends VisualizeCamera2Activity {
 
         super.showBitmap = true;
         super.visualizeOnlyMostRecent = true;
+    }
+
+    protected void setControls(LinearLayout controls ) {
+        setContentView(R.layout.standard_camera2);
+        LinearLayout parent = findViewById(R.id.root_layout);
+        parent.addView(controls);
+
+        FrameLayout surfaceLayout = findViewById(R.id.camera_frame_layout);
+        startCamera(surfaceLayout,null);
     }
 
     @Override
@@ -56,7 +67,7 @@ public class DemoCamera2Activity extends VisualizeCamera2Activity {
     /**
      * Changes the processor used to process the video frames
      */
-    public void setProcessor( DemoProcessing processor ) {
+    public void setProcessing(DemoProcessing processor ) {
         synchronized (lockProcessor) {
             // shut down the previous processor
             if( this.processor != null ) {

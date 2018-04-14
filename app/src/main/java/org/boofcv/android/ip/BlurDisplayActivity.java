@@ -113,7 +113,7 @@ public class BlurDisplayActivity extends DemoFilterCamera2Activity
 				throw new RuntimeException("Unknown");
 		}
 		processing.setRadius(radius);
-		setProcessor(processing);
+		setProcessing(processing);
 	}
 
 	@Override

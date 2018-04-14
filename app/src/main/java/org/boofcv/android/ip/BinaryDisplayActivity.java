@@ -71,7 +71,7 @@ public class BinaryDisplayActivity extends DemoFilterCamera2Activity
 	@Override
 	protected void onResume() {
 		super.onResume();
-		setProcessor(new ThresholdProcessing() );
+		setProcessing(new ThresholdProcessing() );
 	}
 
 	@Override

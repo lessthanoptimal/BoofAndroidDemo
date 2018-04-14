@@ -103,6 +103,7 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/manifest-checker" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/manifests" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/multi-dex" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/pre-dexed" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/prebuild" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/reload-dex" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/res" />
@@ -112,55 +113,56 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/split-apk" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/splits-support" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/symbols" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/tmp" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/transforms" />
       <excludeFolder url="file://$MODULE_DIR$/build/outputs" />
       <excludeFolder url="file://$MODULE_DIR$/build/tmp" />
     </content>
     <orderEntry type="jdk" jdkName="Android API 27 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Gradle: org.boofcv:boofcv-feature:0.29@jar" level="project" />
-    <orderEntry type="library" name="Gradle: com.android.support:support-v4-27.1.1" level="project" />
-    <orderEntry type="library" name="Gradle: android.arch.lifecycle:common:1.1.0@jar" level="project" />
-    <orderEntry type="library" name="Gradle: com.android.support:support-annotations:27.1.1@jar" level="project" />
-    <orderEntry type="library" name="Gradle: org.georegression:georegression:0.15@jar" level="project" />
-    <orderEntry type="library" name="Gradle: com.android.support:animated-vector-drawable-27.1.1" level="project" />
-    <orderEntry type="library" name="Gradle: com.android.support:support-compat-27.1.1" level="project" />
-    <orderEntry type="library" name="Gradle: org.ejml:ejml-dsparse:0.33@jar" level="project" />
-    <orderEntry type="library" name="Gradle: org.boofcv:boofcv-recognition:0.29@jar" level="project" />
-    <orderEntry type="library" name="Gradle: org.deepboof:learning:0.4@jar" level="project" />
-    <orderEntry type="library" name="Gradle: org.yaml:snakeyaml:1.17@jar" level="project" />
-    <orderEntry type="library" name="Gradle: android.arch.lifecycle:viewmodel-1.1.0" level="project" />
-    <orderEntry type="library" name="Gradle: com.google.protobuf:protobuf-java:2.6.1@jar" level="project" />
-    <orderEntry type="library" name="Gradle: org.boofcv:boofcv-ip:0.29@jar" level="project" />
-    <orderEntry type="library" name="Gradle: org.boofcv:boofcv-sfm:0.29@jar" level="project" />
-    <orderEntry type="library" name="Gradle: org.ejml:ejml-zdense:0.33@jar" level="project" />
-    <orderEntry type="library" name="Gradle: com.android.support:support-vector-drawable-27.1.1" level="project" />
-    <orderEntry type="library" name="Gradle: com.android.support:support-media-compat-27.1.1" level="project" />
-    <orderEntry type="library" name="Gradle: com.android.support:support-core-ui-27.1.1" level="project" />
-    <orderEntry type="library" name="Gradle: org.boofcv:boofcv-calibration:0.29@jar" level="project" />
-    <orderEntry type="library" name="Gradle: org.ejml:ejml-ddense:0.33@jar" level="project" />
-    <orderEntry type="library" name="Gradle: com.android.support:support-core-utils-27.1.1" level="project" />
-    <orderEntry type="library" name="Gradle: net.lingala.zip4j:zip4j:1.3.2@jar" level="project" />
-    <orderEntry type="library" name="Gradle: org.ejml:ejml-fdense:0.33@jar" level="project" />
-    <orderEntry type="library" name="Gradle: org.boofcv:boofcv-learning:0.29@jar" level="project" />
-    <orderEntry type="library" name="Gradle: org.rauschig:jarchivelib:0.5.0@jar" level="project" />
-    <orderEntry type="library" name="Gradle: org.boofcv:boofcv-io:0.29@jar" level="project" />
-    <orderEntry type="library" name="Gradle: com.android.support:support-fragment-27.1.1" level="project" />
-    <orderEntry type="library" name="Gradle: org.deepboof:main:0.4@jar" level="project" />
-    <orderEntry type="library" name="Gradle: android.arch.core:runtime-1.1.0" level="project" />
-    <orderEntry type="library" name="Gradle: org.boofcv:boofcv-geo:0.29@jar" level="project" />
-    <orderEntry type="library" name="Gradle: org.deepboof:io:0.4@jar" level="project" />
-    <orderEntry type="library" name="Gradle: com.android.support:appcompat-v7-27.1.1" level="project" />
-    <orderEntry type="library" name="Gradle: com.google.code.findbugs:jsr305:3.0.2@jar" level="project" />
-    <orderEntry type="library" name="Gradle: org.ejml:ejml-core:0.33@jar" level="project" />
-    <orderEntry type="library" name="Gradle: android.arch.lifecycle:livedata-core-1.1.0" level="project" />
-    <orderEntry type="library" name="Gradle: org.boofcv:boofcv-android:0.29@jar" level="project" />
-    <orderEntry type="library" name="Gradle: org.ejml:ejml-simple:0.33@jar" level="project" />
-    <orderEntry type="library" name="Gradle: org.ejml:ejml-cdense:0.33@jar" level="project" />
-    <orderEntry type="library" name="Gradle: org.deepboof:models:0.4@jar" level="project" />
-    <orderEntry type="library" name="Gradle: android.arch.core:common:1.1.0@jar" level="project" />
-    <orderEntry type="library" name="Gradle: org.boofcv:boofcv-core:0.29@jar" level="project" />
-    <orderEntry type="library" name="Gradle: org.ddogleg:ddogleg:0.13@jar" level="project" />
-    <orderEntry type="library" name="Gradle: android.arch.lifecycle:runtime-1.1.0" level="project" />
+    <orderEntry type="library" name="org.boofcv:boofcv-android:0.29@jar" level="project" />
+    <orderEntry type="library" name="org.ejml:ejml-simple:0.33@jar" level="project" />
+    <orderEntry type="library" name="org.ejml:ejml-ddense:0.33@jar" level="project" />
+    <orderEntry type="library" name="com.android.support:animated-vector-drawable-27.1.1" level="project" />
+    <orderEntry type="library" name="com.android.support:appcompat-v7-27.1.1" level="project" />
+    <orderEntry type="library" name="org.ejml:ejml-zdense:0.33@jar" level="project" />
+    <orderEntry type="library" name="org.deepboof:models:0.4@jar" level="project" />
+    <orderEntry type="library" name="org.deepboof:main:0.4@jar" level="project" />
+    <orderEntry type="library" name="org.boofcv:boofcv-ip:0.29@jar" level="project" />
+    <orderEntry type="library" name="android.arch.core:common:1.1.0@jar" level="project" />
+    <orderEntry type="library" name="org.ejml:ejml-fdense:0.33@jar" level="project" />
+    <orderEntry type="library" name="org.boofcv:boofcv-core:0.29@jar" level="project" />
+    <orderEntry type="library" name="org.ejml:ejml-dsparse:0.33@jar" level="project" />
+    <orderEntry type="library" name="org.rauschig:jarchivelib:0.5.0@jar" level="project" />
+    <orderEntry type="library" name="net.lingala.zip4j:zip4j:1.3.2@jar" level="project" />
+    <orderEntry type="library" name="com.google.protobuf:protobuf-java:2.6.1@jar" level="project" />
+    <orderEntry type="library" name="org.boofcv:boofcv-recognition:0.29@jar" level="project" />
+    <orderEntry type="library" name="org.deepboof:learning:0.4@jar" level="project" />
+    <orderEntry type="library" name="com.android.support:support-vector-drawable-27.1.1" level="project" />
+    <orderEntry type="library" name="android.arch.lifecycle:runtime-1.1.0" level="project" />
+    <orderEntry type="library" name="android.arch.lifecycle:common:1.1.0@jar" level="project" />
+    <orderEntry type="library" name="org.yaml:snakeyaml:1.17@jar" level="project" />
+    <orderEntry type="library" name="org.boofcv:boofcv-io:0.29@jar" level="project" />
+    <orderEntry type="library" name="org.georegression:georegression:0.15@jar" level="project" />
+    <orderEntry type="library" name="org.ejml:ejml-cdense:0.33@jar" level="project" />
+    <orderEntry type="library" name="org.ejml:ejml-core:0.33@jar" level="project" />
+    <orderEntry type="library" name="com.android.support:support-core-ui-27.1.1" level="project" />
+    <orderEntry type="library" name="com.android.support:support-compat-27.1.1" level="project" />
+    <orderEntry type="library" name="android.arch.lifecycle:viewmodel-1.1.0" level="project" />
+    <orderEntry type="library" name="org.boofcv:boofcv-calibration:0.29@jar" level="project" />
+    <orderEntry type="library" name="org.boofcv:boofcv-geo:0.29@jar" level="project" />
+    <orderEntry type="library" name="com.google.code.findbugs:jsr305:3.0.2@jar" level="project" />
+    <orderEntry type="library" name="android.arch.lifecycle:livedata-core-1.1.0" level="project" />
+    <orderEntry type="library" name="org.boofcv:boofcv-sfm:0.29@jar" level="project" />
+    <orderEntry type="library" name="org.boofcv:boofcv-feature:0.29@jar" level="project" />
+    <orderEntry type="library" name="com.android.support:support-core-utils-27.1.1" level="project" />
+    <orderEntry type="library" name="org.boofcv:boofcv-learning:0.29@jar" level="project" />
+    <orderEntry type="library" name="com.android.support:support-fragment-27.1.1" level="project" />
+    <orderEntry type="library" name="org.ddogleg:ddogleg:0.13@jar" level="project" />
+    <orderEntry type="library" name="com.android.support:support-media-compat-27.1.1" level="project" />
+    <orderEntry type="library" name="org.deepboof:io:0.4@jar" level="project" />
+    <orderEntry type="library" name="com.android.support:support-annotations:27.1.1@jar" level="project" />
+    <orderEntry type="library" name="com.android.support:support-v4-27.1.1" level="project" />
+    <orderEntry type="library" name="android.arch.core:runtime-1.1.0" level="project" />
   </component>
 </module>
