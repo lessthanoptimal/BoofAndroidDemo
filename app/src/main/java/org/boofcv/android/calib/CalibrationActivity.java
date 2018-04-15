@@ -308,7 +308,6 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 						debugEllipses.addAll(alg.getEllipseDetector().getFoundEllipses(null));
 					} else if( detector instanceof CalibrationDetectorCircleRegularGrid) {
 						DetectCircleRegularGrid<GrayF32> alg = ((CalibrationDetectorCircleRegularGrid) detector).getDetector();
-
 						debugEllipses.clear();
 						debugEllipses.addAll(alg.getEllipseDetector().getFoundEllipses(null));
 					}

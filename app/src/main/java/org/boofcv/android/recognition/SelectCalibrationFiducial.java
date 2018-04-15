@@ -67,11 +67,11 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 			}
 		});
 
-		spinnerTarget = (Spinner) controls.findViewById(R.id.spinner_type);
-		textRows = (EditText) controls.findViewById(R.id.text_rows);
-		textCols = (EditText) controls.findViewById(R.id.text_cols);
+		spinnerTarget = controls.findViewById(R.id.spinner_type);
+		textRows = controls.findViewById(R.id.text_rows);
+		textCols = controls.findViewById(R.id.text_cols);
 
-		updateWidgetValues();
+		updateControlValues();
 
 		final FrameLayout preview = controls.findViewById(R.id.target_frame);
 		final DrawCalibrationFiducial vis = new DrawCalibrationFiducial(activity,this);
@@ -103,6 +103,7 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 				try {
 					cc.targetType = indexToCalib(spinnerTarget.getSelectedItemPosition());
+					updateControlValues();
 					vis.invalidate();
 				} catch( NumberFormatException ignore ){}
 			}
@@ -145,7 +146,7 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 		}
 	}
 
-	private void updateWidgetValues() {
+	private void updateControlValues() {
 		int numCols,numRows;
 
 		switch( cc.targetType ) {
@@ -184,7 +185,8 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		adapter.add("Chessboard");
 		adapter.add("Square Grid");
-		adapter.add("Circle Asymm");
+		adapter.add("Circle Hex");
+		adapter.add("Circle Grid");
 
 		spinnerTarget.setAdapter(adapter);
 	}
