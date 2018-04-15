@@ -36,8 +36,6 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 
 	ConfigAllCalibration cc;
 
-	Activity activity;
-
 	public SelectCalibrationFiducial(ConfigAllCalibration configCalibration) {
 		this.cc = configCalibration;
 	}
@@ -48,11 +46,10 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 	 * @param activity Reference to acitvity launching this dialog
 	 * @param success If use selects OK then run() is called.  Called while in GUI thread.
 	 */
-	public void create( Activity activity , final Runnable success ) {
+	public void show( Activity activity , final Runnable success ) {
 		if (Looper.getMainLooper().getThread() != Thread.currentThread())
 			throw new RuntimeException("Egads");
 
-		this.activity = activity;
 		LayoutInflater inflater = activity.getLayoutInflater();
 		final LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.calibration_configure, null);
 
@@ -70,7 +67,7 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
                 setRowCol(numRows,numCols);
                 success.run();
             } else {
-                Toast.makeText(SelectCalibrationFiducial.this.activity, "Invalid configuration!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, "Invalid configuration!", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -172,7 +169,7 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 		textSpace.addTextChangedListener(watcherSpace);
 		spinnerTarget.setOnItemSelectedListener(spinnerSelected);
 
-		setupTargetSpinner();
+		setupTargetSpinner(activity);
 		dialog.show();
 	}
 
@@ -272,7 +269,7 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 		}
 	}
 
-	private void setupTargetSpinner() {
+	private void setupTargetSpinner( Activity activity ) {
 		if (Looper.getMainLooper().getThread() != Thread.currentThread())
 			throw new RuntimeException("Egads");
 

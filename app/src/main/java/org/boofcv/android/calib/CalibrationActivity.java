@@ -1,6 +1,5 @@
 package org.boofcv.android.calib;
 
-import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -56,8 +55,6 @@ import georegression.struct.shapes.Polygon2D_F64;
  */
 public class CalibrationActivity extends PointTrackerDisplayActivity
 {
-	public static final int TARGET_DIALOG = 10;
-
 	public static ConfigAllCalibration cc = new ConfigAllCalibration();
 	Paint paintPoint = new Paint();
 	Paint paintFailed = new Paint();
@@ -108,14 +105,15 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 
 		shots = new ArrayList<>();
 
-		showDialog(TARGET_DIALOG);
-
 		setControls(controls);
 		mDetector = new GestureDetector(this, new MyGestureDetector());
 		displayView.setOnTouchListener((v, event) -> {
             mDetector.onTouchEvent(event);
             return true;
         });
+
+		SelectCalibrationFiducial dialog = new SelectCalibrationFiducial(cc);
+		dialog.show(this, this::startVideoProcessing);
 	}
 
 	@Override
@@ -160,17 +158,6 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 	public void pressedHelp( View view ) {
 		Intent intent = new Intent(this, CalibrationHelpActivity.class);
 		startActivity(intent);
-	}
-
-	@Override
-	protected Dialog onCreateDialog(int id) {
-		switch (id) {
-			case TARGET_DIALOG:
-				final SelectCalibrationFiducial dialog = new SelectCalibrationFiducial(cc);
-
-				dialog.create(this, () -> startVideoProcessing());
-		}
-		return super.onCreateDialog(id);
 	}
 
 	/**

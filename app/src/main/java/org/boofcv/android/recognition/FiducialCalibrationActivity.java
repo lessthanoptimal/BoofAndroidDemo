@@ -1,6 +1,5 @@
 package org.boofcv.android.recognition;
 
-import android.app.Dialog;
 import android.os.Bundle;
 
 import boofcv.abst.fiducial.FiducialDetector;
@@ -13,8 +12,6 @@ import boofcv.struct.image.GrayU8;
  */
 public class FiducialCalibrationActivity extends FiducialSquareActivity {
 
-	public static final int TARGET_DIALOG = 10;
-
 	public static ConfigAllCalibration cc = new ConfigAllCalibration();
 
 	public FiducialCalibrationActivity() {
@@ -26,24 +23,8 @@ public class FiducialCalibrationActivity extends FiducialSquareActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		showDialog(TARGET_DIALOG);
-	}
-
-	@Override
-	protected Dialog onCreateDialog(int id) {
-		switch (id) {
-			case TARGET_DIALOG:
-				final SelectCalibrationFiducial dialog = new SelectCalibrationFiducial(cc);
-
-				dialog.create(this, new Runnable() {
-					@Override
-					public void run() {
-						changed = true;
-						FiducialCalibrationActivity.this.startDetector();
-					}
-				});
-		}
-		return super.onCreateDialog(id);
+		SelectCalibrationFiducial dialog = new SelectCalibrationFiducial(cc);
+		dialog.show(this, this::startDetector);
 	}
 
 	@Override
