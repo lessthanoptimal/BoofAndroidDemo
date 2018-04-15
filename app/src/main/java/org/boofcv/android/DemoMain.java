@@ -127,7 +127,7 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 
 		ip.addChild("Blur",BlurDisplayActivity.class);
 		ip.addChild("Gradient",GradientDisplayActivity.class);
-		ip.addChild("Auto Threshold",ThresholdDisplayActivity.class);
+		ip.addChild("Binarization",ThresholdDisplayActivity.class);
 		ip.addChild("Binary Ops",BinaryDisplayActivity.class);
 		ip.addChild("Enhance",EnhanceDisplayActivity.class);
 		ip.addChild("Transform",ImageTransformActivity.class);

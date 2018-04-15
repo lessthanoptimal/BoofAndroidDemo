@@ -115,8 +115,7 @@
             android:name=".detect.SegmentationDisplayActivity"
             android:screenOrientation="landscape" />
         <activity
-            android:name=".ip.ThresholdDisplayActivity"
-            android:screenOrientation="landscape" />
+            android:name=".ip.ThresholdDisplayActivity"/>
         <activity
             android:name=".recognition.FiducialSquareBinaryActivity"
             android:screenOrientation="landscape" />

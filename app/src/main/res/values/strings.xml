@@ -22,9 +22,12 @@
     <string-array name="thresholding">
         <item>Global: Otsu</item>
         <item>Global: Entropy</item>
-        <item>Adaptive: Square</item>
-        <item>Adaptive: Gaussian</item>
-        <item>Adaptive: Sauvola</item>
+        <item>Local: Mean</item>
+        <item>Local: Gaussian</item>
+        <item>Local: Sauvola</item>
+        <item>Block: Mean</item>
+        <item>Block: Min-Max</item>
+        <item>Block: Otsu</item>
     </string-array>
 
     <string-array name="background_models">
