@@ -222,7 +222,8 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
             return;
         }
 
-        imageToView.postRotate(90 * (-rotation+1), width/2, height/2);
+
+        imageToView.postRotate(-90*rotation + mSensorOrientation, width/2, height/2);
         imageToView.postTranslate(offsetX,offsetY);
         imageToView.postScale(scale,scale);
         if( stretchToFill ) {
