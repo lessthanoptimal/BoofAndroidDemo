@@ -99,8 +99,7 @@
             android:name=".ip.ImageTransformActivity"
             android:screenOrientation="landscape" />
         <activity
-            android:name=".tracker.ObjectTrackerActivity"
-            android:screenOrientation="landscape" />
+            android:name=".tracker.ObjectTrackerActivity"/>
         <activity
             android:name=".detect.ContourShapeFittingActivity"
             android:screenOrientation="landscape" />

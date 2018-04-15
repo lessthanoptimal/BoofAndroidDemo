@@ -10,6 +10,10 @@ Date: 2018
 - Calibration
   * Scaled visuals to support higher resolutions better
   * Moved calibration to an application public directory that can be accessed without rooting the phone
+- KLT has a slider that controls the number of features
+- Canny shows a washed out image in the background
+- Object Tracker doesn't force all trackers to use color.
+  * This makes some trackers MUCH faster
   TODO update how calibration targets are rendered in preview
   TODO support width and center distance in calib targets
 - TODO Added calibration circle regular grid support
