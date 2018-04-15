@@ -7,18 +7,17 @@ Version 1.9
 Date: 2018
 
 - Updated to BoofCV v0.29
+- Ported many activities over to Camera2 API
 - Calibration
-  * Scaled visuals to support higher resolutions better
   * Moved calibration to an application public directory that can be accessed without rooting the phone
+  * Supports all calibration target types
+  * Better rendering
+  * Better configuration UI
 - KLT has a slider that controls the number of features
 - Canny shows a washed out image in the background
 - Object Tracker doesn't force all trackers to use color.
   * This makes some trackers MUCH faster
-  TODO update how calibration targets are rendered in preview
-  TODO support width and center distance in calib targets
-- TODO Added calibration circle regular grid support
 
-- TODO fixed issue where number pad was excessively large and out of view
 - TODO Add distort MLS example
 - TODO Add QR Code detector example
 - TODO Add equirectangular to pinhole viewer

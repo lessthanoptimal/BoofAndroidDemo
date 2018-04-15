@@ -19,14 +19,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
 import boofcv.abst.geo.calibration.ImageResults;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.calibration.CalibrationPlanarGridZhang99;
-import boofcv.alg.geo.calibration.Zhang99AllParam;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.struct.calib.CameraPinholeRadial;
 import georegression.struct.point.Point2D_F64;
@@ -41,7 +40,7 @@ import georegression.struct.point.Point2D_F64;
 public class CalibrationComputeActivity extends Activity {
 
 	// image information which is to be processed
-	public static List<CalibrationImageInfo> images;
+	public static List<CalibrationObservation> images;
 	public static List<Point2D_F64> targetLayout;
 	public static CameraPinholeRadial intrinsic;
 
@@ -141,19 +140,11 @@ public class CalibrationComputeActivity extends Activity {
 	}
 
 	private void write( final String message ) {
-		runOnUiThread(new Runnable() {
-			public void run() {
-				text.setText(text.getText() + message + "\n");
-			}
-		});
+		runOnUiThread(() -> text.setText(text.getText() + message + "\n"));
 	}
 
 	private void clearText() {
-		runOnUiThread(new Runnable() {
-			public void run() {
-				text.setText("");
-			}
-		});
+		runOnUiThread(() -> text.setText(""));
 	}
 
 	private class CalibrationThread extends Thread implements CalibrationPlanarGridZhang99.Listener
@@ -163,27 +154,26 @@ public class CalibrationComputeActivity extends Activity {
 		@Override
 		public void run() {
 			write("Processing images.  Could take a bit.");
-			List<CalibrationObservation> points = new ArrayList<CalibrationObservation>();
-			for( CalibrationImageInfo c : images ) {
-				calibrationAlg.addImage(c.calibPoints);
+			for( CalibrationObservation c : images ) {
+				calibrationAlg.addImage(c);
 			}
 			// TODO uncomment in BoofCV 0.30
 //			calibrationAlg.getZhang99().setListener(this);
-			CameraPinholeRadial intrinsic = calibrationAlg.process();
-			Zhang99AllParam param = calibrationAlg.getZhangParam();
+			intrinsic = calibrationAlg.process();
 
 			try {
 				clearText();
+				Locale loc = Locale.getDefault();
 				write("Intrinsic Parameters: "+intrinsic.width+" "+intrinsic.height);
-				write(String.format("fx = %6.2f fy = %6.2f",intrinsic.fx,intrinsic.fy));
-				write(String.format("cx = %6.2f cy = %6.2f",intrinsic.cx,intrinsic.cy));
-				write(String.format("radial = [ %6.2e ][ %6.2e ]",intrinsic.radial[0],intrinsic.radial[1]));
+				write(String.format(loc,"fx = %6.2f fy = %6.2f",intrinsic.fx,intrinsic.fy));
+				write(String.format(loc,"cx = %6.2f cy = %6.2f",intrinsic.cx,intrinsic.cy));
+				write(String.format(loc,"radial = [ %6.2e ][ %6.2e ]",intrinsic.radial[0],intrinsic.radial[1]));
 				write("----------------------------");
-				List<ImageResults> results = CalibrateMonoPlanar.computeErrors(points, param, targetLayout);
+				List<ImageResults> results = calibrationAlg.getErrors();
 				double totalError = 0;
 				for( int i = 0; i < results.size(); i++ ) {
 					ImageResults r = results.get(i);
-					write(String.format("[%3d] mean error = %7.3f",i,r.meanError));
+					write(String.format(loc,"[%3d] mean error = %7.3f",i,r.meanError));
 					totalError += r.meanError;
 				}
 				write("Average error = "+(totalError/results.size()));
@@ -195,7 +185,8 @@ public class CalibrationComputeActivity extends Activity {
                 });
 			} catch( RuntimeException e ) {
 				// if a stop is requested a runtime exception is thrown
-				write("Calibration thread stopped");
+				write("Calibration Exception");
+				write("   "+e.getMessage());
 			}
 
 

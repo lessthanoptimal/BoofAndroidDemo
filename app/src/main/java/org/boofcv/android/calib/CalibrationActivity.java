@@ -8,6 +8,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -57,12 +58,14 @@ import georegression.struct.shapes.Polygon2D_F64;
  */
 public class CalibrationActivity extends PointTrackerDisplayActivity
 {
+	public static final String TAG = "CalibrationActivity";
+
 	public static ConfigAllCalibration cc = new ConfigAllCalibration();
 	Paint paintPoint = new Paint();
 	Paint paintFailed = new Paint();
 
 	// Storage for calibration info
-	List<CalibrationImageInfo> shots;
+	List<CalibrationObservation> shots;
 
 	// user has requested that the next image be processed for the target
 	boolean captureRequested = false;
@@ -95,8 +98,8 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 		paintPoint.setStyle(Paint.Style.FILL);
 
 		paintFailed.setColor(Color.CYAN);
-		paintFailed.setStyle(Paint.Style.FILL);
-		paintFailed.setStrokeWidth(3f);
+		paintFailed.setStyle(Paint.Style.STROKE);
+		paintFailed.setStrokeWidth(7f);
 	}
 
 	@Override
@@ -230,9 +233,6 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 
 			synchronized (lockGUI) {
 				canvas.setMatrix(imageToView);
-				// scale the visuals based on the image size
-				paintFailed.setStrokeWidth(5f * bitmap.getWidth() / 640);
-				float radius = 5 * bitmap.getWidth() / 640;
 
 				// draw shapes for debugging purposes
 				for (List<Point2D_I32> l : debugQuads) {
@@ -265,7 +265,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 				// draw detected calibration points
 				for (int i = 0; i < pointsGui.size(); i++) {
 					Point2D_F64 p = pointsGui.get(i);
-					canvas.drawCircle((float) p.x, (float) p.y, radius, paintPoint);
+					canvas.drawCircle((float) p.x, (float) p.y, 6, paintPoint);
 				}
 			}
 		}
@@ -284,11 +284,18 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 			if( timeResume > System.currentTimeMillis() )
 				return;
 
+			synchronized (bitmapLock) {
+				ConvertBitmap.grayToBitmap(input, bitmap, bitmapTmp);
+			}
+
 			boolean detected = false;
 			showDetectDebug = false;
 			if( captureRequested ) {
 				captureRequested = false;
+				long before = System.currentTimeMillis();
 				detected = collectMeasurement(input);
+				long after = System.currentTimeMillis();
+				Log.i(TAG,"detection time "+(after-before)+" (ms)");
 			}
 
 			// safely copy data into data structures used by GUI thread
@@ -318,10 +325,6 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 						debugEllipses.addAll(alg.getEllipseDetector().getFoundEllipses(null));
 					}
 				}
-			}
-
-			synchronized (bitmapLock) {
-				ConvertBitmap.grayToBitmap(input, bitmap, bitmapTmp);
 			}
 		}
 
@@ -368,7 +371,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 			timeResume = System.currentTimeMillis()+1500;
 
 			if( success ) {
-				shots.add( new CalibrationImageInfo(gray,detector.getDetectedPoints()));
+				shots.add(detector.getDetectedPoints());
 				updateShotCountInUiThread();
 				return true;
 			}  else {
@@ -382,11 +385,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 		 */
 		private void updateShotCountInUiThread() {
 			final int size = shots.size();
-			runOnUiThread(new Runnable() {
-				public void run() {
-					textCount.setText(""+size);
-				}
-			});
+			runOnUiThread(() -> textCount.setText(""+size));
 		}
 	}
 }
