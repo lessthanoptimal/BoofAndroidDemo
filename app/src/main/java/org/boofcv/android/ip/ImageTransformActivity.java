@@ -1,6 +1,7 @@
 package org.boofcv.android.ip;
 
-import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,7 +10,8 @@ import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 
-import org.boofcv.android.DemoVideoDisplayActivity;
+import org.boofcv.android.DemoFilterCamera2Activity;
+import org.boofcv.android.DemoProcessing;
 import org.boofcv.android.R;
 
 import boofcv.abst.transform.fft.DiscreteFourierTransform;
@@ -20,7 +22,6 @@ import boofcv.alg.transform.fft.DiscreteFourierTransformOps;
 import boofcv.alg.transform.wavelet.UtilWavelet;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
-import boofcv.android.camera.VideoImageProcessing;
 import boofcv.core.image.ConvertImage;
 import boofcv.factory.transform.pyramid.FactoryPyramid;
 import boofcv.factory.transform.wavelet.FactoryWaveletTransform;
@@ -40,11 +41,14 @@ import boofcv.struct.wavelet.WlCoef;
  *
  * @author Peter Abeles
  */
-public class ImageTransformActivity extends DemoVideoDisplayActivity
+public class ImageTransformActivity extends DemoFilterCamera2Activity
 		implements AdapterView.OnItemSelectedListener
 {
-
 	Spinner spinnerView;
+
+	public ImageTransformActivity() {
+		super(Resolution.MEDIUM);
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -53,15 +57,14 @@ public class ImageTransformActivity extends DemoVideoDisplayActivity
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.select_algorithm,null);
 
-		LinearLayout parent = getViewContent();
-		parent.addView(controls);
-
-		spinnerView = (Spinner)controls.findViewById(R.id.spinner_algs);
+		spinnerView = controls.findViewById(R.id.spinner_algs);
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
 				R.array.transforms, android.R.layout.simple_spinner_item);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinnerView.setAdapter(adapter);
 		spinnerView.setOnItemSelectedListener(this);
+
+		setControls(controls);
 	}
 
 	@Override
@@ -94,25 +97,24 @@ public class ImageTransformActivity extends DemoVideoDisplayActivity
 		}
 	}
 
-	protected class FourierProcessing extends VideoImageProcessing<GrayU8> {
+	protected class FourierProcessing implements DemoProcessing<GrayU8> {
 		DiscreteFourierTransform<GrayF32,InterleavedF32> dft = DiscreteFourierTransformOps.createTransformF32();
 		GrayF32 grayF;
 		InterleavedF32 transform;
 
-		protected FourierProcessing() {
-			super(ImageType.single(GrayU8.class));
+		@Override
+		public void initialize(int imageWidth, int imageHeight) {
+			grayF = new GrayF32(imageWidth,imageHeight);
+			transform = new InterleavedF32(imageWidth,imageHeight,2);
 		}
 
 		@Override
-		protected void declareImages( int width , int height ) {
-			super.declareImages(width, height);
-
-			grayF = new GrayF32(width,height);
-			transform = new InterleavedF32(width,height,2);
+		public void onDraw(Canvas canvas, Matrix imageToView) {
+			drawBitmap(canvas,imageToView);
 		}
 
 		@Override
-		protected void process(GrayU8 input, Bitmap output, byte[] storage) {
+		public void process(GrayU8 input) {
 			ConvertImage.convert(input, grayF);
 			PixelMath.divide(grayF,255.0f,grayF);
 			dft.forward(grayF, transform);
@@ -121,12 +123,24 @@ public class ImageTransformActivity extends DemoVideoDisplayActivity
 			PixelMath.log(grayF,grayF);
 			float max = ImageStatistics.maxAbs(grayF);
 			PixelMath.multiply(grayF, 255f / max, grayF);
-			ConvertBitmap.grayToBitmap(grayF, output, storage);
+			synchronized (bitmapLock) {
+				ConvertBitmap.grayToBitmap(grayF, bitmap, bitmapTmp);
+			}
+		}
+
+		@Override
+		public void stop() {}
+
+		@Override
+		public boolean isThreadSafe() {return false;}
+
+		@Override
+		public ImageType<GrayU8> getImageType() {
+			return ImageType.single(GrayU8.class);
 		}
 	}
 
-	protected class PyramidProcessing<C extends WlCoef>
-			extends VideoImageProcessing<GrayU8>
+	protected class PyramidProcessing implements DemoProcessing<GrayU8>
 	{
 		ImagePyramid<GrayU8> pyramid = FactoryPyramid.discreteGaussian(new int[]{2,4,8,16},-1,2,false,
 				ImageType.single(GrayU8.class));
@@ -134,20 +148,23 @@ public class ImageTransformActivity extends DemoVideoDisplayActivity
 		GrayU8 output;
 		GrayU8 sub = new GrayU8();
 
-		protected PyramidProcessing() {
-			super(ImageType.single(GrayU8.class));
+		private void draw( int x0 , int y0 , GrayU8 layer ) {
+			output.subimage(x0,y0,x0+layer.width,y0+layer.height,sub);
+			sub.setTo(layer);
 		}
 
 		@Override
-		protected void declareImages( int width , int height ) {
-			super.declareImages(width, height);
-
-			output = new GrayU8(width,height);
+		public void initialize(int imageWidth, int imageHeight) {
+			output = new GrayU8(imageWidth,imageHeight);
 		}
 
 		@Override
-		protected void process(GrayU8 input, Bitmap output, byte[] storage) {
+		public void onDraw(Canvas canvas, Matrix imageToView) {
+			drawBitmap(canvas, imageToView);
+		}
 
+		@Override
+		public void process(GrayU8 input) {
 			pyramid.process(input);
 
 			draw(0, 0, pyramid.getLayer(0));
@@ -159,50 +176,68 @@ public class ImageTransformActivity extends DemoVideoDisplayActivity
 				height += l.getHeight();
 			}
 
-			ConvertBitmap.grayToBitmap(this.output, output, storage);
+			synchronized (bitmapLock) {
+				ConvertBitmap.grayToBitmap(this.output, bitmap, bitmapTmp);
+			}
 		}
 
-		private void draw( int x0 , int y0 , GrayU8 layer ) {
-			output.subimage(x0,y0,x0+layer.width,y0+layer.height,sub);
-			sub.setTo(layer);
+		@Override
+		public void stop() {}
+
+		@Override
+		public boolean isThreadSafe() {return false;}
+
+		@Override
+		public ImageType<GrayU8> getImageType() {
+			return ImageType.single(GrayU8.class);
 		}
 	}
 
 	protected class WaveletProcessing<C extends WlCoef>
-			extends VideoImageProcessing<GrayU8>
+			implements DemoProcessing<GrayU8>
 	{
 		WaveletDescription<C> desc = GFactoryWavelet.haar(GrayU8.class);
 		WaveletTransform<GrayU8,GrayS32,C> waveletTran =
 				FactoryWaveletTransform.create(GrayU8.class, desc, 3, 0, 255);
 		GrayS32 transform;
 
-		protected WaveletProcessing() {
-			super(ImageType.single(GrayU8.class));
-		}
-
 		@Override
-		protected void declareImages( int width , int height ) {
-			super.declareImages(width, height);
-
-
-			ImageDimension d = UtilWavelet.transformDimension(width, height, waveletTran.getLevels() );
+		public void initialize(int imageWidth, int imageHeight) {
+			ImageDimension d = UtilWavelet.transformDimension(imageWidth, imageHeight, waveletTran.getLevels() );
 			transform = new GrayS32(d.width,d.height);
 		}
 
 		@Override
-		protected void process(GrayU8 input, Bitmap output, byte[] storage) {
+		public void onDraw(Canvas canvas, Matrix imageToView) {
+			drawBitmap(canvas, imageToView);
+		}
 
-			waveletTran.transform(input,transform);
-			System.out.println("BOOF: num levels " + waveletTran.getLevels());
-			System.out.println("BOOF: width "+transform.getWidth()+" "+transform.getHeight());
+		@Override
+		public void process(GrayU8 input) {
+			waveletTran.transform(input, transform);
+//			System.out.println("BOOF: num levels " + waveletTran.getLevels());
+//			System.out.println("BOOF: width "+transform.getWidth()+" "+transform.getHeight());
 			UtilWavelet.adjustForDisplay(transform, waveletTran.getLevels(), 255);
 
 			// if needed, crop the transform for visualization
 			GrayS32 transform = this.transform;
-			if( transform.width != output.getWidth() || transform.height != output.getHeight() )
-			    transform = transform.subimage(0,0,output.getWidth(),output.getHeight(),null);
+			synchronized (bitmapLock) {
+				if (transform.width != bitmap.getWidth() || transform.height != bitmap.getHeight())
+					transform = transform.subimage(0, 0, bitmap.getWidth(), bitmap.getHeight(), null);
 
-			VisualizeImageData.grayMagnitude(transform,255,output,storage);
+				VisualizeImageData.grayMagnitude(transform, 255, bitmap, bitmapTmp);
+			}
+		}
+
+		@Override
+		public void stop() {}
+
+		@Override
+		public boolean isThreadSafe() {return false;}
+
+		@Override
+		public ImageType<GrayU8> getImageType() {
+			return ImageType.single(GrayU8.class);
 		}
 	}
 }

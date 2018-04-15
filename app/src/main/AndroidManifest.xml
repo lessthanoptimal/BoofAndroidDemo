@@ -51,8 +51,7 @@
             android:name=".ip.EnhanceDisplayActivity"
             android:screenOrientation="landscape" />
         <activity
-            android:name=".ip.GradientDisplayActivity"
-            android:screenOrientation="landscape" />
+            android:name=".ip.GradientDisplayActivity"/>
         <activity
             android:name=".ip.BinaryDisplayActivity"/>
         <activity
@@ -96,8 +95,7 @@
             android:name=".detect.ShapeFitDisplayActivity"
             android:screenOrientation="landscape" />
         <activity
-            android:name=".ip.ImageTransformActivity"
-            android:screenOrientation="landscape" />
+            android:name=".ip.ImageTransformActivity"/>
         <activity
             android:name=".tracker.ObjectTrackerActivity"/>
         <activity
