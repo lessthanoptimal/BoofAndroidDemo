@@ -1,6 +1,7 @@
 package org.boofcv.android.calib;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -37,6 +38,7 @@ import boofcv.alg.fiducial.calib.circle.DetectCircleHexagonalGrid;
 import boofcv.alg.fiducial.calib.circle.DetectCircleRegularGrid;
 import boofcv.alg.fiducial.calib.grid.DetectSquareGridFiducial;
 import boofcv.alg.geo.calibration.CalibrationObservation;
+import boofcv.android.ConvertBitmap;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayF32;
@@ -86,6 +88,9 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 	public CalibrationActivity() {
 		super(Resolution.R640x480);
 
+		// this activity wants control over what is shown
+		super.showBitmap = false;
+
 		paintPoint.setColor(Color.RED);
 		paintPoint.setStyle(Paint.Style.FILL);
 
@@ -123,6 +128,16 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 
 		if( DemoMain.preference.intrinsic != null ) {
 			Toast.makeText(this, "Camera already calibrated", Toast.LENGTH_SHORT).show();
+		}
+	}
+
+	@Override
+	protected void onCameraResolutionChange(int width, int height) {
+		super.onCameraResolutionChange(width, height);
+		synchronized (bitmapLock) {
+			if (bitmap.getWidth() != width || bitmap.getHeight() != height)
+				bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+			bitmapTmp = ConvertBitmap.declareStorage(bitmap, bitmapTmp);
 		}
 	}
 
@@ -203,6 +218,10 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 
 		@Override
 		public void onDraw(Canvas canvas, Matrix imageToView) {
+			synchronized (bitmapLock) {
+				canvas.drawBitmap(bitmap, imageToView, null);
+			}
+
 			if( processRequested ) {
 				processRequested = false;
 				handleProcessRequest();
@@ -301,7 +320,9 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 				}
 			}
 
-
+			synchronized (bitmapLock) {
+				ConvertBitmap.grayToBitmap(input, bitmap, bitmapTmp);
+			}
 		}
 
 		@Override
