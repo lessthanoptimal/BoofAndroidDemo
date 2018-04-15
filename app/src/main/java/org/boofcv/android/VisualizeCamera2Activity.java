@@ -18,17 +18,14 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.nio.ByteBuffer;
 import java.util.Stack;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import boofcv.android.ConvertBitmap;
-import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
 /**
@@ -68,6 +65,7 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
     protected final Object imageLock = new Object();
     protected ImageType imageType = ImageType.single(GrayU8.class);
     protected Stack<ImageBase> stackImages = new Stack<>(); // images which are available for use
+    byte[] convertWork = new byte[1]; // work space for converting images
     //---- END
 
     //---- START owned by bitmapLock
@@ -248,6 +246,8 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
     protected void setImageType( ImageType type ) {
         synchronized (imageLock){
             this.imageType = type;
+            // todo check to see if the type is the same or not before clearing
+            this.stackImages.clear();
         }
     }
 
@@ -264,7 +264,8 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
             } else {
                 converted = stackImages.pop();
             }
-            convert(image,converted);
+            convertWork = ConvertYuv420_888.declareWork(image, convertWork);
+            ConvertYuv420_888.yuvToBoof(image,converted, convertWork);
 
             threadPool.execute(()->processImageOuter(converted));
         }
@@ -297,7 +298,7 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
             // Copy this frame
             if (showBitmap) {
                 synchronized (bitmapLock) {
-                    ConvertBitmap.grayToBitmap((ImageGray) image, bitmap, bitmapTmp);
+                    ConvertBitmap.boofToBitmap(image, bitmap, bitmapTmp);
                 }
             }
 
@@ -315,46 +316,6 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
             if( imageType.getNumBands() != image.getImageType().getNumBands() )
                 return;
             stackImages.add(image);
-        }
-    }
-
-    byte[] storageRow = new byte[1];
-
-    protected void convert( Image src , ImageBase dst ) {
-        if( dst instanceof GrayU8 ) {
-            GrayU8 gray = (GrayU8) dst;
-            Image.Plane plane = src.getPlanes()[0];
-            gray.reshape(plane.getRowStride(), src.getHeight());
-            gray.width = src.getWidth();
-            gray.stride = plane.getRowStride();
-            gray.subImage = true;
-
-            ByteBuffer buffer = plane.getBuffer();
-            buffer.rewind();
-            buffer.get(gray.data, 0, plane.getRowStride() * src.getHeight());
-        } else if( dst instanceof GrayF32) {
-            GrayF32 gray = (GrayF32) dst;
-            Image.Plane plane = src.getPlanes()[0];
-            gray.reshape(plane.getRowStride(), src.getHeight());
-            gray.width = src.getWidth();
-            gray.stride = plane.getRowStride();
-            gray.subImage = true;
-
-            if( storageRow.length < gray.stride ) {
-                storageRow = new byte[gray.stride];
-            }
-
-            ByteBuffer buffer = plane.getBuffer();
-            buffer.rewind();
-            for (int row = 0,index=0; row < gray.height; row++) {
-                buffer.get(storageRow, 0, gray.stride);
-                for (int i = 0; i < gray.stride; i++) {
-                    gray.data[index++] = storageRow[i]&0xFF;
-                }
-            }
-
-        } else {
-            throw new RuntimeException("Unsupported dst type");
         }
     }
 
