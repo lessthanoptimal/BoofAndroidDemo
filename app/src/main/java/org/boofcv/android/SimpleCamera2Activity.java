@@ -77,6 +77,9 @@ public abstract class SimpleCamera2Activity extends AppCompatActivity {
     private ImageReader mPreviewReader;
     private CaptureRequest.Builder mPreviewRequestBuilder;
 
+    // width and height of the view the camera is displayed in
+    protected int viewWidth,viewHeight;
+
     // If true there will be verbose outpput to Log
     protected boolean verbose = true;
 
@@ -231,6 +234,10 @@ public abstract class SimpleCamera2Activity extends AppCompatActivity {
         CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
         if( manager == null )
             throw new RuntimeException("Null camera manager");
+
+        // Save the size of the component the camera feed is being displayed inside of
+        this.viewWidth = widthTexture;
+        this.viewHeight = heightTexture;
 
         try {
             if( verbose )

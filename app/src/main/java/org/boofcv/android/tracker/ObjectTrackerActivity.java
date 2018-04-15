@@ -210,15 +210,6 @@ public class ObjectTrackerActivity extends DemoCamera2Activity
 			return true;
 		}
 
-		float pts[] = new float[2];
-		void mapPoints( Matrix matrix , double x , double y , Point2D_F64 out ) {
-			pts[0] = (float)x;
-			pts[1] = (float)y;
-			matrix.mapPoints(pts);
-			out.x = pts[0];
-			out.y = pts[1];
-		}
-
 		@Override
 		public void initialize(int imageWidth, int imageHeight) {
 			this.width = imageWidth;
@@ -234,8 +225,8 @@ public class ObjectTrackerActivity extends DemoCamera2Activity
 				Point2D_F64 b = new Point2D_F64();
 
 				if ( imageToView.invert(inverse)) {
-					mapPoints(inverse, click0.x, click0.y, a);
-					mapPoints(inverse, click1.x, click1.y, b);
+					applyToPoint(inverse, click0.x, click0.y, a);
+					applyToPoint(inverse, click1.x, click1.y, b);
 
 					canvas.drawRect((int) a.x, (int) a.y, (int) b.x, (int) b.y, paintSelected);
 				}
@@ -243,8 +234,8 @@ public class ObjectTrackerActivity extends DemoCamera2Activity
 				if (!imageToView.invert(inverse)) {
 					return;
 				}
-				mapPoints(inverse,click0.x, click0.y, location.a);
-				mapPoints(inverse,click1.x, click1.y, location.c);
+				applyToPoint(inverse,click0.x, click0.y, location.a);
+				applyToPoint(inverse,click1.x, click1.y, location.c);
 
 				// make sure the user selected a valid region
 				makeInBounds(location.a);

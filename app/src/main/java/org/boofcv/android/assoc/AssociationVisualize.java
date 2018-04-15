@@ -4,8 +4,11 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.util.DisplayMetrics;
 import android.util.TypedValue;
+import android.view.View;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +26,8 @@ import georegression.struct.point.Point2D_F64;
  */
 public class AssociationVisualize {
 
-	public static int SEPARATION = 10;
+	// seperation between the two images
+	public int SEPARATION;
 
 	Activity owner;
 
@@ -43,8 +47,9 @@ public class AssociationVisualize {
 	public byte[] storage;
 
 	// transform between image and output
-	double scale;
-	double tranX,tranY;
+	public Matrix renderToScreen = new Matrix();
+	public double scale;
+	public double tranX,tranY;
 
 	// which features are matched between the two views
 	List<Point2D_F64> locationSrc = new ArrayList<Point2D_F64>();
@@ -55,8 +60,12 @@ public class AssociationVisualize {
 	int mouseX,mouseY;
 	boolean hasMatch = false;
 
+	int renderWidth,renderHeight;
+
 	public AssociationVisualize(Activity owner) {
 		this.owner = owner;
+
+		DisplayMetrics metrics = owner.getApplicationContext().getResources().getDisplayMetrics();
 
 		paintPoint.setColor(Color.RED);
 		paintPoint.setStyle(Paint.Style.FILL);
@@ -64,8 +73,8 @@ public class AssociationVisualize {
 		paintWideLine.setColor(Color.RED);
 		paintWideLine.setStrokeWidth(3);
 
-		textPaint.setColor(Color.BLUE);
-		textPaint.setTextSize(60);
+		textPaint.setColor(Color.CYAN);
+		textPaint.setTextSize(14*metrics.density);
 
 		paintLine.setStrokeWidth(2);
 	}
@@ -83,6 +92,11 @@ public class AssociationVisualize {
 		bitmapSrc = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 		bitmapDst = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 		storage = ConvertBitmap.declareStorage(bitmapSrc, storage);
+
+		SEPARATION = (int)(width*0.05);
+
+		renderWidth = width*2 + SEPARATION;
+		renderHeight = height;
 	}
 
 	public int getOutputWidth() {
@@ -175,22 +189,10 @@ public class AssociationVisualize {
 		}
 	}
 
-	public void render(Canvas canvas, double tranX , double tranY , double scale ) {
-		this.scale = scale;
-		this.tranX = tranX;
-		this.tranY = tranY;
+	public void render(View view , Canvas canvas) {
+		render(view,canvas,hasLeft,hasRight);
 
 		int startX = bitmapSrc.getWidth()+SEPARATION;
-
-		// draw captured images
-		if( hasLeft ) {
-			canvas.drawBitmap(bitmapSrc,0,0,null);
-		}
-
-		if( hasRight ) {
-			canvas.drawBitmap(bitmapDst,startX,0,null);
-		}
-
 		// draw features and matches
 		if( hasMatches() ) {
 			// see if the user is selecting a point
@@ -200,14 +202,10 @@ public class AssociationVisualize {
 				drawAllMatches(canvas, startX);
 			}
 		}
-
-		// it's scaled to image size
-		canvas.restore();
-
 		// provide a hint to the user for what they should be doing
-		int x4 = canvas.getWidth()/4;
-		int x2 = canvas.getWidth()/2;
-		int y2 = canvas.getHeight()/2;
+		int x4 = renderWidth/4;
+		int x2 = renderWidth/2;
+		int y2 = renderHeight/2;
 
 		int textLength = (int)textPaint.measureText("Touch Here");
 
@@ -216,6 +214,28 @@ public class AssociationVisualize {
 		}
 		if( !hasRight ) {
 			canvas.drawText("Touch Here", x2+x4-textLength/2,y2, textPaint);
+		}
+	}
+
+	public void render( View view , Canvas canvas , boolean showLeft , boolean showRight) {
+		scale = Math.min(view.getWidth()/(double)renderWidth,view.getHeight()/(double)renderHeight);
+		tranX = (view.getWidth()-scale*renderWidth)/2;
+		tranY = (view.getHeight()-scale*renderHeight)/2;
+		renderToScreen.reset();
+		renderToScreen.postScale((float)scale,(float)scale);
+		renderToScreen.postTranslate((float)tranX,(float)tranY);
+
+		canvas.setMatrix(renderToScreen);
+
+		int startX = bitmapSrc.getWidth()+SEPARATION;
+
+		// draw captured images
+		if( showLeft ) {
+			canvas.drawBitmap(bitmapSrc,0,0,null);
+		}
+
+		if( showRight ) {
+			canvas.drawBitmap(bitmapDst,startX,0,null);
 		}
 	}
 
@@ -261,7 +281,7 @@ public class AssociationVisualize {
 				owner.getResources().getDisplayMetrics());
 		// 1 cm tolerance
 
-		double bestDistance = Math.pow((px*10)/scale,2);
+		double bestDistance = Math.pow((px*10),2);
 		int best = -1;
 
 		Point2D_F64 imagePt = new Point2D_F64();

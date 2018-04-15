@@ -46,6 +46,7 @@ import org.boofcv.android.tracker.KltDisplayActivity;
 import org.boofcv.android.tracker.ObjectTrackerActivity;
 import org.boofcv.android.tracker.StaticBackgroundMotionActivity;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
@@ -58,6 +59,8 @@ import java.util.Map;
 import boofcv.io.calibration.CalibrationIO;
 
 public class DemoMain extends Activity implements ExpandableListView.OnChildClickListener {
+
+	public static final String TAG = "DemoMain";
 
 	// contains information on all the cameras.  less error prone and easier to deal with
 	public static List<CameraSpecs> specs = new ArrayList<CameraSpecs>();
@@ -83,7 +86,7 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		loadCameraSpecs();
 		createGroups();
 
-		ExpandableListView listView = (ExpandableListView) findViewById(R.id.DemoListView);
+		ExpandableListView listView = findViewById(R.id.DemoListView);
 
 		SimpleExpandableListAdapter expListAdapter =
 				new SimpleExpandableListAdapter(
@@ -311,11 +314,19 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 	private void loadIntrinsic() {
 		preference.intrinsic = null;
 		try {
-			FileInputStream fos = openFileInput("cam"+preference.cameraId+".txt");
-			Reader reader = new InputStreamReader(fos);
-			preference.intrinsic = CalibrationIO.load(reader);
+			File directory = new File(getExternalFilesDir(null),"calibration");
+			String name = "cam"+preference.cameraId+".txt";
+			File file = new File(directory,name);
+			if( file.exists() ) {
+				FileInputStream fos = new FileInputStream(file);
+				Reader reader = new InputStreamReader(fos);
+				preference.intrinsic = CalibrationIO.load(reader);
+				Log.i(TAG,"Loaded camera intrinsics for "+preference.cameraId);
+			} else {
+				Log.w(TAG,"Intrinsic parameters for camera "+preference.cameraId+" doesn't exit");
+			}
 		} catch (RuntimeException e) {
-			Log.w("DemoMain", "Failed to load intrinsic parameters: "+e.getClass().getSimpleName());
+			Log.w(TAG, "Failed to load intrinsic parameters: "+e.getClass().getSimpleName());
 			e.printStackTrace();
 		} catch (FileNotFoundException ignore) {
 		}

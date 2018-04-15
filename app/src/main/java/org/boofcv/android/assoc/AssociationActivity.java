@@ -1,19 +1,21 @@
 package org.boofcv.android.assoc;
 
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 
 import org.boofcv.android.CreateDetectorDescriptor;
-import org.boofcv.android.DemoVideoDisplayActivity;
+import org.boofcv.android.DemoCamera2Activity;
+import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
 import org.ddogleg.struct.FastQueue;
 
@@ -24,7 +26,6 @@ import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.alg.descriptor.UtilFeature;
-import boofcv.android.camera.VideoRenderProcessing;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
@@ -37,9 +38,11 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public class AssociationActivity extends DemoVideoDisplayActivity
+public class AssociationActivity extends DemoCamera2Activity
 		implements AdapterView.OnItemSelectedListener
 {
+	private static final String TAG = "AssociationActivity";
+
 	Spinner spinnerDesc;
 	Spinner spinnerDet;
 
@@ -58,42 +61,40 @@ public class AssociationActivity extends DemoVideoDisplayActivity
 	int selectedDesc = 0;
 
 	public AssociationActivity() {
-		visualize = new AssociationVisualize(this);
+		super(Resolution.R640x480);
+		super.showBitmap = false;
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		visualize = new AssociationVisualize(this);
+
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.associate_controls,null);
 
-		LinearLayout parent = getViewContent();
-		parent.addView(controls);
-
-		spinnerDet = (Spinner)controls.findViewById(R.id.spinner_detector);
+		spinnerDet = controls.findViewById(R.id.spinner_detector);
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
 				R.array.detectors, android.R.layout.simple_spinner_item);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinnerDet.setAdapter(adapter);
 		spinnerDet.setOnItemSelectedListener(this);
 
-		spinnerDesc = (Spinner)controls.findViewById(R.id.spinner_descriptor);
+		spinnerDesc = controls.findViewById(R.id.spinner_descriptor);
 		adapter = ArrayAdapter.createFromResource(this,
 				R.array.descriptors, android.R.layout.simple_spinner_item);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinnerDesc.setAdapter(adapter);
 		spinnerDesc.setOnItemSelectedListener(this);
 
-		FrameLayout iv = getViewPreview();
-		mDetector = new GestureDetector(this, new MyGestureDetector(iv));
-		iv.setOnTouchListener(new View.OnTouchListener(){
-			@Override
-			public boolean onTouch(View v, MotionEvent event)
-			{
-				mDetector.onTouchEvent(event);
-				return true;
-			}});
+		setControls(controls);
+
+		mDetector = new GestureDetector(this, new MyGestureDetector(displayView));
+		displayView.setOnTouchListener((v, event) -> {
+            mDetector.onTouchEvent(event);
+            return true;
+        });
 	}
 
 	@Override
@@ -165,7 +166,7 @@ public class AssociationActivity extends DemoVideoDisplayActivity
 	}
 
 
-	protected class AssociationProcessing<Desc extends TupleDesc> extends VideoRenderProcessing<GrayF32> {
+	protected class AssociationProcessing<Desc extends TupleDesc> extends DemoProcessingAbstract<GrayF32> {
 		DetectDescribePoint<GrayF32,Desc> detDesc;
 		AssociateDescription<Desc> associate;
 
@@ -186,17 +187,18 @@ public class AssociationActivity extends DemoVideoDisplayActivity
 		}
 
 		@Override
-		protected void declareImages(int width, int height) {
-			super.declareImages(width, height);
-			visualize.initializeImages( width, height );
-
-			outputWidth = visualize.getOutputWidth();
-			outputHeight = visualize.getOutputHeight();
+		public void initialize(int imageWidth, int imageHeight) {
+			visualize.initializeImages( imageWidth, imageHeight );
 			changedAlg = true;
 		}
 
 		@Override
-		protected void process(GrayF32 gray) {
+		public void onDraw(Canvas canvas, Matrix imageToView) {
+			visualize.render(displayView,canvas);
+		}
+
+		@Override
+		public void process(GrayF32 gray) {
 			boolean computedFeatures = false;
 
 			int target = 0;
@@ -207,7 +209,8 @@ public class AssociationActivity extends DemoVideoDisplayActivity
 					// first see if there are any features to select
 					if( !visualize.setTouch(touchX,touchY) ) {
 						// if not then it must be a capture image request
-						target = touchX < view.getWidth()/2 ? 1 : 2;
+						Log.i(TAG,"touchX "+touchX+" viewWidth "+viewWidth);
+						target = touchX < viewWidth/2 ? 1 : 2;
 					}
 				} else if( touchEventType == 2 ) {
 					visualize.setSource(null);
@@ -300,11 +303,6 @@ public class AssociationActivity extends DemoVideoDisplayActivity
 				listLoc.grow().set(detDesc.getLocation(i));
 				listDesc.grow().setTo(detDesc.getDescription(i));
 			}
-		}
-
-		@Override
-		protected void render(Canvas canvas, double imageToOutput) {
-			visualize.render(canvas,tranX,tranY,scale);
 		}
 	}
 }

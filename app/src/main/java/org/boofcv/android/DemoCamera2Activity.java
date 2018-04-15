@@ -1,12 +1,16 @@
 package org.boofcv.android;
 
+import android.app.ProgressDialog;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
+import android.os.Looper;
 import android.util.Size;
 import android.view.SurfaceView;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
 import boofcv.struct.image.ImageBase;
+import georegression.struct.point.Point2D_F64;
 
 /**
  * Camera activity specifically designed for this demonstration. Image processing algorithms
@@ -16,6 +20,10 @@ public class DemoCamera2Activity extends VisualizeCamera2Activity {
 
     protected final Object lockProcessor = new Object();
     protected DemoProcessing processor;
+
+    // Used to inform the user that its doing some calculations
+    ProgressDialog progressDialog;
+    protected final Object lockProgress = new Object();
 
     public DemoCamera2Activity(Resolution resolution) {
         super.targetResolution = resolutionToPixels(resolution);
@@ -115,6 +123,84 @@ public class DemoCamera2Activity extends VisualizeCamera2Activity {
                 default:
                     throw new IllegalArgumentException("Unknown");
         }
+    }
+
+    /**
+     * Displays an indeterminate progress dialog.   If the dialog is already open this will change the message being
+     * displayed.  Function blocks until the dialog has been declared.
+     *
+     * @param message Text shown in dialog
+     */
+    protected void setProgressMessage(final String message) {
+        runOnUiThread(() -> {
+            synchronized ( lockProgress ) {
+                if( progressDialog != null ) {
+                    // a dialog is already open, change the message
+                    progressDialog.setMessage(message);
+                    return;
+                }
+                progressDialog = new ProgressDialog(this);
+                progressDialog.setMessage(message);
+                progressDialog.setIndeterminate(true);
+                progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            }
+
+            // don't show the dialog until 1 second has passed
+            long showTime = System.currentTimeMillis()+1000;
+            while( showTime > System.currentTimeMillis() ) {
+                Thread.yield();
+            }
+            // if it hasn't been dismissed, show the dialog
+            synchronized ( lockProgress ) {
+                if( progressDialog != null )
+                    progressDialog.show();
+            }
+        });
+
+        // block until the GUI thread has been called
+        while( progressDialog == null  ) {
+            Thread.yield();
+        }
+    }
+
+    /**
+     * Dismisses the progress dialog.  Can be called even if there is no progressDialog being shown.
+     */
+    protected void hideProgressDialog() {
+        // do nothing if the dialog is already being displayed
+        synchronized ( lockProgress ) {
+            if( progressDialog == null )
+                return;
+        }
+
+        if (Looper.getMainLooper().getThread() == Thread.currentThread()) {
+            // if inside the UI thread just dismiss the dialog and avoid a potential locking condition
+            synchronized ( lockProgress ) {
+                progressDialog.dismiss();
+                progressDialog = null;
+            }
+        } else {
+            runOnUiThread(() -> {
+                synchronized ( lockProgress ) {
+                    progressDialog.dismiss();
+                    progressDialog = null;
+                }
+            });
+
+            // block until dialog has been dismissed
+            while( progressDialog != null  ) {
+                Thread.yield();
+            }
+        }
+    }
+
+    float pts[] = new float[2];
+    public void applyToPoint(Matrix matrix , double x , double y , Point2D_F64 out ) {
+        pts[0] = (float)x;
+        pts[1] = (float)y;
+        matrix.mapPoints(pts);
+        out.x = pts[0];
+        out.y = pts[1];
     }
 
     /**
