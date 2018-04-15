@@ -21,4 +21,5 @@ build/
 
 # IntelliJ
 *.iml
+app/app.iml
 .idea/*
