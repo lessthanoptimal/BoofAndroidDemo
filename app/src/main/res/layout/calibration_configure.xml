@@ -48,7 +48,34 @@
 				  android:layout_width="45sp"
 				  android:layout_height="wrap_content"
 				  android:inputType="number"/>
+	</LinearLayout>
 
+	<LinearLayout android:orientation="horizontal"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:gravity="center">
+
+		<TextView
+			android:text="Width"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:textAppearance="?android:attr/textAppearanceLarge" />
+
+		<EditText android:id="@+id/text_width"
+			android:layout_width="55sp"
+			android:layout_height="wrap_content"
+			android:inputType="numberDecimal"/>
+
+		<TextView
+			android:text="Space"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:textAppearance="?android:attr/textAppearanceLarge" />
+
+		<EditText android:id="@+id/text_space"
+			android:layout_width="55sp"
+			android:layout_height="wrap_content"
+			android:inputType="numberDecimal"/>
 	</LinearLayout>
 
 	<FrameLayout

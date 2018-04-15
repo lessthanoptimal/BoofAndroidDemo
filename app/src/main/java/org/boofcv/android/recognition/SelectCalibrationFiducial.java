@@ -2,7 +2,7 @@ package org.boofcv.android.recognition;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -17,6 +17,8 @@ import android.widget.Toast;
 
 import org.boofcv.android.R;
 
+import java.util.Locale;
+
 import boofcv.abst.fiducial.calib.CalibrationPatterns;
 
 /**
@@ -26,6 +28,11 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 	Spinner spinnerTarget;
 	EditText textRows;
 	EditText textCols;
+	EditText textWidth;
+	EditText textSpace;
+
+	double valueWidth,valueSpace;
+	TextWatcher watcherWidth,watcherSpace;
 
 	ConfigAllCalibration cc;
 
@@ -42,6 +49,9 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 	 * @param success If use selects OK then run() is called.  Called while in GUI thread.
 	 */
 	public void create( Activity activity , final Runnable success ) {
+		if (Looper.getMainLooper().getThread() != Thread.currentThread())
+			throw new RuntimeException("Egads");
+
 		this.activity = activity;
 		LayoutInflater inflater = activity.getLayoutInflater();
 		final LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.calibration_configure, null);
@@ -50,26 +60,25 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 		final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 		builder.setView(controls);
 		builder.setCancelable(true);
-		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialogInterface, int i) {
-				cc.targetType = indexToCalib(spinnerTarget.getSelectedItemPosition());
+		builder.setPositiveButton("OK", (dialogInterface, i) -> {
+            cc.targetType = indexToCalib(spinnerTarget.getSelectedItemPosition());
 
-				int numCols = Integer.parseInt(textCols.getText().toString());
-				int numRows = Integer.parseInt(textRows.getText().toString());
+            int numCols = Integer.parseInt(textCols.getText().toString());
+            int numRows = Integer.parseInt(textRows.getText().toString());
 
-				if (numCols > 0 && numRows > 0) {
-					setRowCol(numRows,numCols);
-					success.run();
-				} else {
-					Toast.makeText(SelectCalibrationFiducial.this.activity, "Invalid configuration!", Toast.LENGTH_SHORT).show();
-				}
-			}
-		});
+            if (numCols > 0 && numRows > 0) {
+                setRowCol(numRows,numCols);
+                success.run();
+            } else {
+                Toast.makeText(SelectCalibrationFiducial.this.activity, "Invalid configuration!", Toast.LENGTH_SHORT).show();
+            }
+        });
 
 		spinnerTarget = controls.findViewById(R.id.spinner_type);
 		textRows = controls.findViewById(R.id.text_rows);
 		textCols = controls.findViewById(R.id.text_cols);
+		textWidth = controls.findViewById(R.id.text_width);
+		textSpace = controls.findViewById(R.id.text_space);
 
 		updateControlValues();
 
@@ -88,7 +97,9 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 				try {
 					int numRows = Integer.parseInt(textRows.getText().toString());
 					int numCols = Integer.parseInt(textCols.getText().toString());
-					setRowCol(numRows,numCols);
+					if( numCols > 0 || numRows > 0  )
+						setRowCol(numRows,numCols);
+
 					vis.invalidate();
 				} catch( NumberFormatException ignore ){}
 			}
@@ -105,6 +116,10 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 					cc.targetType = indexToCalib(spinnerTarget.getSelectedItemPosition());
 					updateControlValues();
 					vis.invalidate();
+
+					boolean enabled = position != 0;
+					textWidth.setEnabled(enabled);
+					textSpace.setEnabled(enabled);
 				} catch( NumberFormatException ignore ){}
 			}
 
@@ -112,13 +127,52 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 			public void onNothingSelected(AdapterView<?> parent) {}
 		};
 
+		watcherWidth = new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+			@Override
+			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+				try {
+					double v = Double.parseDouble(charSequence.toString());
+					if( v > 0 ) {
+						valueWidth = v;
+						setSpaceWidth(valueSpace, valueWidth);
+						vis.invalidate();
+					}
+				} catch( NumberFormatException ignore ){}
+			}
+
+			@Override
+			public void afterTextChanged(Editable editable) {}
+		};
+		watcherSpace = new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+			@Override
+			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+				try {
+					double v = Double.parseDouble(charSequence.toString());
+					if( v > 0 ) {
+						valueSpace = v;
+						setSpaceWidth(valueSpace, valueWidth);
+						vis.invalidate();
+					}
+				} catch( NumberFormatException ignore ){}
+			}
+
+			@Override
+			public void afterTextChanged(Editable editable) {}
+		};
+
 		textRows.addTextChangedListener(watcher);
 		textCols.addTextChangedListener(watcher);
+		textWidth.addTextChangedListener(watcherWidth);
+		textSpace.addTextChangedListener(watcherSpace);
 		spinnerTarget.setOnItemSelectedListener(spinnerSelected);
 
 		setupTargetSpinner();
-
-
 		dialog.show();
 	}
 
@@ -146,8 +200,30 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 		}
 	}
 
+	private void setSpaceWidth(double space , double width ) {
+		switch( cc.targetType ) {
+			case SQUARE_GRID:{
+				cc.squareGrid.spaceWidth = space;
+				cc.squareGrid.squareWidth = width;
+			} break;
+
+			case CIRCLE_HEXAGONAL:{
+				cc.hexagonal.centerDistance = space;
+				cc.hexagonal.circleDiameter = width;
+			} break;
+
+			case CIRCLE_GRID:{
+				cc.circleGrid.centerDistance = space;
+				cc.circleGrid.circleDiameter = width;
+			} break;
+		}
+	}
+
 	private void updateControlValues() {
+		if (Looper.getMainLooper().getThread() != Thread.currentThread())
+			throw new RuntimeException("Egads");
 		int numCols,numRows;
+		valueSpace = 0;valueWidth=0;
 
 		switch( cc.targetType ) {
 			case CHESSBOARD:{
@@ -158,28 +234,48 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 			case SQUARE_GRID:{
 				numCols = cc.squareGrid.numCols;
 				numRows = cc.squareGrid.numRows;
+				valueSpace = cc.squareGrid.spaceWidth;
+				valueWidth = cc.squareGrid.squareWidth;
 			} break;
 
 			case CIRCLE_HEXAGONAL:{
 				numCols = cc.hexagonal.numCols;
 				numRows = cc.hexagonal.numRows;
+				valueSpace = cc.circleGrid.centerDistance;
+				valueWidth = cc.circleGrid.circleDiameter;
 			} break;
 
 			case CIRCLE_GRID:{
 				numCols = cc.circleGrid.numCols;
 				numRows = cc.circleGrid.numRows;
+				valueSpace = cc.circleGrid.centerDistance;
+				valueWidth = cc.circleGrid.circleDiameter;
 			} break;
 
 			default:
 				throw new RuntimeException("Unknown target type");
 		}
 
-		textRows.setText("" + numRows);
-		textCols.setText("" + numCols);
+		textRows.setText(String.format(Locale.getDefault(),"%d", numRows));
+		textCols.setText(String.format(Locale.getDefault(),"%d", numCols));
 
+		// remove the listener so that they aren't triggered by the change
+		if( watcherSpace != null ) {
+			textSpace.removeTextChangedListener(watcherSpace);
+			textWidth.removeTextChangedListener(watcherWidth);
+		}
+		textSpace.setText(String.format(Locale.getDefault(),"%.2f",valueSpace));
+		textWidth.setText(String.format(Locale.getDefault(),"%.2f",valueWidth));
+		if( watcherSpace != null ) {
+			textSpace.addTextChangedListener(watcherSpace);
+			textWidth.addTextChangedListener(watcherWidth);
+		}
 	}
 
 	private void setupTargetSpinner() {
+		if (Looper.getMainLooper().getThread() != Thread.currentThread())
+			throw new RuntimeException("Egads");
+
 		ArrayAdapter<CharSequence> adapter =
 				new ArrayAdapter<CharSequence>(activity, android.R.layout.simple_spinner_item);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

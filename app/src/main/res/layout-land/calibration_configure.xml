@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+			  android:orientation="horizontal"
+			  android:layout_width="match_parent"
+			  android:layout_height="match_parent">
+
+	<GridLayout
+		android:layout_width="wrap_content"
+		android:layout_height="match_parent"
+		android:columnCount="2">
+		<TextView
+			android:text="Type"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:textAppearance="?android:attr/textAppearanceLarge" />
+
+		<Spinner
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:id="@+id/spinner_type" android:layout_gravity="center"/>
+
+		<TextView
+			android:text="Rows"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:textAppearance="?android:attr/textAppearanceLarge" />
+
+		<EditText android:id="@+id/text_rows"
+			android:layout_width="65sp"
+			android:layout_height="wrap_content"
+			android:inputType="number"/>
+
+		<TextView
+			android:text="Columns"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:textAppearance="?android:attr/textAppearanceLarge" />
+
+		<EditText android:id="@+id/text_cols"
+			android:layout_width="65sp"
+			android:layout_height="wrap_content"
+			android:inputType="number"/>
+
+		<TextView
+			android:text="Width"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:textAppearance="?android:attr/textAppearanceLarge" />
+
+		<EditText android:id="@+id/text_width"
+			android:layout_width="65sp"
+			android:layout_height="wrap_content"
+			android:inputType="numberDecimal"/>
+
+		<TextView
+			android:text="Space"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:textAppearance="?android:attr/textAppearanceLarge" />
+
+		<EditText android:id="@+id/text_space"
+			android:layout_width="65sp"
+			android:layout_height="wrap_content"
+			android:inputType="numberDecimal"/>
+	</GridLayout>
+
+	<FrameLayout
+		android:id="@+id/target_frame"
+		android:layout_width="0dp"
+		android:layout_height="fill_parent"
+		android:layout_weight="5"/>
+
+</LinearLayout>

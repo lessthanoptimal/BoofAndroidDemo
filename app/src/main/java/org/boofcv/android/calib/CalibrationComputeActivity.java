@@ -60,11 +60,11 @@ public class CalibrationComputeActivity extends Activity {
 
 		setContentView(R.layout.calibration_compute_view);
 
-		text = (TextView) findViewById(R.id.text_info);
+		text = findViewById(R.id.text_info);
 		text.setMovementMethod(new ScrollingMovementMethod());
 
-		buttonCancel = (Button) findViewById(R.id.button_discard);
-		buttonOK = (Button) findViewById(R.id.button_accept);
+		buttonCancel = findViewById(R.id.button_discard);
+		buttonOK = findViewById(R.id.button_accept);
 
 		// start a new process
 		calibrationAlg = new CalibrateMonoPlanar(targetLayout);

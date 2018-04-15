@@ -81,7 +81,8 @@
             android:name=".tracker.CombinedTrackerDisplayActivity"
             android:screenOrientation="landscape" />
         <activity
-            android:name=".calib.CalibrationActivity"/>
+            android:name=".calib.CalibrationActivity"
+            android:screenOrientation="landscape" />
         <activity
             android:name=".calib.CalibrationComputeActivity"
             android:configChanges="orientation|keyboardHidden|screenSize" />
