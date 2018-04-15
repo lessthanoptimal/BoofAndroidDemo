@@ -1,11 +1,12 @@
 package org.boofcv.android.tracker;
 
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 
-import org.boofcv.android.DemoVideoDisplayActivity;
+import org.boofcv.android.DemoCamera2Activity;
+import org.boofcv.android.DemoProcessing;
 import org.ddogleg.struct.FastQueue;
 
 import java.util.ArrayList;
@@ -13,8 +14,6 @@ import java.util.List;
 
 import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.abst.feature.tracker.PointTracker;
-import boofcv.android.ConvertBitmap;
-import boofcv.android.camera.VideoRenderProcessing;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
@@ -24,55 +23,74 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public class PointTrackerDisplayActivity extends DemoVideoDisplayActivity {
+public class PointTrackerDisplayActivity extends DemoCamera2Activity {
 
 	Paint paintLine = new Paint();
 	Paint paintRed = new Paint();
 	Paint paintBlue = new Paint();
 
+	public PointTrackerDisplayActivity(Resolution resolution) {
+		super(resolution);
 
-	public PointTrackerDisplayActivity() {
 		paintLine.setColor(Color.RED);
-		paintLine.setStrokeWidth(1.5f);
+		paintLine.setStyle(Paint.Style.STROKE);
+		paintLine.setStrokeWidth(3);
 		paintRed.setColor(Color.MAGENTA);
 		paintRed.setStyle(Paint.Style.FILL);
 		paintBlue.setColor(Color.BLUE);
 		paintBlue.setStyle(Paint.Style.FILL);
 	}
 
-	protected class PointProcessing extends VideoRenderProcessing<GrayU8> {
+	protected class PointProcessing implements DemoProcessing<GrayU8> {
 		PointTracker<GrayU8> tracker;
 
 		long tick;
 
-		Bitmap bitmap;
-		byte[] storage;
+		final Object lockTracks = new Object();
 
-		List<PointTrack> active = new ArrayList<PointTrack>();
-		List<PointTrack> spawned = new ArrayList<PointTrack>();
-		List<PointTrack> inactive = new ArrayList<PointTrack>();
+		List<PointTrack> active = new ArrayList<>();
+		List<PointTrack> spawned = new ArrayList<>();
+		List<PointTrack> inactive = new ArrayList<>();
 
 		// storage for data structures that are displayed in the GUI
-		FastQueue<Point2D_F64> trackSrc = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
-		FastQueue<Point2D_F64> trackDst = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
-		FastQueue<Point2D_F64> trackSpawn = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
-
+		FastQueue<Point2D_F64> trackSrc = new FastQueue<>(Point2D_F64.class,true);
+		FastQueue<Point2D_F64> trackDst = new FastQueue<>(Point2D_F64.class,true);
+		FastQueue<Point2D_F64> trackSpawn = new FastQueue<>(Point2D_F64.class,true);
 
 		public PointProcessing( PointTracker<GrayU8> tracker ) {
-			super(ImageType.single(GrayU8.class));
 			this.tracker = tracker;
 		}
 
 		@Override
-		protected void declareImages(int width, int height) {
-			super.declareImages(width, height);
-			bitmap = Bitmap.createBitmap(width,height,Bitmap.Config.ARGB_8888);
-			storage = ConvertBitmap.declareStorage(bitmap, storage);
+		public void initialize(int imageWidth, int imageHeight) {
+
 		}
 
 		@Override
-		protected void process(GrayU8 gray) {
-			tracker.process(gray);
+		public void onDraw(Canvas canvas, Matrix imageToView) {
+
+			canvas.setMatrix(imageToView);
+			synchronized (lockTracks) {
+				for (int i = 0; i < trackSrc.size(); i++) {
+					Point2D_F64 s = trackSrc.get(i);
+					Point2D_F64 p = trackDst.get(i);
+					canvas.drawLine((float) s.x, (float) s.y, (float) p.x, (float) p.y, paintLine);
+					canvas.drawCircle((float) p.x, (float) p.y, 4f, paintRed);
+				}
+
+				for (int i = 0; i < trackSpawn.size(); i++) {
+					Point2D_F64 p = trackSpawn.get(i);
+					canvas.drawCircle((int) p.x, (int) p.y, 6, paintBlue);
+				}
+			}
+		}
+
+		@Override
+		public void process(GrayU8 input) {
+			if( tracker == null )
+				return;
+
+			tracker.process(input);
 
 			// drop tracks which are no longer being used
 			inactive.clear();
@@ -116,9 +134,7 @@ public class PointTrackerDisplayActivity extends DemoVideoDisplayActivity {
 				}
 			}
 
-			synchronized ( lockGui ) {
-				ConvertBitmap.grayToBitmap(gray,bitmap,storage);
-
+			synchronized ( lockTracks ) {
 				trackSrc.reset();
 				trackDst.reset();
 				trackSpawn.reset();
@@ -143,21 +159,18 @@ public class PointTrackerDisplayActivity extends DemoVideoDisplayActivity {
 		}
 
 		@Override
-		protected void render(Canvas canvas, double imageToOutput) {
-			canvas.drawBitmap(bitmap,0,0,null);
+		public void stop() {}
 
-			for( int i = 0; i < trackSrc.size(); i++ ) {
-				Point2D_F64 s = trackSrc.get(i);
-				Point2D_F64 p = trackDst.get(i);
-				canvas.drawLine((float)s.x,(float)s.y,(float)p.x,(float)p.y,paintLine);
-				canvas.drawCircle((float)p.x,(float)p.y,2f, paintRed);
-			}
-
-			for( int i = 0; i < trackSpawn.size(); i++ ) {
-				Point2D_F64 p = trackSpawn.get(i);
-				canvas.drawCircle((int)p.x,(int)p.y,3, paintBlue);
-			}
+		@Override
+		public boolean isThreadSafe() {
+			return false;
 		}
+
+		@Override
+		public ImageType<GrayU8> getImageType() {
+			return ImageType.single(GrayU8.class);
+		}
+
 	}
 
 	private static class TrackInfo {

@@ -2,9 +2,9 @@ package org.boofcv.android.calib;
 
 import android.app.Dialog;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.os.Bundle;
@@ -12,12 +12,12 @@ import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.boofcv.android.DemoMain;
+import org.boofcv.android.DemoProcessing;
 import org.boofcv.android.R;
 import org.boofcv.android.recognition.ConfigAllCalibration;
 import org.boofcv.android.recognition.SelectCalibrationFiducial;
@@ -38,9 +38,6 @@ import boofcv.alg.fiducial.calib.circle.DetectCircleHexagonalGrid;
 import boofcv.alg.fiducial.calib.circle.DetectCircleRegularGrid;
 import boofcv.alg.fiducial.calib.grid.DetectSquareGridFiducial;
 import boofcv.alg.geo.calibration.CalibrationObservation;
-import boofcv.android.ConvertBitmap;
-import boofcv.android.VisualizeImageData;
-import boofcv.android.camera.VideoRenderProcessing;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayF32;
@@ -90,6 +87,8 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 	GestureDetector mDetector;
 
 	public CalibrationActivity() {
+		super(Resolution.R640x480);
+
 		paintPoint.setColor(Color.RED);
 		paintPoint.setStyle(Paint.Style.FILL);
 
@@ -98,30 +97,25 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 		paintFailed.setStrokeWidth(3f);
 	}
 
-	public void onCreate(Bundle savedInstanceState) {
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.calibration_view,null);
 
-		LinearLayout parent = getViewContent();
-		parent.addView(controls);
+		textCount = controls.findViewById(R.id.text_total);
 
-		textCount = (TextView)controls.findViewById(R.id.text_total);
-
-		shots = new ArrayList<CalibrationImageInfo>();
-
-		FrameLayout iv = getViewPreview();
-		mDetector = new GestureDetector(this, new MyGestureDetector(iv));
-		iv.setOnTouchListener(new View.OnTouchListener() {
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				mDetector.onTouchEvent(event);
-				return true;
-			}
-		});
+		shots = new ArrayList<>();
 
 		showDialog(TARGET_DIALOG);
+
+		setControls(controls);
+		mDetector = new GestureDetector(this, new MyGestureDetector());
+		displayView.setOnTouchListener((v, event) -> {
+            mDetector.onTouchEvent(event);
+            return true;
+        });
 	}
 
 	@Override
@@ -195,12 +189,6 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 
 	protected class MyGestureDetector extends GestureDetector.SimpleOnGestureListener
 	{
-		View v;
-
-		public MyGestureDetector(View v) {
-			this.v = v;
-		}
-
 		@Override
 		public boolean onDown(MotionEvent e) {
 			captureRequested = true;
@@ -208,33 +196,76 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 		}
 	}
 
-	private class DetectTarget extends VideoRenderProcessing<GrayF32> {
+	private class DetectTarget implements DemoProcessing<GrayF32> {
 
 		DetectorFiducialCalibration detector;
 
 		FastQueue<Point2D_F64> pointsGui = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
 
+		final Object lockGUI = new Object();
 		List<List<Point2D_I32>> debugQuads = new ArrayList<>();
 		List<EllipseRotated_F64> debugEllipses = new ArrayList<>();
 
-
-		Bitmap bitmap;
-		byte[] storage;
-
 		protected DetectTarget( DetectorFiducialCalibration detector ) {
-			super(ImageType.single(GrayF32.class));
 			this.detector = detector;
 		}
 
 		@Override
-		protected void declareImages(int width, int height) {
-			super.declareImages(width, height);
-			bitmap = Bitmap.createBitmap(width,height,Bitmap.Config.ARGB_8888);
-			storage = ConvertBitmap.declareStorage(bitmap, storage);
+		public void initialize(int imageWidth, int imageHeight) {
 		}
 
 		@Override
-		protected void process(GrayF32 gray) {
+		public void onDraw(Canvas canvas, Matrix imageToView) {
+			if( processRequested ) {
+				processRequested = false;
+				handleProcessRequest();
+				return;
+			}
+
+			synchronized (lockGUI) {
+				canvas.setMatrix(imageToView);
+				// scale the visuals based on the image size
+				paintFailed.setStrokeWidth(5f * bitmap.getWidth() / 640);
+				float radius = 5 * bitmap.getWidth() / 640;
+
+				// draw shapes for debugging purposes
+				for (List<Point2D_I32> l : debugQuads) {
+					for (int i = 1; i < l.size(); i++) {
+						Point2D_I32 c0 = l.get(i - 1);
+						Point2D_I32 c1 = l.get(i);
+						canvas.drawLine(c0.x, c0.y, c1.x, c1.y, paintFailed);
+					}
+					Point2D_I32 c0 = l.get(0);
+					Point2D_I32 c1 = l.get(l.size() - 1);
+					canvas.drawLine(c0.x, c0.y, c1.x, c1.y, paintFailed);
+				}
+
+				for (EllipseRotated_F64 e : debugEllipses) {
+
+					float phi = (float) UtilAngle.radianToDegree(e.phi);
+
+					float x0 = (float) (e.center.x - e.a);
+					float y0 = (float) (e.center.y - e.b);
+					float x1 = (float) (e.center.x + e.a);
+					float y1 = (float) (e.center.y + e.b);
+
+					canvas.rotate(phi, (float) e.center.x, (float) e.center.y);
+//					r.set(cx-w,cy-h,cx+w+1,cy+h+1);
+					canvas.drawOval(new RectF(x0, y0, x1, y1), paintFailed);
+//					canvas.drawOval(r,paint);
+					canvas.rotate(-phi, (float) e.center.x, (float) e.center.y);
+				}
+
+				// draw detected calibration points
+				for (int i = 0; i < pointsGui.size(); i++) {
+					Point2D_F64 p = pointsGui.get(i);
+					canvas.drawCircle((float) p.x, (float) p.y, radius, paintPoint);
+				}
+			}
+		}
+
+		@Override
+		public void process(GrayF32 input) {
 			// User requested that the most recently processed image be removed
 			if( removeRequested ) {
 				removeRequested = false;
@@ -247,20 +278,15 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 			if( timeResume > System.currentTimeMillis() )
 				return;
 
-			synchronized ( lockGui ) {
-				ConvertBitmap.grayToBitmap(gray,bitmap,storage);
-			}
-
 			boolean detected = false;
 			showDetectDebug = false;
 			if( captureRequested ) {
 				captureRequested = false;
-				detected = collectMeasurement(gray);
+				detected = collectMeasurement(input);
 			}
 
 			// safely copy data into data structures used by GUI thread
-			synchronized ( lockGui ) {
-				ConvertBitmap.grayToBitmap(gray,bitmap,storage);
+			synchronized ( lockGUI ) {
 				pointsGui.reset();
 				debugQuads.clear();
 				debugEllipses.clear();
@@ -272,27 +298,39 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 					// show binary image to aid in debugging and detected rectangles
 					if( detector instanceof CalibrationDetectorChessboard) {
 						DetectChessboardFiducial<GrayF32> alg = ((CalibrationDetectorChessboard) detector).getAlgorithm();
-						VisualizeImageData.binaryToBitmap(alg.getBinary(), false, bitmap, storage);
 						extractQuads(alg.getFindSeeds().getDetectorSquare().getPolygons(null,null));
 					} else if( detector instanceof CalibrationDetectorSquareGrid) {
 						DetectSquareGridFiducial<GrayF32> alg = ((CalibrationDetectorSquareGrid) detector).getAlgorithm();
-						VisualizeImageData.binaryToBitmap(alg.getBinary(), false ,bitmap, storage);
 						extractQuads(alg.getDetectorSquare().getPolygons(null,null));
 					} else if( detector instanceof CalibrationDetectorCircleHexagonalGrid) {
 						DetectCircleHexagonalGrid<GrayF32> alg = ((CalibrationDetectorCircleHexagonalGrid) detector).getDetector();
-						VisualizeImageData.binaryToBitmap(alg.getBinary(), false ,bitmap, storage);
-
 						debugEllipses.clear();
 						debugEllipses.addAll(alg.getEllipseDetector().getFoundEllipses(null));
 					} else if( detector instanceof CalibrationDetectorCircleRegularGrid) {
 						DetectCircleRegularGrid<GrayF32> alg = ((CalibrationDetectorCircleRegularGrid) detector).getDetector();
-						VisualizeImageData.binaryToBitmap(alg.getBinary(), false ,bitmap, storage);
 
 						debugEllipses.clear();
 						debugEllipses.addAll(alg.getEllipseDetector().getFoundEllipses(null));
 					}
 				}
 			}
+
+
+		}
+
+		@Override
+		public void stop() {
+
+		}
+
+		@Override
+		public boolean isThreadSafe() {
+			return false;
+		}
+
+		@Override
+		public ImageType<GrayF32> getImageType() {
+			return ImageType.single(GrayF32.class);
 		}
 
 		protected void extractQuads( List<Polygon2D_F64> squares ) {
@@ -315,9 +353,8 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 		 * Detect calibration targets in the image and save the results.  Pause the display so the
 		 * user can see the results]
 		 */
-		private boolean collectMeasurement(GrayF32 gray) {
-
-
+		private boolean collectMeasurement(GrayF32 gray)
+		{
 			boolean success = detector.process(gray);
 
 			// pause the display to provide feed back to the user
@@ -343,64 +380,6 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 					textCount.setText(""+size);
 				}
 			});
-		}
-
-		private boolean detectTarget(GrayF32 gray) {
-			if( detector.process(gray) ) {
-				return true;
-			} else {
-				showDetectDebug = true;
-				return false;
-			}
-		}
-
-		@Override
-		protected void render(Canvas canvas, double imageToOutput) {
-			// launch processing from here since you know data structures aren't being changed
-			if( processRequested ) {
-				processRequested = false;
-				handleProcessRequest();
-			} else {
-				canvas.drawBitmap(bitmap,0,0,null);
-
-				// scale the visuals based on the image size
-				paintFailed.setStrokeWidth(5f*bitmap.getWidth()/640);
-				float radius = 5*bitmap.getWidth()/640;
-
-				// draw shapes for debugging purposes
-				for( List<Point2D_I32> l : debugQuads ) {
-					for( int i = 1; i < l.size(); i++ ) {
-						Point2D_I32 c0 = l.get(i-1);
-						Point2D_I32 c1 = l.get(i);
-						canvas.drawLine(c0.x,c0.y,c1.x,c1.y,paintFailed);
-					}
-					Point2D_I32 c0 = l.get(0);
-					Point2D_I32 c1 = l.get(l.size()-1);
-					canvas.drawLine(c0.x,c0.y,c1.x,c1.y,paintFailed);
-				}
-
-				for( EllipseRotated_F64 e : debugEllipses ) {
-
-					float phi = (float) UtilAngle.radianToDegree(e.phi);
-
-					float x0 = (float)(e.center.x - e.a);
-					float y0 = (float)(e.center.y - e.b);
-					float x1 = (float)(e.center.x + e.a);
-					float y1 = (float)(e.center.y + e.b);
-
-					canvas.rotate(phi, (float)e.center.x, (float)e.center.y);
-//					r.set(cx-w,cy-h,cx+w+1,cy+h+1);
-					canvas.drawOval(new RectF(x0,y0,x1,y1),paintFailed);
-//					canvas.drawOval(r,paint);
-					canvas.rotate(-phi, (float)e.center.x, (float)e.center.y);
-				}
-
-				// draw detected calibration points
-				for( int i = 0; i < pointsGui.size(); i++ ) {
-					Point2D_F64 p = pointsGui.get(i);
-					canvas.drawCircle((float)p.x,(float)p.y,radius,paintPoint);
-				}
-			}
 		}
 	}
 }

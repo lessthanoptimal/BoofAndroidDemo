@@ -65,8 +65,7 @@
             android:name=".detect.LineDisplayActivity"
             android:screenOrientation="landscape" />
         <activity
-            android:name=".tracker.KltDisplayActivity"
-            android:screenOrientation="landscape" />
+            android:name=".tracker.KltDisplayActivity"/>
         <activity
             android:name=".sfm.StabilizeDisplayActivity"
             android:screenOrientation="landscape" />
@@ -83,8 +82,7 @@
             android:name=".tracker.CombinedTrackerDisplayActivity"
             android:screenOrientation="landscape" />
         <activity
-            android:name=".calib.CalibrationActivity"
-            android:screenOrientation="landscape" />
+            android:name=".calib.CalibrationActivity"/>
         <activity
             android:name=".calib.CalibrationComputeActivity"
             android:configChanges="orientation|keyboardHidden|screenSize" />

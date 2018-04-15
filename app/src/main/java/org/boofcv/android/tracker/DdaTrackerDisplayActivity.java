@@ -49,15 +49,16 @@ public class DdaTrackerDisplayActivity extends PointTrackerDisplayActivity
 	Spinner spinnerDet;
 	Spinner spinnerDesc;
 
+	public DdaTrackerDisplayActivity() {
+		super(Resolution.MEDIUM);
+	}
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.associate_controls,null);
-
-		LinearLayout parent = getViewContent();
-		parent.addView(controls);
 
 		List<String> detectors = new ArrayList<String>();
 		detectors.add( "Shi-Tomasi");
@@ -81,6 +82,8 @@ public class DdaTrackerDisplayActivity extends PointTrackerDisplayActivity
 		spinnerDesc.setAdapter(spinnerAdapter);
 		spinnerDesc.setOnItemSelectedListener(this);
 		spinnerDesc.invalidate();
+
+		setControls(controls);
 	}
 
 	@Override

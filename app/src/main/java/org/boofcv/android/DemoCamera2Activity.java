@@ -99,9 +99,11 @@ public class DemoCamera2Activity extends VisualizeCamera2Activity {
     public int resolutionToPixels(Resolution resolution) {
         switch (resolution) {
             case LOW:
+            case R320x240:
                 return 320*240;
 
             case MEDIUM:
+            case R640x480:
                 return 640*480;
 
             case HIGH:
@@ -115,7 +117,13 @@ public class DemoCamera2Activity extends VisualizeCamera2Activity {
         }
     }
 
+    /**
+     * Algorithm which require an exact resolution should request
+     * a specific one. Algorithms produce better results with more
+     * resolution should choose a relative one.
+     */
     public enum Resolution {
-        LOW,MEDIUM,HIGH,MAX;
+        LOW,MEDIUM,HIGH,MAX,R320x240,R640x480;
+
     }
 }

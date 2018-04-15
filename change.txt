@@ -19,11 +19,7 @@ Date: 2018
 - TODO Add QR Code detector example
 - TODO Add equirectangular to pinhole viewer
   * Provide example image.
-- TODO Update polygon fit for new parameters
-- TODO Add new binary thresholds
 
-- TODO Camera2 API
-- TODO Have each algorithm select if it wants low, medium, or high resolution
 -------------------------------------------------
 Version 1.8.1
 Date: 2016-02-08

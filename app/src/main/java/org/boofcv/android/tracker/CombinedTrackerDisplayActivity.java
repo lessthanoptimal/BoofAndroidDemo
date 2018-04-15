@@ -49,15 +49,16 @@ public class CombinedTrackerDisplayActivity extends PointTrackerDisplayActivity
 	Spinner spinnerDet;
 	Spinner spinnerDesc;
 
+	public CombinedTrackerDisplayActivity() {
+		super(Resolution.MEDIUM);
+	}
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.combined_tracker_controls,null);
-
-		LinearLayout parent = getViewContent();
-		parent.addView(controls);
 
 		List<String> local = new ArrayList<String>();
 		local.add( "KLT");
@@ -86,6 +87,8 @@ public class CombinedTrackerDisplayActivity extends PointTrackerDisplayActivity
 		spinnerAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, descriptors);
 		spinnerDesc.setAdapter(spinnerAdapter);
 		spinnerDesc.setOnItemSelectedListener(this);
+
+		setControls(controls);
 	}
 
 	@Override

@@ -25,8 +25,10 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import boofcv.android.ConvertBitmap;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 
 /**
@@ -295,7 +297,7 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
             // Copy this frame
             if (showBitmap) {
                 synchronized (bitmapLock) {
-                    ConvertBitmap.grayToBitmap((GrayU8) image, bitmap, bitmapTmp);
+                    ConvertBitmap.grayToBitmap((ImageGray) image, bitmap, bitmapTmp);
                 }
             }
 
@@ -316,9 +318,11 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
         }
     }
 
+    byte[] storageRow = new byte[1];
+
     protected void convert( Image src , ImageBase dst ) {
         if( dst instanceof GrayU8 ) {
-            GrayU8 gray = (GrayU8)dst;
+            GrayU8 gray = (GrayU8) dst;
             Image.Plane plane = src.getPlanes()[0];
             gray.reshape(plane.getRowStride(), src.getHeight());
             gray.width = src.getWidth();
@@ -328,6 +332,27 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
             ByteBuffer buffer = plane.getBuffer();
             buffer.rewind();
             buffer.get(gray.data, 0, plane.getRowStride() * src.getHeight());
+        } else if( dst instanceof GrayF32) {
+            GrayF32 gray = (GrayF32) dst;
+            Image.Plane plane = src.getPlanes()[0];
+            gray.reshape(plane.getRowStride(), src.getHeight());
+            gray.width = src.getWidth();
+            gray.stride = plane.getRowStride();
+            gray.subImage = true;
+
+            if( storageRow.length < gray.stride ) {
+                storageRow = new byte[gray.stride];
+            }
+
+            ByteBuffer buffer = plane.getBuffer();
+            buffer.rewind();
+            for (int row = 0,index=0; row < gray.height; row++) {
+                buffer.get(storageRow, 0, gray.stride);
+                for (int i = 0; i < gray.stride; i++) {
+                    gray.data[index++] = storageRow[i]&0xFF;
+                }
+            }
+
         } else {
             throw new RuntimeException("Unsupported dst type");
         }
