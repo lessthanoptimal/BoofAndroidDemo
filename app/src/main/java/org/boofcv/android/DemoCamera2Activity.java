@@ -1,9 +1,13 @@
 package org.boofcv.android;
 
 import android.app.ProgressDialog;
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.os.Bundle;
 import android.os.Looper;
+import android.support.annotation.Nullable;
+import android.util.DisplayMetrics;
 import android.util.Size;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
@@ -32,6 +36,8 @@ public class DemoCamera2Activity extends VisualizeCamera2Activity {
     ProgressDialog progressDialog;
     protected final Object lockProgress = new Object();
 
+    protected DisplayMetrics displayMetrics;
+
     public DemoCamera2Activity(Resolution resolution) {
         super.targetResolution = resolutionToPixels(resolution);
 
@@ -39,10 +45,17 @@ public class DemoCamera2Activity extends VisualizeCamera2Activity {
         super.visualizeOnlyMostRecent = true;
     }
 
-    protected void setControls(LinearLayout controls ) {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        displayMetrics = Resources.getSystem().getDisplayMetrics();
+    }
+
+    protected void setControls(@Nullable LinearLayout controls ) {
         setContentView(R.layout.standard_camera2);
         LinearLayout parent = findViewById(R.id.root_layout);
-        parent.addView(controls);
+        if( controls != null)
+            parent.addView(controls);
 
         FrameLayout surfaceLayout = findViewById(R.id.camera_frame_layout);
         startCamera(surfaceLayout,null);
@@ -243,6 +256,22 @@ public class DemoCamera2Activity extends VisualizeCamera2Activity {
         matrix.mapPoints(pts);
         out.x = pts[0];
         out.y = pts[1];
+    }
+
+    /**
+     * Some times the size of a font of stroke needs to be specified in the input image
+     * but then gets scaled to image resolution. This compensates for that.
+     */
+    public float screenDensityAdjusted() {
+        if( mCameraSize == null )
+            return displayMetrics.density;
+
+        int rotation = getWindowManager().getDefaultDisplay().getRotation();
+        int screenWidth = (rotation==0||rotation==2)?displayMetrics.widthPixels:displayMetrics.heightPixels;
+        int cameraWidth = mSensorOrientation==0||mSensorOrientation==180?
+                mCameraSize.getWidth():mCameraSize.getHeight();
+
+        return displayMetrics.density*cameraWidth/screenWidth;
     }
 
     /**

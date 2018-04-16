@@ -1,6 +1,10 @@
 package org.boofcv.android.recognition;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+
+import org.boofcv.android.R;
 
 import java.util.List;
 
@@ -26,6 +30,7 @@ public class FiducialSquareImageActivity extends FiducialSquareActivity
 
 	public FiducialSquareImageActivity() {
 		super(FiducialSquareImageHelpActivity.class);
+		layout = R.layout.fiducial_image_controls;
 	}
 
 	@Override
@@ -35,15 +40,21 @@ public class FiducialSquareImageActivity extends FiducialSquareActivity
 
 	@Override
 	protected void onResume() {
-		super.onResume();
-
 		manager = new FiducialManager(this);
 		manager.loadList();
 		list = manager.copyList();
 
 		if( list.size() == 0 ) {
 			drawText = "ADD FIDUCIALS!";
+		} else {
+			drawText = null;
 		}
+		super.onResume();
+	}
+
+	public void pressedLibrary( View view ) {
+		Intent intent = new Intent(this, FiducialImageLibraryAcitivity.class );
+		startActivity(intent);
 	}
 
 	@Override

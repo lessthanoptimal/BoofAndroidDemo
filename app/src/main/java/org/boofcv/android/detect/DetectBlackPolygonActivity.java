@@ -1,6 +1,7 @@
 package org.boofcv.android.detect;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
@@ -21,6 +22,7 @@ import android.widget.ToggleButton;
 import org.boofcv.android.DemoFilterCamera2Activity;
 import org.boofcv.android.DemoProcessing;
 import org.boofcv.android.R;
+import org.boofcv.android.misc.MiscUtil;
 import org.ddogleg.struct.FastQueue;
 
 import java.util.ArrayList;
@@ -37,7 +39,6 @@ import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
-import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 
 /**
@@ -78,7 +79,7 @@ public class DetectBlackPolygonActivity extends DemoFilterCamera2Activity
 
 	public DetectBlackPolygonActivity() {
 		super(Resolution.MEDIUM);
-		super.showBitmap = true;
+		super.showBitmap = false;
 
 		double rgb[] = new double[3];
 
@@ -94,13 +95,23 @@ public class DetectBlackPolygonActivity extends DemoFilterCamera2Activity
 		}
 	}
 
+	@Override
+	protected void onCameraResolutionChange(int width, int height) {
+		super.onCameraResolutionChange(width, height);
+		synchronized (bitmapLock) {
+			if (bitmap.getWidth() != width || bitmap.getHeight() != height)
+				bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+			bitmapTmp = ConvertBitmap.declareStorage(bitmap, bitmapTmp);
+		}
+	}
+
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		paint = new Paint();
 		paint.setStyle(Paint.Style.STROKE);
 		paint.setFlags(Paint.ANTI_ALIAS_FLAG);
-		paint.setStrokeWidth(3.0f);
+		paint.setStrokeWidth(2.0f*screenDensityAdjusted());
 
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.detect_black_polygon_controls,null);
@@ -254,18 +265,7 @@ public class DetectBlackPolygonActivity extends DemoFilterCamera2Activity
 					Polygon2D_F64 s = copy.get(i);
 					paint.setColor(colors[s.size() - MIN_SIDES]);
 
-
-					path.reset();
-					for (int j = 0; j < s.size(); j++) {
-						Point2D_F64 p = s.get(j);
-						if (j == 0)
-							path.moveTo((float) p.x, (float) p.y);
-						else
-							path.lineTo((float) p.x, (float) p.y);
-					}
-					Point2D_F64 p = s.get(0);
-					path.lineTo((float) p.x, (float) p.y);
-					canvas.drawPath(path, paint);
+					MiscUtil.renderPolygon(s,path,canvas,paint);
 				}
 			}
 		}

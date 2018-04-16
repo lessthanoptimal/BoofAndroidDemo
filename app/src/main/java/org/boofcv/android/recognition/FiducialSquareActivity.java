@@ -70,6 +70,9 @@ public abstract class FiducialSquareActivity extends DemoCamera2Activity
 
 	protected boolean disableControls = false;
 
+	// Which layout it should use
+	int layout = R.layout.fiducial_controls;
+
 	FiducialSquareActivity(Class help) {
 		super(Resolution.MEDIUM);
 		this.help = help;
@@ -81,7 +84,7 @@ public abstract class FiducialSquareActivity extends DemoCamera2Activity
 		super.onCreate(savedInstanceState);
 
 		LayoutInflater inflater = getLayoutInflater();
-		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.fiducial_controls,null);
+		LinearLayout controls = (LinearLayout)inflater.inflate(layout,null);
 
 		final ToggleButton toggle = controls.findViewById(R.id.toggle_robust);
 		final SeekBar seek = controls.findViewById(R.id.slider_threshold);
@@ -193,31 +196,34 @@ public abstract class FiducialSquareActivity extends DemoCamera2Activity
 			paintSelected.setColor(Color.argb(0xFF / 2, 0xFF, 0, 0));
 
 			paintLine0.setColor(Color.RED);
-			paintLine0.setStrokeWidth(4f);
 			paintLine0.setFlags(Paint.ANTI_ALIAS_FLAG);
 			paintLine1.setColor(Color.BLACK);
-			paintLine1.setStrokeWidth(4f);
 			paintLine1.setFlags(Paint.ANTI_ALIAS_FLAG);
 			paintLine2.setColor(Color.BLUE);
-			paintLine2.setStrokeWidth(4f);
 			paintLine2.setFlags(Paint.ANTI_ALIAS_FLAG);
 			paintLine3.setColor(Color.GREEN);
-			paintLine3.setStrokeWidth(4f);
 			paintLine3.setFlags(Paint.ANTI_ALIAS_FLAG);
 
 			// Create out paint to use for drawing
 			textPaint.setARGB(255, 255, 100, 100);
-			textPaint.setTextSize(30);
 
 			textBorder.setARGB(255, 0, 0, 0);
-			textBorder.setTextSize(30);
 			textBorder.setStyle(Paint.Style.STROKE);
-			textBorder.setStrokeWidth(3);
 		}
 
 		@Override
 		public void initialize(int imageWidth, int imageHeight)
 		{
+			// the adjustment requires knowing what the camera's resolution is. The camera
+			// must be initialized at this point
+			textPaint.setTextSize(30*screenDensityAdjusted());
+			textBorder.setTextSize(30*screenDensityAdjusted());
+			textBorder.setStrokeWidth(3*screenDensityAdjusted());
+			paintLine0.setStrokeWidth(4f*screenDensityAdjusted());
+			paintLine1.setStrokeWidth(4f*screenDensityAdjusted());
+			paintLine2.setStrokeWidth(4f*screenDensityAdjusted());
+			paintLine3.setStrokeWidth(4f*screenDensityAdjusted());
+
 			double fov[] = cameraNominalFov();
 			intrinsic = MiscUtil.checkThenInventIntrinsic(imageWidth,imageHeight,fov[0],fov[1]);
 			detector.setLensDistortion(LensDistortionOps.narrow(intrinsic),imageWidth,imageHeight);
@@ -229,6 +235,7 @@ public abstract class FiducialSquareActivity extends DemoCamera2Activity
 				canvas.drawBitmap(bitmap,imageToView,null);
 			}
 
+			canvas.save();
 			canvas.setMatrix(imageToView);
 			synchronized (listPose) {
 				for ( int i = 0; i < listPose.size; i++ ) {
@@ -238,6 +245,7 @@ public abstract class FiducialSquareActivity extends DemoCamera2Activity
 				}
 			}
 
+			canvas.restore();
 			if( drawText != null ) {
 				renderDrawText(canvas);
 			}

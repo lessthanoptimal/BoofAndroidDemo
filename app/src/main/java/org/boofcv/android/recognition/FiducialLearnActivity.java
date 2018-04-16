@@ -2,11 +2,12 @@ package org.boofcv.android.recognition;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -17,7 +18,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 
-import org.boofcv.android.DemoVideoDisplayActivity;
+import org.boofcv.android.DemoCamera2Activity;
+import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
 import org.boofcv.android.misc.MiscUtil;
 import org.boofcv.android.misc.UnitsDistance;
@@ -31,13 +33,14 @@ import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
-import boofcv.android.camera.VideoRenderProcessing;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
+import georegression.geometry.UtilPolygons2D_F64;
 import georegression.metric.Area2D_F64;
 import georegression.metric.Intersection2D_F64;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
 
 /**
@@ -46,7 +49,7 @@ import georegression.struct.shapes.Quadrilateral_F64;
  *
  * @author Peter Abeles
  */
-public class FiducialLearnActivity extends DemoVideoDisplayActivity
+public class FiducialLearnActivity extends DemoCamera2Activity
 		implements View.OnTouchListener
 {
 	public static final String TAG = "FiducialLearnActivity";
@@ -58,10 +61,26 @@ public class FiducialLearnActivity extends DemoVideoDisplayActivity
 
 	FiducialManager manager;
 
+	public FiducialLearnActivity() {
+		super(Resolution.MEDIUM);
+	}
+
+	@Override
+	protected void onCameraResolutionChange(int width, int height) {
+		super.onCameraResolutionChange(width, height);
+		synchronized (bitmapLock) {
+			if (bitmap.getWidth() != width || bitmap.getHeight() != height)
+				bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+			bitmapTmp = ConvertBitmap.declareStorage(bitmap, bitmapTmp);
+		}
+	}
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		getViewPreview().setOnTouchListener(this);
+
+		setControls(null);
+		displayView.setOnTouchListener(this);
 
 		manager = new FiducialManager(this);
 		manager.loadList();
@@ -90,15 +109,12 @@ public class FiducialLearnActivity extends DemoVideoDisplayActivity
 		return true;
 	}
 
-	protected class FiducialProcessor extends VideoRenderProcessing<GrayU8> {
+	protected class FiducialProcessor extends DemoProcessingAbstract<GrayU8> {
 
 		final FiducialDetector detector = new FiducialDetector();
 
 		Paint paintBorder = new Paint();
 		Paint paintInside = new Paint();
-
-		Bitmap bitmap;
-		byte[] storage;
 
 		FiducialDetector.Detected detected[];
 		int numDetected = 0;
@@ -106,14 +122,12 @@ public class FiducialLearnActivity extends DemoVideoDisplayActivity
 		GrowQueue_I32 indexes = new GrowQueue_I32();
 		GrowQueue_F64 area = new GrowQueue_F64();
 
+		Matrix viewToImage = new Matrix();
+		Path path = new Path();
+		Polygon2D_F64 polygon = new Polygon2D_F64(4);
+
 		public FiducialProcessor() {
 			super(ImageType.single(GrayU8.class));
-
-			paintBorder.setColor(Color.BLACK);
-			paintBorder.setStrokeWidth(6);
-
-			paintInside.setColor(Color.RED);
-			paintInside.setStrokeWidth(3);
 
 			detected = new FiducialDetector.Detected[3];
 			for (int i = 0; i < detected.length; i++) {
@@ -121,17 +135,6 @@ public class FiducialLearnActivity extends DemoVideoDisplayActivity
 				detected[i].binary = new GrayU8(1,1);
 				detected[i].location = new Quadrilateral_F64();
 			}
-		}
-
-		@Override
-		protected void declareImages(int width, int height) {
-			super.declareImages(width, height);
-			CameraPinholeRadial intrinsic = MiscUtil.checkThenInventIntrinsic();
-			LensDistortionNarrowFOV distort = LensDistortionOps.narrow(intrinsic);
-			detector.configure(distort, intrinsic.width, intrinsic.height, true);
-			bitmap = Bitmap.createBitmap(width,height,Bitmap.Config.ARGB_8888);
-			storage = ConvertBitmap.declareStorage(bitmap, storage);
-			numDetected = 0;
 		}
 
 		private boolean validQuadrilateral( Quadrilateral_F64 quad ) {
@@ -150,17 +153,64 @@ public class FiducialLearnActivity extends DemoVideoDisplayActivity
 		}
 
 		@Override
-		protected void process(GrayU8 gray) {
+		public void initialize(int imageWidth, int imageHeight) {
+			paintBorder.setColor(Color.BLACK);
+			paintBorder.setStyle(Paint.Style.STROKE);
+			paintBorder.setStrokeWidth(3*screenDensityAdjusted());
 
+			paintInside.setColor(Color.RED);
+			paintInside.setStyle(Paint.Style.STROKE);
+			paintInside.setStrokeWidth(2*screenDensityAdjusted());
+
+			double fov[] = cameraNominalFov();
+			CameraPinholeRadial intrinsic = MiscUtil.checkThenInventIntrinsic(imageWidth,imageHeight,fov[0],fov[1]);
+			LensDistortionNarrowFOV distort = LensDistortionOps.narrow(intrinsic);
+			detector.configure(distort, intrinsic.width, intrinsic.height, true);
+			numDetected = 0;
+		}
+
+		@Override
+		public void onDraw(Canvas canvas, Matrix imageToView) {
+
+			if( touched) {
+				imageToView.invert(viewToImage);
+				applyToPoint(viewToImage,touch.x,touch.y,touch);
+			}
+
+			boolean selected = false;
+			synchronized (lockGui) {
+				canvas.setMatrix(imageToView);
+				for (int i = 0; i < numDetected; i++) {
+					FiducialDetector.Detected d = detected[i];
+
+					if (validQuadrilateral(d.location)) {
+						drawQuad(canvas, d.location, 3, paintBorder);
+						drawQuad(canvas, d.location, 0, paintInside);
+
+						if (touched && Intersection2D_F64.contains(d.location, touch)) {
+							touchedFiducial.setTo(d.binary);
+							selected = true;
+						}
+					}
+				}
+			}
+
+			if( selected ) {
+				// it's in the GUI thread already so this call is OK
+				dialogAcceptFiducial("","");
+			} else {
+				touched = false;
+			}
+		}
+
+		@Override
+		public void process(GrayU8 gray) {
 			detector.process(gray);
 
 			synchronized ( lockGui ) {
-				ConvertBitmap.grayToBitmap(gray,bitmap,storage);
-
 				List<FiducialDetector.Detected> found = detector.getDetected();
 
 				// Select the largest quadrilaterals
-
 				if( found.size() <= detected.length ) {
 					numDetected = found.size();
 					for (int i = 0; i < numDetected; i++) {
@@ -188,62 +238,9 @@ public class FiducialLearnActivity extends DemoVideoDisplayActivity
 			}
 		}
 
-		@Override
-		protected void render(Canvas canvas, double imageToOutput) {
-
-			canvas.drawBitmap(bitmap, 0, 0, null);
-
-			if( touched) {
-				imageToOutput(touch.x,touch.y,touch);
-			}
-
-			boolean selected = false;
-			for (int i = 0; i < numDetected; i++) {
-				FiducialDetector.Detected d = detected[i];
-
-				if( validQuadrilateral(d.location) ) {
-					drawQuad(canvas, d.location, 3, paintBorder);
-					drawQuad(canvas, d.location, 0, paintInside);
-
-					if( touched && Intersection2D_F64.contains(d.location,touch)) {
-						touchedFiducial.setTo(d.binary);
-						selected = true;
-					}
-				}
-			}
-
-			if( selected ) {
-				// it's in the GUI thread already so this call is OK
-				dialogAcceptFiducial("","");
-			} else {
-				touched = false;
-			}
-		}
-
 		private void drawQuad( Canvas canvas , Quadrilateral_F64 quad , int extend, Paint color ) {
-			drawLine(canvas, quad.a, quad.b, extend, color);
-			drawLine(canvas, quad.b, quad.c, extend, color);
-			drawLine(canvas, quad.c, quad.d, extend, color);
-			drawLine(canvas, quad.d, quad.a, extend, color);
-		}
-
-		private void drawLine( Canvas canvas , Point2D_F64 a, Point2D_F64 b, int extend, Paint color ) {
-
-			double slopeX = b.x-a.x;
-			double slopeY = b.y-a.y;
-
-			double r = Math.sqrt(slopeX*slopeX + slopeY*slopeY);
-
-			slopeX /= r;
-			slopeY /= r;
-
-			float x0 = (float)(a.x - slopeX*extend);
-			float y0 = (float)(a.y - slopeY*extend);
-
-			float x1 = (float)(b.x + slopeX*extend);
-			float y1 = (float)(b.y + slopeY*extend);
-
-			canvas.drawLine(x0, y0, x1, y1,color);
+			UtilPolygons2D_F64.convert(quad, polygon);
+			MiscUtil.renderPolygon(polygon, path, canvas, color);
 		}
 	}
 
@@ -273,39 +270,28 @@ public class FiducialLearnActivity extends DemoVideoDisplayActivity
 		VisualizeImageData.binaryToBitmap(touchedFiducial, true, image, null);
 
 		LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.dialog_fiducial_accept, null);
-		ImageView imageView = (ImageView) layout.findViewById(R.id.imageView);
+		ImageView imageView = layout.findViewById(R.id.imageView);
 
-		final EditText textName = (EditText) layout.findViewById(R.id.imageName);
-		final EditText textSize = (EditText) layout.findViewById(R.id.imageSize);
-		final Spinner units = (Spinner) layout.findViewById(R.id.spinner_units_distance);
+		final EditText textName = layout.findViewById(R.id.imageName);
+		final EditText textSize = layout.findViewById(R.id.imageSize);
+		final Spinner units = layout.findViewById(R.id.spinner_units_distance);
 
 		textName.setText(name);
 		textSize.setText(size);
 
-		setupSpinners(this, units, (List) UnitsDistance.all);
+		setupSpinners(this, units, UnitsDistance.all);
 
 		imageView.setImageBitmap(image);
 
 		// Create the GUI and show it
 		builder.setView(layout)
-				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						UnitsDistance selectedUnit = UnitsDistance.all.get(units.getSelectedItemPosition());
-						handleSaveFiducial(textName.getText().toString(),textSize.getText().toString(),selectedUnit);
-						dialogActive = false;
-					}
-				})
-				.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						dialogActive = false;
-					}
-				})
-				.setOnCancelListener(new DialogInterface.OnCancelListener() {
-					@Override
-					public void onCancel(DialogInterface dialog) {
-						dialogActive = false;
-					}
-				});
+				.setPositiveButton("OK", (dialog, id) -> {
+                    UnitsDistance selectedUnit = UnitsDistance.all.get(units.getSelectedItemPosition());
+                    handleSaveFiducial(textName.getText().toString(),textSize.getText().toString(),selectedUnit);
+                    dialogActive = false;
+                })
+				.setNegativeButton("Cancel", (dialog, id) -> dialogActive = false)
+				.setOnCancelListener(dialog -> dialogActive = false);
 		AlertDialog dialog = builder.create();
 		dialog.show();
 	}

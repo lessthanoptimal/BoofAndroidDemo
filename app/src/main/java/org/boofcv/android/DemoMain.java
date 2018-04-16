@@ -35,7 +35,6 @@ import org.boofcv.android.ip.GradientDisplayActivity;
 import org.boofcv.android.ip.ImageTransformActivity;
 import org.boofcv.android.ip.ThresholdDisplayActivity;
 import org.boofcv.android.recognition.FiducialCalibrationActivity;
-import org.boofcv.android.recognition.FiducialImageLibraryAcitivity;
 import org.boofcv.android.recognition.FiducialSquareBinaryActivity;
 import org.boofcv.android.recognition.FiducialSquareImageActivity;
 import org.boofcv.android.recognition.ImageClassificationActivity;
@@ -157,7 +156,6 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		recognition.addChild("Image Classification", ImageClassificationActivity.class);
 		recognition.addChild("Square Binary",FiducialSquareBinaryActivity.class);
 		recognition.addChild("Square Image",FiducialSquareImageActivity.class);
-		recognition.addChild("Square Image Library",FiducialImageLibraryAcitivity.class);
 		recognition.addChild("Calib Targets",FiducialCalibrationActivity.class);
 
 		calib.addChild("Calibrate",CalibrationActivity.class);

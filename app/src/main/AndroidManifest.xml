@@ -45,14 +45,10 @@
             android:name=".DemoVideoDisplayActivity"
             android:screenOrientation="landscape" />
         <activity android:name=".PreferenceActivity" />
-        <activity
-            android:name=".ip.BlurDisplayActivity"/>
-        <activity
-            android:name=".ip.EnhanceDisplayActivity"/>
-        <activity
-            android:name=".ip.GradientDisplayActivity"/>
-        <activity
-            android:name=".ip.BinaryDisplayActivity"/>
+        <activity android:name=".ip.BlurDisplayActivity"/>
+        <activity android:name=".ip.EnhanceDisplayActivity"/>
+        <activity android:name=".ip.GradientDisplayActivity"/>
+        <activity android:name=".ip.BinaryDisplayActivity"/>
         <activity
             android:name=".detect.PointDisplayActivity"
             android:screenOrientation="landscape" />
@@ -62,8 +58,7 @@
         <activity
             android:name=".detect.LineDisplayActivity"
             android:screenOrientation="landscape" />
-        <activity
-            android:name=".tracker.KltDisplayActivity"/>
+        <activity android:name=".tracker.KltDisplayActivity"/>
         <activity
             android:name=".sfm.StabilizeDisplayActivity"
             android:screenOrientation="landscape" />
@@ -94,38 +89,28 @@
         <activity
             android:name=".detect.ShapeFitDisplayActivity"
             android:screenOrientation="landscape" />
-        <activity
-            android:name=".ip.ImageTransformActivity"/>
-        <activity
-            android:name=".tracker.ObjectTrackerActivity"/>
+        <activity android:name=".ip.ImageTransformActivity"/>
+        <activity android:name=".tracker.ObjectTrackerActivity"/>
         <activity
             android:name=".detect.ContourShapeFittingActivity"
             android:screenOrientation="landscape" />
-        <activity
-            android:name=".detect.CannyEdgeActivity"/>
+        <activity android:name=".detect.CannyEdgeActivity"/>
         <activity
             android:name=".calib.UndistortDisplayActivity"
             android:screenOrientation="landscape" />
         <activity
             android:name=".detect.SegmentationDisplayActivity"
             android:screenOrientation="landscape" />
-        <activity
-            android:name=".ip.ThresholdDisplayActivity"/>
-        <activity
-            android:name=".recognition.FiducialSquareBinaryActivity"/>
+        <activity android:name=".ip.ThresholdDisplayActivity"/>
+        <activity android:name=".recognition.FiducialSquareBinaryActivity"/>
         <activity android:name=".recognition.FiducialSquareBinaryHelpActivity" />
-        <activity
-            android:name=".recognition.FiducialSquareImageActivity"/>
+        <activity android:name=".recognition.FiducialSquareImageActivity"/>
         <activity android:name=".recognition.FiducialSquareImageHelpActivity" />
-        <activity
-            android:name=".recognition.FiducialLearnActivity"
-            android:screenOrientation="landscape" />
+        <activity android:name=".recognition.FiducialLearnActivity" />
         <activity android:name=".recognition.FiducialImageLibraryAcitivity" />
         <activity android:name=".recognition.FiducialSelectHelpActivity" />
-        <activity
-            android:name=".recognition.FiducialCalibrationActivity"/>
-        <activity
-            android:name=".recognition.FiducialCalibrationHelpActivity"/>
+        <activity android:name=".recognition.FiducialCalibrationActivity"/>
+        <activity android:name=".recognition.FiducialCalibrationHelpActivity"/>
         <activity
             android:name=".tracker.StaticBackgroundMotionActivity"
             android:screenOrientation="landscape" />
