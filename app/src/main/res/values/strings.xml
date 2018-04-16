@@ -69,7 +69,6 @@
         <item>Histogram Local</item>
         <item>Sharpen-4</item>
         <item>Sharpen-8</item>
-        <item>None</item>
     </string-array>
 
     <string-array name="gradients">

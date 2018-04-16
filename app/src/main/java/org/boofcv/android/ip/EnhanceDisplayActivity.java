@@ -1,8 +1,10 @@
 package org.boofcv.android.ip;
 
-import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -11,15 +13,16 @@ import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 
-import org.boofcv.android.DemoVideoDisplayActivity;
+import org.boofcv.android.DemoFilterCamera2Activity;
+import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
 
 import boofcv.alg.enhance.EnhanceImageOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.android.ConvertBitmap;
-import boofcv.android.camera.VideoImageProcessing;
 import boofcv.core.image.ConvertImage;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
 
@@ -28,12 +31,18 @@ import boofcv.struct.image.Planar;
  *
  * @author Peter Abeles
  */
-public class EnhanceDisplayActivity extends DemoVideoDisplayActivity
+public class EnhanceDisplayActivity extends DemoFilterCamera2Activity
 		implements AdapterView.OnItemSelectedListener, CompoundButton.OnCheckedChangeListener
 {
 
 	Spinner spinnerView;
 	CheckBox checkColor;
+
+	boolean showEnhanced = true;
+
+	public EnhanceDisplayActivity() {
+		super(Resolution.MEDIUM);
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -42,32 +51,40 @@ public class EnhanceDisplayActivity extends DemoVideoDisplayActivity
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.enhance_controls,null);
 
-		LinearLayout parent = getViewContent();
-		parent.addView(controls);
-
-		spinnerView = (Spinner)controls.findViewById(R.id.spinner_enhance);
+		spinnerView = controls.findViewById(R.id.spinner_enhance);
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
 				R.array.enhance, android.R.layout.simple_spinner_item);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinnerView.setAdapter(adapter);
 		spinnerView.setOnItemSelectedListener(this);
 
-		checkColor = (CheckBox)controls.findViewById(R.id.check_color);
+		checkColor = controls.findViewById(R.id.check_color);
 		checkColor.setOnCheckedChangeListener(this);
+
+		setControls(controls);
+
+		displayView.setOnTouchListener((view, motionEvent) -> {
+            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                showEnhanced = false;
+            } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                showEnhanced = true;
+            }
+            return true;
+        });
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-		startBlurProcess(spinnerView.getSelectedItemPosition(),checkColor.isChecked());
+		startEnhance(spinnerView.getSelectedItemPosition(),checkColor.isChecked());
 	}
 
 	@Override
 	public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id ) {
-		startBlurProcess(pos,checkColor.isChecked());
+		startEnhance(pos,checkColor.isChecked());
 	}
 
-	private void startBlurProcess(int pos, boolean color ) {
+	private void startEnhance(int pos, boolean color ) {
 		switch (pos) {
 			case 0:
 				if( color )
@@ -96,13 +113,6 @@ public class EnhanceDisplayActivity extends DemoVideoDisplayActivity
 				else
 					setProcessing(new SharpenProcessing(8) );
 				break;
-
-			case 4:
-				if( color )
-					setProcessing(new NoneProcessingColor() );
-				else
-					setProcessing(new NoneProcessing() );
-				break;
 		}
 	}
 
@@ -111,90 +121,113 @@ public class EnhanceDisplayActivity extends DemoVideoDisplayActivity
 
 	@Override
 	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-		startBlurProcess(spinnerView.getSelectedItemPosition(),isChecked);
+		startEnhance(spinnerView.getSelectedItemPosition(),isChecked);
 	}
 
-	protected abstract class EnhanceProcessing extends VideoImageProcessing<GrayU8> {
-		GrayU8 enhanced;
+	@Override
+	protected void processImage(ImageBase image) {
+		if( showEnhanced )
+			super.processImage(image);
+		else {
+			synchronized (bitmapLock) {
+				ConvertBitmap.boofToBitmap(image, bitmap, bitmapTmp);
+			}
+		}
+	}
+
+	protected void renderOutput(GrayU8 output ) {
+		synchronized (bitmapLock) {
+			ConvertBitmap.grayToBitmap(output, bitmap, bitmapTmp);
+		}
+	}
+
+	protected void renderOutput( Planar<GrayU8> output ) {
+		synchronized (bitmapLock) {
+			ConvertBitmap.multiToBitmap(output, bitmap, bitmapTmp);
+		}
+	}
+
+	protected abstract class EnhanceProcessing extends DemoProcessingAbstract<GrayU8> {
+		int histogram[] = new int[256];
+		int transform[] = new int[256];
+		GrayU8 enhanced = new GrayU8(1,1);
 
 		protected EnhanceProcessing() {
 			super(ImageType.single(GrayU8.class));
 		}
 
 		@Override
-		protected void declareImages( int width , int height ) {
-			super.declareImages(width, height);
+		public void initialize(int imageWidth, int imageHeight) {
+			enhanced.reshape(imageWidth,imageHeight);
+		}
 
-			enhanced = new GrayU8(width,height);
+		@Override
+		public void onDraw(Canvas canvas, Matrix imageToView) {
+			drawBitmap(canvas,imageToView);
 		}
 	}
 
-	protected abstract class EnhanceProcessingColor extends VideoImageProcessing<Planar<GrayU8>> {
-		Planar<GrayU8> enhanced;
-		GrayU8 gray;
+	protected abstract class EnhanceProcessingColor extends DemoProcessingAbstract<Planar<GrayU8>> {
+		int histogram[] = new int[256];
+		int transform[] = new int[256];
+
+		Planar<GrayU8> enhanced = new Planar<>(GrayU8.class, 1, 1, 3);
+		GrayU8 gray = new GrayU8(1,1);
 
 		public EnhanceProcessingColor() {
 			super(ImageType.pl(3, GrayU8.class));
 		}
 
 		@Override
-		protected void declareImages( int width , int height ) {
-			super.declareImages(width, height);
+		public void initialize(int imageWidth, int imageHeight) {
+			gray.reshape(imageWidth,imageHeight);
+			enhanced.reshape(imageWidth,imageHeight);
+		}
 
-			gray = new GrayU8(width,height);
-			enhanced = new Planar<GrayU8>(GrayU8.class,width,height,3);
+		@Override
+		public void onDraw(Canvas canvas, Matrix imageToView) {
+			drawBitmap(canvas,imageToView);
 		}
 	}
 
 	protected class HistogramGlobalProcessing extends EnhanceProcessing {
-		int histogram[] = new int[256];
-		int transform[] = new int[256];
-
 
 		@Override
-		protected void process(GrayU8 input, Bitmap output, byte[] storage) {
+		public void process(GrayU8 input) {
 			ImageStatistics.histogram(input,0, histogram);
 			EnhanceImageOps.equalize(histogram, transform);
 			EnhanceImageOps.applyTransform(input, transform, enhanced);
-			ConvertBitmap.grayToBitmap(enhanced,output,storage);
+			renderOutput(enhanced);
 		}
 	}
 
 	protected class HistogramGlobalProcessingColor extends EnhanceProcessingColor {
-		int histogram[] = new int[256];
-		int transform[] = new int[256];
-
 		@Override
-		protected void process(Planar<GrayU8> input, Bitmap output, byte[] storage) {
+		public void process(Planar<GrayU8> input) {
 			ConvertImage.average(input,gray);
 			ImageStatistics.histogram(gray,0, histogram);
 			EnhanceImageOps.equalize(histogram, transform);
 			for( int i = 0; i < 3; i++ )
 				EnhanceImageOps.applyTransform(input.getBand(i), transform, enhanced.getBand(i));
-			ConvertBitmap.multiToBitmap(enhanced,output,storage);
+			renderOutput(enhanced);
 		}
 	}
 
 	protected class HistogramLocalProcessing extends EnhanceProcessing {
-		int histogram[] = new int[256];
-		int transform[] = new int[256];
-
 		@Override
-		protected void process(GrayU8 input, Bitmap output, byte[] storage) {
+		public void process(GrayU8 input) {
 			EnhanceImageOps.equalizeLocal(input, 50, enhanced, histogram, transform);
-			ConvertBitmap.grayToBitmap(enhanced,output,storage);
+			renderOutput(enhanced);
 		}
 	}
 
 	protected class HistogramLocalProcessingColor extends EnhanceProcessingColor {
-		int histogram[] = new int[256];
-		int transform[] = new int[256];
 
 		@Override
-		protected void process(Planar<GrayU8> input, Bitmap output, byte[] storage) {
+		public void process(Planar<GrayU8> input ) {
 			for( int i = 0; i < 3; i++ )
 				EnhanceImageOps.equalizeLocal(input.getBand(i), 50, enhanced.getBand(i), histogram, transform);
-			ConvertBitmap.multiToBitmap(enhanced,output,storage);
+			renderOutput(enhanced);
 		}
 	}
 
@@ -207,12 +240,12 @@ public class EnhanceDisplayActivity extends DemoVideoDisplayActivity
 		}
 
 		@Override
-		protected void process(GrayU8 input, Bitmap output, byte[] storage) {
+		public void process(GrayU8 input) {
 			if( which == 4 )
 				EnhanceImageOps.sharpen4(input, enhanced);
 			else
 				EnhanceImageOps.sharpen8(input, enhanced);
-			ConvertBitmap.grayToBitmap(enhanced,output,storage);
+			renderOutput(enhanced);
 		}
 	}
 
@@ -225,30 +258,14 @@ public class EnhanceDisplayActivity extends DemoVideoDisplayActivity
 		}
 
 		@Override
-		protected void process( Planar<GrayU8> input, Bitmap output, byte[] storage) {
+		public void process( Planar<GrayU8> input) {
 			for( int i = 0; i < 3; i++ ) {
 				if( which == 4 )
 					EnhanceImageOps.sharpen4(input.getBand(i), enhanced.getBand(i));
 				else
 					EnhanceImageOps.sharpen8(input.getBand(i), enhanced.getBand(i));
 			}
-			ConvertBitmap.multiToBitmap(enhanced, output, storage);
-		}
-	}
-
-	protected class NoneProcessing extends EnhanceProcessing {
-
-		@Override
-		protected void process(GrayU8 input, Bitmap output, byte[] storage) {
-			ConvertBitmap.grayToBitmap(input,output,storage);
-		}
-	}
-
-	protected class NoneProcessingColor extends EnhanceProcessingColor {
-
-		@Override
-		protected void process(Planar<GrayU8> input, Bitmap output, byte[] storage) {
-			ConvertBitmap.multiToBitmap(input, output, storage);
+			renderOutput(enhanced);
 		}
 	}
 }

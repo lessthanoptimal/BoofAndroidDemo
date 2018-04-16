@@ -48,8 +48,7 @@
         <activity
             android:name=".ip.BlurDisplayActivity"/>
         <activity
-            android:name=".ip.EnhanceDisplayActivity"
-            android:screenOrientation="landscape" />
+            android:name=".ip.EnhanceDisplayActivity"/>
         <activity
             android:name=".ip.GradientDisplayActivity"/>
         <activity

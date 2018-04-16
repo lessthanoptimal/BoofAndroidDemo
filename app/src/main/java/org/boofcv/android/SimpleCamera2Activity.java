@@ -290,9 +290,11 @@ public abstract class SimpleCamera2Activity extends AppCompatActivity {
             Toast.makeText(this, "Cannot access the camera.", Toast.LENGTH_SHORT).show();
             finish();
         } catch (NullPointerException e) {
+            e.printStackTrace();
+            Log.e(TAG,"Null point in openCamera()");
             // Currently an NPE is thrown when the Camera2API is used but not supported on the
             // device this code runs.
-            Toast.makeText(this,"Camera2 API not supported on the device",Toast.LENGTH_LONG).show();
+            Toast.makeText(this,"Null pointer. Camera2 API not supported?",Toast.LENGTH_LONG).show();
             finish();
         } catch (InterruptedException e) {
             throw new RuntimeException("Interrupted while trying to lock camera opening.");

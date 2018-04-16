@@ -276,6 +276,8 @@ public abstract class VisualizeCamera2Activity extends SimpleCamera2Activity {
      * Where all the image processing happens. If the number of threads is greater than one then
      * this function can be called multiple times before previous calls have finished.
      *
+     * WARNING: If the image type can change this must be before processing it.
+     *
      * @param image The image which is to be processed. The image is owned by this function until
      *              it returns. After that the image and all it's data will be recycled. DO NOT
      *              SAVE A REFERENCE TO IT.

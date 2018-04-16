@@ -10,6 +10,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 
 /**
@@ -60,8 +61,20 @@ public class DemoCamera2Activity extends VisualizeCamera2Activity {
         if( processor != null) {
             if( !processor.isThreadSafe() && threadPool.getMaximumPoolSize() > 1 )
                 throw new RuntimeException("Process is not thread safe but the pool is larger than 1!");
-            processor.process(image);
+            // TODO update in v0.30
+            if( isSameType(processor.getImageType(),image.getImageType()))
+                processor.process(image);
         }
+    }
+
+    public static boolean isSameType(ImageType a , ImageType b ) {
+        if( a.getFamily() != b.getFamily() )
+            return false;
+        if( a.getDataType() != b.getDataType() )
+            return false;
+        if( a.getNumBands() != b.getNumBands() )
+            return false;
+        return true;
     }
 
     @Override
