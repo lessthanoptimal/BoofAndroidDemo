@@ -5,10 +5,12 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.os.Looper;
 import android.util.Size;
+import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
+import boofcv.android.ConvertBitmap;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
@@ -21,6 +23,10 @@ public class DemoCamera2Activity extends VisualizeCamera2Activity {
 
     protected final Object lockProcessor = new Object();
     protected DemoProcessing processor;
+
+    // If true it will show the processed image, otherwise it will
+    // display the input image
+    protected boolean showProcessed = true;
 
     // Used to inform the user that its doing some calculations
     ProgressDialog progressDialog;
@@ -51,8 +57,25 @@ public class DemoCamera2Activity extends VisualizeCamera2Activity {
         }
     }
 
+    public void activateTouchToShowInput() {
+        displayView.setOnTouchListener((view, motionEvent) -> {
+            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                showProcessed = false;
+            } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                showProcessed = true;
+            }
+            return true;
+        });
+    }
+
     @Override
     protected void processImage(ImageBase image) {
+        if( !showProcessed) {
+            synchronized (bitmapLock) {
+                ConvertBitmap.boofToBitmap(image, bitmap, bitmapTmp);
+            }
+            return;
+        }
         DemoProcessing processor;
         synchronized (lockProcessor) {
             processor = this.processor;
@@ -111,9 +134,15 @@ public class DemoCamera2Activity extends VisualizeCamera2Activity {
     protected void onDrawFrame(SurfaceView view , Canvas canvas ) {
         super.onDrawFrame(view,canvas);
 
-        synchronized (lockProcessor) {
-            if( processor != null )
-                processor.onDraw(canvas, imageToView);
+        if( !showProcessed ) {
+            synchronized (bitmapLock) {
+                canvas.drawBitmap(bitmap, imageToView, null);
+            }
+        } else {
+            synchronized (lockProcessor) {
+                if (processor != null)
+                    processor.onDraw(canvas, imageToView);
+            }
         }
     }
 

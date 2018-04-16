@@ -64,6 +64,7 @@ public class CannyEdgeActivity extends DemoCamera2Activity
 		colorize = toggle.isChecked();
 
 		setControls(controls);
+		activateTouchToShowInput();
 	}
 
 	@Override
