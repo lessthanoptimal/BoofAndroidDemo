@@ -18,6 +18,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.Size;
+import android.util.SizeF;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
@@ -27,6 +28,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
+
+import georegression.metric.UtilAngle;
 
 /**
  * Activity for collecting images from single camera on an Android device using the camera2 API.
@@ -70,6 +73,8 @@ public abstract class SimpleCamera2Activity extends AppCompatActivity {
 
     // the camera that was selected to view
     protected String cameraId;
+    // describes physical properties of the camera
+    protected CameraCharacteristics mCameraCharacterstics;
 
     private ReentrantLock mCameraOpenCloseLock = new ReentrantLock();
 
@@ -269,6 +274,7 @@ public abstract class SimpleCamera2Activity extends AppCompatActivity {
                 if( verbose )
                     Log.i(TAG,"selected cameraId="+cameraId+" orientation="+mSensorOrientation);
 
+                mCameraCharacterstics = characteristics;
                 onCameraResolutionChange( mCameraSize.getWidth(), mCameraSize.getHeight() );
                 try {
                     mPreviewReader = ImageReader.newInstance(
@@ -312,6 +318,7 @@ public abstract class SimpleCamera2Activity extends AppCompatActivity {
                 mCameraDevice = null;
             }
             mCameraSize = null;
+            mCameraCharacterstics = null;
         } finally {
             mCameraOpenCloseLock.unlock();
         }
@@ -494,6 +501,25 @@ public abstract class SimpleCamera2Activity extends AppCompatActivity {
             finish();
         }
     };
+
+    /**
+     * Estimates the camera's horizontal and vertical FOV by picking a nominal value.
+     * Determining the actual FOV is a much more complex process.
+     */
+    public double[] cameraNominalFov() {
+        SizeF sensorSize = mCameraCharacterstics.get(CameraCharacteristics.SENSOR_INFO_PHYSICAL_SIZE);
+        float[] focalLengths = mCameraCharacterstics.get(CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS);
+
+        if( focalLengths == null || sensorSize == null ) {
+            double hfov = UtilAngle.radian(60);
+            double vfov = hfov*mCameraSize.getHeight()/mCameraSize.getWidth();
+            return new double[]{hfov,vfov};
+        } else {
+            double hfov = 2 * Math.atan(sensorSize.getWidth() / (2 * focalLengths[0]));
+            double vfov = 2 * Math.atan(sensorSize.getHeight() / (2 * focalLengths[0]));
+            return new double[]{hfov,vfov};
+        }
+    }
 
     private ImageReader.OnImageAvailableListener onAvailableListener = imageReader -> {
         Image image = imageReader.acquireLatestImage();

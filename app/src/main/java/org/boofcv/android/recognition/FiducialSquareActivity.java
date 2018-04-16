@@ -4,23 +4,26 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.CompoundButton;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import org.boofcv.android.DemoCamera2Activity;
 import org.boofcv.android.DemoMain;
-import org.boofcv.android.DemoVideoDisplayActivity;
+import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
 import org.boofcv.android.misc.MiscUtil;
+import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.GrowQueue_F64;
+import org.ddogleg.struct.GrowQueue_I64;
 
 import boofcv.abst.fiducial.CalibrationFiducialDetector;
 import boofcv.abst.fiducial.FiducialDetector;
@@ -32,13 +35,9 @@ import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
-import boofcv.android.camera.VideoImageProcessing;
-import boofcv.core.image.ConvertImage;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
-import boofcv.struct.image.ImageType;
-import boofcv.struct.image.Planar;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -50,31 +49,31 @@ import georegression.transform.se.SePointOps_F64;
  *
  * @author Peter Abeles
  */
-public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
+public abstract class FiducialSquareActivity extends DemoCamera2Activity
 		implements View.OnTouchListener
 {
 	public static final String TAG = "FiducialSquareActivity";
 
 	final Object lock = new Object();
-	volatile boolean changed = true;
 	volatile boolean robust = true;
 	volatile int binaryThreshold = 100;
 
 	Se3_F64 targetToCamera = new Se3_F64();
-	CameraPinholeRadial intrinsic;
 
 	Class help;
 
 	// this text is displayed
 	String drawText = "";
 
-	// true for showinginput image or false for debug information
-	boolean showInput = true;
+	// If true then the background will be the thresholded image
+	boolean showThreshold = true;
 
 	protected boolean disableControls = false;
 
 	FiducialSquareActivity(Class help) {
+		super(Resolution.MEDIUM);
 		this.help = help;
+		super.showBitmap = false;
 	}
 
 	@Override
@@ -84,14 +83,8 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.fiducial_controls,null);
 
-		LinearLayout parent = getViewContent();
-		parent.addView(controls);
-
-		FrameLayout iv = getViewPreview();
-		iv.setOnTouchListener(this);
-
-		final ToggleButton toggle = (ToggleButton) controls.findViewById(R.id.toggle_robust);
-		final SeekBar seek = (SeekBar) controls.findViewById(R.id.slider_threshold);
+		final ToggleButton toggle = controls.findViewById(R.id.toggle_robust);
+		final SeekBar seek = controls.findViewById(R.id.slider_threshold);
 
 		if( disableControls ) {
 			toggle.setEnabled(false);
@@ -104,8 +97,8 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 				@Override
 				public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 					synchronized (lock) {
-						changed = true;
 						binaryThreshold = progress;
+						startDetector();
 					}
 				}
 
@@ -117,20 +110,30 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 				public void onStopTrackingTouch(SeekBar seekBar) {
 				}
 			});
-			toggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-				@Override
-				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-					synchronized (lock) {
-						changed = true;
-						robust = isChecked;
-						if (robust) {
-							seek.setEnabled(false);
-						} else {
-							seek.setEnabled(true);
-						}
-					}
-				}
-			});
+			toggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                synchronized (lock) {
+                    robust = isChecked;
+                    if (robust) {
+                        seek.setEnabled(false);
+                    } else {
+                        seek.setEnabled(true);
+                    }
+					startDetector();
+                }
+            });
+		}
+
+		setControls(controls);
+		displayView.setOnTouchListener(this);
+	}
+
+	@Override
+	protected void onCameraResolutionChange(int width, int height) {
+		super.onCameraResolutionChange(width, height);
+		synchronized (bitmapLock) {
+			if (bitmap.getWidth() != width || bitmap.getHeight() != height)
+				bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+			bitmapTmp = ConvertBitmap.declareStorage(bitmap, bitmapTmp);
 		}
 	}
 
@@ -142,8 +145,6 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 	@Override
 	protected void onResume() {
 		super.onResume();
-		changed = true;
-		intrinsic = null;
 		startDetector();
 		if( DemoMain.preference.intrinsic == null ) {
 			Toast.makeText(FiducialSquareActivity.this, "Calibrate camera for better results!", Toast.LENGTH_LONG).show();
@@ -153,22 +154,20 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		if( MotionEvent.ACTION_DOWN == event.getActionMasked()) {
-			showInput = !showInput;
+			showThreshold = !showThreshold;
 			return true;
 		}
 		return false;
 	}
 
 	protected void startDetector() {
-		setProcessing(new FiducialProcessor() );
+		setProcessing(new FiducialProcessor(createDetector()) );
 	}
 
 	protected abstract FiducialDetector<GrayU8> createDetector();
 
-	protected class FiducialProcessor<T extends ImageBase<T>> extends VideoImageProcessing<Planar<GrayU8>>
+	protected class FiducialProcessor<T extends ImageBase<T>> extends DemoProcessingAbstract<T>
 	{
-		T input;
-
 		FiducialDetector<T> detector;
 
 		Paint paintSelected = new Paint();
@@ -181,8 +180,15 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 
 		Rect bounds = new Rect();
 
-		protected FiducialProcessor() {
-			super(ImageType.pl(3, GrayU8.class));
+		final FastQueue<Se3_F64> listPose = new FastQueue<>(Se3_F64.class,true);
+		final GrowQueue_F64 listWidths = new GrowQueue_F64();
+		final GrowQueue_I64 listIDs = new GrowQueue_I64();
+		CameraPinholeRadial intrinsic;
+
+		protected FiducialProcessor( FiducialDetector<T> detector ) {
+			super(detector.getInputType());
+
+			this.detector = detector;
 
 			paintSelected.setColor(Color.argb(0xFF / 2, 0xFF, 0, 0));
 
@@ -210,68 +216,70 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 		}
 
 		@Override
-		protected void declareImages(int width, int height) {
-			super.declareImages(width, height);
-
-			intrinsic = MiscUtil.checkThenInventIntrinsic();
+		public void initialize(int imageWidth, int imageHeight)
+		{
+			double fov[] = cameraNominalFov();
+			intrinsic = MiscUtil.checkThenInventIntrinsic(imageWidth,imageHeight,fov[0],fov[1]);
+			detector.setLensDistortion(LensDistortionOps.narrow(intrinsic),imageWidth,imageHeight);
 		}
 
 		@Override
-		protected void process(Planar<GrayU8> color, Bitmap output, byte[] storage)
-		{
-			if( changed && intrinsic != null ) {
-				changed = false;
-				detector = (FiducialDetector)createDetector();
-				detector.setLensDistortion(LensDistortionOps.narrow(intrinsic),color.width,color.height);
-				if( input == null || input.getImageType() != detector.getInputType() ) {
-					input = detector.getInputType().createImage(1, 1);
+		public void onDraw(Canvas canvas, Matrix imageToView) {
+			synchronized (bitmapLock) {
+				canvas.drawBitmap(bitmap,imageToView,null);
+			}
+
+			canvas.setMatrix(imageToView);
+			synchronized (listPose) {
+				for ( int i = 0; i < listPose.size; i++ ) {
+					double width = listWidths.get(i);
+					long id = listIDs.get(i);
+					drawCube(id, listPose.get(i), intrinsic, width, canvas);
 				}
-			}
-
-			if( detector == null  ) {
-				return;
-			}
-
-			ImageType inputType = detector.getInputType();
-			if( inputType.getFamily() == ImageType.Family.GRAY ) {
-				input.reshape(color.width,color.height);
-				ConvertImage.average(color, (GrayU8) input);
-			} else {
-				input = (T) color;
-			}
-
-			detector.detect(input);
-
-			if( showInput ) {
-				ConvertBitmap.multiToBitmap(color, output, storage);
-			} else {
-				GrayU8 binary = null;
-				if( detector instanceof CalibrationFiducialDetector) {
-					DetectorFiducialCalibration a = ((CalibrationFiducialDetector) detector).getCalibDetector();
-					if( a instanceof CalibrationDetectorChessboard) {
-						binary = ((CalibrationDetectorChessboard)a).getAlgorithm().getBinary();
-					} else {
-						binary = ((CalibrationDetectorSquareGrid)a).getAlgorithm().getBinary();
-					}
-				} else {
-					binary = ((SquareBase_to_FiducialDetector) detector).getAlgorithm().getBinary();
-				}
-				VisualizeImageData.binaryToBitmap(binary, false, output, storage);
-			}
-
-			Canvas canvas = new Canvas(output);
-
-			for (int i = 0; i < detector.totalFound(); i++) {
-				detector.getFiducialToCamera(i, targetToCamera);
-
-				double width = detector.getWidth(i);
-				drawCube(detector.getId(i),targetToCamera,intrinsic,width,canvas);
 			}
 
 			if( drawText != null ) {
 				renderDrawText(canvas);
 			}
+		}
 
+		@Override
+		public void process( T input )
+		{
+			detector.detect(input);
+
+			synchronized (bitmapLock) {
+				if (showThreshold) {
+					ConvertBitmap.boofToBitmap(input, bitmap, bitmapTmp);
+				} else {
+					GrayU8 binary = null;
+					if (detector instanceof CalibrationFiducialDetector) {
+						DetectorFiducialCalibration a = ((CalibrationFiducialDetector) detector).getCalibDetector();
+						if (a instanceof CalibrationDetectorChessboard) {
+							binary = ((CalibrationDetectorChessboard) a).getAlgorithm().getBinary();
+						} else {
+							binary = ((CalibrationDetectorSquareGrid) a).getAlgorithm().getBinary();
+						}
+					} else {
+						binary = ((SquareBase_to_FiducialDetector) detector).getAlgorithm().getBinary();
+					}
+					VisualizeImageData.binaryToBitmap(binary, false,bitmap, bitmapTmp);
+				}
+			}
+
+			// save the results for displaying in the UI thread
+			synchronized (listPose) {
+				listPose.reset();
+				listWidths.reset();
+				listIDs.reset();
+
+				for (int i = 0; i < detector.totalFound(); i++) {
+					detector.getFiducialToCamera(i, targetToCamera);
+					listPose.grow().set(targetToCamera);
+					listWidths.add(detector.getWidth(i));
+					listIDs.add(detector.getId(i));
+				}
+			}
 		}
 
 		/**
@@ -352,6 +360,5 @@ public abstract class FiducialSquareActivity extends DemoVideoDisplayActivity
 		private void drawLine( Canvas canvas , Point2D_F32 a , Point2D_F32 b , Paint color ) {
 			canvas.drawLine(a.x,a.y,b.x,b.y,color);
 		}
-
 	}
 }

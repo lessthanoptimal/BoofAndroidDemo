@@ -112,12 +112,10 @@
         <activity
             android:name=".ip.ThresholdDisplayActivity"/>
         <activity
-            android:name=".recognition.FiducialSquareBinaryActivity"
-            android:screenOrientation="landscape" />
+            android:name=".recognition.FiducialSquareBinaryActivity"/>
         <activity android:name=".recognition.FiducialSquareBinaryHelpActivity" />
         <activity
-            android:name=".recognition.FiducialSquareImageActivity"
-            android:screenOrientation="landscape" />
+            android:name=".recognition.FiducialSquareImageActivity"/>
         <activity android:name=".recognition.FiducialSquareImageHelpActivity" />
         <activity
             android:name=".recognition.FiducialLearnActivity"
@@ -125,11 +123,9 @@
         <activity android:name=".recognition.FiducialImageLibraryAcitivity" />
         <activity android:name=".recognition.FiducialSelectHelpActivity" />
         <activity
-            android:name=".recognition.FiducialCalibrationActivity"
-            android:screenOrientation="landscape" />
+            android:name=".recognition.FiducialCalibrationActivity"/>
         <activity
-            android:name=".recognition.FiducialCalibrationHelpActivity"
-            android:screenOrientation="landscape" />
+            android:name=".recognition.FiducialCalibrationHelpActivity"/>
         <activity
             android:name=".tracker.StaticBackgroundMotionActivity"
             android:screenOrientation="landscape" />

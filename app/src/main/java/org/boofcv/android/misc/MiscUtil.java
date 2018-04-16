@@ -42,4 +42,28 @@ public class MiscUtil {
 
 		return intrinsic;
 	}
+
+	public static CameraPinholeRadial checkThenInventIntrinsic( int width , int height ,
+																double hfov , double vfov) {
+
+		CameraPinholeRadial intrinsic;
+
+		// make sure the camera is calibrated first
+		if( DemoMain.preference.intrinsic == null ) {
+			intrinsic = new CameraPinholeRadial();
+
+			intrinsic.width = width; intrinsic.height = height;
+			intrinsic.cx = intrinsic.width/2;
+			intrinsic.cy = intrinsic.height/2;
+			intrinsic.fx = intrinsic.cx / Math.tan(hfov/2.0f);
+			intrinsic.fy = intrinsic.cy / Math.tan(vfov/2.0f);
+		} else {
+			intrinsic = DemoMain.preference.intrinsic;
+			if( intrinsic.width != width || intrinsic.height != height ) {
+				throw new RuntimeException("Intrinsics doesn't match current resolution");
+			}
+		}
+
+		return intrinsic;
+	}
 }
