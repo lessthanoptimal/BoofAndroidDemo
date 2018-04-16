@@ -11,7 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 
 import org.boofcv.android.DemoFilterCamera2Activity;
-import org.boofcv.android.DemoProcessing;
+import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
 
 import boofcv.abst.transform.fft.DiscreteFourierTransform;
@@ -97,10 +97,14 @@ public class ImageTransformActivity extends DemoFilterCamera2Activity
 		}
 	}
 
-	protected class FourierProcessing implements DemoProcessing<GrayU8> {
+	protected class FourierProcessing extends DemoProcessingAbstract<GrayU8> {
 		DiscreteFourierTransform<GrayF32,InterleavedF32> dft = DiscreteFourierTransformOps.createTransformF32();
 		GrayF32 grayF;
 		InterleavedF32 transform;
+
+		public FourierProcessing() {
+			super(GrayU8.class);
+		}
 
 		@Override
 		public void initialize(int imageWidth, int imageHeight) {
@@ -127,26 +131,19 @@ public class ImageTransformActivity extends DemoFilterCamera2Activity
 				ConvertBitmap.grayToBitmap(grayF, bitmap, bitmapTmp);
 			}
 		}
-
-		@Override
-		public void stop() {}
-
-		@Override
-		public boolean isThreadSafe() {return false;}
-
-		@Override
-		public ImageType<GrayU8> getImageType() {
-			return ImageType.single(GrayU8.class);
-		}
 	}
 
-	protected class PyramidProcessing implements DemoProcessing<GrayU8>
+	protected class PyramidProcessing extends DemoProcessingAbstract<GrayU8>
 	{
 		ImagePyramid<GrayU8> pyramid = FactoryPyramid.discreteGaussian(new int[]{2,4,8,16},-1,2,false,
 				ImageType.single(GrayU8.class));
 
 		GrayU8 output;
 		GrayU8 sub = new GrayU8();
+
+		public PyramidProcessing() {
+			super(GrayU8.class);
+		}
 
 		private void draw( int x0 , int y0 , GrayU8 layer ) {
 			output.subimage(x0,y0,x0+layer.width,y0+layer.height,sub);
@@ -180,26 +177,19 @@ public class ImageTransformActivity extends DemoFilterCamera2Activity
 				ConvertBitmap.grayToBitmap(this.output, bitmap, bitmapTmp);
 			}
 		}
-
-		@Override
-		public void stop() {}
-
-		@Override
-		public boolean isThreadSafe() {return false;}
-
-		@Override
-		public ImageType<GrayU8> getImageType() {
-			return ImageType.single(GrayU8.class);
-		}
 	}
 
 	protected class WaveletProcessing<C extends WlCoef>
-			implements DemoProcessing<GrayU8>
+			extends DemoProcessingAbstract<GrayU8>
 	{
 		WaveletDescription<C> desc = GFactoryWavelet.haar(GrayU8.class);
 		WaveletTransform<GrayU8,GrayS32,C> waveletTran =
 				FactoryWaveletTransform.create(GrayU8.class, desc, 3, 0, 255);
 		GrayS32 transform;
+
+		public WaveletProcessing() {
+			super(GrayU8.class);
+		}
 
 		@Override
 		public void initialize(int imageWidth, int imageHeight) {
@@ -227,17 +217,6 @@ public class ImageTransformActivity extends DemoFilterCamera2Activity
 
 				VisualizeImageData.grayMagnitude(transform, 255, bitmap, bitmapTmp);
 			}
-		}
-
-		@Override
-		public void stop() {}
-
-		@Override
-		public boolean isThreadSafe() {return false;}
-
-		@Override
-		public ImageType<GrayU8> getImageType() {
-			return ImageType.single(GrayU8.class);
 		}
 	}
 }

@@ -13,13 +13,12 @@ import android.widget.SeekBar;
 import android.widget.Spinner;
 
 import org.boofcv.android.DemoFilterCamera2Activity;
-import org.boofcv.android.DemoProcessing;
+import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
 
 import boofcv.abst.filter.blur.BlurFilter;
 import boofcv.factory.filter.blur.FactoryBlurFilter;
 import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageType;
 
 /**
  * Blurs the input video image using different algorithms.
@@ -79,6 +78,7 @@ public class BlurDisplayActivity extends DemoFilterCamera2Activity
 		});
 
 		setControls(controls);
+		activateTouchToShowInput();
 	}
 
 	@Override
@@ -119,11 +119,12 @@ public class BlurDisplayActivity extends DemoFilterCamera2Activity
 	@Override
 	public void onNothingSelected(AdapterView<?> adapterView) {}
 
-	protected class BlurProcessing implements DemoProcessing<GrayU8> {
+	protected class BlurProcessing extends DemoProcessingAbstract<GrayU8> {
 		GrayU8 blurred;
 		final BlurFilter<GrayU8> filter;
 
 		public BlurProcessing(BlurFilter<GrayU8> filter) {
+			super(GrayU8.class);
 			this.filter = filter;
 		}
 
@@ -153,21 +154,6 @@ public class BlurDisplayActivity extends DemoFilterCamera2Activity
 			} else {
 				convertToOutput(input);
 			}
-		}
-
-		@Override
-		public void stop() {
-
-		}
-
-		@Override
-		public boolean isThreadSafe() {
-			return false;
-		}
-
-		@Override
-		public ImageType<GrayU8> getImageType() {
-			return filter.getInputType();
 		}
 	}
 }

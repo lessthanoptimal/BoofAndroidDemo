@@ -17,6 +17,8 @@ Date: 2018
 - Canny shows a washed out image in the background
 - Object Tracker doesn't force all trackers to use color.
   * This makes some trackers MUCH faster
+- Filter Activities
+  * Touching the screen shows the input image
 
 - TODO Add distort MLS example
 - TODO Add QR Code detector example

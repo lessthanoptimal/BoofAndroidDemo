@@ -4,7 +4,6 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -22,7 +21,6 @@ import boofcv.alg.misc.ImageStatistics;
 import boofcv.android.ConvertBitmap;
 import boofcv.core.image.ConvertImage;
 import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
 
@@ -37,8 +35,6 @@ public class EnhanceDisplayActivity extends DemoFilterCamera2Activity
 
 	Spinner spinnerView;
 	CheckBox checkColor;
-
-	boolean showEnhanced = true;
 
 	public EnhanceDisplayActivity() {
 		super(Resolution.MEDIUM);
@@ -62,15 +58,7 @@ public class EnhanceDisplayActivity extends DemoFilterCamera2Activity
 		checkColor.setOnCheckedChangeListener(this);
 
 		setControls(controls);
-
-		displayView.setOnTouchListener((view, motionEvent) -> {
-            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                showEnhanced = false;
-            } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                showEnhanced = true;
-            }
-            return true;
-        });
+		activateTouchToShowInput();
 	}
 
 	@Override
@@ -122,17 +110,6 @@ public class EnhanceDisplayActivity extends DemoFilterCamera2Activity
 	@Override
 	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 		startEnhance(spinnerView.getSelectedItemPosition(),isChecked);
-	}
-
-	@Override
-	protected void processImage(ImageBase image) {
-		if( showEnhanced )
-			super.processImage(image);
-		else {
-			synchronized (bitmapLock) {
-				ConvertBitmap.boofToBitmap(image, bitmap, bitmapTmp);
-			}
-		}
 	}
 
 	protected void renderOutput(GrayU8 output ) {

@@ -14,14 +14,13 @@ import android.widget.Spinner;
 import android.widget.ToggleButton;
 
 import org.boofcv.android.DemoFilterCamera2Activity;
-import org.boofcv.android.DemoProcessing;
+import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
 
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.GThresholdImageOps;
 import boofcv.android.VisualizeImageData;
 import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageType;
 
 /**
  * Converts camera image into a binary image and lets the user control the threshold/filters.
@@ -66,6 +65,7 @@ public class BinaryDisplayActivity extends DemoFilterCamera2Activity
 		action = spinner.getSelectedItemPosition();
 
 		setControls(controls);
+		activateTouchToShowInput();
 	}
 
 	@Override
@@ -104,9 +104,13 @@ public class BinaryDisplayActivity extends DemoFilterCamera2Activity
 		}
 	}
 
-	protected class ThresholdProcessing implements DemoProcessing<GrayU8> {
+	protected class ThresholdProcessing extends DemoProcessingAbstract<GrayU8> {
 		GrayU8 binary;
 		GrayU8 afterOps;
+
+		public ThresholdProcessing() {
+			super(GrayU8.class);
+		}
 
 		@Override
 		public void initialize(int imageWidth, int imageHeight) {
@@ -161,21 +165,6 @@ public class BinaryDisplayActivity extends DemoFilterCamera2Activity
 			}
 
 			convertToOutput(afterOps);
-		}
-
-		@Override
-		public void stop() {
-
-		}
-
-		@Override
-		public boolean isThreadSafe() {
-			return false;
-		}
-
-		@Override
-		public ImageType<GrayU8> getImageType() {
-			return ImageType.single(GrayU8.class);
 		}
 	}
 }

@@ -11,7 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 
 import org.boofcv.android.DemoFilterCamera2Activity;
-import org.boofcv.android.DemoProcessing;
+import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
 
 import boofcv.abst.filter.derivative.ImageGradient;
@@ -19,7 +19,6 @@ import boofcv.android.VisualizeImageData;
 import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageType;
 
 /**
  * Displays the gradient of a gray scale image.  The gradient is colorized so that x and y directions are visible.
@@ -54,6 +53,7 @@ implements AdapterView.OnItemSelectedListener
 		spinnerGradient.setOnItemSelectedListener(this);
 
 		setControls(controls);
+		activateTouchToShowInput();
 	}
 
 	@Override
@@ -97,12 +97,13 @@ implements AdapterView.OnItemSelectedListener
 	@Override
 	public void onNothingSelected(AdapterView<?> adapterView) {}
 
-	protected class GradientProcessing implements DemoProcessing<GrayU8> {
+	protected class GradientProcessing extends DemoProcessingAbstract<GrayU8> {
 		GrayS16 derivX;
 		GrayS16 derivY;
 		ImageGradient<GrayU8,GrayS16> gradient;
 
 		public GradientProcessing(ImageGradient<GrayU8,GrayS16> gradient) {
+			super(GrayU8.class);
 			this.gradient = gradient;
 		}
 
@@ -125,19 +126,6 @@ implements AdapterView.OnItemSelectedListener
 			synchronized (bitmapLock ) {
 				VisualizeImageData.colorizeGradient(derivX,derivY,-1,bitmap,bitmapTmp);
 			}
-		}
-
-		@Override
-		public void stop() {}
-
-		@Override
-		public boolean isThreadSafe() {
-			return false;
-		}
-
-		@Override
-		public ImageType<GrayU8> getImageType() {
-			return ImageType.single(GrayU8.class);
 		}
 	}
 }
