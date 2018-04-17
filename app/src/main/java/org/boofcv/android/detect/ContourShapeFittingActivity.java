@@ -35,8 +35,8 @@ import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import georegression.metric.UtilAngle;
+import georegression.struct.curve.EllipseRotated_F64;
 import georegression.struct.point.Point2D_I32;
-import georegression.struct.shapes.EllipseRotated_F64;
 
 /**
  * Fits different shapes to binary images

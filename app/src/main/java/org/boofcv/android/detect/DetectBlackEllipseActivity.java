@@ -32,7 +32,7 @@ import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import georegression.metric.UtilAngle;
-import georegression.struct.shapes.EllipseRotated_F64;
+import georegression.struct.curve.EllipseRotated_F64;
 
 /**
  * Detects ellipses in an image which are black.

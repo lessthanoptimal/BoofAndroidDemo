@@ -194,7 +194,7 @@ public class SegmentationDisplayActivity extends DemoVideoDisplayActivity
 					VisualizeImageData.regionBorders(pixelToRegion, 0xFF0000, output, storage);
 				}
 			} else {
-				ConvertBitmap.multiToBitmap(input,output,storage);
+				ConvertBitmap.planarToBitmap(input,output,storage);
 			}
 		}
 	}

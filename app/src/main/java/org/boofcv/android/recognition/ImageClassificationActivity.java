@@ -242,9 +242,9 @@ public class ImageClassificationActivity extends DemoVideoDisplayActivity
         protected void process(Planar<GrayF32> input, Bitmap output, byte[] storage) {
 
             if( status == Status.CLASSIFIED || status == Status.PROCESSING ) {
-                ConvertBitmap.multiToBitmap(workImage, output, storage);
+                ConvertBitmap.planarToBitmap(workImage, output, storage);
             } else {
-                ConvertBitmap.multiToBitmap(input, output, storage);
+                ConvertBitmap.planarToBitmap(input, output, storage);
             }
 
             if( screenTouched == true  ) {

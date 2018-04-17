@@ -120,7 +120,7 @@ public class EnhanceDisplayActivity extends DemoBitmapCamera2Activity
 
 	protected void renderOutput( Planar<GrayU8> output ) {
 		synchronized (bitmapLock) {
-			ConvertBitmap.multiToBitmap(output, bitmap, bitmapTmp);
+			ConvertBitmap.planarToBitmap(output, bitmap, bitmapTmp);
 		}
 	}
 

@@ -45,9 +45,9 @@ import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
 import georegression.metric.UtilAngle;
+import georegression.struct.curve.EllipseRotated_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
-import georegression.struct.shapes.EllipseRotated_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 
 /**
