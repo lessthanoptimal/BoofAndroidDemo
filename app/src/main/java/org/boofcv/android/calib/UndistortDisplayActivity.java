@@ -1,18 +1,22 @@
 package org.boofcv.android.calib;
 
-import android.graphics.Bitmap;
+import android.app.AlertDialog;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import org.boofcv.android.DemoFilterCamera2Activity;
 import org.boofcv.android.DemoMain;
-import org.boofcv.android.DemoVideoDisplayActivity;
+import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
 
 import boofcv.alg.distort.AdjustmentType;
@@ -21,33 +25,34 @@ import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.android.ConvertBitmap;
-import boofcv.android.camera.VideoImageProcessing;
-import boofcv.core.image.ConvertImage;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.calib.CameraPinhole;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
-import boofcv.struct.image.Planar;
 
 /**
  * After the camera has been calibrated the user can display a distortion free image
  *
  * @author Peter Abeles
  */
-public class UndistortDisplayActivity extends DemoVideoDisplayActivity
+public class UndistortDisplayActivity extends DemoFilterCamera2Activity
 		implements CompoundButton.OnCheckedChangeListener
 {
 
-	ToggleButton toggleDistort;
 	ToggleButton toggleColor;
 
-	boolean isDistorted = false;
 	boolean isColor = false;
 
-	ImageDistort<GrayU8,GrayU8> removeDistortion;
+	ImageDistort removeDistortion;
+
+	public UndistortDisplayActivity() {
+		super(Resolution.MEDIUM);
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -56,35 +61,38 @@ public class UndistortDisplayActivity extends DemoVideoDisplayActivity
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.undistort_controls,null);
 
-		LinearLayout parent = getViewContent();
-		parent.addView(controls);
 
-		toggleDistort = (ToggleButton)controls.findViewById(R.id.toggle_distort);
-		toggleDistort.setOnCheckedChangeListener(this);
-		toggleDistort.setChecked(isDistorted);
-
-		toggleColor = (ToggleButton)controls.findViewById(R.id.toggle_color);
+		toggleColor = controls.findViewById(R.id.toggle_color);
 		toggleColor.setOnCheckedChangeListener(this);
 		toggleColor.setChecked(isColor);
 
-		if( DemoMain.preference.intrinsic != null ) {
-			// define the transform.  Cache the results for quick rendering later on
-			CameraPinhole desired = new CameraPinhole();
-			Point2Transform2_F32 fullView = LensDistortionOps.transformChangeModel_F32(AdjustmentType.FULL_VIEW,
-					DemoMain.preference.intrinsic,desired,false,null);
-			InterpolatePixelS<GrayU8> interp = FactoryInterpolation.
-					bilinearPixelS(GrayU8.class, BorderType.ZERO);
-			// for some reason not caching is faster on a low end phone.  Maybe it has to do with CPU memory
-			// cache misses when looking up a point?
-			removeDistortion = FactoryDistort.distortSB(false,interp,GrayU8.class);
-			removeDistortion.setModel(new PointToPixelTransform_F32(fullView));
-		}
+		setControls(controls);
+		activateTouchToShowInput();
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-		setProcessing(new UndistortProcessing());
+		setProcessing();
+	}
+
+	public void pressedHelp( View view ) {
+		AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+		alertDialog.setTitle("Undistort");
+		alertDialog.setMessage("On most cellphones, lens distortion has already been removed. " +
+				"That's why you hardly see any change. Touch screen to see original image.");
+		alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+				(dialog, which) -> dialog.dismiss());
+		alertDialog.show();
+	}
+
+	private void setProcessing() {
+		Log.e("Undistort","Set Processing!");
+		if( isColor ) {
+			setProcessing(new UndistortProcessing(ImageType.pl(3,GrayU8.class)));
+		} else {
+			setProcessing(new UndistortProcessing(ImageType.single(GrayU8.class)));
+		}
 	}
 
 	@Override
@@ -94,56 +102,77 @@ public class UndistortDisplayActivity extends DemoVideoDisplayActivity
 					"You must first calibrate the camera!", Toast.LENGTH_LONG);
 			toast.show();
 		}
-		if( toggleDistort == compoundButton ) {
-			isDistorted = b;
-		} else if( toggleColor == compoundButton ) {
+
+		if( toggleColor == compoundButton ) {
 			isColor = b;
+			setProcessing();
 		}
 	}
 
-	protected class UndistortProcessing extends VideoImageProcessing<Planar<GrayU8>> {
-		Planar<GrayU8> undistorted;
+	protected class UndistortProcessing extends DemoProcessingAbstract {
+		ImageBase undistorted;
 
-		public UndistortProcessing() {
-			super(ImageType.pl(3,GrayU8.class));
+		public UndistortProcessing( ImageType imageType ) {
+			super(imageType);
+
+			if (DemoMain.preference.intrinsic == null) {
+				return;
+			}
+			CameraPinholeRadial intrinsic = DemoMain.preference.intrinsic;
+
+			// define the transform.  Cache the results for quick rendering later on
+			CameraPinhole desired = new CameraPinhole();
+			desired.set(intrinsic);
+
+			Point2Transform2_F32 fullView = LensDistortionOps.transformChangeModel_F32(AdjustmentType.FULL_VIEW,
+					intrinsic,desired,false,null);
+			InterpolatePixelS<GrayU8> interp = FactoryInterpolation.
+					bilinearPixelS(GrayU8.class, BorderType.ZERO);
+			// for some reason not caching is faster on a low end phone.  Maybe it has to do with CPU memory
+			// cache misses when looking up a point?
+			removeDistortion = FactoryDistort.distort(false,interp,imageType);
+			removeDistortion.setModel(new PointToPixelTransform_F32(fullView));
+
 		}
 
 		@Override
-		protected void declareImages( int width , int height ) {
-			super.declareImages(width, height);
+		public void initialize(int imageWidth, int imageHeight) {
+			undistorted = imageType.createImage(imageWidth,imageHeight);
 
-			undistorted = new Planar<GrayU8>(GrayU8.class,width,height,3);
+			CameraPinholeRadial intrinsic = DemoMain.preference.intrinsic;
+
+			if( intrinsic.width != imageWidth || intrinsic.height != imageHeight ) {
+				UndistortDisplayActivity.this.runOnUiThread(()->{
+					Toast toast = Toast.makeText(UndistortDisplayActivity.this,
+							"Calibration doesn't match input image!", Toast.LENGTH_LONG);
+					toast.show();
+					UndistortDisplayActivity.this.finish();
+				});
+			}
 		}
 
 		@Override
-		protected void process(Planar<GrayU8> input, Bitmap output, byte[] storage) {
-			if( DemoMain.preference.intrinsic == null ) {
-				Canvas canvas = new Canvas(output);
+		public void onDraw(Canvas canvas, Matrix imageToView) {
+			if (DemoMain.preference.intrinsic == null) {
+				Log.e("Undistort","No intrinsic!");
 				Paint paint = new Paint();
 				paint.setColor(Color.RED);
-				paint.setTextSize(output.getWidth()/10);
-				int textLength = (int)paint.measureText("Calibrate Camera First");
+				paint.setTextSize(canvas.getWidth() / 10);
+				int textLength = (int) paint.measureText("Calibrate Camera First");
 
 				canvas.drawText("Calibrate Camera First", (canvas.getWidth() - textLength) / 2, canvas.getHeight() / 2, paint);
-			} else if( isDistorted ) {
-				if( isColor )
-					ConvertBitmap.multiToBitmap(input,output,storage);
-				else {
-					ConvertImage.average(input,undistorted.getBand(0));
-					ConvertBitmap.grayToBitmap(undistorted.getBand(0),output,storage);
-				}
 			} else {
-				if( isColor ) {
-					for( int i = 0; i < input.getNumBands(); i++ ) {
-						removeDistortion.apply(input.getBand(i),undistorted.getBand(i));
-					}
+				Log.e("Drawing bitmap","Has intrinsic!");
+				drawBitmap(canvas,imageToView);
+			}
+		}
 
-					ConvertBitmap.multiToBitmap(undistorted,output,storage);
-				} else {
-					ConvertImage.average(input,undistorted.getBand(0));
-					removeDistortion.apply(undistorted.getBand(0),undistorted.getBand(1));
-					ConvertBitmap.grayToBitmap(undistorted.getBand(1),output,storage);
-				}
+		@Override
+		public void process(ImageBase input) {
+			Log.e("Undistort","process called");
+			removeDistortion.apply(input,undistorted);
+			synchronized (bitmapLock) {
+				ConvertBitmap.boofToBitmap(undistorted, bitmap, bitmapTmp);
 			}
 		}
 	}

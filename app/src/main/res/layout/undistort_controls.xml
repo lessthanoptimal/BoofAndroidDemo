@@ -9,17 +9,16 @@
 				  android:layout_height="wrap_content"
 				  android:gravity="center"
 				  android:layout_gravity="center"
-				  android:textOn="Distorted"
-				  android:textOff="Undistorted"
-				  android:id="@+id/toggle_distort"/>
-
-	<ToggleButton android:layout_width="wrap_content"
-				  android:layout_height="wrap_content"
-				  android:gravity="center"
-				  android:layout_gravity="center"
 				  android:textOn="Color"
 				  android:textOff="Gray"
 				  android:id="@+id/toggle_color"/>
 
+	<Button
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_marginLeft="50dip"
+		android:text="Help"
+		android:onClick="pressedHelp"
+		android:layout_gravity="center"/>
 
 </LinearLayout>

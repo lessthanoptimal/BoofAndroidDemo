@@ -95,9 +95,7 @@
             android:name=".detect.ContourShapeFittingActivity"
             android:screenOrientation="landscape" />
         <activity android:name=".detect.CannyEdgeActivity"/>
-        <activity
-            android:name=".calib.UndistortDisplayActivity"
-            android:screenOrientation="landscape" />
+        <activity android:name=".calib.UndistortDisplayActivity"/>
         <activity
             android:name=".detect.SegmentationDisplayActivity"
             android:screenOrientation="landscape" />
