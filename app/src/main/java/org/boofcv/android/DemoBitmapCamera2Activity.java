@@ -8,9 +8,12 @@ import android.graphics.Matrix;
 import boofcv.android.ConvertBitmap;
 import boofcv.struct.image.GrayU8;
 
-public class DemoFilterCamera2Activity extends DemoCamera2Activity {
+/**
+ * Activity where rendering to the bitmap should be managed by the activity entirely
+ */
+public class DemoBitmapCamera2Activity extends DemoCamera2Activity {
 
-    public DemoFilterCamera2Activity(Resolution resolution) {
+    public DemoBitmapCamera2Activity(Resolution resolution) {
         super(resolution);
         super.showBitmap = false;
     }

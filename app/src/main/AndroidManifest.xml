@@ -109,6 +109,8 @@
         <activity android:name=".recognition.FiducialSelectHelpActivity" />
         <activity android:name=".recognition.FiducialCalibrationActivity"/>
         <activity android:name=".recognition.FiducialCalibrationHelpActivity"/>
+        <activity android:name=".recognition.QrCodeDetectActivity"/>
+        <activity android:name=".recognition.QrCodeListActivity"/>
         <activity
             android:name=".tracker.StaticBackgroundMotionActivity"
             android:screenOrientation="landscape" />

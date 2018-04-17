@@ -10,7 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 
-import org.boofcv.android.DemoFilterCamera2Activity;
+import org.boofcv.android.DemoBitmapCamera2Activity;
 import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
 
@@ -41,7 +41,7 @@ import boofcv.struct.wavelet.WlCoef;
  *
  * @author Peter Abeles
  */
-public class ImageTransformActivity extends DemoFilterCamera2Activity
+public class ImageTransformActivity extends DemoBitmapCamera2Activity
 		implements AdapterView.OnItemSelectedListener
 {
 	Spinner spinnerView;

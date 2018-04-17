@@ -38,6 +38,7 @@ import org.boofcv.android.recognition.FiducialCalibrationActivity;
 import org.boofcv.android.recognition.FiducialSquareBinaryActivity;
 import org.boofcv.android.recognition.FiducialSquareImageActivity;
 import org.boofcv.android.recognition.ImageClassificationActivity;
+import org.boofcv.android.recognition.QrCodeDetectActivity;
 import org.boofcv.android.sfm.DisparityActivity;
 import org.boofcv.android.sfm.MosaicDisplayActivity;
 import org.boofcv.android.sfm.StabilizeDisplayActivity;
@@ -153,6 +154,7 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 //		tracker.addChild("Point: Det-Desc-Assoc", DdaTrackerDisplayActivity.class);
 //		tracker.addChild("Point: Combined", CombinedTrackerDisplayActivity.class);
 
+		recognition.addChild("QR Code", QrCodeDetectActivity.class);
 		recognition.addChild("Image Classification", ImageClassificationActivity.class);
 		recognition.addChild("Square Binary",FiducialSquareBinaryActivity.class);
 		recognition.addChild("Square Image",FiducialSquareImageActivity.class);

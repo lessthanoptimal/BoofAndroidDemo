@@ -13,7 +13,7 @@ import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.ToggleButton;
 
-import org.boofcv.android.DemoFilterCamera2Activity;
+import org.boofcv.android.DemoBitmapCamera2Activity;
 import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
 
@@ -27,7 +27,7 @@ import boofcv.struct.image.GrayU8;
  *
  * @author Peter Abeles
  */
-public class BinaryDisplayActivity extends DemoFilterCamera2Activity
+public class BinaryDisplayActivity extends DemoBitmapCamera2Activity
 		implements SeekBar.OnSeekBarChangeListener ,
 		CompoundButton.OnCheckedChangeListener,
 		AdapterView.OnItemSelectedListener {

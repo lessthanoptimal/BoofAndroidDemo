@@ -31,7 +31,6 @@ import java.util.List;
 
 import boofcv.alg.distort.LensDistortionNarrowFOV;
 import boofcv.alg.distort.LensDistortionOps;
-import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.GrayU8;
@@ -63,16 +62,6 @@ public class FiducialLearnActivity extends DemoCamera2Activity
 
 	public FiducialLearnActivity() {
 		super(Resolution.MEDIUM);
-	}
-
-	@Override
-	protected void onCameraResolutionChange(int width, int height) {
-		super.onCameraResolutionChange(width, height);
-		synchronized (bitmapLock) {
-			if (bitmap.getWidth() != width || bitmap.getHeight() != height)
-				bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-			bitmapTmp = ConvertBitmap.declareStorage(bitmap, bitmapTmp);
-		}
 	}
 
 	@Override

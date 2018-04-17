@@ -12,7 +12,7 @@ import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 
-import org.boofcv.android.DemoFilterCamera2Activity;
+import org.boofcv.android.DemoBitmapCamera2Activity;
 import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
 
@@ -29,7 +29,7 @@ import boofcv.struct.image.Planar;
  *
  * @author Peter Abeles
  */
-public class EnhanceDisplayActivity extends DemoFilterCamera2Activity
+public class EnhanceDisplayActivity extends DemoBitmapCamera2Activity
 		implements AdapterView.OnItemSelectedListener, CompoundButton.OnCheckedChangeListener
 {
 

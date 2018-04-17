@@ -14,7 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import org.boofcv.android.DemoFilterCamera2Activity;
+import org.boofcv.android.DemoBitmapCamera2Activity;
 import org.boofcv.android.DemoMain;
 import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
@@ -40,7 +40,7 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class UndistortDisplayActivity extends DemoFilterCamera2Activity
+public class UndistortDisplayActivity extends DemoBitmapCamera2Activity
 		implements CompoundButton.OnCheckedChangeListener
 {
 

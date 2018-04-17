@@ -1,7 +1,6 @@
 package org.boofcv.android.recognition;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -16,7 +15,7 @@ import android.widget.SeekBar;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import org.boofcv.android.DemoCamera2Activity;
+import org.boofcv.android.DemoBitmapCamera2Activity;
 import org.boofcv.android.DemoMain;
 import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
@@ -49,7 +48,7 @@ import georegression.transform.se.SePointOps_F64;
  *
  * @author Peter Abeles
  */
-public abstract class FiducialSquareActivity extends DemoCamera2Activity
+public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 		implements View.OnTouchListener
 {
 	public static final String TAG = "FiducialSquareActivity";
@@ -76,7 +75,6 @@ public abstract class FiducialSquareActivity extends DemoCamera2Activity
 	FiducialSquareActivity(Class help) {
 		super(Resolution.MEDIUM);
 		this.help = help;
-		super.showBitmap = false;
 	}
 
 	@Override
@@ -128,16 +126,6 @@ public abstract class FiducialSquareActivity extends DemoCamera2Activity
 
 		setControls(controls);
 		displayView.setOnTouchListener(this);
-	}
-
-	@Override
-	protected void onCameraResolutionChange(int width, int height) {
-		super.onCameraResolutionChange(width, height);
-		synchronized (bitmapLock) {
-			if (bitmap.getWidth() != width || bitmap.getHeight() != height)
-				bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-			bitmapTmp = ConvertBitmap.declareStorage(bitmap, bitmapTmp);
-		}
 	}
 
 	public void pressedHelp( View view ) {

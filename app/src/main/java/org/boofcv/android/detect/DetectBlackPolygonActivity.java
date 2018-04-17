@@ -1,7 +1,6 @@
 package org.boofcv.android.detect;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
@@ -19,7 +18,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-import org.boofcv.android.DemoFilterCamera2Activity;
+import org.boofcv.android.DemoBitmapCamera2Activity;
 import org.boofcv.android.DemoProcessing;
 import org.boofcv.android.R;
 import org.boofcv.android.misc.MiscUtil;
@@ -46,7 +45,7 @@ import georegression.struct.shapes.Polygon2D_F64;
  *
  * @author Peter Abeles
  */
-public class DetectBlackPolygonActivity extends DemoFilterCamera2Activity
+public class DetectBlackPolygonActivity extends DemoBitmapCamera2Activity
 		implements AdapterView.OnItemSelectedListener , View.OnTouchListener {
 
 	static final int MAX_SIDES = 20;
@@ -79,7 +78,6 @@ public class DetectBlackPolygonActivity extends DemoFilterCamera2Activity
 
 	public DetectBlackPolygonActivity() {
 		super(Resolution.MEDIUM);
-		super.showBitmap = false;
 
 		double rgb[] = new double[3];
 
@@ -92,16 +90,6 @@ public class DetectBlackPolygonActivity extends DemoFilterCamera2Activity
 			ColorHsv.hsvToRgb(hue,sat,255,rgb);
 
 			colors[i] = 255 << 24 | ((int)rgb[0] << 16) | ((int)rgb[1] << 8) | (int)rgb[2];
-		}
-	}
-
-	@Override
-	protected void onCameraResolutionChange(int width, int height) {
-		super.onCameraResolutionChange(width, height);
-		synchronized (bitmapLock) {
-			if (bitmap.getWidth() != width || bitmap.getHeight() != height)
-				bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-			bitmapTmp = ConvertBitmap.declareStorage(bitmap, bitmapTmp);
 		}
 	}
 

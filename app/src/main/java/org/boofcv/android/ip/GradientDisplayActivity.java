@@ -10,7 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 
-import org.boofcv.android.DemoFilterCamera2Activity;
+import org.boofcv.android.DemoBitmapCamera2Activity;
 import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
 
@@ -26,7 +26,7 @@ import boofcv.struct.image.GrayU8;
  *
  * @author Peter Abeles
  */
-public class GradientDisplayActivity extends DemoFilterCamera2Activity
+public class GradientDisplayActivity extends DemoBitmapCamera2Activity
 implements AdapterView.OnItemSelectedListener
 {
 	Spinner spinnerGradient;

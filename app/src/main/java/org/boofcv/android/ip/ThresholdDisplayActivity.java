@@ -12,7 +12,7 @@ import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.ToggleButton;
 
-import org.boofcv.android.DemoFilterCamera2Activity;
+import org.boofcv.android.DemoBitmapCamera2Activity;
 import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
 
@@ -27,7 +27,7 @@ import boofcv.struct.image.GrayU8;
  *
  * @author Peter Abeles
  */
-public class ThresholdDisplayActivity extends DemoFilterCamera2Activity
+public class ThresholdDisplayActivity extends DemoBitmapCamera2Activity
 {
 
 	Spinner spinnerView;
