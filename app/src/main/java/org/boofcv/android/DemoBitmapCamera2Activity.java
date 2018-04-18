@@ -6,7 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 
 import boofcv.android.ConvertBitmap;
-import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageBase;
 
 /**
  * Activity where rendering to the bitmap should be managed by the activity entirely
@@ -28,9 +28,9 @@ public class DemoBitmapCamera2Activity extends DemoCamera2Activity {
         }
     }
 
-    protected void convertToOutput(GrayU8 blurred ) {
+    protected void convertToBitmapDisplay(ImageBase image ) {
         synchronized (bitmapLock) {
-            ConvertBitmap.grayToBitmap(blurred, bitmap, bitmapTmp);
+            ConvertBitmap.boofToBitmap(image, bitmap, bitmapTmp);
         }
     }
 

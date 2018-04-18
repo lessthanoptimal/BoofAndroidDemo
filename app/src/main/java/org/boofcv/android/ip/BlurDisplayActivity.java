@@ -150,9 +150,9 @@ public class BlurDisplayActivity extends DemoBitmapCamera2Activity
 				synchronized ( filter ) {
 					filter.process(input, blurred);
 				}
-				convertToOutput(blurred);
+				convertToBitmapDisplay(blurred);
 			} else {
-				convertToOutput(input);
+				convertToBitmapDisplay(input);
 			}
 		}
 	}

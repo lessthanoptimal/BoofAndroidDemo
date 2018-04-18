@@ -1,9 +1,8 @@
 package org.boofcv.android.recognition;
 
-import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
@@ -17,7 +16,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -25,7 +23,8 @@ import android.widget.Toast;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 
-import org.boofcv.android.DemoVideoDisplayActivity;
+import org.boofcv.android.DemoBitmapCamera2Activity;
+import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
 
 import java.io.BufferedInputStream;
@@ -37,10 +36,9 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
+import java.util.Locale;
 
 import boofcv.abst.scene.ImageClassifier;
-import boofcv.android.ConvertBitmap;
-import boofcv.android.camera.VideoImageProcessing;
 import boofcv.factory.scene.ClassifierAndSource;
 import boofcv.factory.scene.FactoryImageClassifier;
 import boofcv.struct.image.GrayF32;
@@ -51,7 +49,7 @@ import boofcv.struct.image.Planar;
  * Displays a video stream until the user clicks the window.  It then attempts to classify what
  * is currently in view.  Results are rendered and the static frame is shown until tapped again
  */
-public class ImageClassificationActivity extends DemoVideoDisplayActivity
+public class ImageClassificationActivity extends DemoBitmapCamera2Activity
         implements AdapterView.OnItemSelectedListener {
     public static final String MODEL_PATH = "classifier_models";
 
@@ -68,14 +66,13 @@ public class ImageClassificationActivity extends DemoVideoDisplayActivity
     long startTime;
 
     // Progress Dialog
-    private ProgressDialog pDialog;
-    public static final int progress_bar_type = 0;
-
     private boolean guiEnabled = true;
 
     boolean screenTouched = false;
 
-    // Don't automatically
+    public ImageClassificationActivity() {
+        super(Resolution.R640x480);
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -84,30 +81,25 @@ public class ImageClassificationActivity extends DemoVideoDisplayActivity
         LayoutInflater inflater = getLayoutInflater();
         LinearLayout controls = (LinearLayout) inflater.inflate(R.layout.image_recognition_controls, null);
 
-        LinearLayout parent = getViewContent();
-        parent.addView(controls);
-
-        spinnerClassifier = (Spinner) controls.findViewById(R.id.spinner_algs);
+        spinnerClassifier = controls.findViewById(R.id.spinner_algs);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.image_classifiers, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerClassifier.setAdapter(adapter);
         spinnerClassifier.setOnItemSelectedListener(this);
 
-        deleteButton = (Button) findViewById(R.id.button_delete);
+        deleteButton = findViewById(R.id.button_delete);
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
-        FrameLayout iv = getViewPreview();
+        setControls(controls);
+
         final GestureDetector mDetector = new GestureDetector(this, new MyGestureDetector());
-        iv.setOnTouchListener(new View.OnTouchListener(){
-            @Override
-            public boolean onTouch(View v, MotionEvent event)
-            {
-                mDetector.onTouchEvent(event);
-                return true;
-            }});
+        displayView.setOnTouchListener((v, event) -> {
+            mDetector.onTouchEvent(event);
+            return true;
+        });
     }
 
     @Override
@@ -145,41 +137,17 @@ public class ImageClassificationActivity extends DemoVideoDisplayActivity
     }
 
     protected void deactiveControls() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                guiEnabled = false;
-                spinnerClassifier.setEnabled(false);
-            }
+        runOnUiThread(() -> {
+            guiEnabled = false;
+            spinnerClassifier.setEnabled(false);
         });
-
     }
 
     protected void activateControls() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                guiEnabled = true;
-                spinnerClassifier.setEnabled(true);
-            }
+        runOnUiThread(() -> {
+            guiEnabled = true;
+            spinnerClassifier.setEnabled(true);
         });
-    }
-
-    @Override
-    protected Dialog onCreateDialog(int id) {
-        switch (id) {
-            case progress_bar_type: // we set this to 0
-                pDialog = new ProgressDialog(this);
-                pDialog.setMessage("Initializing");
-                pDialog.setIndeterminate(false);
-                pDialog.setMax(100);
-                pDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                pDialog.setCancelable(false);
-                pDialog.show();
-                return pDialog;
-            default:
-                return null;
-        }
     }
 
     private void startClassifier(int which) {
@@ -209,15 +177,13 @@ public class ImageClassificationActivity extends DemoVideoDisplayActivity
     }
 
     private void download( final String path ) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                deactiveControls();
-                new DownloadNetworkModel().execute(path);
-            }});
+        runOnUiThread(() -> {
+            deactiveControls();
+            new DownloadNetworkModel().execute(path);
+        });
     }
 
-    protected class ClassifierProcessing extends VideoImageProcessing<Planar<GrayF32>> {
+    protected class ClassifierProcessing extends DemoProcessingAbstract<Planar<GrayF32>> {
 
         private Paint textPaint = new Paint();
         private Paint bestPaint = new Paint();
@@ -227,27 +193,84 @@ public class ImageClassificationActivity extends DemoVideoDisplayActivity
             super(ImageType.pl(3, GrayF32.class));
 
             textPaint.setARGB(255, 255, 100, 100);
-            textPaint.setTextSize(16);
+            textPaint.setTextSize(18*displayMetrics.density);
             textPaint.setTypeface(Typeface.create("monospace", Typeface.NORMAL));
+            textPaint.setTextAlign(Paint.Align.CENTER);
 
             bestPaint.setARGB(255, 255, 0, 0);
-            bestPaint.setTextSize(16);
+            bestPaint.setTextSize(18*displayMetrics.density);
             bestPaint.setTypeface(Typeface.create("monospace", Typeface.BOLD));
+            bestPaint.setTextAlign(Paint.Align.CENTER);
 
             dimPaint.setARGB(200,0,0,0);
         }
 
+        @Override
+        public void initialize(int imageWidth, int imageHeight) {
+
+        }
 
         @Override
-        protected void process(Planar<GrayF32> input, Bitmap output, byte[] storage) {
+        public void onDraw(Canvas canvas, Matrix imageToView) {
+            drawBitmap(canvas,imageToView);
+            if( classifier == null )
+                return;
+
+            int H = (int)(1.1*textPaint.getTextSize()+1); // This isn't actually the correct way to do this
+            Locale locale = Locale.getDefault();
+            if( status == Status.CLASSIFIED ) {
+                List<ImageClassifier.Score> scores = classifier.getAllResults();
+                List<String> categories = classifier.getCategories();
+
+                int N = Math.min(4, scores.size());
+
+                int y = canvas.getHeight()/2 - (int)(H*N/2);
+                int x = canvas.getWidth()/2;
+
+                ImageClassifier.Score best = scores.get(0);
+
+                int blackHeight = (N+3)*H;
+                canvas.drawRect(0, y-blackHeight/2, canvas.getWidth(), y + blackHeight/2, dimPaint);
+                y -= (N-1)*H/2;
+                for (int i = 0; i < N; i++) {
+                    Paint paint = i==0?bestPaint:textPaint;
+                    ImageClassifier.Score s = scores.get(i);
+                    String which = categories.get(s.category);
+
+                    canvas.drawText(String.format(locale,"%12s %8.1e ", which, s.score), x + 10, y +i * H, paint);
+                }
+
+            } else if( status == Status.PROCESSING ) {
+                int x = canvas.getWidth()/2;
+                int y = canvas.getHeight()/2;
+
+                long ellapsed = System.currentTimeMillis()-startTime;
+                canvas.drawText(String.format(locale,"Processing Image %03d s",ellapsed/1000), x, y, textPaint);
+                canvas.drawText("CNN still being optimized", x, y+H, textPaint);
+
+            } else {
+                int x = canvas.getWidth()/2;
+                int y = canvas.getHeight()/2;
+                String message;
+                if( status == Status.WAITING ) {
+                    message = "Touch the screen";
+                } else {
+                    message = "Status "+status.toString();
+                }
+                canvas.drawText(message, x, y, textPaint);
+            }
+        }
+
+        @Override
+        public void process(Planar<GrayF32> input) {
 
             if( status == Status.CLASSIFIED || status == Status.PROCESSING ) {
-                ConvertBitmap.planarToBitmap(workImage, output, storage);
+                convertToBitmapDisplay(workImage);
             } else {
-                ConvertBitmap.planarToBitmap(input, output, storage);
+                convertToBitmapDisplay(input);
             }
 
-            if( screenTouched == true  ) {
+            if(screenTouched) {
                 screenTouched = false;
                 if( status == Status.WAITING ) {
                     download(sources.get(0));
@@ -262,44 +285,6 @@ public class ImageClassificationActivity extends DemoVideoDisplayActivity
                 }
             }
 
-        }
-
-        @Override
-        protected void render(  Canvas canvas , double imageToOutput ) {
-            super.render(canvas,imageToOutput);
-
-            if( classifier == null )
-                return;
-
-            if( status == Status.CLASSIFIED ) {
-                List<ImageClassifier.Score> scores = classifier.getAllResults();
-                List<String> categories = classifier.getCategories();
-
-                int N = Math.min(4, scores.size());
-
-                int y = 30;
-                int x = 5;
-
-                ImageClassifier.Score best = scores.get(0);
-
-                canvas.drawRect(0, 0, canvas.getWidth(), y + 10 + (N + 1) * 20, dimPaint);
-                canvas.drawText(String.format("%12s %8.1e ", categories.get(best.category), best.score), x, y, bestPaint);
-                for (int i = 1; i < N; i++) {
-                    ImageClassifier.Score s = scores.get(i);
-                    String which = categories.get(s.category);
-
-                    canvas.drawText(String.format("%12s %8.1e ", which, s.score), x + 10, y + 10 + i * 20, textPaint);
-
-                }
-
-            } else if( status == Status.PROCESSING ) {
-                long ellapsed = System.currentTimeMillis()-startTime;
-                canvas.drawText(String.format("Processing Image %03d s",ellapsed/1000), 50, 50, textPaint);
-                canvas.drawText("CNN still needs to be optimized", 50, 80, textPaint);
-
-            } else {
-                canvas.drawText("Status " + status, 50, 50, textPaint);
-            }
         }
     }
 
@@ -346,14 +331,23 @@ public class ImageClassificationActivity extends DemoVideoDisplayActivity
      * Background Async Task to download file
      */
     class DownloadNetworkModel extends AsyncTask<String, String, String> {
-
+        private final String TAG = "ICA";
+        private ProgressDialog pDialog;
         /**
          * Before starting background thread Show Progress Bar Dialog
          */
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            showDialog(progress_bar_type);
+            runOnUiThread(()->{
+                pDialog = new ProgressDialog(ImageClassificationActivity.this);
+                pDialog.setMessage("Initializing");
+                pDialog.setIndeterminate(false);
+                pDialog.setMax(100);
+                pDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                pDialog.setCancelable(false);
+                pDialog.show();
+            });
         }
 
         /**
@@ -361,6 +355,7 @@ public class ImageClassificationActivity extends DemoVideoDisplayActivity
          */
         @Override
         protected String doInBackground(String... f_url) {
+            Thread.currentThread().setName("DownloadModel");
             int count;
             File destinationZip,initialPath,decompressedPath;
             final String fileName;
@@ -372,21 +367,17 @@ public class ImageClassificationActivity extends DemoVideoDisplayActivity
                 decompressedPath = new File(initialPath, modelName);
 
                 // see if it can load the model
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        pDialog.setMessage("Loading "+modelName);
-                    }
-                });
+                runOnUiThread(() -> pDialog.setMessage("Loading "+modelName));
                 try {
                     setStatus(ImageClassificationActivity.Status.LOADING);
+                    Log.i(TAG,"before load model "+decompressedPath.getPath());
                     classifier.loadModel(decompressedPath);
+                    Log.d(TAG,"loaded model "+modelName);
                     setStatus(ImageClassificationActivity.Status.IDLE);
-                    Log.d("ICA","loaded model "+modelName);
                     return null;
                 } catch( IOException e ) {
-                    Log.w("ICA","Failed to load model on first attempt.  Downloading");
-                    Log.w("ICA","    message = "+e.getMessage());
+                    Log.w(TAG,"Failed to load model on first attempt.  Downloading");
+                    Log.w(TAG,"    message = "+e.getMessage());
                 }
 
                 // download the file
@@ -400,13 +391,9 @@ public class ImageClassificationActivity extends DemoVideoDisplayActivity
 
             // Try loading the model now that it's downloaded
             try {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        pDialog.setMessage("Decompressing "+fileName);
-                    }
-                });
+                runOnUiThread(() -> pDialog.setMessage("Decompressing "+fileName));
 
+                Log.i(TAG,"Decompressing "+decompressedPath.getPath());
                 setStatus(ImageClassificationActivity.Status.DECOMPRESSING);
 
                 deleteModelData(false); // clean up first
@@ -417,17 +404,12 @@ public class ImageClassificationActivity extends DemoVideoDisplayActivity
                     Log.e("Error: ","Failed to delete "+destinationZip.getName());
                 }
 
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        pDialog.setMessage("Loading "+modelName);
-                    }
-                });
+                runOnUiThread(() -> pDialog.setMessage("Loading "+modelName));
                 setStatus(ImageClassificationActivity.Status.LOADING);
                 classifier.loadModel(decompressedPath);
                 setStatus( ImageClassificationActivity.Status.IDLE);
             } catch( ZipException | IOException e ) {
-                Log.w("ICA","Failed to load model on second attempt.");
+                Log.w(TAG,"Failed to load model on second attempt.");
                 e.printStackTrace();
                 setStatus(ImageClassificationActivity.Status.ERROR);
             }
@@ -437,28 +419,24 @@ public class ImageClassificationActivity extends DemoVideoDisplayActivity
 
         private void downloadModelFile(File destinationZip, File decompressedPath, String sourcePath) throws IOException {
             int count;
-            Log.w("ICA","download location "+ sourcePath);
+            Log.w(TAG,"download location "+ sourcePath);
 
             URL url = new URL(sourcePath);
             URLConnection connection = url.openConnection();
             connection.connect();
 
-            InputStream input = new BufferedInputStream(url.openStream(),
-                    8192);
+            InputStream input = new BufferedInputStream(url.openStream(),8192);
 
             // this will be useful so that you can show a typical 0 to 100% progress bar
             final int fileSize = connection.getContentLength();
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    int sizeMB = fileSize/1024/1024;
-                    pDialog.setMessage("Downloading "+sizeMB+" MB");
-                }
+            runOnUiThread(() -> {
+                int sizeMB = fileSize/1024/1024;
+                pDialog.setMessage("Downloading "+sizeMB+" MB");
             });
 
 
-            System.out.println("   destination path   = "+destinationZip.getAbsolutePath());
-            System.out.println("   decompression path = "+decompressedPath.getAbsolutePath());
+            Log.i(TAG,"   destination path   = "+destinationZip.getAbsolutePath());
+            Log.i(TAG,"   decompression path = "+decompressedPath.getAbsolutePath());
 
             OutputStream output = new FileOutputStream(destinationZip);
 
@@ -476,7 +454,7 @@ public class ImageClassificationActivity extends DemoVideoDisplayActivity
                 output.write(data, 0, count);
             }
 
-            System.out.println(" downloaded bytes "+total);
+            Log.i(TAG," downloaded bytes "+total);
 
             // flushing output
             output.flush();
@@ -499,9 +477,9 @@ public class ImageClassificationActivity extends DemoVideoDisplayActivity
          **/
         @Override
         protected void onPostExecute(String file_url) {
+            Log.i(TAG,"onPostExecute()");
             // dismiss the dialog after the file was downloaded
-            dismissDialog(progress_bar_type);
-
+            runOnUiThread(()->pDialog.dismiss());
         }
     }
 
@@ -523,12 +501,9 @@ public class ImageClassificationActivity extends DemoVideoDisplayActivity
     private void setStatus( Status status ) {
 
         if( status == Status.IDLE || status == Status.ERROR || status == Status.CLASSIFIED) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if( !guiEnabled ) {
-                        activateControls();
-                    }
+            runOnUiThread(() -> {
+                if( !guiEnabled ) {
+                    activateControls();
                 }
             });
         }
