@@ -1,3 +1,11 @@
+- TODO Reduce resolution when running on slower devices automatically
+- TODO Let user manually select resolution
+- TODO Show FPS in camera2 activities
+- TODO Add distort MLS example
+- TODO Add QR Code detector example
+- TODO Add equirectangular to pinhole viewer
+  * Provide example image.
+
 TODO: Added Equirectangular to Pinhole camera
 TODO: Webpage with grid for calibration.  Add link in app description
 TODO: See if mosaic can be improved with a different tracker

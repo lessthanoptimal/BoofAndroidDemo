@@ -6,6 +6,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -30,6 +31,7 @@ import boofcv.struct.image.GrayU8;
  * Used to detect and read information from QR codes
  */
 public class QrCodeDetectActivity extends DemoCamera2Activity {
+    private static final String TAG = "QrCodeDetect";
 
     // Switches what information is displayed
     Mode mode = Mode.NORMAL;
@@ -39,7 +41,9 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
     // Where the number of unique messages are listed
     TextView textUnqiueCount;
     // List of unique qr codes
-    Map<String,QrCode> unique = new HashMap<>(); // TODO save this across screen rotations
+    public static final Object uniqueLock = new Object();
+    public static final Map<String,QrCode> unique = new HashMap<>();
+    // TODO don't use a static method and forget detection if the activity is exited by the user
 
     public QrCodeDetectActivity() {
         super(Resolution.HIGH);
@@ -83,8 +87,8 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
         Paint colorFailed = new Paint();
         Path path = new Path();
 
-
         int uniqueCount = 0;
+        int oldValue = -1;
 
         public QrCodeProcessing() {
             super(GrayU8.class);
@@ -97,15 +101,19 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
 
         @Override
         public void initialize(int imageWidth, int imageHeight) {
-
+            synchronized (uniqueLock) {
+                uniqueCount = unique.size();
+            }
         }
 
         @Override
         public void onDraw(Canvas canvas, Matrix imageToView) {
             canvas.setMatrix(imageToView);
             synchronized (lockGui) {
-                textUnqiueCount.setText(uniqueCount+"");
-
+                if( oldValue != uniqueCount ) {
+                    oldValue = uniqueCount;
+                    textUnqiueCount.setText(uniqueCount + "");
+                }
                 switch( mode ) {
                     case NORMAL:{
                         for( int i = 0; i < detected.size; i++ ) {
@@ -130,12 +138,18 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
         public void process(GrayU8 input) {
             detector.process(input);
 
-            for (QrCode qr : detector.getDetections()) {
-                if( !unique.containsKey(qr.message)) {
-                    unique.put(qr.message,qr);
+            synchronized (uniqueLock) {
+                for (QrCode qr : detector.getDetections()) {
+                    if (qr.message == null) {
+                        Log.e(TAG, "qr with null message?!?");
+                    }
+                    if (!unique.containsKey(qr.message)) {
+                        Log.i(TAG,"Adding new qr code with message of length="+qr.message.length());
+                        unique.put(qr.message, qr.clone());
+                    }
                 }
+                uniqueCount = unique.size();
             }
-            uniqueCount = unique.size();
 
             synchronized (lockGui) {
                 detected.reset();
