@@ -71,7 +71,7 @@ public class ImageClassificationActivity extends DemoBitmapCamera2Activity
     boolean screenTouched = false;
 
     public ImageClassificationActivity() {
-        super(Resolution.R640x480);
+        super(Resolution.R320x240);
     }
 
     @Override
