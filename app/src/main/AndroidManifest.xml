@@ -116,9 +116,7 @@
             android:screenOrientation="landscape" />
         <activity android:name=".detect.DetectBlackPolygonActivity"/>
         <activity android:name=".detect.DetectBlackPolygonHelpActivity" />
-        <activity
-            android:name=".detect.DetectBlackEllipseActivity"
-            android:screenOrientation="landscape" />
+        <activity android:name=".detect.DetectBlackEllipseActivity"/>
         <!--<activity android:name=".detect.DetectBlackEllipseHelpActivity" />-->
         <activity android:name=".recognition.ImageClassificationActivity"/>
     </application>

@@ -20,10 +20,6 @@ Date: 2018
 - Filter Activities
   * Touching the screen shows the input image
 
--- BUGS
- * Overlay is in the wrong location on Nexus 5x
- * object tracking drag not drawing
-
 - TODO Reduce resolution when running on slower devices automatically
 - TODO Let user manually select resolution
 - TODO Show FPS in camera2 civities

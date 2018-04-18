@@ -165,26 +165,22 @@ public class ObjectTrackerActivity extends DemoCamera2Activity
 
 		int width,height;
 
-		Matrix inverse = new Matrix();
+		Matrix viewToimage = new Matrix();
 
 		protected TrackingProcessing(TrackerObjectQuad tracker ) {
 			mode = 0;
 			this.tracker = tracker;
 
-			paintSelected.setColor(Color.argb(0xFF/2,0xFF,0,0));
+			paintSelected.setARGB(0xFF/2,0xFF,0,0);
+			paintSelected.setStyle(Paint.Style.FILL_AND_STROKE);
 
 			paintLine0.setColor(Color.RED);
-			paintLine0.setStrokeWidth(5f);
 			paintLine1.setColor(Color.MAGENTA);
-			paintLine1.setStrokeWidth(5f);
 			paintLine2.setColor(Color.BLUE);
-			paintLine2.setStrokeWidth(5f);
 			paintLine3.setColor(Color.GREEN);
-			paintLine3.setStrokeWidth(5f);
 
 			// Create out paint to use for drawing
 			textPaint.setARGB(255, 200, 0, 0);
-			textPaint.setTextSize(60);
 		}
 
 		private void drawLine( Canvas canvas , Point2D_F64 a , Point2D_F64 b , Paint color ) {
@@ -214,6 +210,14 @@ public class ObjectTrackerActivity extends DemoCamera2Activity
 		public void initialize(int imageWidth, int imageHeight) {
 			this.width = imageWidth;
 			this.height = imageHeight;
+
+			float density = screenDensityAdjusted();
+			paintSelected.setStrokeWidth(5f*density);
+			paintLine0.setStrokeWidth(5f*density);
+			paintLine1.setStrokeWidth(5f*density);
+			paintLine2.setStrokeWidth(5f*density);
+			paintLine3.setStrokeWidth(5f*density);
+			textPaint.setTextSize(60*density);
 		}
 
 		@Override
@@ -224,18 +228,23 @@ public class ObjectTrackerActivity extends DemoCamera2Activity
 				Point2D_F64 a = new Point2D_F64();
 				Point2D_F64 b = new Point2D_F64();
 
-				if ( imageToView.invert(inverse)) {
-					applyToPoint(inverse, click0.x, click0.y, a);
-					applyToPoint(inverse, click1.x, click1.y, b);
+				if ( imageToView.invert(viewToimage)) {
+					applyToPoint(viewToimage, click0.x, click0.y, a);
+					applyToPoint(viewToimage, click1.x, click1.y, b);
 
-					canvas.drawRect((int) a.x, (int) a.y, (int) b.x, (int) b.y, paintSelected);
+					double x0 = Math.min(a.x,b.x);
+					double x1 = Math.max(a.x,b.x);
+					double y0 = Math.min(a.y,b.y);
+					double y1 = Math.max(a.y,b.y);
+
+					canvas.drawRect((int) x0, (int) y0, (int) x1, (int) y1, paintSelected);
 				}
 			} else if( mode == 2 ) {
-				if (!imageToView.invert(inverse)) {
+				if (!imageToView.invert(viewToimage)) {
 					return;
 				}
-				applyToPoint(inverse,click0.x, click0.y, location.a);
-				applyToPoint(inverse,click1.x, click1.y, location.c);
+				applyToPoint(viewToimage,click0.x, click0.y, location.a);
+				applyToPoint(viewToimage,click1.x, click1.y, location.c);
 
 				// make sure the user selected a valid region
 				makeInBounds(location.a);
@@ -250,12 +259,8 @@ public class ObjectTrackerActivity extends DemoCamera2Activity
 					mode = 3;
 				} else {
 					// the user screw up. Let them know what they did wrong
-					runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							Toast.makeText(ObjectTrackerActivity.this, "Drag a larger region", Toast.LENGTH_SHORT).show();
-						}
-					});
+					runOnUiThread(() -> Toast.makeText(ObjectTrackerActivity.this,
+							"Drag a larger region", Toast.LENGTH_SHORT).show());
 					mode = 0;
 				}
 			}

@@ -19,7 +19,7 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import org.boofcv.android.DemoBitmapCamera2Activity;
-import org.boofcv.android.DemoProcessing;
+import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
 import org.boofcv.android.misc.MiscUtil;
 import org.ddogleg.struct.FastQueue;
@@ -37,7 +37,6 @@ import boofcv.factory.shape.ConfigPolygonDetector;
 import boofcv.factory.shape.FactoryShapeDetector;
 import boofcv.struct.ConfigLength;
 import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageType;
 import georegression.struct.shapes.Polygon2D_F64;
 
 /**
@@ -229,12 +228,16 @@ public class DetectBlackPolygonActivity extends DemoBitmapCamera2Activity
 		return false;
 	}
 
-	protected class PolygonProcessing implements DemoProcessing<GrayU8> {
+	protected class PolygonProcessing extends DemoProcessingAbstract<GrayU8> {
 
 		final List<Polygon2D_F64> found = new ArrayList<>();
 		final FastQueue<Polygon2D_F64> copy = new FastQueue<>(Polygon2D_F64.class,true);
 
 		Path path = new Path();
+
+		public PolygonProcessing() {
+			super(GrayU8.class);
+		}
 
 		@Override
 		public void initialize(int imageWidth, int imageHeight) {
@@ -286,21 +289,6 @@ public class DetectBlackPolygonActivity extends DemoBitmapCamera2Activity
 					VisualizeImageData.binaryToBitmap(binary, false, bitmap, bitmapTmp);
 				}
 			}
-		}
-
-		@Override
-		public void stop() {
-
-		}
-
-		@Override
-		public boolean isThreadSafe() {
-			return false;
-		}
-
-		@Override
-		public ImageType<GrayU8> getImageType() {
-			return ImageType.single(GrayU8.class);
 		}
 	}
 }

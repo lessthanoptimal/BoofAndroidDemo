@@ -1,8 +1,8 @@
 package org.boofcv.android.detect;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.os.Bundle;
@@ -11,12 +11,13 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 
-import org.boofcv.android.DemoVideoDisplayActivity;
+import org.boofcv.android.DemoBitmapCamera2Activity;
+import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
+import org.ddogleg.struct.FastQueue;
 
 import java.util.List;
 
@@ -24,7 +25,6 @@ import boofcv.abst.filter.binary.InputToBinary;
 import boofcv.alg.shapes.ellipse.BinaryEllipseDetector;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
-import boofcv.android.camera.VideoImageProcessing;
 import boofcv.factory.filter.binary.FactoryThresholdBinary;
 import boofcv.factory.shape.ConfigEllipseDetector;
 import boofcv.factory.shape.FactoryShapeDetector;
@@ -39,7 +39,7 @@ import georegression.struct.curve.EllipseRotated_F64;
  *
  * @author Peter Abeles
  */
-public class DetectBlackEllipseActivity extends DemoVideoDisplayActivity
+public class DetectBlackEllipseActivity extends DemoBitmapCamera2Activity
 		implements AdapterView.OnItemSelectedListener , View.OnTouchListener
 {
 	Paint paint;
@@ -51,36 +51,38 @@ public class DetectBlackEllipseActivity extends DemoVideoDisplayActivity
 
 	boolean showInput = true;
 
+	final Object lockBinarization = new Object();
 	BinaryEllipseDetector<GrayU8> detector;
 	InputToBinary<GrayU8> inputToBinary;
 
 	GrayU8 binary = new GrayU8(1,1);
+
+	public DetectBlackEllipseActivity() {
+		super(Resolution.MEDIUM);
+	}
 
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		paint = new Paint();
-		paint.setARGB(0xFF,0xFF,0,0);
+		paint.setARGB(0xFF, 0xFF, 0, 0);
 		paint.setStyle(Paint.Style.STROKE);
 		paint.setFlags(Paint.ANTI_ALIAS_FLAG);
-		paint.setStrokeWidth(3.0f);
 
 		LayoutInflater inflater = getLayoutInflater();
-		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.detect_black_ellipse_controls,null);
+		LinearLayout controls = (LinearLayout) inflater.inflate(R.layout.detect_black_ellipse_controls, null);
 
-		LinearLayout parent = getViewContent();
-		parent.addView(controls);
 
-		FrameLayout iv = getViewPreview();
-		iv.setOnTouchListener(this);
-
-		spinnerThresholder = (Spinner)controls.findViewById(R.id.spinner_algs);
+		spinnerThresholder = (Spinner) controls.findViewById(R.id.spinner_algs);
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
 				R.array.threshold_styles, android.R.layout.simple_spinner_item);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinnerThresholder.setAdapter(adapter);
 		spinnerThresholder.setOnItemSelectedListener(this);
+
+		setControls(controls);
+		displayView.setOnTouchListener(this);
 	}
 
 	@Override
@@ -111,17 +113,19 @@ public class DetectBlackEllipseActivity extends DemoVideoDisplayActivity
 			return;
 		active = which;
 
-		switch( active ) {
-			case 0 :
-				inputToBinary = FactoryThresholdBinary.globalOtsu(0, 255, true, GrayU8.class);
-				break;
+		synchronized (lockBinarization) {
+			switch (active) {
+				case 0:
+					inputToBinary = FactoryThresholdBinary.globalOtsu(0, 255, true, GrayU8.class);
+					break;
 
-			case 1:
-				inputToBinary = FactoryThresholdBinary.localMean(ConfigLength.fixed(10),0.95,true,GrayU8.class);
-				break;
+				case 1:
+					inputToBinary = FactoryThresholdBinary.localMean(ConfigLength.fixed(10), 0.95, true, GrayU8.class);
+					break;
 
-			default:
-				throw new RuntimeException("Unknown type");
+				default:
+					throw new RuntimeException("Unknown type");
+			}
 		}
 	}
 
@@ -143,55 +147,72 @@ public class DetectBlackEllipseActivity extends DemoVideoDisplayActivity
 		return false;
 	}
 
-	protected class EllipseProcessing extends VideoImageProcessing<GrayU8> {
+	protected class EllipseProcessing extends DemoProcessingAbstract<GrayU8> {
 
 		RectF r = new RectF();
+
+		FastQueue<EllipseRotated_F64> ellipses = new FastQueue<>(EllipseRotated_F64.class,true);
 
 		protected EllipseProcessing() {
 			super(ImageType.single(GrayU8.class));
 		}
 
 		@Override
-		protected void declareImages(int width, int height) {
-			super.declareImages(width, height);
-			binary.reshape(width,height);
+		public void initialize(int imageWidth, int imageHeight) {
+			binary.reshape(imageWidth,imageHeight);
+			paint.setStrokeWidth(5.0f*screenDensityAdjusted());
 		}
 
 		@Override
-		protected void process(GrayU8 image, Bitmap output, byte[] storage) {
+		public void onDraw(Canvas canvas, Matrix imageToView) {
+			drawBitmap(canvas,imageToView);
 
-			synchronized ( this ) {
-				inputToBinary.process(image,binary);
+			canvas.setMatrix(imageToView);
+			synchronized (lockGui) {
+				for (EllipseRotated_F64 ellipse : ellipses.toList()) {
+
+					float phi = (float) UtilAngle.degree(ellipse.phi);
+					float cx = (float) ellipse.center.x;
+					float cy = (float) ellipse.center.y;
+					float w = (float) ellipse.a;
+					float h = (float) ellipse.b;
+
+					//  really skinny ones are probably just a line and not what the user wants
+					if (w <= 2 || h <= 2)
+						return;
+
+					canvas.save();
+					canvas.rotate(phi, cx, cy);
+					r.set(cx - w, cy - h, cx + w + 1, cy + h + 1);
+					canvas.drawOval(r, paint);
+					canvas.restore();
+				}
+			}
+		}
+
+		@Override
+		public void process(GrayU8 input) {
+			synchronized ( lockBinarization ) {
+				inputToBinary.process(input,binary);
 			}
 
-			detector.process(image,binary);
-
-			if( showInput ) {
-				ConvertBitmap.boofToBitmap(image,output,storage);
-			} else {
-				VisualizeImageData.binaryToBitmap(binary,false,output,storage);
+			synchronized (bitmapLock) {
+				if (showInput) {
+					ConvertBitmap.boofToBitmap(input, bitmap, bitmapTmp);
+				} else {
+					VisualizeImageData.binaryToBitmap(binary, false, bitmap, bitmapTmp);
+				}
 			}
 
-			Canvas canvas = new Canvas(output);
+			detector.process(input,binary);
 
 			List<EllipseRotated_F64> found = detector.getFoundEllipses(null);
 
-			for( EllipseRotated_F64 ellipse : found )  {
-
-				float phi = (float) UtilAngle.degree(ellipse.phi);
-				float cx =  (float)ellipse.center.x;
-				float cy =  (float)ellipse.center.y;
-				float w = (float)ellipse.a;
-				float h = (float)ellipse.b;
-
-				//  really skinny ones are probably just a line and not what the user wants
-				if( w <= 2 || h <= 2 )
-					return;
-
-				canvas.rotate(phi, cx, cy);
-				r.set(cx-w,cy-h,cx+w+1,cy+h+1);
-				canvas.drawOval(r,paint);
-				canvas.rotate(-phi, cx, cy);
+			synchronized (lockGui) {
+				ellipses.reset();
+				for (EllipseRotated_F64 ellipse : found) {
+					ellipses.grow().set(ellipse);
+				}
 			}
 		}
 	}
