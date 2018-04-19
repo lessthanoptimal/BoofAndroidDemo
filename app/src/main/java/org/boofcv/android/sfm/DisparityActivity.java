@@ -102,10 +102,14 @@ public class DisparityActivity extends DemoCamera2Activity
 	@Override
 	protected void onResume() {
 		super.onResume();
-		setProcessing(new DisparityProcessing());
 		visualize.setSource(null);
 		visualize.setDestination(null);
 		changeDisparityAlg = spinnerAlgs.getSelectedItemPosition();
+	}
+
+	@Override
+	public void createNewProcessor() {
+		setProcessing(new DisparityProcessing());
 	}
 
 	@Override

@@ -76,12 +76,7 @@ public class FiducialLearnActivity extends DemoCamera2Activity
 	}
 
 	@Override
-	protected void onResume() {
-		super.onResume();
-		startFiducialDetector();
-	}
-
-	protected void startFiducialDetector() {
+	public void createNewProcessor() {
 		setProcessing(new FiducialProcessor());
 	}
 

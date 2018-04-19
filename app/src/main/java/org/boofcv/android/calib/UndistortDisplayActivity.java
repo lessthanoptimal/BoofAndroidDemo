@@ -69,13 +69,7 @@ public class UndistortDisplayActivity extends DemoBitmapCamera2Activity
 		setControls(controls);
 		activateTouchToShowInput();
 	}
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-		setProcessing();
-	}
-
+	
 	public void pressedHelp( View view ) {
 		AlertDialog alertDialog = new AlertDialog.Builder(this).create();
 		alertDialog.setTitle("Undistort");
@@ -86,7 +80,8 @@ public class UndistortDisplayActivity extends DemoBitmapCamera2Activity
 		alertDialog.show();
 	}
 
-	private void setProcessing() {
+	@Override
+	public void createNewProcessor() {
 		Log.e("Undistort","Set Processing!");
 		if( isColor ) {
 			setProcessing(new UndistortProcessing(ImageType.pl(3,GrayU8.class)));
@@ -105,7 +100,7 @@ public class UndistortDisplayActivity extends DemoBitmapCamera2Activity
 
 		if( toggleColor == compoundButton ) {
 			isColor = b;
-			setProcessing();
+			createNewProcessor();
 		}
 	}
 

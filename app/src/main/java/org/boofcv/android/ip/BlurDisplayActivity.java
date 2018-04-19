@@ -36,6 +36,7 @@ public class BlurDisplayActivity extends DemoBitmapCamera2Activity
 
 	public BlurDisplayActivity() {
 		super(Resolution.MEDIUM);
+		super.changeResolutionOnSlow = true;
 	}
 
 	@Override
@@ -82,8 +83,7 @@ public class BlurDisplayActivity extends DemoBitmapCamera2Activity
 	}
 
 	@Override
-	protected void onResume() {
-		super.onResume();
+	public void createNewProcessor() {
 		startBlurProcess(spinnerView.getSelectedItemPosition());
 	}
 

@@ -4,18 +4,23 @@ import android.app.ProgressDialog;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.hardware.camera2.CameraDevice;
 import android.os.Bundle;
 import android.os.Looper;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.Size;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import boofcv.android.ConvertBitmap;
 import boofcv.android.camera2.VisualizeCamera2Activity;
+import boofcv.misc.MovingAverage;
 import boofcv.struct.image.ImageBase;
 import georegression.struct.point.Point2D_F64;
 
@@ -23,7 +28,7 @@ import georegression.struct.point.Point2D_F64;
  * Camera activity specifically designed for this demonstration. Image processing algorithms
  * can be swapped in and out
  */
-public class DemoCamera2Activity extends VisualizeCamera2Activity {
+public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
 
     protected final Object lockProcessor = new Object();
     protected DemoProcessing processor;
@@ -38,6 +43,17 @@ public class DemoCamera2Activity extends VisualizeCamera2Activity {
 
     protected DisplayMetrics displayMetrics;
 
+    //START Timing data structures locked on super.lockTiming
+    protected int totalFramesProcessed; // total frames processed for the specific processing algorithm
+    protected MovingAverage periodProcess = new MovingAverage(0.8); // milliseconds
+    //END
+
+    // if a process is taking too long poentially trigger a change in resolution to sleep things up
+    protected boolean changeResolutionOnSlow = false;
+    protected boolean triggerSlow;
+    protected final static double TRIGGER_HORIBLY_SLOW = 5000.0;
+    protected final static double TRIGGER_SLOW = 500.0;
+
     public DemoCamera2Activity(Resolution resolution) {
         super.targetResolution = resolutionToPixels(resolution);
 
@@ -51,6 +67,12 @@ public class DemoCamera2Activity extends VisualizeCamera2Activity {
         displayMetrics = Resources.getSystem().getDisplayMetrics();
     }
 
+    /**
+     * Creates a new process and calls setProcess(new ASDASDASD). This is invoked
+     * after a new camera device has been opened
+     */
+    public abstract void createNewProcessor();
+
     protected void setControls(@Nullable LinearLayout controls ) {
         setContentView(R.layout.standard_camera2);
         LinearLayout parent = findViewById(R.id.root_layout);
@@ -63,7 +85,9 @@ public class DemoCamera2Activity extends VisualizeCamera2Activity {
 
     @Override
     protected void onCameraResolutionChange( int width , int height ) {
+        Log.i("Demo","onCameraResolutionChange called. "+width+"x"+height);
         super.onCameraResolutionChange(width,height);
+        triggerSlow = false;
         DemoProcessing p = processor;
         if( p != null ) {
             p.initialize(width,height);
@@ -94,20 +118,96 @@ public class DemoCamera2Activity extends VisualizeCamera2Activity {
             processor = this.processor;
         }
 
-        if( processor != null) {
-            if( !processor.isThreadSafe() && threadPool.getMaximumPoolSize() > 1 )
-                throw new RuntimeException("Process is not thread safe but the pool is larger than 1!");
-
-            if( processor.getImageType().isSameType(image.getImageType()))
-                processor.process(image);
+        if( processor == null) {
+            return;
         }
+
+        if( !processor.isThreadSafe() && threadPool.getMaximumPoolSize() > 1 )
+            throw new RuntimeException("Process is not thread safe but the pool is larger than 1!");
+
+        if( processor.getImageType().isSameType(image.getImageType())) {
+            long before = System.nanoTime();
+            processor.process(image);
+            long after = System.nanoTime();
+
+            double milliseconds = (after-before)*1e-6;
+
+            double timeProcess,timeConvert;
+            synchronized (lockTiming) {
+                totalFramesProcessed++;
+                // give it a few frames to warm up
+                if( totalFramesProcessed >= TIMING_WARM_UP ) {
+                    periodProcess.update(milliseconds);
+                    triggerSlow |= periodProcess.getAverage() > TRIGGER_SLOW;
+                } else {
+                    // if things are extremely slow right off the bat abort and change resolution
+                    triggerSlow |= milliseconds >= TRIGGER_HORIBLY_SLOW;
+                }
+
+                timeProcess = periodProcess.getAverage();
+                timeConvert = periodConvert.getAverage();
+            }
+
+            if( verbose ) {
+                Log.i("DemoTiming",String.format("Total Frames %4d process %5.1f convert %5.1f at %dx%d",
+                        totalFramesProcessed,timeProcess,timeConvert,image.width,image.height));
+            }
+
+        }
+
+        if( changeResolutionOnSlow && triggerSlow ) {
+            handleReduceResolution(processor);
+        }
+    }
+
+    private void handleReduceResolution(DemoProcessing processor) {
+        int original = targetResolution;
+        targetResolution = Math.max(320*240,targetResolution/4);
+        if( original != targetResolution ) {
+            // Prevent new instances from launching. I hope. Not sure if this will work if
+            // there's multiple worker threads
+            synchronized (lockProcessor) {
+                this.processor = null;
+                if( processor != null ) {
+                    processor.stop();
+                }
+            }
+
+            if( verbose )
+                Log.i("Demo","Changing resolution because of slow process. pixels="+targetResolution);
+            runOnUiThread(()->{
+                Toast.makeText(DemoCamera2Activity.this,"Reducing resolution for performance",Toast.LENGTH_SHORT).show();
+                closeCamera();
+                openCamera(viewWidth,viewHeight);
+
+            });
+        } else {
+            changeResolutionOnSlow = false;
+            triggerSlow = false;
+            Log.i("Demo","Slow but at minimum resolution already");
+        }
+    }
+
+    @Override
+    protected void onCameraOpened( @NonNull CameraDevice cameraDevice ) {
+        // Adding a delay before starting the process seems to allow things to run better
+        // An image can be displayed
+        new java.util.Timer().schedule(
+                new java.util.TimerTask() {
+                    @Override
+                    public void run() {
+                        runOnUiThread(()->createNewProcessor());
+                    }
+                },
+                500);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         synchronized (lockProcessor) {
-            processor.stop();
+            if( processor != null )
+                processor.stop();
         }
     }
 
@@ -128,7 +228,15 @@ public class DemoCamera2Activity extends VisualizeCamera2Activity {
             // be initialized when the size is set
             Size s = this.mCameraSize;
             if( s != null ) {
+                Log.i("Demo","initializing processor "+s.getWidth()+"x"+s.getHeight());
                 processor.initialize(s.getWidth(),s.getHeight());
+            } else {
+                Log.i("Demo","skipping initializing processor. size not known");
+            }
+
+            synchronized (lockTiming) {
+                totalFramesProcessed = 0;
+                periodProcess.reset();
             }
         }
     }

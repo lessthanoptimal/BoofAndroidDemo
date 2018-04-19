@@ -21,8 +21,11 @@ import boofcv.struct.image.GrayU8;
  */
 public class KltDisplayActivity extends PointTrackerDisplayActivity {
 
+	private int maxFeatures=50;
+
 	public KltDisplayActivity() {
-		super(Resolution.R640x480);
+		super(Resolution.MEDIUM);
+		super.changeResolutionOnSlow = true;
 	}
 
 	@Override
@@ -33,19 +36,13 @@ public class KltDisplayActivity extends PointTrackerDisplayActivity {
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.klt_controls,null);
 
 		SeekBar seek = controls.findViewById(R.id.slider_tracks);
+		seek.setProgress(maxFeatures);
+
 		seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 			@Override
 			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-				ConfigGeneralDetector config = new ConfigGeneralDetector();
-				config.maxFeatures = progress+1;
-				config.threshold = 20;
-				config.radius = 3;
-
-				PointTracker<GrayU8> tracker =
-						FactoryPointTracker.klt(new int[]{1,2,4},config,3,GrayU8.class, GrayS16.class);
-
-				Log.i("KLT","threshold = "+progress);
-				setProcessing(new PointProcessing(tracker));
+				maxFeatures = progress+1;
+				createNewProcessor();
 			}
 
 			@Override
@@ -54,14 +51,27 @@ public class KltDisplayActivity extends PointTrackerDisplayActivity {
 			@Override
 			public void onStopTrackingTouch(SeekBar seekBar) {}
 		});
-		seek.setProgress(150);
+
 
 		setControls(controls);
 	}
 
 	@Override
+	public void createNewProcessor() {
+		ConfigGeneralDetector config = new ConfigGeneralDetector();
+		config.maxFeatures = maxFeatures;
+		config.threshold = Math.max(20,45-(maxFeatures/20));
+		config.radius = 3;
+
+		PointTracker<GrayU8> tracker =
+				FactoryPointTracker.klt(new int[]{1,2,4},config,3,GrayU8.class, GrayS16.class);
+
+		Log.i("KLT","maxFeatures = "+maxFeatures);
+		setProcessing(new PointProcessing(tracker));
+	}
+
+	@Override
 	protected void onResume() {
 		super.onResume();
-
 	}
 }

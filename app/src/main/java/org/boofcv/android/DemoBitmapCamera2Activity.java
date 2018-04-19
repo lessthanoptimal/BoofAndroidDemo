@@ -11,7 +11,7 @@ import boofcv.struct.image.ImageBase;
 /**
  * Activity where rendering to the bitmap should be managed by the activity entirely
  */
-public class DemoBitmapCamera2Activity extends DemoCamera2Activity {
+public abstract class DemoBitmapCamera2Activity extends DemoCamera2Activity {
 
     public DemoBitmapCamera2Activity(Resolution resolution) {
         super(resolution);

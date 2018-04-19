@@ -77,6 +77,7 @@ public class DetectBlackPolygonActivity extends DemoBitmapCamera2Activity
 
 	public DetectBlackPolygonActivity() {
 		super(Resolution.MEDIUM);
+		super.changeResolutionOnSlow = true;
 
 		double rgb[] = new double[3];
 
@@ -92,13 +93,13 @@ public class DetectBlackPolygonActivity extends DemoBitmapCamera2Activity
 		}
 	}
 
-	public void onCreate(Bundle savedInstanceState) {
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		paint = new Paint();
 		paint.setStyle(Paint.Style.STROKE);
 		paint.setFlags(Paint.ANTI_ALIAS_FLAG);
-		paint.setStrokeWidth(2.0f*screenDensityAdjusted());
 
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.detect_black_polygon_controls,null);
@@ -139,8 +140,7 @@ public class DetectBlackPolygonActivity extends DemoBitmapCamera2Activity
 	}
 
 	@Override
-	protected void onResume() {
-		super.onResume();
+	public void createNewProcessor() {
 		ConfigPolygonDetector configPoly = new ConfigPolygonDetector(minSides,maxSides);
 
 		detector = FactoryShapeDetector.polygon(configPoly,GrayU8.class);
@@ -241,6 +241,7 @@ public class DetectBlackPolygonActivity extends DemoBitmapCamera2Activity
 
 		@Override
 		public void initialize(int imageWidth, int imageHeight) {
+			paint.setStrokeWidth(2.0f*screenDensityAdjusted());
 			binary.reshape(imageWidth,imageHeight);
 		}
 

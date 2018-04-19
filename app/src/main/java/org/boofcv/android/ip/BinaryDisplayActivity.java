@@ -69,8 +69,7 @@ public class BinaryDisplayActivity extends DemoBitmapCamera2Activity
 	}
 
 	@Override
-	protected void onResume() {
-		super.onResume();
+	public void createNewProcessor() {
 		setProcessing(new ThresholdProcessing() );
 	}
 

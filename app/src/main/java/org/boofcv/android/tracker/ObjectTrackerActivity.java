@@ -73,8 +73,7 @@ public class ObjectTrackerActivity extends DemoCamera2Activity
 	}
 
 	@Override
-	protected void onResume() {
-		super.onResume();
+	public void createNewProcessor() {
 		startObjectTracking(spinnerView.getSelectedItemPosition());
 	}
 

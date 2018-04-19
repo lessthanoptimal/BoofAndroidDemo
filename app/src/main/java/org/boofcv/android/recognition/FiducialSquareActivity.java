@@ -74,6 +74,7 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 
 	FiducialSquareActivity(Class help) {
 		super(Resolution.MEDIUM);
+		super.changeResolutionOnSlow = true;
 		this.help = help;
 	}
 
@@ -99,7 +100,7 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 				public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 					synchronized (lock) {
 						binaryThreshold = progress;
-						startDetector();
+						createNewProcessor();
 					}
 				}
 
@@ -119,7 +120,7 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
                     } else {
                         seek.setEnabled(true);
                     }
-					startDetector();
+					createNewProcessor();
                 }
             });
 		}
@@ -136,7 +137,6 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 	@Override
 	protected void onResume() {
 		super.onResume();
-		startDetector();
 		if( DemoMain.preference.intrinsic == null ) {
 			Toast.makeText(FiducialSquareActivity.this, "Calibrate camera for better results!", Toast.LENGTH_LONG).show();
 		}
@@ -151,7 +151,8 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 		return false;
 	}
 
-	protected void startDetector() {
+	@Override
+	public void createNewProcessor() {
 		setProcessing(new FiducialProcessor(createDetector()) );
 	}
 

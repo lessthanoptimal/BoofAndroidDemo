@@ -44,8 +44,9 @@ public class CannyEdgeActivity extends DemoCamera2Activity
 	boolean colorize;
 
 	public CannyEdgeActivity() {
-		super(Resolution.LOW);
+		super(Resolution.MEDIUM);
 		super.showBitmap = true;
+		super.changeResolutionOnSlow = true;
 	}
 
 	@Override
@@ -68,12 +69,6 @@ public class CannyEdgeActivity extends DemoCamera2Activity
 	}
 
 	@Override
-	protected void onResume() {
-		super.onResume();
-		startCanny();
-	}
-
-	@Override
 	public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 		threshold = progress/100.0f;
 	}
@@ -84,7 +79,8 @@ public class CannyEdgeActivity extends DemoCamera2Activity
 	@Override
 	public void onStopTrackingTouch(SeekBar seekBar) {}
 
-	private void startCanny() {
+	@Override
+	public void createNewProcessor() {
 		setProcessing(new CannyProcessing());
 	}
 

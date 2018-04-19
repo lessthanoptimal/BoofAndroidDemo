@@ -41,6 +41,7 @@ public class ThresholdDisplayActivity extends DemoBitmapCamera2Activity
 
 	public ThresholdDisplayActivity() {
 		super(Resolution.MEDIUM);
+		super.changeResolutionOnSlow = true;
 	}
 
 	@Override
@@ -126,8 +127,7 @@ public class ThresholdDisplayActivity extends DemoBitmapCamera2Activity
 	}
 
 	@Override
-	protected void onResume() {
-		super.onResume();
+	public void createNewProcessor() {
 		setProcessing(new ThresholdingProcessing());
 	}
 

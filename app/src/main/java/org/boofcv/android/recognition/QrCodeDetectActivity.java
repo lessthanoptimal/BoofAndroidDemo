@@ -47,6 +47,7 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
 
     public QrCodeDetectActivity() {
         super(Resolution.HIGH);
+        super.changeResolutionOnSlow = true;
     }
 
     @Override
@@ -66,9 +67,8 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        setProcessing(new QrCodeProcessing() );
+    public void createNewProcessor() {
+        setProcessing(new QrCodeProcessing());
     }
 
     public void pressedListView( View view ) {

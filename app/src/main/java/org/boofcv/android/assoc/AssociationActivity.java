@@ -102,8 +102,6 @@ public class AssociationActivity extends DemoCamera2Activity
 		super.onResume();
 		visualize.setSource(null);
 		visualize.setDestination(null);
-
-		startAssociationProcessing();
 	}
 
 	@Override
@@ -114,10 +112,11 @@ public class AssociationActivity extends DemoCamera2Activity
 			selectedDet = spinnerDet.getSelectedItemPosition();
 		}
 
-		startAssociationProcessing();
+		createNewProcessor();
 	}
 
-	private void startAssociationProcessing() {
+	@Override
+	public void createNewProcessor() {
 		DetectDescribePoint detDesc = CreateDetectorDescriptor.create(selectedDet, selectedDesc, GrayF32.class);
 
 		ScoreAssociation score = FactoryAssociation.defaultScore(detDesc.getDescriptionType());

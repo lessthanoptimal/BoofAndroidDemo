@@ -121,14 +121,12 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
         });
 
 		SelectCalibrationFiducial dialog = new SelectCalibrationFiducial(cc);
-		dialog.show(this, this::startVideoProcessing);
+		dialog.show(this, this::createNewProcessor);
 	}
 
 	@Override
 	protected void onResume() {
-		super.onResume();  // Always call the superclass method first
-		startVideoProcessing();
-
+		super.onResume();
 		if( DemoMain.preference.intrinsic != null ) {
 			Toast.makeText(this, "Camera already calibrated", Toast.LENGTH_SHORT).show();
 		}
@@ -147,7 +145,8 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 	/**
 	 * Configures the detector, configures target description for calibration and starts the detector thread.
 	 */
-	private void startVideoProcessing() {
+	@Override
+	public void createNewProcessor() {
 		DetectorFiducialCalibration detector;
 
 		if( cc.targetType == CalibrationPatterns.CHESSBOARD ) {

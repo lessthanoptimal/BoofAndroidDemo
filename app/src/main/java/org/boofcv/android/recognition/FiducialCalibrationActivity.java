@@ -24,7 +24,7 @@ public class FiducialCalibrationActivity extends FiducialSquareActivity {
 		super.onCreate(savedInstanceState);
 
 		SelectCalibrationFiducial dialog = new SelectCalibrationFiducial(cc);
-		dialog.show(this, this::startDetector);
+		dialog.show(this, this::createNewProcessor);
 	}
 
 	@Override

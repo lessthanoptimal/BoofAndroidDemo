@@ -38,6 +38,7 @@ public class EnhanceDisplayActivity extends DemoBitmapCamera2Activity
 
 	public EnhanceDisplayActivity() {
 		super(Resolution.MEDIUM);
+		super.changeResolutionOnSlow = true;
 	}
 
 	@Override
@@ -62,8 +63,7 @@ public class EnhanceDisplayActivity extends DemoBitmapCamera2Activity
 	}
 
 	@Override
-	protected void onResume() {
-		super.onResume();
+	public void createNewProcessor() {
 		startEnhance(spinnerView.getSelectedItemPosition(),checkColor.isChecked());
 	}
 

@@ -59,6 +59,7 @@ public class DetectBlackEllipseActivity extends DemoBitmapCamera2Activity
 
 	public DetectBlackEllipseActivity() {
 		super(Resolution.MEDIUM);
+		super.changeResolutionOnSlow = true;
 	}
 
 
@@ -86,8 +87,7 @@ public class DetectBlackEllipseActivity extends DemoBitmapCamera2Activity
 	}
 
 	@Override
-	protected void onResume() {
-		super.onResume();
+	public void createNewProcessor() {
 		ConfigEllipseDetector config = new ConfigEllipseDetector();
 		config.maxIterations = 1;
 		config.numSampleContour = 20;

@@ -92,13 +92,10 @@ public class CombinedTrackerDisplayActivity extends PointTrackerDisplayActivity
 	}
 
 	@Override
-	protected void onResume() {
-		super.onResume();
-
+	public void createNewProcessor() {
 		PointTracker<GrayU8> tracker = createTracker(selectedDetector,selectedDescriptor);
 		setProcessing(new PointProcessing(tracker));
 	}
-
 
 	private PointTracker<GrayU8> createTracker( int detector , int descriptor  )
 	{

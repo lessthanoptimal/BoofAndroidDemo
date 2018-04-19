@@ -23,7 +23,7 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public class PointTrackerDisplayActivity extends DemoCamera2Activity {
+public abstract class PointTrackerDisplayActivity extends DemoCamera2Activity {
 
 	Paint paintLine = new Paint();
 	Paint paintRed = new Paint();
@@ -34,7 +34,6 @@ public class PointTrackerDisplayActivity extends DemoCamera2Activity {
 
 		paintLine.setColor(Color.RED);
 		paintLine.setStyle(Paint.Style.STROKE);
-		paintLine.setStrokeWidth(3);
 		paintRed.setColor(Color.MAGENTA);
 		paintRed.setStyle(Paint.Style.FILL);
 		paintBlue.setColor(Color.BLUE);
@@ -57,13 +56,16 @@ public class PointTrackerDisplayActivity extends DemoCamera2Activity {
 		FastQueue<Point2D_F64> trackDst = new FastQueue<>(Point2D_F64.class,true);
 		FastQueue<Point2D_F64> trackSpawn = new FastQueue<>(Point2D_F64.class,true);
 
+		float circleRadius;
+
 		public PointProcessing( PointTracker<GrayU8> tracker ) {
 			this.tracker = tracker;
 		}
 
 		@Override
 		public void initialize(int imageWidth, int imageHeight) {
-
+			paintLine.setStrokeWidth(3*screenDensityAdjusted());
+			circleRadius = 2*screenDensityAdjusted();
 		}
 
 		@Override
@@ -75,12 +77,12 @@ public class PointTrackerDisplayActivity extends DemoCamera2Activity {
 					Point2D_F64 s = trackSrc.get(i);
 					Point2D_F64 p = trackDst.get(i);
 					canvas.drawLine((float) s.x, (float) s.y, (float) p.x, (float) p.y, paintLine);
-					canvas.drawCircle((float) p.x, (float) p.y, 4f, paintRed);
+					canvas.drawCircle((float) p.x, (float) p.y, circleRadius, paintRed);
 				}
 
 				for (int i = 0; i < trackSpawn.size(); i++) {
 					Point2D_F64 p = trackSpawn.get(i);
-					canvas.drawCircle((int) p.x, (int) p.y, 6, paintBlue);
+					canvas.drawCircle((int) p.x, (int) p.y, circleRadius*1.5f, paintBlue);
 				}
 			}
 		}

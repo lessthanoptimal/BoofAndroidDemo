@@ -39,10 +39,12 @@ import java.util.List;
 import java.util.Locale;
 
 import boofcv.abst.scene.ImageClassifier;
+import boofcv.core.image.ConvertImage;
 import boofcv.factory.scene.ClassifierAndSource;
 import boofcv.factory.scene.FactoryImageClassifier;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.image.InterleavedU8;
 import boofcv.struct.image.Planar;
 
 /**
@@ -62,6 +64,7 @@ public class ImageClassificationActivity extends DemoBitmapCamera2Activity
     ImageClassifier<Planar<GrayF32>> classifier;
     List<String> sources;
     Status status = Status.INITIALIZING;
+
     Planar<GrayF32> workImage = ImageType.pl(3, GrayF32.class).createImage(1,1);
     long startTime;
 
@@ -71,7 +74,7 @@ public class ImageClassificationActivity extends DemoBitmapCamera2Activity
     boolean screenTouched = false;
 
     public ImageClassificationActivity() {
-        super(Resolution.R320x240);
+        super(Resolution.R640x480);
     }
 
     @Override
@@ -113,8 +116,7 @@ public class ImageClassificationActivity extends DemoBitmapCamera2Activity
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void createNewProcessor() {
         setProcessing(new ClassifierProcessing());
     }
 
@@ -183,14 +185,16 @@ public class ImageClassificationActivity extends DemoBitmapCamera2Activity
         });
     }
 
-    protected class ClassifierProcessing extends DemoProcessingAbstract<Planar<GrayF32>> {
+    // Input is an interleaved U8 image because planar float images were extremely slow on
+    // some older hardware
+    protected class ClassifierProcessing extends DemoProcessingAbstract<InterleavedU8> {
 
         private Paint textPaint = new Paint();
         private Paint bestPaint = new Paint();
         private Paint dimPaint = new Paint();
 
         public ClassifierProcessing() {
-            super(ImageType.pl(3, GrayF32.class));
+            super(ImageType.il(3, InterleavedU8.class));
 
             textPaint.setARGB(255, 255, 100, 100);
             textPaint.setTextSize(18*displayMetrics.density);
@@ -207,7 +211,7 @@ public class ImageClassificationActivity extends DemoBitmapCamera2Activity
 
         @Override
         public void initialize(int imageWidth, int imageHeight) {
-
+            workImage.reshape(imageWidth,imageHeight);
         }
 
         @Override
@@ -262,7 +266,7 @@ public class ImageClassificationActivity extends DemoBitmapCamera2Activity
         }
 
         @Override
-        public void process(Planar<GrayF32> input) {
+        public void process(InterleavedU8 input) {
 
             if( status == Status.CLASSIFIED || status == Status.PROCESSING ) {
                 convertToBitmapDisplay(workImage);
@@ -277,7 +281,7 @@ public class ImageClassificationActivity extends DemoBitmapCamera2Activity
                 } else if (status == Status.IDLE) {
                     startTime = System.currentTimeMillis();
                     status = Status.PROCESSING;
-                    workImage.setTo(input);
+                    ConvertImage.convertU8F32(input,workImage);
                     deactiveControls();
                     new ProcessImageTask(workImage).execute();
                 } else if( status == Status.CLASSIFIED ) {

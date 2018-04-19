@@ -87,14 +87,12 @@ public class DdaTrackerDisplayActivity extends PointTrackerDisplayActivity
 	}
 
 	@Override
-	protected void onResume() {
-		super.onResume();
-
+	public void createNewProcessor() {
 		PointTracker<GrayU8> tracker = createTracker(selectedDetector,selectedDescriptor);
 		setProcessing(new PointProcessing(tracker));
 	}
 
-	private PointTracker<GrayU8> createTracker( int detector , int descriptor  )
+	private PointTracker<GrayU8> createTracker(int detector , int descriptor  )
 	{
 		DetectDescribePoint detDesc = create(tableDet[detector],tableDesc[descriptor],GrayU8.class);
 

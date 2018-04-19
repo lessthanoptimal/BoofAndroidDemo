@@ -68,8 +68,7 @@ public class ImageTransformActivity extends DemoBitmapCamera2Activity
 	}
 
 	@Override
-	protected void onResume() {
-		super.onResume();
+	public void createNewProcessor() {
 		startTransformProcess(spinnerView.getSelectedItemPosition());
 	}
 

@@ -57,8 +57,7 @@ implements AdapterView.OnItemSelectedListener
 	}
 
 	@Override
-	protected void onResume() {
-		super.onResume();
+	public void createNewProcessor() {
 		startGradientProcess(spinnerGradient.getSelectedItemPosition());
 	}
 
