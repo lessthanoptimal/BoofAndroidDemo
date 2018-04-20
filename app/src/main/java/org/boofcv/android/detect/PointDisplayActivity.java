@@ -1,8 +1,8 @@
 package org.boofcv.android.detect;
 
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -12,7 +12,8 @@ import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 
-import org.boofcv.android.DemoVideoDisplayActivity;
+import org.boofcv.android.DemoCamera2Activity;
+import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
 
 import boofcv.abst.feature.detect.extract.ConfigExtract;
@@ -21,8 +22,6 @@ import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.alg.feature.detect.interest.EasyGeneralFeatureDetector;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
-import boofcv.android.ConvertBitmap;
-import boofcv.android.camera.VideoRenderProcessing;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
 import boofcv.struct.QueueCorner;
@@ -37,7 +36,7 @@ import georegression.struct.point.Point2D_I16;
  *
  * @author Peter Abeles
  */
-public class PointDisplayActivity extends DemoVideoDisplayActivity
+public class PointDisplayActivity extends DemoCamera2Activity
 		implements AdapterView.OnItemSelectedListener  {
 
 	Spinner spinner;
@@ -49,7 +48,13 @@ public class PointDisplayActivity extends DemoVideoDisplayActivity
 
 	int active = -1;
 
-	public void onCreate(Bundle savedInstanceState) {
+	public PointDisplayActivity() {
+		super(Resolution.MEDIUM);
+		super.changeResolutionOnSlow = true;
+	}
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		paintMax = new Paint();
@@ -63,10 +68,7 @@ public class PointDisplayActivity extends DemoVideoDisplayActivity
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.detect_point_controls,null);
 
-		LinearLayout parent = getViewContent();
-		parent.addView(controls);
-
-		spinner = (Spinner)controls.findViewById(R.id.spinner_algs);
+		spinner = controls.findViewById(R.id.spinner_algs);
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
 				R.array.point_features, android.R.layout.simple_spinner_item);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -80,11 +82,12 @@ public class PointDisplayActivity extends DemoVideoDisplayActivity
 		nonmaxMax = FactoryFeatureExtractor.nonmax(configCorner);
 		nonmaxCandidate = FactoryFeatureExtractor.nonmaxCandidate(configCorner);
 		nonmaxMinMax = FactoryFeatureExtractor.nonmax(configBlob);
+
+		setControls(controls);
 	}
 
 	@Override
-	protected void onResume() {
-		super.onResume();
+	public void createNewProcessor() {
 		setSelection( spinner.getSelectedItemPosition() );
 	}
 
@@ -149,75 +152,71 @@ public class PointDisplayActivity extends DemoVideoDisplayActivity
 	@Override
 	public void onNothingSelected(AdapterView<?> adapterView) {}
 
-	protected class PointProcessing extends VideoRenderProcessing<GrayU8> {
-		EasyGeneralFeatureDetector<GrayU8,GrayS16> detector;
+	protected class PointProcessing extends DemoProcessingAbstract<GrayU8> {
+		EasyGeneralFeatureDetector<GrayU8, GrayS16> detector;
 
 		NonMaxSuppression nonmax;
-
-		Bitmap bitmap;
-		byte[] storage;
 
 		// location of point features displayed inside of GUI
 		QueueCorner maximumsGUI = new QueueCorner();
 		QueueCorner minimumsGUI = new QueueCorner();
 
+		float radius;
 
 		public PointProcessing(GeneralFeatureIntensity<GrayU8, GrayS16> intensity,
 							   NonMaxSuppression nonmax) {
 			super(ImageType.single(GrayU8.class));
-			GeneralFeatureDetector<GrayU8,GrayS16> general =
-			new GeneralFeatureDetector<GrayU8, GrayS16>(intensity,nonmax);
+			GeneralFeatureDetector<GrayU8, GrayS16> general =
+					new GeneralFeatureDetector<GrayU8, GrayS16>(intensity, nonmax);
 
-			detector = new EasyGeneralFeatureDetector<GrayU8,GrayS16>(general,GrayU8.class,GrayS16.class);
+			detector = new EasyGeneralFeatureDetector<>(general, GrayU8.class, GrayS16.class);
 			this.nonmax = nonmax;
 		}
 
 		@Override
-		protected void declareImages(int width, int height) {
-			super.declareImages(width, height);
-			bitmap = Bitmap.createBitmap(width,height,Bitmap.Config.ARGB_8888);
-			storage = ConvertBitmap.declareStorage(bitmap,storage);
+		public void initialize(int imageWidth, int imageHeight) {
+			radius = 3 * screenDensityAdjusted();
 		}
 
 		@Override
-		protected void process(GrayU8 gray) {
+		public void onDraw(Canvas canvas, Matrix imageToView) {
+
+			canvas.setMatrix(imageToView);
+			synchronized (lockGui) {
+				for (int i = 0; i < maximumsGUI.size; i++) {
+					Point2D_I16 p = maximumsGUI.get(i);
+					canvas.drawCircle(p.x, p.y, radius, paintMax);
+				}
+
+				for (int i = 0; i < minimumsGUI.size; i++) {
+					Point2D_I16 p = minimumsGUI.get(i);
+					canvas.drawCircle(p.x, p.y, radius, paintMin);
+				}
+			}
+		}
+
+		@Override
+		public void process(GrayU8 gray) {
 			// adjust the non-max region based on image size
-			nonmax.setSearchRadius( 3*gray.width/320 );
-			detector.getDetector().setMaxFeatures( 200*gray.width/320 );
-			detector.detect(gray,null);
+			nonmax.setSearchRadius(3 * gray.width / 320);
+			detector.getDetector().setMaxFeatures(200 * gray.width / 320);
+			detector.detect(gray, null);
 
-			synchronized ( lockGui ) {
-				ConvertBitmap.grayToBitmap(gray,bitmap,storage);
-
+			synchronized (lockGui) {
 				maximumsGUI.reset();
 				minimumsGUI.reset();
 
 				QueueCorner maximums = detector.getMaximums();
 				QueueCorner minimums = detector.getMinimums();
 
-				for( int i = 0; i < maximums.size; i++ ) {
+				for (int i = 0; i < maximums.size; i++) {
 					Point2D_I16 p = maximums.get(i);
 					maximumsGUI.grow().set(p);
 				}
-				for( int i = 0; i < minimums.size; i++ ) {
+				for (int i = 0; i < minimums.size; i++) {
 					Point2D_I16 p = minimums.get(i);
 					minimumsGUI.grow().set(p);
 				}
-			}
-		}
-
-		@Override
-		protected void render(Canvas canvas, double imageToOutput) {
-			canvas.drawBitmap(bitmap,0,0,null);
-
-			for( int i = 0; i < maximumsGUI.size; i++ ) {
-				Point2D_I16 p = maximumsGUI.get(i);
-				canvas.drawCircle(p.x,p.y,3,paintMax);
-			}
-
-			for( int i = 0; i < minimumsGUI.size; i++ ) {
-				Point2D_I16 p = minimumsGUI.get(i);
-				canvas.drawCircle(p.x,p.y,3,paintMin);
 			}
 		}
 	}

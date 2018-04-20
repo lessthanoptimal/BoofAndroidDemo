@@ -220,7 +220,8 @@ public class ContourShapeFittingActivity extends DemoBitmapCamera2Activity
 
 		public PolygonProcessing() {
 			alg.setLoops(true);
-			alg.setMinimumSideLength(3);
+			alg.setMinimumSideLength(10);
+			alg.setMaxSides(20);
 			alg.setCornerScorePenalty(0.25);
 		}
 
