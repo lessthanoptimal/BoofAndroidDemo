@@ -269,14 +269,18 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
         super.onDrawFrame(view,canvas);
 
         if( !showProcessed ) {
-            synchronized (bitmapLock) {
-                canvas.drawBitmap(bitmap, imageToView, null);
+            if( !showBitmap ) { // if true then it has already been rendered
+                synchronized (bitmapLock) {
+                    canvas.drawBitmap(bitmap, imageToView, null);
+                }
             }
         } else {
+            DemoProcessing processor;
             synchronized (lockProcessor) {
-                if (processor != null)
-                    processor.onDraw(canvas, imageToView);
+                processor = this.processor;
             }
+            if (processor != null)
+                processor.onDraw(canvas, imageToView);
         }
         long stopTime = System.nanoTime();
 

@@ -110,10 +110,6 @@ public class ContourShapeFittingActivity extends DemoBitmapCamera2Activity
 			case 1:
 				setProcessing(new PolygonProcessing() );
 				break;
-//
-//			case 2:
-//				setProcessing(new BlurProcessing(FactoryBlurFilter.median(GrayU8.class,2)) );
-//				break;
 		}
 	}
 

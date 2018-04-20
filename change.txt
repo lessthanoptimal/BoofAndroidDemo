@@ -30,9 +30,7 @@ TODO super pixels
 TODO Delete unused activities using camera 1
 TODO use camera2 for info dialog
 TODO QR Code
-- clear button for list
 - tap to see info
-- truncate message in list
 
 -------------------------------------------------
 Version 1.8.1

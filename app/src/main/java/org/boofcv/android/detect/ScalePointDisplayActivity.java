@@ -108,6 +108,7 @@ public class ScalePointDisplayActivity extends DemoCamera2Activity
 	protected class PointProcessing extends DemoProcessingAbstract<GrayU8> {
 		InterestPointDetector<GrayU8> detector;
 
+		float density;
 
 		FastQueue<ScalePoint> foundGUI = new FastQueue<ScalePoint>(ScalePoint.class,true);
 
@@ -118,7 +119,7 @@ public class ScalePointDisplayActivity extends DemoCamera2Activity
 
 		@Override
 		public void initialize(int imageWidth, int imageHeight) {
-
+			density = screenDensityAdjusted();
 		}
 
 		@Override
@@ -127,7 +128,7 @@ public class ScalePointDisplayActivity extends DemoCamera2Activity
 			synchronized (lockGui) {
 				for (int i = 0; i < foundGUI.size(); i++) {
 					ScalePoint p = foundGUI.get(i);
-					float radius = (float)(p.scale*screenDensityAdjusted());
+					float radius = (float)(p.scale*density);
 					canvas.drawCircle((float) p.x, (float) p.y, radius, paintMax);
 				}
 			}
