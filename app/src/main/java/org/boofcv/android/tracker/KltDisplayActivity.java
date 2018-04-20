@@ -21,10 +21,10 @@ import boofcv.struct.image.GrayU8;
  */
 public class KltDisplayActivity extends PointTrackerDisplayActivity {
 
-	private int maxFeatures=50;
+	private int maxFeatures=120;
 
 	public KltDisplayActivity() {
-		super(Resolution.MEDIUM);
+		super(Resolution.LOW);
 		super.changeResolutionOnSlow = true;
 	}
 

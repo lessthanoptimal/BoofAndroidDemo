@@ -167,8 +167,6 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		sfm.addChild("Stabilization",StabilizeDisplayActivity.class);
 		sfm.addChild("Mosaic",MosaicDisplayActivity.class);
 
-
-
 		groups.add(ip);
 		groups.add(detect);
 		groups.add(assoc);

@@ -118,8 +118,12 @@ public class CannyEdgeActivity extends DemoCamera2Activity
 		@Override
 		public void initialize(int imageWidth, int imageHeight) {
 			// predeclare some memory
-			contours.resize(5000);
-			edgeLengths.resize(1000);
+			synchronized (contours) {
+				contours.growArray(5000);
+				edgeLengths.resize(1000);
+				contours.size = 0;
+				edgeLengths.size = 0;
+			}
 		}
 
 		@Override
@@ -138,7 +142,7 @@ public class CannyEdgeActivity extends DemoCamera2Activity
 				paintLine.setColor(Color.WHITE);
 
 			synchronized (contours) {
-				int where = 0;
+				int pointIndex = 0;
 				int edgeIndex = 0;
 				int nextColor = 0;
 				for (int i = 0; i < edgeLengths.size; i++) {
@@ -148,10 +152,8 @@ public class CannyEdgeActivity extends DemoCamera2Activity
 						continue;
 
 					// Renders much faster drawing rects than a path
-					Point2D_I32 p = contours.get(where++);
-					canvas.drawRect(p.x,p.y,p.x+1,p.y+1,paintLine);
-					for (int j = 1; j < length; j++) {
-						p = contours.get(where++);
+					for (int j = 0; j < length; j++) {
+						Point2D_I32 p = contours.get(pointIndex++);
 						canvas.drawRect(p.x,p.y,p.x+1,p.y+1,paintLine);
 					}
 					if( colorize && i >= nextColor) {

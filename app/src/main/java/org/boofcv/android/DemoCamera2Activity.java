@@ -4,6 +4,9 @@ import android.app.ProgressDialog;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.hardware.camera2.CameraDevice;
 import android.os.Bundle;
 import android.os.Looper;
@@ -17,6 +20,8 @@ import android.view.SurfaceView;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+
+import java.util.Locale;
 
 import boofcv.android.ConvertBitmap;
 import boofcv.android.camera2.VisualizeCamera2Activity;
@@ -45,7 +50,8 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
 
     //START Timing data structures locked on super.lockTiming
     protected int totalFramesProcessed; // total frames processed for the specific processing algorithm
-    protected MovingAverage periodProcess = new MovingAverage(0.8); // milliseconds
+    protected MovingAverage periodProcess = new MovingAverage(0.5); // milliseconds
+    protected MovingAverage periodRender = new MovingAverage(0.5); // milliseconds
     //END
 
     // if a process is taking too long poentially trigger a change in resolution to sleep things up
@@ -53,6 +59,12 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
     protected boolean triggerSlow;
     protected final static double TRIGGER_HORIBLY_SLOW = 5000.0;
     protected final static double TRIGGER_SLOW = 500.0;
+
+    // Work variables for rendering performance
+    private Paint paintText = new Paint();
+    private Rect bounds0 = new Rect();
+    private Rect bounds1 = new Rect();
+    private Rect bounds2 = new Rect();
 
     public DemoCamera2Activity(Resolution resolution) {
         super.targetResolution = resolutionToPixels(resolution);
@@ -65,6 +77,12 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         displayMetrics = Resources.getSystem().getDisplayMetrics();
+
+        paintText.setStrokeWidth(3*displayMetrics.density);
+        paintText.setTextSize(24*displayMetrics.density);
+        paintText.setTextAlign(Paint.Align.LEFT);
+        paintText.setARGB(0xA0,0xFF,0,0);
+        paintText.setTypeface(Typeface.MONOSPACE);
     }
 
     /**
@@ -149,8 +167,8 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
             }
 
             if( verbose ) {
-                Log.i("DemoTiming",String.format("Total Frames %4d process %5.1f convert %5.1f at %dx%d",
-                        totalFramesProcessed,timeProcess,timeConvert,image.width,image.height));
+                Log.i("DemoTiming",String.format("Total Frames %4d curr %5.1f ave process %5.1f convert %5.1f at %dx%d",
+                        totalFramesProcessed,milliseconds,timeProcess,timeConvert,image.width,image.height));
             }
 
         }
@@ -161,8 +179,8 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
     }
 
     private void handleReduceResolution(DemoProcessing processor) {
-        int original = targetResolution;
-        targetResolution = Math.max(320*240,targetResolution/4);
+        int original = mCameraSize.getWidth()*mCameraSize.getHeight();
+        targetResolution = Math.max(320*240,original/4);
         if( original != targetResolution ) {
             // Prevent new instances from launching. I hope. Not sure if this will work if
             // there's multiple worker threads
@@ -237,12 +255,14 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
             synchronized (lockTiming) {
                 totalFramesProcessed = 0;
                 periodProcess.reset();
+                periodRender.reset();
             }
         }
     }
 
     @Override
     protected void onDrawFrame(SurfaceView view , Canvas canvas ) {
+        long startTime = System.nanoTime();
         super.onDrawFrame(view,canvas);
 
         if( !showProcessed ) {
@@ -255,6 +275,49 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
                     processor.onDraw(canvas, imageToView);
             }
         }
+        long stopTime = System.nanoTime();
+
+        double processPeriod;
+        double renderPeriod;
+
+        synchronized (lockTiming) {
+            periodRender.update((stopTime-startTime)*1e-6);
+            renderPeriod = periodRender.getAverage();
+            processPeriod = periodProcess.getAverage();
+        }
+        if( DemoMain.preference.showFps )
+            renderSpeed(canvas, processPeriod, renderPeriod);
+    }
+
+    /**
+     * Renders how fast the algorithm and rendering is running
+     */
+    private void renderSpeed(Canvas canvas, double processPeriod, double renderPeriod) {
+        canvas.setMatrix(identity);
+
+        Locale local = Locale.getDefault();
+        String line0 = String.format(local,"%dx%d",bitmap.getWidth(),bitmap.getHeight());
+        String line1 = String.format(local,"%6.1f (ms) Alg",processPeriod);
+        String line2 = String.format(local,"%6.1f (ms) Vis",renderPeriod);
+
+        float spaceH = 3*displayMetrics.density;
+        paintText.getTextBounds(line0, 0, line0.length(), bounds0);
+        paintText.getTextBounds(line1, 0, line1.length(), bounds1);
+        paintText.getTextBounds(line2, 0, line2.length(), bounds2);
+
+        float width = Math.max(bounds0.width(),bounds1.width());
+        width = Math.max(width,bounds2.width());
+        float centerX = canvas.getWidth()/2;
+        float centerY = canvas.getHeight()/2;
+        float height = bounds0.height()+bounds1.height()+bounds2.height()+2*spaceH;
+        float x0 = centerX-width/2 + (width-bounds0.width())/2;
+        float y0 = centerY-height/2;
+        float y1 = y0 + bounds0.height() + spaceH;
+        float y2 = y1 + bounds1.height() + spaceH;
+
+        canvas.drawText(line0,x0,y0,paintText);
+        canvas.drawText(line1,centerX-width/2,y1,paintText);
+        canvas.drawText(line2,centerX-width/2,y2,paintText);
     }
 
     public int resolutionToPixels(Resolution resolution) {
