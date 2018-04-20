@@ -177,6 +177,7 @@ public class ContourShapeFittingActivity extends DemoBitmapCamera2Activity
 				fitShape(points);
 			}
 			finalizeShapes();
+			visualizationPending = true;
 		}
 	}
 

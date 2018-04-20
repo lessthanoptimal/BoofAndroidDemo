@@ -33,6 +33,9 @@ import georegression.struct.point.Point2D_F64;
 /**
  * Camera activity specifically designed for this demonstration. Image processing algorithms
  * can be swapped in and out
+ *
+ * useful variables and methods
+ * visualizationPending
  */
 public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
 
@@ -54,6 +57,15 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
     protected MovingAverage periodProcess = new MovingAverage(0.8); // milliseconds
     protected MovingAverage periodRender = new MovingAverage(0.8); // milliseconds
     //END
+
+    // If this is true then visualization data has not been rendered and the input image
+    // will not be processed. This ensures that visualization and the background image
+    // are rendered together with each other
+    // To use this feature set the variable to true inside the process(image) block after visuals
+    // have been made
+    protected volatile boolean visualizationPending = false;
+    // NOTE: The current approach isn't perfect. it's possible for an old do nothing visual to
+    //       mark this variable as false before the now one is passed in
 
     // if a process is taking too long poentially trigger a change in resolution to sleep things up
     protected boolean changeResolutionOnSlow = false;
@@ -128,6 +140,10 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
 
     @Override
     protected void processImage(ImageBase image) {
+        // the previous visualization has yet to be rendered.
+        if( visualizationPending )
+            return;
+
         if( !showProcessed) {
             synchronized (bitmapLock) {
                 ConvertBitmap.boofToBitmap(image, bitmap, bitmapTmp);
@@ -283,6 +299,8 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
                 processor.onDraw(canvas, imageToView);
         }
         long stopTime = System.nanoTime();
+
+        visualizationPending = false;
 
         double processPeriod;
         double renderPeriod;
