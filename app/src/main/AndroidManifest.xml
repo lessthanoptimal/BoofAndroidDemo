@@ -51,9 +51,7 @@
         <activity android:name=".ip.BinaryDisplayActivity"/>
         <activity android:name=".detect.PointDisplayActivity" />
         <activity android:name=".detect.ScalePointDisplayActivity" />
-        <activity
-            android:name=".detect.LineDisplayActivity"
-            android:screenOrientation="landscape" />
+        <activity android:name=".detect.LineDisplayActivity" />
         <activity android:name=".tracker.KltDisplayActivity"/>
         <activity
             android:name=".sfm.StabilizeDisplayActivity"
@@ -82,9 +80,6 @@
             android:screenOrientation="landscape" />
         <activity android:name=".AboutActivity" />
         <activity android:name=".calib.CalibrationHelpActivity" />
-        <activity
-            android:name=".detect.ShapeFitDisplayActivity"
-            android:screenOrientation="landscape" />
         <activity android:name=".ip.ImageTransformActivity"/>
         <activity android:name=".tracker.ObjectTrackerActivity"/>
         <activity android:name=".detect.ContourShapeFittingActivity"/>
@@ -105,9 +100,7 @@
         <activity android:name=".recognition.FiducialCalibrationHelpActivity"/>
         <activity android:name=".recognition.QrCodeDetectActivity"/>
         <activity android:name=".recognition.QrCodeListActivity"/>
-        <activity
-            android:name=".tracker.StaticBackgroundMotionActivity"
-            android:screenOrientation="landscape" />
+        <activity android:name=".tracker.StaticBackgroundMotionActivity"/>
         <activity android:name=".detect.DetectBlackPolygonActivity"/>
         <activity android:name=".detect.DetectBlackPolygonHelpActivity" />
         <activity android:name=".detect.DetectBlackEllipseActivity"/>

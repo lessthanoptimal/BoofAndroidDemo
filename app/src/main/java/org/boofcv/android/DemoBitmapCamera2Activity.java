@@ -6,6 +6,8 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 
 import boofcv.android.ConvertBitmap;
+import boofcv.android.VisualizeImageData;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 
 /**
@@ -31,6 +33,12 @@ public abstract class DemoBitmapCamera2Activity extends DemoCamera2Activity {
     protected void convertToBitmapDisplay(ImageBase image ) {
         synchronized (bitmapLock) {
             ConvertBitmap.boofToBitmap(image, bitmap, bitmapTmp);
+        }
+    }
+
+    protected void convertBinaryToBitmapDisplay(GrayU8 image ) {
+        synchronized (bitmapLock) {
+            VisualizeImageData.binaryToBitmap(image,false, bitmap, bitmapTmp);
         }
     }
 

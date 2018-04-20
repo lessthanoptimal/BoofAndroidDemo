@@ -1,33 +1,30 @@
 package org.boofcv.android.tracker;
 
-import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 
-import org.boofcv.android.DemoVideoDisplayActivity;
+import org.boofcv.android.DemoBitmapCamera2Activity;
+import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
 
 import boofcv.abst.distort.FDistort;
 import boofcv.alg.background.BackgroundModelStationary;
 import boofcv.alg.background.stationary.BackgroundStationaryBasic;
 import boofcv.alg.background.stationary.BackgroundStationaryGaussian;
+import boofcv.alg.background.stationary.BackgroundStationaryGmm;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.alg.misc.PixelMath;
-import boofcv.android.ConvertBitmap;
-import boofcv.android.VisualizeImageData;
-import boofcv.android.camera.VideoImageProcessing;
-import boofcv.core.image.GConvertImage;
 import boofcv.core.image.GeneralizedImageOps;
 import boofcv.factory.background.ConfigBackgroundBasic;
 import boofcv.factory.background.ConfigBackgroundGaussian;
+import boofcv.factory.background.ConfigBackgroundGmm;
 import boofcv.factory.background.FactoryBackgroundModel;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
@@ -40,8 +37,8 @@ import boofcv.struct.image.ImageType;
  *
  * @author Peter Abeles
  */
-public class StaticBackgroundMotionActivity extends DemoVideoDisplayActivity
-		implements AdapterView.OnItemSelectedListener, View.OnTouchListener
+public class StaticBackgroundMotionActivity extends DemoBitmapCamera2Activity
+		implements AdapterView.OnItemSelectedListener
 {
 
 	int selected;
@@ -52,8 +49,10 @@ public class StaticBackgroundMotionActivity extends DemoVideoDisplayActivity
 	SeekBar seek;
 	BackgroundModelStationary model;
 
-	// if true turn on picture-in-picture mode
-	boolean pip = true;
+	public StaticBackgroundMotionActivity() {
+		super(Resolution.LOW);
+		super.changeResolutionOnSlow = true;
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -62,20 +61,15 @@ public class StaticBackgroundMotionActivity extends DemoVideoDisplayActivity
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout) inflater.inflate(R.layout.background_controls, null);
 
-		LinearLayout parent = getViewContent();
-		parent.addView(controls);
 
-		FrameLayout iv = getViewPreview();
-		iv.setOnTouchListener(this);
-
-		Spinner spinnerView = (Spinner)controls.findViewById(R.id.spinner_algs);
+		Spinner spinnerView = controls.findViewById(R.id.spinner_algs);
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
 				R.array.background_models, android.R.layout.simple_spinner_item);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinnerView.setAdapter(adapter);
 		spinnerView.setOnItemSelectedListener(this);
 
-		seek = (SeekBar)controls.findViewById(R.id.slider_threshold);
+		seek = controls.findViewById(R.id.slider_threshold);
 
 		seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 			@Override
@@ -85,6 +79,8 @@ public class StaticBackgroundMotionActivity extends DemoVideoDisplayActivity
 					((BackgroundStationaryBasic)model).setThreshold(threshold);
 				} else if( model instanceof BackgroundStationaryGaussian ) {
 					((BackgroundStationaryGaussian)model).setThreshold(threshold);
+				} else if( model instanceof BackgroundStationaryGmm) {
+					((BackgroundStationaryGmm)model).setMaxDistance(threshold/10f);
 				}
 			}
 
@@ -94,18 +90,21 @@ public class StaticBackgroundMotionActivity extends DemoVideoDisplayActivity
 			@Override
 			public void onStopTrackingTouch(SeekBar seekBar) {}
 		});
+
+		setControls(controls);
+		super.activateTouchToShowInput();
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-		setBackground();
+		createNewProcessor();
 	}
 
 	@Override
 	public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id ) {
 		selected = pos;
-		setBackground();
+		createNewProcessor();
 	}
 
 	@Override
@@ -115,7 +114,8 @@ public class StaticBackgroundMotionActivity extends DemoVideoDisplayActivity
 		resetRequested = true;
 	}
 
-	private void setBackground() {
+	@Override
+	public void createNewProcessor() {
 		switch( selected ) {
 			case 0:
 			case 1:
@@ -137,6 +137,8 @@ public class StaticBackgroundMotionActivity extends DemoVideoDisplayActivity
 		configGaussian.initialVariance = 100;
 		configGaussian.minimumDifference = 2;
 
+		ConfigBackgroundGmm configGmm = new ConfigBackgroundGmm();
+
 		switch( selected ) {
 			case 0:
 				model = FactoryBackgroundModel.stationaryBasic(
@@ -155,6 +157,14 @@ public class StaticBackgroundMotionActivity extends DemoVideoDisplayActivity
 				model = FactoryBackgroundModel.stationaryGaussian(configGaussian, (ImageType)ImageType.il(3, ImageDataType.U8));
 				break;
 
+			case 4:
+				model = FactoryBackgroundModel.stationaryGmm(configGmm, ImageType.single(GrayU8.class));
+				break;
+
+			case 5:
+				model = FactoryBackgroundModel.stationaryGmm(configGmm, (ImageType)ImageType.il(3, ImageDataType.U8));
+				break;
+
 			default:
 				throw new RuntimeException("unknown selected");
 		}
@@ -162,16 +172,7 @@ public class StaticBackgroundMotionActivity extends DemoVideoDisplayActivity
 		setProcessing(new BackgroundProcessing(model));
 	}
 
-	@Override
-	public boolean onTouch(View v, MotionEvent event) {
-		if( MotionEvent.ACTION_DOWN == event.getActionMasked()) {
-			pip = !pip;
-			return true;
-		}
-		return false;
-	}
-
-	protected class BackgroundProcessing<T extends ImageBase<T>> extends VideoImageProcessing<T> {
+	protected class BackgroundProcessing<T extends ImageBase<T>> extends DemoProcessingAbstract<T> {
 		BackgroundModelStationary<T> model;
 
 		GrayU8 binary = new GrayU8(1,1);
@@ -184,53 +185,40 @@ public class StaticBackgroundMotionActivity extends DemoVideoDisplayActivity
 			super(model.getImageType());
 			this.model = model;
 			this.scaled = model.getImageType().createImage(1, 1);
-
 			this.work = GeneralizedImageOps.createSingleBand(model.getImageType().getDataType(),1,1);
 		}
 
 		@Override
-		protected void declareImages(int width, int height) {
-			super.declareImages(width, height);
-			binary.reshape(width, height);
-			work.reshape(width, height);
-			scaled.reshape(width/3,height/3);
+		public void initialize(int imageWidth, int imageHeight) {
+			binary.reshape(imageWidth, imageHeight);
+			work.reshape(imageWidth, imageHeight);
+			scaled.reshape(imageWidth/3,imageHeight/3);
 
 			shrink = new FDistort();
 		}
 
 		@Override
-		protected void process(T image, Bitmap output, byte[] storage) {
+		public void onDraw(Canvas canvas, Matrix imageToView) {
+			synchronized (bitmapLock) {
+				drawBitmap(canvas,imageToView);
+			}
+		}
+
+		@Override
+		public void process(T input) {
 			if( resetRequested ) {
 				resetRequested = false;
 				model.reset();
 				ImageMiscOps.fill(binary,0);
 			} else {
-				model.segment(image, binary);
-				model.updateBackground(image);
+				model.segment(input, binary);
+				model.updateBackground(input);
 			}
-
-			if( pip ) {
-
-				// shrink the input image
-				shrink.init(image,scaled).scaleExt();
-				shrink.apply();
-
-				// rescale the binary image so that it can be viewed
-				PixelMath.multiply(binary,255,binary);
-
-				// overwrite the original image with the binary one
-				GConvertImage.convert(binary, work);
-				// if the input image is color then it needs a gray scale image of the same type
-				GConvertImage.convert(work,image);
-
-				// render the shrunk image inside the original
-				int x0 = image.width  - scaled.width;
-				int y0 = image.height - scaled.height;
-
-				image.subimage(x0,y0,binary.width,binary.height).setTo(scaled);
-				ConvertBitmap.boofToBitmap(image,output,storage);
-			} else {
-				VisualizeImageData.binaryToBitmap(binary, false, output, storage);
+			synchronized (bitmapLock) {
+				if( showProcessed )
+					convertBinaryToBitmapDisplay(binary);
+				else
+					convertToBitmapDisplay(input);
 			}
 		}
 	}

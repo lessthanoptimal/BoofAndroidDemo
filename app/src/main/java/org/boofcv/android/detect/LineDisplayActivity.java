@@ -1,11 +1,10 @@
 package org.boofcv.android.detect;
 
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -14,9 +13,9 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
-import android.widget.TextView;
 
-import org.boofcv.android.DemoVideoDisplayActivity;
+import org.boofcv.android.DemoCamera2Activity;
+import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
 import org.ddogleg.struct.FastQueue;
 
@@ -25,8 +24,6 @@ import java.util.List;
 import boofcv.abst.feature.detect.line.DetectLine;
 import boofcv.abst.feature.detect.line.DetectLineSegment;
 import boofcv.alg.feature.detect.line.LineImageOps;
-import boofcv.android.ConvertBitmap;
-import boofcv.android.camera.VideoRenderProcessing;
 import boofcv.factory.feature.detect.line.ConfigHoughFoot;
 import boofcv.factory.feature.detect.line.ConfigHoughPolar;
 import boofcv.factory.feature.detect.line.FactoryDetectLineAlgs;
@@ -42,7 +39,7 @@ import georegression.struct.line.LineSegment2D_F32;
  *
  * @author Peter Abeles
  */
-public class LineDisplayActivity extends DemoVideoDisplayActivity
+public class LineDisplayActivity extends DemoCamera2Activity
 		implements AdapterView.OnItemSelectedListener {
 
 	Paint paint;
@@ -55,7 +52,13 @@ public class LineDisplayActivity extends DemoVideoDisplayActivity
 	// the number of lines its configured to detect
 	int numLines = 3;
 
-	public void onCreate(Bundle savedInstanceState) {
+	public LineDisplayActivity() {
+		super(Resolution.MEDIUM);
+		super.changeResolutionOnSlow = true;
+	}
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		paint = new Paint();
@@ -66,34 +69,29 @@ public class LineDisplayActivity extends DemoVideoDisplayActivity
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.detect_line_controls,null);
 
-		LinearLayout parent = getViewContent();
-		parent.addView(controls);
-
-		spinner = (Spinner)controls.findViewById(R.id.spinner_algs);
+		spinner = controls.findViewById(R.id.spinner_algs);
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
 				R.array.line_features, android.R.layout.simple_spinner_item);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinner.setAdapter(adapter);
 		spinner.setOnItemSelectedListener(this);
 
-		editLines = (EditText) controls.findViewById(R.id.num_lines);
+		editLines = controls.findViewById(R.id.num_lines);
 		editLines.setText("" + numLines);
 		editLines.setOnEditorActionListener(
-				new EditText.OnEditorActionListener() {
-					@Override
-					public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-						if ( actionId == EditorInfo.IME_ACTION_DONE ) {
-							checkUpdateLines();
-						}
-						return false; // pass on to other listeners.
-					}
-				});
+				(v, actionId, event) -> {
+                    if ( actionId == EditorInfo.IME_ACTION_DONE ) {
+                        checkUpdateLines();
+                    }
+                    return false; // pass on to other listeners.
+                });
 		// TODO This doesn't cover the back where the user dismisses the keyboard with the back button
+
+		setControls(controls);
 	}
 
 	@Override
-	protected void onResume() {
-		super.onResume();
+	public void createNewProcessor() {
 		setSelection( spinner.getSelectedItemPosition() );
 	}
 
@@ -163,14 +161,12 @@ public class LineDisplayActivity extends DemoVideoDisplayActivity
 	@Override
 	public void onNothingSelected(AdapterView<?> adapterView) {}
 
-	protected class LineProcessing extends VideoRenderProcessing<GrayU8> {
+	protected class LineProcessing extends DemoProcessingAbstract<GrayU8> {
 		DetectLine<GrayU8> detector;
 		DetectLineSegment<GrayU8> detectorSegment = null;
 
 		FastQueue<LineSegment2D_F32> lines = new FastQueue<LineSegment2D_F32>(LineSegment2D_F32.class,true);
 
-		Bitmap bitmap;
-		byte[] storage;
 
 		public LineProcessing(DetectLine<GrayU8> detector) {
 			super(ImageType.single(GrayU8.class));
@@ -182,21 +178,29 @@ public class LineDisplayActivity extends DemoVideoDisplayActivity
 			this.detectorSegment = detectorSegment;
 		}
 
+
 		@Override
-		protected void declareImages(int width, int height) {
-			super.declareImages(width, height);
-			bitmap = Bitmap.createBitmap(width,height,Bitmap.Config.ARGB_8888);
-			storage = ConvertBitmap.declareStorage(bitmap,storage);
+		public void initialize(int imageWidth, int imageHeight) {
+
 		}
 
 		@Override
-		protected void process(GrayU8 gray) {
+		public void onDraw(Canvas canvas, Matrix imageToView) {
+			canvas.setMatrix(imageToView);
+			synchronized (lockGui) {
+				for( LineSegment2D_F32 s : lines.toList() )  {
+					canvas.drawLine(s.a.x,s.a.y,s.b.x,s.b.y,paint);
+				}
+			}
+		}
+
+		@Override
+		public void process(GrayU8 gray) {
 
 			if( detector != null ) {
 				List<LineParametric2D_F32> found = detector.detect(gray);
 
 				synchronized ( lockGui ) {
-					ConvertBitmap.grayToBitmap(gray,bitmap,storage);
 					lines.reset();
 					for( LineParametric2D_F32 p : found ) {
 						LineSegment2D_F32 ls = LineImageOps.convert(p, gray.width,gray.height);
@@ -207,7 +211,6 @@ public class LineDisplayActivity extends DemoVideoDisplayActivity
 			} else {
 				List<LineSegment2D_F32> found = detectorSegment.detect(gray);
 				synchronized ( lockGui ) {
-					ConvertBitmap.grayToBitmap(gray,bitmap,storage);
 					lines.reset();
 					for( LineSegment2D_F32 p : found ) {
 						lines.grow().set(p.a,p.b);
@@ -216,13 +219,5 @@ public class LineDisplayActivity extends DemoVideoDisplayActivity
 			}
 		}
 
-		@Override
-		protected void render(Canvas canvas, double imageToOutput) {
-			canvas.drawBitmap(bitmap,0,0,null);
-
-			for( LineSegment2D_F32 s : lines.toList() )  {
-				canvas.drawLine(s.a.x,s.a.y,s.b.x,s.b.y,paint);
-			}
-		}
 	}
 }

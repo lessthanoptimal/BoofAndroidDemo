@@ -35,6 +35,8 @@
         <item>Basic: Color</item>
         <item>Gaussian: Grey</item>
         <item>Gaussian: Color</item>
+        <item>GMM: Grey</item>
+        <item>GMM: Color</item>
     </string-array>
 
     <string-array name="fiducials">
