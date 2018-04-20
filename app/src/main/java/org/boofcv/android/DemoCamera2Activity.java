@@ -7,6 +7,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.os.Bundle;
 import android.os.Looper;
@@ -112,6 +113,11 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
 
         FrameLayout surfaceLayout = findViewById(R.id.camera_frame_layout);
         startCamera(surfaceLayout,null);
+    }
+
+    @Override
+    protected boolean selectCamera( String cameraId , CameraCharacteristics characteristics) {
+        return cameraId.equals(DemoMain.preference.cameraId);
     }
 
     @Override

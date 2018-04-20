@@ -3,15 +3,21 @@ package org.boofcv.android;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.hardware.Camera;
+import android.graphics.ImageFormat;
+import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraCharacteristics;
+import android.hardware.camera2.CameraManager;
+import android.hardware.camera2.params.StreamConfigurationMap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.util.Size;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -55,6 +61,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,13 +75,14 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 
 	// contains information on all the cameras.  less error prone and easier to deal with
 	public static List<CameraSpecs> specs = new ArrayList<CameraSpecs>();
+
 	// specifies which camera to use an image size
 	public static DemoPreference preference;
 	// If another activity modifies the demo preferences this needs to be set to true so that it knows to reload
 	// camera parameters.
 	public static boolean changedPreferences = false;
 
-	List<Group> groups = new ArrayList<Group>();
+	List<Group> groups = new ArrayList<>();
 
 	boolean waitingCameraPermissions = true;
 
@@ -226,20 +234,33 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 					0);
 		} else {
 			waitingCameraPermissions = false;
-			int numberOfCameras = Camera.getNumberOfCameras();
-			for (int i = 0; i < numberOfCameras; i++) {
-				CameraSpecs c = new CameraSpecs();
-				specs.add(c);
 
-				Camera.getCameraInfo(i, c.info);
-				Camera camera = Camera.open(i);
-				Camera.Parameters params = camera.getParameters();
-				c.horizontalViewAngle = params.getHorizontalViewAngle();
-				c.verticalViewAngle = params.getVerticalViewAngle();
-				c.sizePreview.addAll(params.getSupportedPreviewSizes());
-				c.sizePicture.addAll(params.getSupportedPictureSizes());
-				camera.release();
-			}
+            CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+            if( manager == null )
+                throw new RuntimeException("No cameras?!");
+            try {
+                String[] cameras = manager.getCameraIdList();
+
+                for ( String cameraId : cameras ) {
+                    CameraSpecs c = new CameraSpecs();
+                    specs.add(c);
+                    c.deviceId = cameraId;
+                    CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
+                    Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
+                    c.facingBack = facing != null && facing==CameraCharacteristics.LENS_FACING_BACK;
+                    StreamConfigurationMap map = characteristics.
+                            get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+                    if (map == null) {
+                        continue;
+                    }
+                    Size[] sizes = map.getOutputSizes(ImageFormat.YUV_420_888);
+                    if( sizes == null )
+                        continue;
+                    c.sizes.addAll(Arrays.asList(sizes));
+                }
+            } catch (CameraAccessException e) {
+                throw new RuntimeException("No camera access??? Wasn't it just granted?");
+            }
 		}
 	}
 
@@ -275,12 +296,9 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		for (int i = 0; i < specs.size(); i++) {
 		    CameraSpecs c = specs.get(i);
 
-			if( c.info.facing == Camera.CameraInfo.CAMERA_FACING_BACK ) {
-				preference.cameraId = i;
+            preference.cameraId = c.deviceId;
+            if( c.facingBack) {
 				break;
-			} else {
-				// default to a front facing camera if a back facing one can't be found
-				preference.cameraId = i;
 			}
 		}
 
@@ -402,5 +420,14 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 			children.add(name);
 			actions.add(action);
 		}
+	}
+
+	public static CameraSpecs defaultCameraSpecs() {
+		for( int i = 0; i < specs.size(); i++ ) {
+			CameraSpecs s = specs.get(i);
+			if( s.deviceId.equals(preference.cameraId))
+				return s;
+		}
+		throw new RuntimeException("Can't find default camera");
 	}
 }

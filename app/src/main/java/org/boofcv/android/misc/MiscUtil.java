@@ -4,11 +4,9 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
 
-import org.boofcv.android.CameraSpecs;
 import org.boofcv.android.DemoMain;
 
 import boofcv.struct.calib.CameraPinholeRadial;
-import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Polygon2D_F64;
 
@@ -16,32 +14,6 @@ import georegression.struct.shapes.Polygon2D_F64;
  * @author Peter Abeles
  */
 public class MiscUtil {
-	/**
-	 * Either loads the current intrinsic parameters or makes one up from camera information
-	 * if it doesn't exist
-	 */
-	public static CameraPinholeRadial checkThenInventIntrinsic( int width , int height) {
-
-		CameraPinholeRadial intrinsic = DemoMain.preference.lookup(width, height);
-
-		// make sure the camera is calibrated first
-		if( intrinsic == null ) {
-			CameraSpecs specs = DemoMain.specs.get(DemoMain.preference.cameraId);
-
-			intrinsic = new CameraPinholeRadial();
-
-			double hfov = UtilAngle.degreeToRadian(specs.horizontalViewAngle);
-			double vfov = UtilAngle.degreeToRadian(specs.verticalViewAngle);
-
-			intrinsic.width = width; intrinsic.height = height;
-			intrinsic.cx = intrinsic.width/2;
-			intrinsic.cy = intrinsic.height/2;
-			intrinsic.fx = intrinsic.cx / Math.tan(hfov/2.0f);
-			intrinsic.fy = intrinsic.cy / Math.tan(vfov/2.0f);
-		}
-
-		return intrinsic;
-	}
 
 	public static CameraPinholeRadial checkThenInventIntrinsic( int width , int height ,
 																double hfov , double vfov) {

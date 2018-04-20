@@ -1,6 +1,6 @@
 package org.boofcv.android;
 
-import android.hardware.Camera;
+import android.util.Size;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,9 +11,7 @@ import java.util.List;
  * @author Peter Abeles
  */
 public class CameraSpecs {
-	public Camera.CameraInfo info = new Camera.CameraInfo();
-	public List<Camera.Size> sizePreview = new ArrayList<Camera.Size>();
-	public List<Camera.Size> sizePicture = new ArrayList<Camera.Size>();
-	public float horizontalViewAngle;
-	public float verticalViewAngle;
+	public String deviceId = "";
+	public boolean facingBack = false;
+	public List<Size> sizes = new ArrayList<>();
 }

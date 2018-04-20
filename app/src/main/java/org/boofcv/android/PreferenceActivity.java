@@ -1,7 +1,10 @@
 package org.boofcv.android;
 
 import android.app.Activity;
-import android.hardware.Camera;
+import android.content.Context;
+import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraCharacteristics;
+import android.hardware.camera2.CameraManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -28,6 +31,7 @@ public class PreferenceActivity extends Activity
 
 	DemoPreference preference;
 	List<CameraSpecs> specs;
+	String[] cameras;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -37,14 +41,22 @@ public class PreferenceActivity extends Activity
 		specs = DemoMain.specs;
 		preference = DemoMain.preference;
 
-		checkSpeed = (CheckBox) findViewById(R.id.checkbox_speed);
-		checkReduce = (CheckBox) findViewById(R.id.checkbox_reduce);
-		spinnerCamera = (Spinner) findViewById(R.id.spinner_camera);
+		checkSpeed = findViewById(R.id.checkbox_speed);
+		checkReduce = findViewById(R.id.checkbox_reduce);
+		spinnerCamera = findViewById(R.id.spinner_camera);
 
 		// finish setting up the GUI
-		setupCameraSpinner();
+		try {
+			setupCameraSpinner();
+		} catch (CameraAccessException e) {
+			e.printStackTrace();
+		}
 
-		spinnerCamera.setSelection(preference.cameraId);
+		if( preference.cameraId == null ) {
+			preference.cameraId = cameras[0];
+		}
+
+		spinnerCamera.setSelection(cameraNameToIndex(preference.cameraId));
 		checkSpeed.setChecked(preference.showSpeed);
 		checkReduce.setChecked(preference.autoReduce);
 
@@ -53,40 +65,42 @@ public class PreferenceActivity extends Activity
 		spinnerCamera.setOnItemSelectedListener(this);
 	}
 
-	private void setupCameraSpinner() {
-		// Find the total number of cameras available
-		int numberOfCameras = Camera.getNumberOfCameras();
-
+	private void setupCameraSpinner() throws CameraAccessException {
+		CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+		if( manager == null )
+			return;
 		// Find the ID of the default camera
 		ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_spinner_item);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-		Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
-		for (int i = 0; i < numberOfCameras; i++) {
-			Camera.getCameraInfo(i, cameraInfo);
-			if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-				adapter.add("Front "+i);
-			} else if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
-				adapter.add("Back "+i);
-			} else {
-				adapter.add("Unknown "+i);
-			}
+		cameras = manager.getCameraIdList();
+		for (int i = 0; i < cameras.length; i++ ) {
+			String cameraId = cameras[i];
+			CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
+			Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
+
+			adapter.add(CameraInformationActivity.facing(facing)+" "+cameraId);
 		}
 
 		spinnerCamera.setAdapter(adapter);
-		spinnerCamera.setSelection(preference.cameraId);
+		spinnerCamera.setSelection(cameraNameToIndex(preference.cameraId));
+	}
+
+	private int cameraNameToIndex( String name ) {
+		for (int i = 0; i < cameras.length; i++) {
+			if( cameras[i].equals(name))
+				return i;
+		}
+		throw new RuntimeException("Unknown camera "+name);
 	}
 
 
 	@Override
 	public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id ) {
-		CameraSpecs camera = specs.get( preference.cameraId );
-
 		if( spinnerCamera == adapterView ) {
 			Log.d("PreferenceActivity","onItemSelected camera");
 //			Toast.makeText(this,"spinner camera",2).show();
-
-			preference.cameraId = spinnerCamera.getSelectedItemPosition();
+			preference.cameraId = cameras[spinnerCamera.getSelectedItemPosition()];
 		} else {
 //			Toast.makeText(this,"spinner unknown",2).show();
 			Log.d("PreferenceActivity","onItemSelected unknown");

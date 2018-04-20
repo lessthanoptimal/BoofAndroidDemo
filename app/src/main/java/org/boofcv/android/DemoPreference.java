@@ -10,7 +10,7 @@ import boofcv.struct.calib.CameraPinholeRadial;
  */
 public class DemoPreference {
 	public final Object lock = new Object();
-	public int cameraId;
+	public String cameraId;
 	public boolean showSpeed;
 	public boolean autoReduce;
 	public List<CameraPinholeRadial> calibration = new ArrayList<>();
