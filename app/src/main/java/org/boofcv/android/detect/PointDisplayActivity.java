@@ -46,8 +46,6 @@ public class PointDisplayActivity extends DemoCamera2Activity
 	NonMaxSuppression nonmaxMinMax;
 	NonMaxSuppression nonmaxCandidate;
 
-	int active = -1;
-
 	public PointDisplayActivity() {
 		super(Resolution.MEDIUM);
 		super.changeResolutionOnSlow = true;
@@ -88,20 +86,15 @@ public class PointDisplayActivity extends DemoCamera2Activity
 
 	@Override
 	public void createNewProcessor() {
-		runOnUiThread(()-> setSelection( spinner.getSelectedItemPosition() ));
+		 setSelection( spinner.getSelectedItemPosition() );
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
-		active = -1;
 	}
 
 	private void setSelection( int which ) {
-		if( which == active )
-			return;
-		active = which;
-
 		GeneralFeatureIntensity<GrayU8, GrayS16> intensity;
 		NonMaxSuppression nonmax = nonmaxMax;
 

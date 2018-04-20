@@ -38,8 +38,6 @@ public class ScalePointDisplayActivity extends DemoCamera2Activity
 
 	Paint paintMax;
 
-	int active = -1;
-
 	public ScalePointDisplayActivity() {
 		super(Resolution.MEDIUM);
 		super.changeResolutionOnSlow = true;
@@ -72,20 +70,14 @@ public class ScalePointDisplayActivity extends DemoCamera2Activity
 
 	@Override
 	public void createNewProcessor() {
-		runOnUiThread(()-> setSelection( spinner.getSelectedItemPosition() ));
-	}
+		setSelection( spinner.getSelectedItemPosition() );	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
-		active = -1;
 	}
 
 	private void setSelection( int which ) {
-		if( which == active )
-			return;
-		active = which;
-
 		InterestPointDetector<GrayU8> detector;
 
 		switch( which ) {

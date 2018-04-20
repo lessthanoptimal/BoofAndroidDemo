@@ -110,6 +110,8 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
         DemoProcessing p = processor;
         if( p != null ) {
             p.initialize(width,height);
+        } else {
+            Log.i("Demo","  processor is null");
         }
     }
 
