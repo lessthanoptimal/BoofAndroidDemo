@@ -81,8 +81,8 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
         paintText.setStrokeWidth(3*displayMetrics.density);
         paintText.setTextSize(24*displayMetrics.density);
         paintText.setTextAlign(Paint.Align.LEFT);
-        paintText.setARGB(0xA0,0xFF,0,0);
-        paintText.setTypeface(Typeface.MONOSPACE);
+        paintText.setARGB(0xFF,0xFF,0,0);
+        paintText.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD));
     }
 
     /**
@@ -297,8 +297,8 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
 
         Locale local = Locale.getDefault();
         String line0 = String.format(local,"%dx%d",bitmap.getWidth(),bitmap.getHeight());
-        String line1 = String.format(local,"%6.1f (ms) Alg",processPeriod);
-        String line2 = String.format(local,"%6.1f (ms) Vis",renderPeriod);
+        String line1 = String.format(local,"%6.1fms Alg",processPeriod);
+        String line2 = String.format(local,"%6.1fms Vis",renderPeriod);
 
         float spaceH = 3*displayMetrics.density;
         paintText.getTextBounds(line0, 0, line0.length(), bounds0);
@@ -308,10 +308,10 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
         float width = Math.max(bounds0.width(),bounds1.width());
         width = Math.max(width,bounds2.width());
         float centerX = canvas.getWidth()/2;
-        float centerY = canvas.getHeight()/2;
+//        float centerY = canvas.getHeight()/2;
         float height = bounds0.height()+bounds1.height()+bounds2.height()+2*spaceH;
         float x0 = centerX-width/2 + (width-bounds0.width())/2;
-        float y0 = centerY-height/2;
+        float y0 = height/2;
         float y1 = y0 + bounds0.height() + spaceH;
         float y2 = y1 + bounds1.height() + spaceH;
 

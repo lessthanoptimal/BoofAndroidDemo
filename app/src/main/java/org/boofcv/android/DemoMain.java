@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
+import android.widget.Toolbar;
 
 import org.boofcv.android.assoc.AssociationActivity;
 import org.boofcv.android.calib.CalibrationActivity;
@@ -103,6 +104,9 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 
 		listView.setAdapter(expListAdapter);
 		listView.setOnChildClickListener(this);
+
+		Toolbar toolbar = findViewById(R.id.my_toolbar);
+		setActionBar(toolbar);
 	}
 
 	@Override

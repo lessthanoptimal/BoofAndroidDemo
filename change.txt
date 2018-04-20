@@ -21,6 +21,9 @@ Date: 2018
   * Touching the screen shows the input image
 - Added QR Code example
 
+TODO port all activities
+TODO update preferences
+TODO use camera2 for info dialog
 -------------------------------------------------
 Version 1.8.1
 Date: 2016-02-08
