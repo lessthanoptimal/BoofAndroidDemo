@@ -91,9 +91,7 @@
             android:screenOrientation="landscape" />
         <activity android:name=".ip.ImageTransformActivity"/>
         <activity android:name=".tracker.ObjectTrackerActivity"/>
-        <activity
-            android:name=".detect.ContourShapeFittingActivity"
-            android:screenOrientation="landscape" />
+        <activity android:name=".detect.ContourShapeFittingActivity"/>
         <activity android:name=".detect.CannyEdgeActivity"/>
         <activity android:name=".calib.UndistortDisplayActivity"/>
         <activity
