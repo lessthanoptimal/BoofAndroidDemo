@@ -10,9 +10,5 @@
         android:layout_height="0px"
         android:background="#000000"
         android:orientation="vertical">
-    <TextureView
-        android:id="@+id/texture"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
     </FrameLayout>
 </LinearLayout>

@@ -53,12 +53,8 @@
         <activity android:name=".detect.ScalePointDisplayActivity" />
         <activity android:name=".detect.LineDisplayActivity" />
         <activity android:name=".tracker.KltDisplayActivity"/>
-        <activity
-            android:name=".sfm.StabilizeDisplayActivity"
-            android:screenOrientation="landscape" />
-        <activity
-            android:name=".sfm.MosaicDisplayActivity"
-            android:screenOrientation="landscape" />
+        <activity android:name=".sfm.StabilizeDisplayActivity" />
+        <activity android:name=".sfm.MosaicDisplayActivity" />
         <activity
             android:name=".assoc.AssociationActivity"
             android:screenOrientation="landscape" />

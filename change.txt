@@ -7,7 +7,7 @@ Version 2.0
 Date: 2018
 
 - Updated to BoofCV v0.30
-- Ported many activities over to Camera2 API
+- Ported activities over to Camera2 API
 - Calibration
   * Moved calibration to an application public directory that can be accessed without rooting the phone
   * Supports all calibration target types
@@ -20,9 +20,11 @@ Date: 2018
 - Filter Activities
   * Touching the screen shows the input image
 - Added QR Code example
+- Added GMM to background
+- Mosaic and Stabilize
+  * Added SURF tracker option
 
 TODO port all activities
-TODO update preferences
 TODO use camera2 for info dialog
 -------------------------------------------------
 Version 1.8.1

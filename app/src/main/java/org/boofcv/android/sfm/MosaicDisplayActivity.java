@@ -3,32 +3,31 @@ package org.boofcv.android.sfm;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.ToggleButton;
 
-import org.boofcv.android.DemoVideoDisplayActivity;
+import org.boofcv.android.DemoCamera2Activity;
+import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
 import org.ddogleg.struct.FastQueue;
 
 import java.util.List;
 
-import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
-import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.abst.sfm.AccessPointTracks;
 import boofcv.abst.sfm.d2.ImageMotion2D;
 import boofcv.alg.sfm.d2.StitchingFromMotion2D;
 import boofcv.android.ConvertBitmap;
-import boofcv.android.camera.VideoRenderProcessing;
-import boofcv.factory.feature.tracker.FactoryPointTracker;
-import boofcv.factory.sfm.FactoryMotion2D;
 import boofcv.misc.BoofMiscOps;
-import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import georegression.struct.affine.Affine2D_F64;
@@ -36,53 +35,81 @@ import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.transform.homography.HomographyPointOps_F64;
 
+import static org.boofcv.android.sfm.StabilizeDisplayActivity.createStabilization;
+
 /**
  * Displays an image mosaic created from the video stream.
  *
  * @author Peter Abeles
  */
-public class MosaicDisplayActivity extends DemoVideoDisplayActivity
+public class MosaicDisplayActivity extends DemoCamera2Activity
 implements CompoundButton.OnCheckedChangeListener
 {
 
-	Paint paintInlier;
-	Paint paintOutlier;
+	Paint paintBorder=new Paint();
+	Paint paintInlier=new Paint();
+	Paint paintOutlier=new Paint();
 
 	boolean showFeatures;
 	boolean resetRequested;
 	boolean paused = false;
 
+	int outputWidth,outputHeight;
+
+	Spinner spinnerView;
+
+	public MosaicDisplayActivity() {
+		super(Resolution.R320x240);
+		super.showBitmap = false;
+	}
+
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		paintInlier = new Paint();
-		paintInlier.setColor(Color.RED);
+		paintInlier.setColor(Color.GREEN);
 		paintInlier.setStyle(Paint.Style.FILL);
-		paintOutlier = new Paint();
-		paintOutlier.setColor(Color.BLUE);
+		paintOutlier.setColor(Color.RED);
 		paintOutlier.setStyle(Paint.Style.FILL);
+		paintBorder.setColor(Color.CYAN);
+		paintBorder.setStyle(Paint.Style.STROKE);
 
 		resetRequested = false;
 
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.mosaic_controls,null);
 
-		LinearLayout parent = getViewContent();
-		parent.addView(controls);
+		spinnerView = controls.findViewById(R.id.spinner_algs);
+		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+				R.array.trackers_stabilize, android.R.layout.simple_spinner_item);
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		spinnerView.setAdapter(adapter);
+		spinnerView.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+				createNewProcessor();
+			}
 
-		CheckBox seek = (CheckBox)controls.findViewById(R.id.check_features);
+			@Override
+			public void onNothingSelected(AdapterView<?> adapterView) {}
+		});
+
+		CheckBox seek = controls.findViewById(R.id.check_features);
 		seek.setOnCheckedChangeListener(this);
+
+		setControls(controls);
+		// set the background color so the mosaic's boundary can be seen easier
+		displayView.setBackgroundColor(Color.DKGRAY);
 	}
 
 	@Override
-	protected void onResume() {
-		super.onResume();
-		StitchingFromMotion2D<GrayU8,Affine2D_F64> distortAlg = createStabilization();
+	public void createNewProcessor() {
+		StitchingFromMotion2D<GrayU8,Affine2D_F64> distortAlg =
+				createStabilization(spinnerView.getSelectedItemPosition());
 		setProcessing(new PointProcessing(distortAlg));
 	}
 
-	public void resetPressed( View view ) {
+	public void resetPressed(View view ) {
 		resetRequested = true;
 	}
 
@@ -90,34 +117,15 @@ implements CompoundButton.OnCheckedChangeListener
 		paused = !((ToggleButton)view).isChecked();
 	}
 
-	private StitchingFromMotion2D<GrayU8,Affine2D_F64> createStabilization() {
-
-		ConfigGeneralDetector config = new ConfigGeneralDetector();
-		config.maxFeatures = 150;
-		config.threshold = 40;
-		config.radius = 3;
-
-		PointTracker<GrayU8> tracker = FactoryPointTracker.
-				klt(new int[]{1, 2,4}, config, 3, GrayU8.class, GrayS16.class);
-
-		ImageMotion2D<GrayU8,Affine2D_F64> motion = FactoryMotion2D.createMotion2D(100, 1.5, 2, 40,
-				0.5, 0.6, false,tracker, new Affine2D_F64());
-
-		return FactoryMotion2D.createVideoStitch(0.2,motion, ImageType.single(GrayU8.class));
-	}
-
 	@Override
 	public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
 		showFeatures = b;
 	}
 
-	protected class PointProcessing extends VideoRenderProcessing<GrayU8> {
+	protected class PointProcessing extends DemoProcessingAbstract<GrayU8> {
 		StitchingFromMotion2D<GrayU8,Affine2D_F64> alg;
 		Homography2D_F64 imageToDistorted = new Homography2D_F64();
 		Homography2D_F64 distortedToImage = new Homography2D_F64();
-
-		Bitmap bitmap;
-		byte[] storage;
 
 		StitchingFromMotion2D.Corners corners = new StitchingFromMotion2D.Corners();
 		Point2D_F64 distPt = new Point2D_F64();
@@ -125,39 +133,86 @@ implements CompoundButton.OnCheckedChangeListener
 		FastQueue<Point2D_F64> inliersGui = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
 		FastQueue<Point2D_F64> outliersGui = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
 
+		float radius;
+
 		public PointProcessing( StitchingFromMotion2D<GrayU8,Affine2D_F64> alg  ) {
 			super(ImageType.single(GrayU8.class));
 			this.alg = alg;
 		}
 
 		@Override
-		protected void declareImages(int width, int height) {
-			super.declareImages(width, height);
+		public void initialize(int imageWidth, int imageHeight) {
 
-			outputWidth = width*2;
-			outputHeight = height;
+			outputWidth = imageWidth*2;
+			outputHeight = imageHeight*2;
+			synchronized (bitmapLock) {
+				bitmap = Bitmap.createBitmap(outputWidth, outputHeight, Bitmap.Config.ARGB_8888);
+				bitmapTmp = ConvertBitmap.declareStorage(bitmap,bitmapTmp);
+			}
 
-			int tx = outputWidth/2 - width/4;
-			int ty = outputHeight/2 - height/4;
+			int rotation = getWindowManager().getDefaultDisplay().getRotation();
+			videoToDisplayMartix(outputWidth, outputHeight,mSensorOrientation,
+					viewWidth,viewHeight,rotation*90, stretchToFill,imageToView);
+
+			int tx = outputWidth/2 - imageWidth/4;
+			int ty = outputHeight/2 - imageHeight/4;
 
 			Affine2D_F64 init = new Affine2D_F64(0.5,0,0,0.5,tx,ty);
 			init = init.invert(null);
 
 			alg.configure(outputWidth,outputHeight,init);
-			bitmap = Bitmap.createBitmap(outputWidth, outputHeight, Bitmap.Config.ARGB_8888);
-			storage = ConvertBitmap.declareStorage(bitmap, storage);
+
+			float density = screenDensityAdjusted();
+			radius = 3*density;
+			paintBorder.setStrokeWidth(8*density);
+
 		}
 
 		@Override
-		protected void process(GrayU8 gray) {
+		public void onDraw(Canvas canvas, Matrix imageToView) {
+			synchronized (bitmapLock) {
+				canvas.drawBitmap(bitmap,imageToView,null);
+			}
+
+			if( !showFeatures )
+				return;
+
+			canvas.setMatrix(imageToView);
+			synchronized (lockGui) {
+				Point2D_F64 p0 = corners.p0;
+				Point2D_F64 p1 = corners.p1;
+				Point2D_F64 p2 = corners.p2;
+				Point2D_F64 p3 = corners.p3;
+
+				canvas.drawLine((int) p0.x, (int) p0.y, (int) p1.x, (int) p1.y, paintBorder);
+				canvas.drawLine((int) p1.x, (int) p1.y, (int) p2.x, (int) p2.y, paintBorder);
+				canvas.drawLine((int) p2.x, (int) p2.y, (int) p3.x, (int) p3.y, paintBorder);
+				canvas.drawLine((int) p3.x, (int) p3.y, (int) p0.x, (int) p0.y, paintBorder);
+
+				for (int i = 0; i < inliersGui.size; i++) {
+					Point2D_F64 p = inliersGui.get(i);
+					canvas.drawCircle((float) p.x, (float) p.y, radius, paintInlier);
+				}
+				for (int i = 0; i < outliersGui.size; i++) {
+					Point2D_F64 p = outliersGui.get(i);
+					canvas.drawCircle((float) p.x, (float) p.y, radius, paintOutlier);
+				}
+			}
+		}
+
+		@Override
+		public void process(GrayU8 gray) {
 			if(paused)
 				return;
 
 			if( !resetRequested && alg.process(gray) ) {
 				GrayU8 stitched = alg.getStitchedImage();
 
+				synchronized (bitmapLock) {
+					ConvertBitmap.grayToBitmap(stitched,bitmap,bitmapTmp);
+				}
+
 				synchronized ( lockGui ) {
-					ConvertBitmap.grayToBitmap(stitched,bitmap,storage);
 
 					ImageMotion2D<?,?> motion = alg.getMotion();
 					if( showFeatures && (motion instanceof AccessPointTracks) ) {
@@ -190,36 +245,11 @@ implements CompoundButton.OnCheckedChangeListener
 					alg.setOriginToCurrent();
 				}
 
-
-
 			} else {
 				resetRequested = false;
 				alg.reset();
 			}
 		}
 
-		@Override
-		protected void render(Canvas canvas, double imageToOutput) {
-			canvas.drawBitmap(bitmap,0,0,null);
-
-			Point2D_F64 p0 = corners.p0;
-			Point2D_F64 p1 = corners.p1;
-			Point2D_F64 p2 = corners.p2;
-			Point2D_F64 p3 = corners.p3;
-
-			canvas.drawLine((int)p0.x,(int)p0.y,(int)p1.x,(int)p1.y, paintInlier);
-			canvas.drawLine((int)p1.x,(int)p1.y,(int)p2.x,(int)p2.y, paintInlier);
-			canvas.drawLine((int)p2.x,(int)p2.y,(int)p3.x,(int)p3.y, paintInlier);
-			canvas.drawLine((int)p3.x,(int)p3.y,(int)p0.x,(int)p0.y, paintInlier);
-
-			for( int i = 0; i < inliersGui.size; i++ ) {
-				Point2D_F64 p = inliersGui.get(i);
-				canvas.drawCircle((float)p.x,(float)p.y,3,paintInlier);
-			}
-			for( int i = 0; i < outliersGui.size; i++ ) {
-				Point2D_F64 p = outliersGui.get(i);
-				canvas.drawCircle((float)p.x,(float)p.y,3,paintOutlier);
-			}
-		}
 	}
 }

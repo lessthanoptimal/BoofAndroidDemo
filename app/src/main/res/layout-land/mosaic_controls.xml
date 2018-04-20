@@ -25,4 +25,13 @@
 			android:text="Features"
 			android:id="@+id/check_features" android:layout_gravity="center"/>
 
+	<ToggleButton
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:checked="true"
+			android:textOn="Running"
+			android:textOff="Paused"
+			android:onClick="pausedPressed"
+			android:id="@+id/toggle_pause" android:layout_gravity="center"/>
+
 </LinearLayout>
