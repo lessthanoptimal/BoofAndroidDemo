@@ -50,9 +50,7 @@
         <activity android:name=".ip.GradientDisplayActivity"/>
         <activity android:name=".ip.BinaryDisplayActivity"/>
         <activity android:name=".detect.PointDisplayActivity" />
-        <activity
-            android:name=".detect.ScalePointDisplayActivity"
-            android:screenOrientation="landscape" />
+        <activity android:name=".detect.ScalePointDisplayActivity" />
         <activity
             android:name=".detect.LineDisplayActivity"
             android:screenOrientation="landscape" />

@@ -88,7 +88,7 @@ public class PointDisplayActivity extends DemoCamera2Activity
 
 	@Override
 	public void createNewProcessor() {
-		setSelection( spinner.getSelectedItemPosition() );
+		runOnUiThread(()-> setSelection( spinner.getSelectedItemPosition() ));
 	}
 
 	@Override
