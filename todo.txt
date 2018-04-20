@@ -1,8 +1,5 @@
-- TODO Reduce resolution when running on slower devices automatically
 - TODO Let user manually select resolution
-- TODO Show FPS in camera2 activities
 - TODO Add distort MLS example
-- TODO Add QR Code detector example
 - TODO Add equirectangular to pinhole viewer
   * Provide example image.
 

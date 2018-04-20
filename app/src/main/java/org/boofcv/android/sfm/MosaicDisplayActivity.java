@@ -151,7 +151,7 @@ implements CompoundButton.OnCheckedChangeListener
 			}
 
 			int rotation = getWindowManager().getDefaultDisplay().getRotation();
-			videoToDisplayMartix(outputWidth, outputHeight,mSensorOrientation,
+			videoToDisplayMatrix(outputWidth, outputHeight,mSensorOrientation,
 					viewWidth,viewHeight,rotation*90, stretchToFill,imageToView);
 
 			int tx = outputWidth/2 - imageWidth/4;

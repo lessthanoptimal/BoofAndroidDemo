@@ -8,6 +8,7 @@ import android.graphics.Path;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -30,6 +31,7 @@ import boofcv.alg.filter.binary.ThresholdImageOps;
 import boofcv.alg.shapes.FitData;
 import boofcv.alg.shapes.ShapeFittingOps;
 import boofcv.alg.shapes.polyline.splitmerge.PolylineSplitMerge;
+import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.image.GrayS32;
@@ -51,6 +53,7 @@ public class ContourShapeFittingActivity extends DemoBitmapCamera2Activity
 	Spinner spinnerView;
 
 	volatile boolean down;
+	volatile boolean showBinary=true;
 
 	public ContourShapeFittingActivity() {
 		super(Resolution.MEDIUM);
@@ -77,6 +80,15 @@ public class ContourShapeFittingActivity extends DemoBitmapCamera2Activity
 		toggle.setOnCheckedChangeListener((buttonView, isChecked) -> down = isChecked);
 
 		setControls(controls);
+		displayView.setOnTouchListener((view, event) -> {
+			switch( event.getActionMasked() ) {
+				case MotionEvent.ACTION_DOWN:showBinary=false;break;
+				case MotionEvent.ACTION_UP:showBinary=true;break;
+				default:return false;
+			}
+            return true;
+
+        });
 	}
 
 	@Override
@@ -123,6 +135,7 @@ public class ContourShapeFittingActivity extends DemoBitmapCamera2Activity
 		protected abstract void fitShape( List<Point2D_I32> contour );
 
 		protected abstract void resetShapes();
+		protected abstract void finalizeShapes();
 
 		@Override
 		public void initialize(int imageWidth, int imageHeight) {
@@ -148,40 +161,54 @@ public class ContourShapeFittingActivity extends DemoBitmapCamera2Activity
 
 			// draw binary image for output
 			synchronized (bitmapLock) {
-				VisualizeImageData.binaryToBitmap(filtered1, false, bitmap, bitmapTmp);
+				if( showBinary ) {
+					VisualizeImageData.binaryToBitmap(filtered1, false, bitmap, bitmapTmp);
+				} else {
+					ConvertBitmap.boofToBitmap(input,bitmap,bitmapTmp);
+				}
 			}
 
 			// draw the ellipses
 			findContours.process(filtered1,contourOutput);
 			List<Contour> contours = BinaryImageOps.contour(filtered1, ConnectRule.EIGHT,null);
 
-			synchronized (lockGui) {
-				resetShapes();
-				for (Contour contour : contours) {
-					List<Point2D_I32> points = contour.external;
-					if (points.size() < 20)
-						continue;
+			resetShapes();
+			for (Contour contour : contours) {
+				List<Point2D_I32> points = contour.external;
+				if (points.size() < 20)
+					continue;
 
-					fitShape(points);
-				}
+				fitShape(points);
 			}
+			finalizeShapes();
 		}
 	}
 
 	protected class EllipseProcessing extends BaseProcessing {
 
 		final FitData<EllipseRotated_F64> ellipseStorage = new FitData<>(new EllipseRotated_F64());
-		final FastQueue<EllipseRotated_F64> ellipses = new FastQueue<>(EllipseRotated_F64.class,true);
+		final FastQueue<EllipseRotated_F64> ellipsesVis = new FastQueue<>(EllipseRotated_F64.class,true);
+		final FastQueue<EllipseRotated_F64> ellipsesWork = new FastQueue<>(EllipseRotated_F64.class,true);
 
 		@Override
 		protected void fitShape(List<Point2D_I32> contour) {
 			ShapeFittingOps.fitEllipse_I32(contour, 0, false, ellipseStorage);
-			ellipses.grow().set(ellipseStorage.shape);
+			ellipsesWork.grow().set(ellipseStorage.shape);
 		}
 
 		@Override
 		protected void resetShapes() {
-			ellipses.reset();
+			ellipsesWork.reset();
+		}
+
+		@Override
+		protected void finalizeShapes() {
+			synchronized (lockGui) {
+				ellipsesVis.reset();
+				for (int i = 0; i < ellipsesWork.size; i++) {
+					ellipsesVis.grow().set(ellipsesWork.get(i));
+				}
+			}
 		}
 
 		@Override
@@ -189,8 +216,8 @@ public class ContourShapeFittingActivity extends DemoBitmapCamera2Activity
 			drawBitmap(canvas,imageToView);
 			canvas.setMatrix(imageToView);
 			synchronized (lockGui) {
-				for( int i = 0; i < ellipses.size; i++ ) {
-					EllipseRotated_F64 ellipse = ellipses.get(i);
+				for(int i = 0; i < ellipsesVis.size; i++ ) {
+					EllipseRotated_F64 ellipse = ellipsesVis.get(i);
 					float phi = (float) UtilAngle.radianToDegree(ellipse.phi);
 					float cx = (float) ellipse.center.x;
 					float cy = (float) ellipse.center.y;
@@ -215,7 +242,8 @@ public class ContourShapeFittingActivity extends DemoBitmapCamera2Activity
 
 		PolylineSplitMerge alg = new PolylineSplitMerge();
 
-		final FastQueue<Polygon2D_I32> polygons = new FastQueue<>(Polygon2D_I32.class,true);
+		final FastQueue<Polygon2D_I32> workPoly = new FastQueue<>(Polygon2D_I32.class,true);
+		final FastQueue<Polygon2D_I32> visPoly = new FastQueue<>(Polygon2D_I32.class,true);
 		Path path = new Path();
 
 		public PolygonProcessing() {
@@ -230,17 +258,27 @@ public class ContourShapeFittingActivity extends DemoBitmapCamera2Activity
 			if( !alg.process(contour) )
 				return;
 			PolylineSplitMerge.CandidatePolyline best = alg.getBestPolyline();
-			Polygon2D_I32 poly = polygons.grow();
+			Polygon2D_I32 poly = workPoly.grow();
 			poly.vertexes.resize(best.splits.size);
 			for (int i = 0; i < best.splits.size; i++) {
 				Point2D_I32 p = contour.get(best.splits.get(i));
-				poly.vertexes.get(i).set(p);
+				poly.get(i).set(p);
 			}
 		}
 
 		@Override
 		protected void resetShapes() {
-			polygons.reset();
+			workPoly.reset();
+		}
+
+		@Override
+		protected void finalizeShapes() {
+			synchronized (lockGui) {
+				visPoly.reset();
+				for (int i = 0; i < workPoly.size; i++) {
+					visPoly.grow().set(workPoly.get(i));
+				}
+			}
 		}
 
 		@Override
@@ -248,11 +286,11 @@ public class ContourShapeFittingActivity extends DemoBitmapCamera2Activity
 			drawBitmap(canvas,imageToView);
 			canvas.setMatrix(imageToView);
 			synchronized (lockGui) {
-				for( int i = 0; i < polygons.size; i++ ) {
-					Polygon2D_I32 poly = polygons.get(i);
+				for( int i = 0; i < visPoly.size; i++ ) {
+					Polygon2D_I32 poly = visPoly.get(i);
 					path.reset();
 					for (int j = 0; j < poly.size(); j++) {
-						Point2D_I32 p = poly.vertexes.get(j);
+						Point2D_I32 p = poly.get(j);
 						if(j ==0)
 							path.moveTo(p.x,p.y);
 						else

@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -29,6 +30,7 @@ import org.boofcv.android.detect.DetectBlackPolygonActivity;
 import org.boofcv.android.detect.LineDisplayActivity;
 import org.boofcv.android.detect.PointDisplayActivity;
 import org.boofcv.android.detect.ScalePointDisplayActivity;
+import org.boofcv.android.detect.SegmentationDisplayActivity;
 import org.boofcv.android.ip.BinaryDisplayActivity;
 import org.boofcv.android.ip.BlurDisplayActivity;
 import org.boofcv.android.ip.EnhanceDisplayActivity;
@@ -76,7 +78,6 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 
 	boolean waitingCameraPermissions = true;
 
-
 	/**
 	 * Called when the activity is first created.
 	 */
@@ -123,6 +124,10 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		}
 	}
 
+	public void pressedWebsite( View view ) {
+		Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://boofcv.org"));
+		startActivity(browserIntent);
+	}
 
 	private void createGroups() {
 		Group ip = new Group("Image Processing");
@@ -148,7 +153,7 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		detect.addChild("Black Polygon",DetectBlackPolygonActivity.class);
 		detect.addChild("Black Ellipse",DetectBlackEllipseActivity.class);
 		// segmentation is just too slow right now
-//		detect.addChild("Segmentation",SegmentationDisplayActivity.class);
+		detect.addChild("Segmentation",SegmentationDisplayActivity.class);
 
 		assoc.addChild("Two Pictures",AssociationActivity.class);
 

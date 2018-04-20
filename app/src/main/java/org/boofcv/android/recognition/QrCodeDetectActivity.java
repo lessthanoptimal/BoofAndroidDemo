@@ -36,7 +36,7 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
     // Switches what information is displayed
     Mode mode = Mode.NORMAL;
     // Does it render failed detections too?
-    boolean showFailures = true;
+    boolean showFailures = false;
 
     // Where the number of unique messages are listed
     TextView textUnqiueCount;
@@ -58,6 +58,7 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
         LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.qrcode_detect_controls,null);
 
         final ToggleButton toggle = controls.findViewById(R.id.show_failures);
+        toggle.setChecked(showFailures);
         toggle.setOnCheckedChangeListener((buttonView, isChecked) -> showFailures = isChecked);
 
         textUnqiueCount = controls.findViewById(R.id.total_unique);

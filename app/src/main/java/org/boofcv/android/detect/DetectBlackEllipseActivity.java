@@ -75,7 +75,7 @@ public class DetectBlackEllipseActivity extends DemoBitmapCamera2Activity
 		LinearLayout controls = (LinearLayout) inflater.inflate(R.layout.detect_black_ellipse_controls, null);
 
 
-		spinnerThresholder = (Spinner) controls.findViewById(R.id.spinner_algs);
+		spinnerThresholder = controls.findViewById(R.id.spinner_algs);
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
 				R.array.threshold_styles, android.R.layout.simple_spinner_item);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

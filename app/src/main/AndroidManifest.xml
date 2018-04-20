@@ -81,9 +81,7 @@
         <activity android:name=".detect.ContourShapeFittingActivity"/>
         <activity android:name=".detect.CannyEdgeActivity"/>
         <activity android:name=".calib.UndistortDisplayActivity"/>
-        <activity
-            android:name=".detect.SegmentationDisplayActivity"
-            android:screenOrientation="landscape" />
+        <activity android:name=".detect.SegmentationDisplayActivity"/>
         <activity android:name=".ip.ThresholdDisplayActivity"/>
         <activity android:name=".recognition.FiducialSquareBinaryActivity"/>
         <activity android:name=".recognition.FiducialSquareBinaryHelpActivity" />

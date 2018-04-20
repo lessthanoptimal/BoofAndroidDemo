@@ -44,7 +44,10 @@ public class QrCodeListActivity extends AppCompatActivity {
         synchronized (uniqueLock) {
             for (QrCode qr : QrCodeDetectActivity.unique.values()) {
                 qrcodes.add(qr);
-                listItems.add("Detected: " + qr.message);
+                // filter out bad characters and new lines
+                String message = qr.message.replaceAll("\\p{C}", " ");
+                int N = Math.min(25,message.length());
+                listItems.add(String.format("%4d: %25s",qr.message.length(),message.substring(0,N)));
             }
         }
 
@@ -77,6 +80,13 @@ public class QrCodeListActivity extends AppCompatActivity {
             clipboard.setPrimaryClip(clip);
             Toast.makeText(this, "Copied "+message.length()+" characters", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public void pressedClearList( View view ) {
+        synchronized (uniqueLock) {
+            QrCodeDetectActivity.unique.clear();
+        }
+        recreate();
     }
 
 }

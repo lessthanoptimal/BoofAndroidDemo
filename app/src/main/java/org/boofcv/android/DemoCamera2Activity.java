@@ -82,7 +82,7 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
         paintText.setStrokeWidth(3*displayMetrics.density);
         paintText.setTextSize(24*displayMetrics.density);
         paintText.setTextAlign(Paint.Align.LEFT);
-        paintText.setARGB(0xFF,0xFF,0,0);
+        paintText.setARGB(0xFF,0xFF,0xB0,0);
         paintText.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD));
     }
 

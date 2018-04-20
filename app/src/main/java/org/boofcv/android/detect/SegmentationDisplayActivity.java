@@ -1,6 +1,7 @@
 package org.boofcv.android.detect;
 
-import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.os.Bundle;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
@@ -8,12 +9,12 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import org.boofcv.android.DemoVideoDisplayActivity;
+import org.boofcv.android.DemoBitmapCamera2Activity;
+import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
@@ -23,7 +24,6 @@ import boofcv.alg.segmentation.ComputeRegionMeanColor;
 import boofcv.alg.segmentation.ImageSegmentationOps;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
-import boofcv.android.camera.VideoImageProcessing;
 import boofcv.factory.segmentation.ConfigSlic;
 import boofcv.factory.segmentation.FactoryImageSegmentation;
 import boofcv.factory.segmentation.FactorySegmentationAlg;
@@ -38,7 +38,7 @@ import boofcv.struct.image.Planar;
  *
  * @author Peter Abeles
  */
-public class SegmentationDisplayActivity extends DemoVideoDisplayActivity
+public class SegmentationDisplayActivity extends DemoBitmapCamera2Activity
 		implements AdapterView.OnItemSelectedListener
 {
 
@@ -49,6 +49,10 @@ public class SegmentationDisplayActivity extends DemoVideoDisplayActivity
 
 	private GestureDetector mDetector;
 
+	public SegmentationDisplayActivity() {
+		super(Resolution.MEDIUM);
+	}
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -56,32 +60,26 @@ public class SegmentationDisplayActivity extends DemoVideoDisplayActivity
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.select_algorithm,null);
 
-		LinearLayout parent = getViewContent();
-		parent.addView(controls);
+		setControls(controls);
 
-		spinnerView = (Spinner)controls.findViewById(R.id.spinner_algs);
+		spinnerView = controls.findViewById(R.id.spinner_algs);
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
 				R.array.segmentation_algs, android.R.layout.simple_spinner_item);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinnerView.setAdapter(adapter);
 		spinnerView.setOnItemSelectedListener(this);
 
-		FrameLayout iv = getViewPreview();
-		mDetector = new GestureDetector(this, new MyGestureDetector(iv));
-		iv.setOnTouchListener(new View.OnTouchListener(){
-			@Override
-			public boolean onTouch(View v, MotionEvent event)
-			{
-				mDetector.onTouchEvent(event);
-				return true;
-			}});
+		mDetector = new GestureDetector(this, new MyGestureDetector(displayView));
+		displayView.setOnTouchListener((v, event) -> {
+            mDetector.onTouchEvent(event);
+            return true;
+        });
 
 		Toast.makeText(this,"FAST DEVICES ONLY! Can take minutes.",Toast.LENGTH_LONG).show();
 	}
 
 	@Override
-	protected void onResume() {
-		super.onResume();
+	public void createNewProcessor() {
 		startSegmentProcess(spinnerView.getSelectedItemPosition());
 	}
 
@@ -141,7 +139,7 @@ public class SegmentationDisplayActivity extends DemoVideoDisplayActivity
 		}
 	}
 
-	protected class SegmentationProcessing extends VideoImageProcessing<Planar<GrayU8>> {
+	protected class SegmentationProcessing extends DemoProcessingAbstract<Planar<GrayU8>> {
 		GrayS32 pixelToRegion;
 		ImageSuperpixels<Planar<GrayU8>> segmentation;
 		Planar<GrayU8> background;
@@ -157,17 +155,18 @@ public class SegmentationDisplayActivity extends DemoVideoDisplayActivity
 		}
 
 		@Override
-		protected void declareImages( int width , int height ) {
-			super.declareImages(width, height);
-
-			pixelToRegion = new GrayS32(width,height);
-			background = new Planar<GrayU8>(GrayU8.class,width,height,3);
+		public void initialize(int imageWidth, int imageHeight) {
+			pixelToRegion = new GrayS32(imageWidth,imageHeight);
+			background = new Planar<>(GrayU8.class, imageWidth, imageHeight, 3);
 		}
 
 		@Override
-		protected void process(Planar<GrayU8> input, Bitmap output, byte[] storage) {
+		public void onDraw(Canvas canvas, Matrix imageToView) {
+			drawBitmap(canvas,imageToView);
+		}
 
-			// TODO if the user tries to exit while computing a segmentation things get weird
+		@Override
+		public void process(Planar<GrayU8> input) {
 			if( mode != Mode.VIEW_VIDEO ) {
 				if( !hasSegment ) {
 					// save the current image
@@ -189,17 +188,21 @@ public class SegmentationDisplayActivity extends DemoVideoDisplayActivity
 
 					hideProgressDialog();
 				}
-				VisualizeImageData.regionsColor(pixelToRegion, segmentColor, output, storage);
-				if( mode == Mode.VIEW_LINES ) {
-					VisualizeImageData.regionBorders(pixelToRegion, 0xFF0000, output, storage);
+				synchronized (bitmapLock) {
+					VisualizeImageData.regionsColor(pixelToRegion, segmentColor, bitmap, bitmapTmp);
+					if (mode == Mode.VIEW_LINES) {
+						VisualizeImageData.regionBorders(pixelToRegion, 0xFF0000, bitmap, bitmapTmp);
+					}
 				}
 			} else {
-				ConvertBitmap.planarToBitmap(input,output,storage);
+				synchronized (bitmapLock) {
+					ConvertBitmap.planarToBitmap(input, bitmap, bitmapTmp);
+				}
 			}
 		}
 	}
 
-	static enum Mode {
+	enum Mode {
 		VIEW_VIDEO,
 		VIEW_MEAN,
 		VIEW_LINES

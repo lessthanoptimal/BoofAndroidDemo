@@ -16,7 +16,18 @@
 		android:paddingLeft="16dp"
 		android:paddingRight="16dp"
 		android:layout_width="fill_parent"
-		android:layout_height="fill_parent"
+		android:layout_height="0dp"
+		android:layout_weight="1"
 		android:id="@+id/DemoListView" android:layout_gravity="center"/>
+
+	<ImageButton
+		android:layout_width="wrap_content"
+		android:layout_height="40dp"
+		android:src="@drawable/boofcv_logo"
+		android:scaleType="fitCenter"
+		android:adjustViewBounds="true"
+		android:background="@drawable/roundedcorners"
+		android:onClick="pressedWebsite"
+		android:layout_gravity="center"/>
 </LinearLayout>
 

@@ -55,7 +55,8 @@ implements CompoundButton.OnCheckedChangeListener
 	Spinner spinnerView;
 
 	public StabilizeDisplayActivity() {
-		super(Resolution.R320x240);
+		super(Resolution.LOW);
+		super.changeResolutionOnSlow = true;
 	}
 
 	@Override
