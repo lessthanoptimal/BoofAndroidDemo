@@ -8,8 +8,14 @@
 	<CheckBox
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:text="Show FPS"
-			android:id="@+id/checkbox_FPS" android:layout_gravity="center"/>
+			android:text="Show Speed"
+			android:id="@+id/checkbox_speed" android:layout_gravity="center"/>
+
+	<CheckBox
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="Auto Reduce"
+		android:id="@+id/checkbox_reduce" android:layout_gravity="center"/>
 
 	<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
 				 android:id="@+id/tableLayout1"
@@ -29,36 +35,6 @@
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:id="@+id/spinner_camera" android:layout_gravity="center"/>
-		</TableRow>
-
-		<TableRow
-				android:id="@+id/tableRow2"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:padding="5dip" >
-			<TextView
-					android:text="Video Size"
-					android:textAppearance="?android:attr/textAppearanceLarge" />
-
-			<Spinner
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:id="@+id/spinner_video_size" android:layout_gravity="center"/>
-		</TableRow>
-
-		<TableRow
-				android:id="@+id/tableRow3"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:padding="5dip" >
-			<TextView
-					android:text="Picture Size"
-					android:textAppearance="?android:attr/textAppearanceLarge" />
-
-			<Spinner
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:id="@+id/spinner_picture_size" android:layout_gravity="center"/>
 		</TableRow>
 
 	</TableLayout>

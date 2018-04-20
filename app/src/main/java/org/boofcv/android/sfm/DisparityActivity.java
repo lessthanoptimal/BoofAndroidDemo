@@ -16,7 +16,6 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import org.boofcv.android.DemoCamera2Activity;
-import org.boofcv.android.DemoMain;
 import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
 import org.boofcv.android.assoc.AssociationVisualize;
@@ -32,6 +31,7 @@ import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.feature.disparity.DisparityAlgorithms;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.image.GrayF32;
 
@@ -147,7 +147,7 @@ public class DisparityActivity extends DemoCamera2Activity
 		public boolean onDown(MotionEvent e) {
 
 			// make sure the camera is calibrated first
-			if( DemoMain.preference.intrinsic == null ) {
+			if( lookupIntrinsics() == null ) {
 				Toast.makeText(DisparityActivity.this, "You must first calibrate the camera!", Toast.LENGTH_SHORT).show();
 				return false;
 			}
@@ -196,18 +196,10 @@ public class DisparityActivity extends DemoCamera2Activity
 
 		GrayF32 disparityImage;
 		int disparityMin,disparityMax;
+		CameraPinholeRadial intrinsic;
 
 		public DisparityProcessing() {
 			super(GrayF32.class);
-
-			DetectDescribePoint<GrayF32, BrightFeature> detDesc =
-					FactoryDetectDescribe.surfFast(null,null,null,GrayF32.class);
-
-			ScoreAssociation<BrightFeature> score = FactoryAssociation.defaultScore(BrightFeature.class);
-			AssociateDescription<BrightFeature> associate =
-					FactoryAssociation.greedy(score,Double.MAX_VALUE,true);
-
-			disparity = new DisparityCalculation<>(detDesc, associate, DemoMain.preference.intrinsic);
 		}
 
 		private StereoDisparity<GrayF32, GrayF32> createDisparity() {
@@ -233,6 +225,16 @@ public class DisparityActivity extends DemoCamera2Activity
 
 		@Override
 		public void initialize(int imageWidth, int imageHeight) {
+			intrinsic = lookupIntrinsics();
+
+			DetectDescribePoint<GrayF32, BrightFeature> detDesc =
+					FactoryDetectDescribe.surfFast(null,null,null,GrayF32.class);
+
+			ScoreAssociation<BrightFeature> score = FactoryAssociation.defaultScore(BrightFeature.class);
+			AssociateDescription<BrightFeature> associate =
+					FactoryAssociation.greedy(score,Double.MAX_VALUE,true);
+
+			disparity = new DisparityCalculation<>(detDesc, associate, intrinsic);
 			disparityImage = new GrayF32(imageWidth,imageHeight);
 			visualize.initializeImages( imageWidth, imageHeight );
 			disparity.init(imageWidth,imageHeight);
@@ -240,7 +242,7 @@ public class DisparityActivity extends DemoCamera2Activity
 
 		@Override
 		public void onDraw(Canvas canvas, Matrix imageToView) {
-			if( DemoMain.preference.intrinsic == null ) {
+			if( intrinsic == null ) {
 				Paint paint = new Paint();
 				paint.setColor(Color.RED);
 				paint.setTextSize(40*displayMetrics.density);
@@ -250,7 +252,6 @@ public class DisparityActivity extends DemoCamera2Activity
 			} else if( activeView == DView.DISPARITY ) {
 				// draw rectified image
 				ConvertBitmap.grayToBitmap(disparity.rectifiedLeft, visualize.bitmapSrc, visualize.storage);
-				canvas.drawBitmap(visualize.bitmapSrc,0,0,null);
 
 				if( disparity.isDisparityAvailable() ) {
 					VisualizeImageData.disparity(disparityImage,disparityMin,disparityMax,0,

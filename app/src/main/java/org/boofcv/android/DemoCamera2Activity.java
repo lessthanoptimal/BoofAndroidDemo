@@ -26,6 +26,7 @@ import java.util.Locale;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.camera2.VisualizeCamera2Activity;
 import boofcv.misc.MovingAverage;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.ImageBase;
 import georegression.struct.point.Point2D_F64;
 
@@ -50,15 +51,15 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
 
     //START Timing data structures locked on super.lockTiming
     protected int totalFramesProcessed; // total frames processed for the specific processing algorithm
-    protected MovingAverage periodProcess = new MovingAverage(0.5); // milliseconds
-    protected MovingAverage periodRender = new MovingAverage(0.5); // milliseconds
+    protected MovingAverage periodProcess = new MovingAverage(0.8); // milliseconds
+    protected MovingAverage periodRender = new MovingAverage(0.8); // milliseconds
     //END
 
     // if a process is taking too long poentially trigger a change in resolution to sleep things up
     protected boolean changeResolutionOnSlow = false;
     protected boolean triggerSlow;
-    protected final static double TRIGGER_HORIBLY_SLOW = 5000.0;
-    protected final static double TRIGGER_SLOW = 500.0;
+    protected final static double TRIGGER_HORIBLY_SLOW = 2000.0;
+    protected final static double TRIGGER_SLOW = 400.0;
 
     // Work variables for rendering performance
     private Paint paintText = new Paint();
@@ -173,7 +174,7 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
 
         }
 
-        if( changeResolutionOnSlow && triggerSlow ) {
+        if( DemoMain.preference.autoReduce && changeResolutionOnSlow && triggerSlow ) {
             handleReduceResolution(processor);
         }
     }
@@ -285,7 +286,7 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
             renderPeriod = periodRender.getAverage();
             processPeriod = periodProcess.getAverage();
         }
-        if( DemoMain.preference.showFps )
+        if( DemoMain.preference.showSpeed)
             renderSpeed(canvas, processPeriod, renderPeriod);
     }
 
@@ -300,7 +301,7 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
         String line1 = String.format(local,"%6.1fms Alg",processPeriod);
         String line2 = String.format(local,"%6.1fms Vis",renderPeriod);
 
-        float spaceH = 3*displayMetrics.density;
+        float spaceH = 10*displayMetrics.density;
         paintText.getTextBounds(line0, 0, line0.length(), bounds0);
         paintText.getTextBounds(line1, 0, line1.length(), bounds1);
         paintText.getTextBounds(line2, 0, line2.length(), bounds2);
@@ -433,6 +434,10 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
                 mCameraSize.getWidth():mCameraSize.getHeight();
 
         return displayMetrics.density*cameraWidth/screenWidth;
+    }
+
+    public CameraPinholeRadial lookupIntrinsics() {
+        return DemoMain.preference.lookup(mCameraSize.getWidth(),mCameraSize.getHeight());
     }
 
     /**

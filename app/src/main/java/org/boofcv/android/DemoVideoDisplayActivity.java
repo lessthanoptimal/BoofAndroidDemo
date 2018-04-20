@@ -26,7 +26,7 @@ public class DemoVideoDisplayActivity extends VideoDisplayActivity {
 		super.onCreate(savedInstanceState);
 
 		preference = DemoMain.preference;
-		setShowFPS(preference.showFps);
+		setShowFPS(preference.showSpeed);
 	}
 
 	@Override
@@ -35,10 +35,8 @@ public class DemoVideoDisplayActivity extends VideoDisplayActivity {
 		Camera.getCameraInfo(preference.cameraId,info);
 
 		Camera.Parameters param = mCamera.getParameters();
-		Camera.Size sizePreview = param.getSupportedPreviewSizes().get(preference.preview);
-		param.setPreviewSize(sizePreview.width,sizePreview.height);
-		Camera.Size sizePicture = param.getSupportedPictureSizes().get(preference.picture);
-		param.setPictureSize(sizePicture.width, sizePicture.height);
+		param.setPreviewSize(320,240);
+		param.setPictureSize(320,240);
 		mCamera.setParameters(param);
 
 		return mCamera;

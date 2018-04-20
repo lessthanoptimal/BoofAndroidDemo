@@ -92,7 +92,7 @@ public class UndistortDisplayActivity extends DemoBitmapCamera2Activity
 
 	@Override
 	public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-		if( DemoMain.preference.intrinsic == null ) {
+		if( DemoMain.preference.calibration.isEmpty() ) {
 			Toast toast = Toast.makeText(UndistortDisplayActivity.this,
 					"You must first calibrate the camera!", Toast.LENGTH_LONG);
 			toast.show();
@@ -106,49 +106,47 @@ public class UndistortDisplayActivity extends DemoBitmapCamera2Activity
 
 	protected class UndistortProcessing extends DemoProcessingAbstract {
 		ImageBase undistorted;
-
 		public UndistortProcessing( ImageType imageType ) {
 			super(imageType);
 
-			if (DemoMain.preference.intrinsic == null) {
+			if (DemoMain.preference.calibration.isEmpty() ) {
 				return;
 			}
-			CameraPinholeRadial intrinsic = DemoMain.preference.intrinsic;
-
-			// define the transform.  Cache the results for quick rendering later on
-			CameraPinhole desired = new CameraPinhole();
-			desired.set(intrinsic);
-
-			Point2Transform2_F32 fullView = LensDistortionOps.transformChangeModel_F32(AdjustmentType.FULL_VIEW,
-					intrinsic,desired,false,null);
-			InterpolatePixelS<GrayU8> interp = FactoryInterpolation.
-					bilinearPixelS(GrayU8.class, BorderType.ZERO);
-			// for some reason not caching is faster on a low end phone.  Maybe it has to do with CPU memory
-			// cache misses when looking up a point?
-			removeDistortion = FactoryDistort.distort(false,interp,imageType);
-			removeDistortion.setModel(new PointToPixelTransform_F32(fullView));
-
 		}
 
 		@Override
 		public void initialize(int imageWidth, int imageHeight) {
 			undistorted = imageType.createImage(imageWidth,imageHeight);
 
-			CameraPinholeRadial intrinsic = DemoMain.preference.intrinsic;
+			CameraPinholeRadial intrinsic = DemoMain.preference.lookup(
+					imageWidth,imageHeight);
 
-			if( intrinsic.width != imageWidth || intrinsic.height != imageHeight ) {
+			if( intrinsic == null ) {
 				UndistortDisplayActivity.this.runOnUiThread(()->{
 					Toast toast = Toast.makeText(UndistortDisplayActivity.this,
-							"Calibration doesn't match input image!", Toast.LENGTH_LONG);
+							"Can't find calibration for this resolution!", Toast.LENGTH_LONG);
 					toast.show();
 					UndistortDisplayActivity.this.finish();
 				});
+			} else {
+				// define the transform.  Cache the results for quick rendering later on
+				CameraPinhole desired = new CameraPinhole();
+				desired.set(intrinsic);
+
+				Point2Transform2_F32 fullView = LensDistortionOps.transformChangeModel_F32(AdjustmentType.FULL_VIEW,
+						intrinsic,desired,false,null);
+				InterpolatePixelS<GrayU8> interp = FactoryInterpolation.
+						bilinearPixelS(GrayU8.class, BorderType.ZERO);
+				// for some reason not caching is faster on a low end phone.  Maybe it has to do with CPU memory
+				// cache misses when looking up a point?
+				removeDistortion = FactoryDistort.distort(false,interp,imageType);
+				removeDistortion.setModel(new PointToPixelTransform_F32(fullView));
 			}
 		}
 
 		@Override
 		public void onDraw(Canvas canvas, Matrix imageToView) {
-			if (DemoMain.preference.intrinsic == null) {
+			if (removeDistortion == null) {
 				Log.e("Undistort","No intrinsic!");
 				Paint paint = new Paint();
 				paint.setColor(Color.RED);

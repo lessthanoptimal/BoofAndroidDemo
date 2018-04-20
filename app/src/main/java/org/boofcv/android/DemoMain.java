@@ -58,6 +58,7 @@ import java.util.List;
 import java.util.Map;
 
 import boofcv.io.calibration.CalibrationIO;
+import boofcv.struct.calib.CameraPinholeRadial;
 
 public class DemoMain extends Activity implements ExpandableListView.OnChildClickListener {
 
@@ -256,7 +257,8 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 	}
 
 	private void setDefaultPreferences() {
-		preference.showFps = false;
+		preference.showSpeed = false;
+		preference.autoReduce = true;
 
 		// There are no cameras.  This is possible due to the hardware camera setting being set to false
 		// which was a work around a bad design decision where front facing cameras wouldn't be accepted as hardware
@@ -278,11 +280,6 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		}
 
 		if( !specs.isEmpty() ) {
-			CameraSpecs camera = specs.get(preference.cameraId);
-			preference.preview = UtilVarious.closest(camera.sizePreview, 320, 240);
-			preference.picture = UtilVarious.closest(camera.sizePicture, 640, 480);
-
-			// see if there are any intrinsic parameters to load
 			loadIntrinsic();
 		}
 	}
@@ -314,7 +311,7 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 	}
 
 	private void loadIntrinsic() {
-		preference.intrinsic = null;
+		preference.reset();
 		try {
 			File directory = new File(getExternalFilesDir(null),"calibration");
 			String name = "cam"+preference.cameraId+".txt";
@@ -322,7 +319,8 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 			if( file.exists() ) {
 				FileInputStream fos = new FileInputStream(file);
 				Reader reader = new InputStreamReader(fos);
-				preference.intrinsic = CalibrationIO.load(reader);
+				CameraPinholeRadial intrinsic = CalibrationIO.load(reader);
+				preference.add(intrinsic);
 				Log.i(TAG,"Loaded camera intrinsics for "+preference.cameraId);
 			} else {
 				Log.w(TAG,"Intrinsic parameters for camera "+preference.cameraId+" doesn't exit");

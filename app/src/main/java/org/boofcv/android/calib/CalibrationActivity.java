@@ -17,7 +17,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.boofcv.android.DemoMain;
 import org.boofcv.android.DemoProcessing;
 import org.boofcv.android.R;
 import org.boofcv.android.recognition.ConfigAllCalibration;
@@ -127,9 +126,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if( DemoMain.preference.intrinsic != null ) {
-			Toast.makeText(this, "Camera already calibrated", Toast.LENGTH_SHORT).show();
-		}
+
 	}
 
 	@Override
@@ -139,6 +136,9 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 			if (bitmap.getWidth() != width || bitmap.getHeight() != height)
 				bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 			bitmapTmp = ConvertBitmap.declareStorage(bitmap, bitmapTmp);
+		}
+		if( lookupIntrinsics() != null ) {
+			runOnUiThread(()-> Toast.makeText(this, "Camera already calibrated", Toast.LENGTH_SHORT).show());
 		}
 	}
 

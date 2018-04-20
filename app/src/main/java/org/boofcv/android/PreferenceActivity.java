@@ -22,14 +22,9 @@ public class PreferenceActivity extends Activity
 		implements AdapterView.OnItemSelectedListener , CompoundButton.OnCheckedChangeListener
 {
 
-	CheckBox checkFPS;
+	CheckBox checkSpeed;
+	CheckBox checkReduce;
 	Spinner spinnerCamera;
-	Spinner spinnerVideo;
-	Spinner spinnerPicture;
-
-	// size the user selected.  when cameras change it tries to select a similar size
-	Camera.Size prefVideoSize;
-	Camera.Size prefPictureSize;
 
 	DemoPreference preference;
 	List<CameraSpecs> specs;
@@ -42,36 +37,21 @@ public class PreferenceActivity extends Activity
 		specs = DemoMain.specs;
 		preference = DemoMain.preference;
 
-		checkFPS = (CheckBox) findViewById(R.id.checkbox_FPS);
+		checkSpeed = (CheckBox) findViewById(R.id.checkbox_speed);
+		checkReduce = (CheckBox) findViewById(R.id.checkbox_reduce);
 		spinnerCamera = (Spinner) findViewById(R.id.spinner_camera);
-		spinnerVideo = (Spinner) findViewById(R.id.spinner_video_size);
-		spinnerPicture = (Spinner) findViewById(R.id.spinner_picture_size);
-
-		// remember the size the user selected
-		CameraSpecs camera = specs.get( preference.cameraId );
-		prefVideoSize = camera.sizePreview.get( preference.preview );
-		prefPictureSize = camera.sizePicture.get( preference.picture );
-
-		ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_spinner_item);
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		spinnerVideo.setAdapter(adapter);
-		adapter = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_spinner_item);
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		spinnerPicture.setAdapter(adapter);
 
 		// finish setting up the GUI
 		setupCameraSpinner();
-		setupSizeSpinners();
 
 		spinnerCamera.setSelection(preference.cameraId);
-		checkFPS.setChecked(preference.showFps);
+		checkSpeed.setChecked(preference.showSpeed);
+		checkReduce.setChecked(preference.autoReduce);
 
-		checkFPS.setOnCheckedChangeListener(this);
+		checkSpeed.setOnCheckedChangeListener(this);
+		checkReduce.setOnCheckedChangeListener(this);
 		spinnerCamera.setOnItemSelectedListener(this);
-		spinnerVideo.setOnItemSelectedListener(this);
-		spinnerPicture.setOnItemSelectedListener(this);
 	}
-
 
 	private void setupCameraSpinner() {
 		// Find the total number of cameras available
@@ -97,34 +77,6 @@ public class PreferenceActivity extends Activity
 		spinnerCamera.setSelection(preference.cameraId);
 	}
 
-	private void setupSizeSpinners() {
-		CameraSpecs camera = specs.get(preference.cameraId);
-
-		ArrayAdapter<CharSequence> adapterVideo = (ArrayAdapter<CharSequence>)spinnerVideo.getAdapter();
-		ArrayAdapter<CharSequence> adapterPicture = (ArrayAdapter<CharSequence>)spinnerPicture.getAdapter();
-
-		addAll(camera.sizePreview,adapterVideo);
-		addAll(camera.sizePicture,adapterPicture);
-
-		// select a similar size to what it had selected before
-		DemoPreference preference = DemoMain.preference;
-		preference.preview = UtilVarious.closest(camera.sizePreview, prefVideoSize.width, prefVideoSize.height);
-		preference.picture = UtilVarious.closest(camera.sizePicture, prefPictureSize.width, prefPictureSize.height);
-
-		spinnerVideo.setSelection(preference.preview);
-		spinnerPicture.setSelection(preference.picture );
-
-		spinnerVideo.invalidate();
-		spinnerPicture.invalidate();
-	}
-
-	private void addAll( List<Camera.Size> sizes , ArrayAdapter<CharSequence> adapter ) {
-
-		adapter.clear();
-		for( Camera.Size s : sizes ) {
-			adapter.add(s.width+" x "+s.height);
-		}
-	}
 
 	@Override
 	public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id ) {
@@ -134,28 +86,7 @@ public class PreferenceActivity extends Activity
 			Log.d("PreferenceActivity","onItemSelected camera");
 //			Toast.makeText(this,"spinner camera",2).show();
 
-			int selected = spinnerCamera.getSelectedItemPosition();
-			if( selected != preference.cameraId ) {
-				preference.cameraId = selected;
-				setupSizeSpinners();
-			}
-		} else if( spinnerVideo == adapterView ) {
-//			Toast.makeText(this,"spinner video",2).show();
-			Log.d("PreferenceActivity","onItemSelected video");
-
-			int selected = spinnerVideo.getSelectedItemPosition();
-			if( selected != preference.preview ) {
-				preference.preview = selected;
-				prefVideoSize = camera.sizePreview.get(preference.preview);
-			}
-		} else if( spinnerPicture == adapterView ) {
-//			Toast.makeText(this,"spinner picture",2).show();
-			Log.d("PreferenceActivity","onItemSelected picture");
-			int selected = spinnerPicture.getSelectedItemPosition();
-			if( selected != preference.picture ) {
-				preference.picture = selected;
-				prefPictureSize = camera.sizePicture.get(preference.picture);
-			}
+			preference.cameraId = spinnerCamera.getSelectedItemPosition();
 		} else {
 //			Toast.makeText(this,"spinner unknown",2).show();
 			Log.d("PreferenceActivity","onItemSelected unknown");
@@ -169,6 +100,9 @@ public class PreferenceActivity extends Activity
 
 	@Override
 	public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-		preference.showFps = b;
+		if( compoundButton == checkSpeed)
+			preference.showSpeed = b;
+		else if( compoundButton == checkReduce )
+			preference.autoReduce = b;
 	}
 }

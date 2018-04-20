@@ -16,7 +16,6 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import org.boofcv.android.DemoBitmapCamera2Activity;
-import org.boofcv.android.DemoMain;
 import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
 import org.boofcv.android.misc.MiscUtil;
@@ -62,7 +61,7 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 	Class help;
 
 	// this text is displayed
-	String drawText = "";
+	String textToDraw = "";
 
 	// If true then the background will be the thresholded image
 	boolean showThreshold = true;
@@ -137,9 +136,6 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if( DemoMain.preference.intrinsic == null ) {
-			Toast.makeText(FiducialSquareActivity.this, "Calibrate camera for better results!", Toast.LENGTH_LONG).show();
-		}
 	}
 
 	@Override
@@ -167,8 +163,9 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 		Paint paintLine1 = new Paint();
 		Paint paintLine2 = new Paint();
 		Paint paintLine3 = new Paint();
-		private Paint textPaint = new Paint();
-		private Paint textBorder = new Paint();
+		private Paint paintTextVideo = new Paint(); // drawn in image coordinates
+		private Paint paintTextView = new Paint(); // text drawn directory to screen
+		private Paint paintTextBorder = new Paint();
 
 		Rect bounds = new Rect();
 
@@ -194,20 +191,26 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 			paintLine3.setFlags(Paint.ANTI_ALIAS_FLAG);
 
 			// Create out paint to use for drawing
-			textPaint.setARGB(255, 255, 100, 100);
+			paintTextVideo.setARGB(255, 255, 100, 100);
+			paintTextView.setARGB(255, 255, 100, 100);
+			paintTextView.setTextSize(24*displayMetrics.density);
 
-			textBorder.setARGB(255, 0, 0, 0);
-			textBorder.setStyle(Paint.Style.STROKE);
+			paintTextBorder.setARGB(255, 0, 0, 0);
+			paintTextBorder.setStyle(Paint.Style.STROKE);
 		}
 
 		@Override
 		public void initialize(int imageWidth, int imageHeight)
 		{
+			if( lookupIntrinsics() == null ) {
+				Toast.makeText(FiducialSquareActivity.this, "Calibrate camera for better results!", Toast.LENGTH_LONG).show();
+			}
+
 			// the adjustment requires knowing what the camera's resolution is. The camera
 			// must be initialized at this point
-			textPaint.setTextSize(30*screenDensityAdjusted());
-			textBorder.setTextSize(30*screenDensityAdjusted());
-			textBorder.setStrokeWidth(3*screenDensityAdjusted());
+			paintTextVideo.setTextSize(30*screenDensityAdjusted());
+			paintTextBorder.setTextSize(30*screenDensityAdjusted());
+			paintTextBorder.setStrokeWidth(3*screenDensityAdjusted());
 			paintLine0.setStrokeWidth(4f*screenDensityAdjusted());
 			paintLine1.setStrokeWidth(4f*screenDensityAdjusted());
 			paintLine2.setStrokeWidth(4f*screenDensityAdjusted());
@@ -235,7 +238,7 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 			}
 
 			canvas.restore();
-			if( drawText != null ) {
+			if( textToDraw != null ) {
 				renderDrawText(canvas);
 			}
 		}
@@ -332,17 +335,17 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 
 			String numberString = ""+number;
 
-			textPaint.getTextBounds(numberString,0,numberString.length(),bounds);
+			paintTextVideo.getTextBounds(numberString,0,numberString.length(),bounds);
 
 			int textLength = bounds.width();
 			int textHeight = bounds.height();
 
-			canvas.drawText(numberString, centerPixel.x-textLength/2,centerPixel.y+textHeight/2, textBorder);
-			canvas.drawText(numberString, centerPixel.x-textLength/2,centerPixel.y+textHeight/2, textPaint);
+			canvas.drawText(numberString, centerPixel.x-textLength/2,centerPixel.y+textHeight/2, paintTextBorder);
+			canvas.drawText(numberString, centerPixel.x-textLength/2,centerPixel.y+textHeight/2, paintTextVideo);
 		}
 
 		private void renderDrawText( Canvas canvas ) {
-			textPaint.getTextBounds(drawText,0,drawText.length(),bounds);
+			paintTextView.getTextBounds(textToDraw,0, textToDraw.length(),bounds);
 
 			int textLength = bounds.width();
 			int textHeight = bounds.height();
@@ -350,8 +353,7 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 			int x0 = canvas.getWidth()/2 - textLength/2;
 			int y0 = canvas.getHeight()/2 + textHeight/2;
 
-			canvas.drawText(drawText, x0, y0, textBorder);
-			canvas.drawText(drawText, x0, y0, textPaint);
+			canvas.drawText(textToDraw, x0, y0, paintTextView);
 		}
 
 		private void drawLine( Canvas canvas , Point2D_F32 a , Point2D_F32 b , Paint color ) {

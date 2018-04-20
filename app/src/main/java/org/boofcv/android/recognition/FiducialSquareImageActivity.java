@@ -45,9 +45,9 @@ public class FiducialSquareImageActivity extends FiducialSquareActivity
 		list = manager.copyList();
 
 		if( list.size() == 0 ) {
-			drawText = "ADD FIDUCIALS!";
+			textToDraw = "ADD FIDUCIALS!";
 		} else {
-			drawText = null;
+			textToDraw = null;
 		}
 		super.onResume();
 	}
