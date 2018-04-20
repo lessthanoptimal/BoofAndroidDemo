@@ -430,4 +430,12 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		}
 		throw new RuntimeException("Can't find default camera");
 	}
+	public static CameraSpecs cameraSpecs( String cameraId ) {
+		for( int i = 0; i < specs.size(); i++ ) {
+			CameraSpecs s = specs.get(i);
+			if( s.deviceId.equals(cameraId))
+				return s;
+		}
+		return null;
+	}
 }

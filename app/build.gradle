@@ -23,6 +23,7 @@ android {
     buildTypes {
         debug {
             minifyEnabled false
+            debuggable true
         }
         fast {
             initWith buildTypes.debug

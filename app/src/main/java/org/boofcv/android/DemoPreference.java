@@ -13,6 +13,7 @@ public class DemoPreference {
 	public String cameraId;
 	public boolean showSpeed;
 	public boolean autoReduce;
+	public int resolution=0;
 	public List<CameraPinholeRadial> calibration = new ArrayList<>();
 
 	public void reset() {

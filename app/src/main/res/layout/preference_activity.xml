@@ -37,6 +37,21 @@
 					android:id="@+id/spinner_camera" android:layout_gravity="center"/>
 		</TableRow>
 
+		<TableRow
+			android:id="@+id/tableRow2"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:padding="5dip" >
+			<TextView
+				android:text="Resolution"
+				android:textAppearance="?android:attr/textAppearanceLarge" />
+			<Spinner
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:id="@+id/spinner_resolution" android:layout_gravity="center"/>
+		</TableRow>
+
+
 	</TableLayout>
 
 </LinearLayout>

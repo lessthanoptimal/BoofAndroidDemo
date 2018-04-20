@@ -121,6 +121,26 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
     }
 
     @Override
+    protected int selectResolution(int widthTexture, int heightTexture, Size[] resolutions) {
+        // Auto mode on resolution
+        if (DemoMain.preference.resolution == 0)
+            return super.selectResolution(widthTexture, heightTexture, resolutions);
+
+        // A specific on requested
+        CameraSpecs s = DemoMain.defaultCameraSpecs();
+        Size target = s.sizes.get( DemoMain.preference.resolution-1);
+        for( int i = 0; i < resolutions.length; i++  ) {
+            Size r = resolutions[i];
+            if( r.getWidth() == target.getWidth() && r.getHeight() == r.getHeight() ) {
+                return i;
+            }
+        }
+        // failed to find the requested. Fall back to default behavior
+        Log.e("Demo","Can't find requested resolution");
+        return super.selectResolution(widthTexture, heightTexture, resolutions);
+    }
+
+    @Override
     protected void onCameraResolutionChange( int width , int height ) {
         Log.i("Demo","onCameraResolutionChange called. "+width+"x"+height);
         super.onCameraResolutionChange(width,height);
@@ -477,6 +497,5 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
      */
     public enum Resolution {
         LOW,MEDIUM,HIGH,MAX,R320x240,R640x480;
-
     }
 }

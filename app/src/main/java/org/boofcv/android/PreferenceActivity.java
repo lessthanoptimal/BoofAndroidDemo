@@ -7,6 +7,7 @@ import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Size;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -28,6 +29,7 @@ public class PreferenceActivity extends Activity
 	CheckBox checkSpeed;
 	CheckBox checkReduce;
 	Spinner spinnerCamera;
+	Spinner spinnerResolution;
 
 	DemoPreference preference;
 	List<CameraSpecs> specs;
@@ -44,6 +46,7 @@ public class PreferenceActivity extends Activity
 		checkSpeed = findViewById(R.id.checkbox_speed);
 		checkReduce = findViewById(R.id.checkbox_reduce);
 		spinnerCamera = findViewById(R.id.spinner_camera);
+		spinnerResolution = findViewById(R.id.spinner_resolution);
 
 		// finish setting up the GUI
 		try {
@@ -52,17 +55,15 @@ public class PreferenceActivity extends Activity
 			e.printStackTrace();
 		}
 
-		if( preference.cameraId == null ) {
-			preference.cameraId = cameras[0];
-		}
-
 		spinnerCamera.setSelection(cameraNameToIndex(preference.cameraId));
 		checkSpeed.setChecked(preference.showSpeed);
 		checkReduce.setChecked(preference.autoReduce);
+		setupResolutionSpinner(preference.resolution);
 
 		checkSpeed.setOnCheckedChangeListener(this);
 		checkReduce.setOnCheckedChangeListener(this);
 		spinnerCamera.setOnItemSelectedListener(this);
+		spinnerResolution.setOnItemSelectedListener(this);
 	}
 
 	private void setupCameraSpinner() throws CameraAccessException {
@@ -86,6 +87,20 @@ public class PreferenceActivity extends Activity
 		spinnerCamera.setSelection(cameraNameToIndex(preference.cameraId));
 	}
 
+	private void setupResolutionSpinner( int selected ) {
+		ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_spinner_item);
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+		CameraSpecs specs = DemoMain.defaultCameraSpecs();
+		adapter.add("Automatic");
+		for (int i = 0; i < specs.sizes.size(); i++ ) {
+			Size s = specs.sizes.get(i);
+			adapter.add(s.getWidth()+"x"+s.getHeight());
+		}
+		spinnerResolution.setAdapter(adapter);
+		spinnerResolution.setSelection(selected);
+	}
+
 	private int cameraNameToIndex( String name ) {
 		for (int i = 0; i < cameras.length; i++) {
 			if( cameras[i].equals(name))
@@ -100,10 +115,10 @@ public class PreferenceActivity extends Activity
 		if( spinnerCamera == adapterView ) {
 			Log.d("PreferenceActivity","onItemSelected camera");
 //			Toast.makeText(this,"spinner camera",2).show();
-			preference.cameraId = cameras[spinnerCamera.getSelectedItemPosition()];
-		} else {
-//			Toast.makeText(this,"spinner unknown",2).show();
-			Log.d("PreferenceActivity","onItemSelected unknown");
+			preference.cameraId = cameras[pos];
+			setupResolutionSpinner(preference.resolution);
+		} else if( spinnerResolution == adapterView ) {
+			preference.resolution = pos;
 		}
 		DemoMain.changedPreferences = true;
 	}
