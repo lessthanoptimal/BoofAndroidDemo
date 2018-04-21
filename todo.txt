@@ -1,15 +1,12 @@
-- TODO Let user manually select resolution
-- TODO Add distort MLS example
-- TODO Add equirectangular to pinhole viewer
+TODO Add distort MLS example
+TODO: Binary blob/contour demonstration
+  * show inner/outer/pixels
+TODO: Added Equirectangular to Pinhole camera
   * Provide example image.
 
-TODO: Added Equirectangular to Pinhole camera
+
 TODO: Webpage with grid for calibration.  Add link in app description
-TODO: See if mosaic can be improved with a different tracker
-TODO: nv21ToMsRgb_U8 crashes for some input image sizes on old cell phone
-   - width and width/2 seem to work better for the stride
 TODO: Color histogram lookup of photos on phone?
-TODO: 3D pose of fiducials
-TODO: Reset button for disparity
 TODO: Preview in disparity
 TODO: Preview in associate
+TODO: 3D Point Cloud for Disparity

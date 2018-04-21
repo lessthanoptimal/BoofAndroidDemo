@@ -41,9 +41,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".DemoVideoDisplayActivity"
-            android:screenOrientation="landscape" />
         <activity android:name=".PreferenceActivity" />
         <activity android:name=".ip.BlurDisplayActivity"/>
         <activity android:name=".ip.EnhanceDisplayActivity"/>
@@ -57,12 +54,6 @@
         <activity android:name=".sfm.MosaicDisplayActivity" />
         <activity
             android:name=".assoc.AssociationActivity"
-            android:screenOrientation="landscape" />
-        <activity
-            android:name=".tracker.DdaTrackerDisplayActivity"
-            android:screenOrientation="landscape" />
-        <activity
-            android:name=".tracker.CombinedTrackerDisplayActivity"
             android:screenOrientation="landscape" />
         <activity
             android:name=".calib.CalibrationActivity"
@@ -98,7 +89,6 @@
         <activity android:name=".detect.DetectBlackPolygonActivity"/>
         <activity android:name=".detect.DetectBlackPolygonHelpActivity" />
         <activity android:name=".detect.DetectBlackEllipseActivity"/>
-        <!--<activity android:name=".detect.DetectBlackEllipseHelpActivity" />-->
         <activity android:name=".recognition.ImageClassificationActivity"/>
     </application>
 

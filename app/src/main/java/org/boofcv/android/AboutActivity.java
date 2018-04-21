@@ -6,6 +6,8 @@ import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.widget.TextView;
 
+import boofcv.BoofVersion;
+
 /**
  * Displays information about this application.
  *
@@ -23,14 +25,17 @@ public class AboutActivity extends Activity {
 			"additional instructions for several demos.</p>"+
 			"<p>The application's source code is available on " +
 			"<a href=\"https://github.com/lessthanoptimal/BoofAndroidDemo\">GitHub</a>." +
-			"<p>Written by Peter Abeles</p>";
+			"<p>Written by Peter Abeles</p>" +
+			"<p>BoofCV Version = "+ BoofVersion.VERSION+"<br>"+
+			"BoofCV GIT SHA = "+ BoofVersion.GIT_SHA+"</p>";
+
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.about);
 
-		TextView textView = (TextView) findViewById(R.id.text_about);
+		TextView textView = findViewById(R.id.text_about);
 
 		textView.setMovementMethod(LinkMovementMethod.getInstance());
 		textView.setText(Html.fromHtml(text));
