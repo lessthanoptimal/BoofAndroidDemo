@@ -13,12 +13,9 @@ import android.util.Size;
 import android.widget.TextView;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.util.ArrayList;
+import java.util.List;
 
-import boofcv.io.calibration.CalibrationIO;
 import boofcv.struct.calib.CameraPinholeRadial;
 
 /**
@@ -159,35 +156,21 @@ public class CameraInformationActivity extends Activity {
 			write("No cameras have ben calibrated. No Directory");
 			return;
 		}
-		String prefix = "cam"+which;
+		List<CameraPinholeRadial> calibration = new ArrayList<>();
+		List<File> locations = new ArrayList<>();
+		DemoMain.loadIntrinsics(this,which,calibration,locations);
 
-		boolean success = false;
-		File files[] = directory.listFiles();
-		if( files == null ) {
-			write("No cameras have ben calibrated. No files.");
-			return;
-		}
-		for( File f : files ) {
-			String name = f.getName();
-			if (!name.startsWith(prefix))
-				continue;
-			try {
-				FileInputStream fis = new FileInputStream(f);
-				Reader reader = new InputStreamReader(fis);
-				CameraPinholeRadial intrinsic = CalibrationIO.load(reader);
-				write("Found intrinsic for camera " + which);
-				write(String.format("  Dimension %d %d", intrinsic.width, intrinsic.height));
-				write(String.format("  fx = %6.1f fy = %6.1f", intrinsic.fx, intrinsic.fy));
-				write(String.format("  cx = %6.1f cy = %6.1f", intrinsic.cx, intrinsic.cy));
-				write(String.format("  skew = %8.3f", intrinsic.skew));
-				write("  Path: " + f.getAbsolutePath());
-				success = true;
-			} catch( IOException | RuntimeException e ) {
-				write("Error reading "+name+" "+e.getMessage());
-			}
+		for( int i = 0; i < calibration.size(); i++ ) {
+			CameraPinholeRadial intrinsic = calibration.get(i);
+			write("Found intrinsic for camera " + which);
+			write(String.format("  Dimension %d %d", intrinsic.width, intrinsic.height));
+			write(String.format("  fx = %6.1f fy = %6.1f", intrinsic.fx, intrinsic.fy));
+			write(String.format("  cx = %6.1f cy = %6.1f", intrinsic.cx, intrinsic.cy));
+			write(String.format("  skew = %8.3f", intrinsic.skew));
+			write("  Path: " + locations.get(i).getAbsolutePath());
 		}
 
-		if( !success ) {
+		if( calibration.isEmpty() ) {
 			write("Camera "+which+" has not been calibrated");
 		}
 

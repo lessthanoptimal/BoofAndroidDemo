@@ -212,8 +212,8 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
             }
 
             if( verbose ) {
-                Log.i("DemoTiming",String.format("Total Frames %4d curr %5.1f ave process %5.1f convert %5.1f at %dx%d",
-                        totalFramesProcessed,milliseconds,timeProcess,timeConvert,image.width,image.height));
+//                Log.i("DemoTiming",String.format("Total Frames %4d curr %5.1f ave process %5.1f convert %5.1f at %dx%d",
+//                        totalFramesProcessed,milliseconds,timeProcess,timeConvert,image.width,image.height));
             }
 
         }

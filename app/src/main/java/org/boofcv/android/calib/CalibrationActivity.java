@@ -98,7 +98,6 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 
 		paintFailed.setColor(Color.CYAN);
 		paintFailed.setStyle(Paint.Style.STROKE);
-		paintFailed.setStrokeWidth(7f);
 	}
 
 	@Override
@@ -209,6 +208,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 		final Object lockGUI = new Object();
 		List<List<Point2D_I32>> debugQuads = new ArrayList<>();
 		List<EllipseRotated_F64> debugEllipses = new ArrayList<>();
+		float radius;
 
 		protected DetectTarget( DetectorFiducialCalibration detector ) {
 			this.detector = detector;
@@ -216,6 +216,9 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 
 		@Override
 		public void initialize(int imageWidth, int imageHeight) {
+			float density = screenDensityAdjusted();
+			paintFailed.setStrokeWidth(7f*density);
+			radius = 6*density;
 		}
 
 		@Override
@@ -254,17 +257,17 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 					float x1 = (float) (e.center.x + e.a);
 					float y1 = (float) (e.center.y + e.b);
 
+					canvas.save();
 					canvas.rotate(phi, (float) e.center.x, (float) e.center.y);
 //					r.set(cx-w,cy-h,cx+w+1,cy+h+1);
 					canvas.drawOval(new RectF(x0, y0, x1, y1), paintFailed);
-//					canvas.drawOval(r,paint);
-					canvas.rotate(-phi, (float) e.center.x, (float) e.center.y);
+					canvas.restore();
 				}
 
 				// draw detected calibration points
 				for (int i = 0; i < pointsGui.size(); i++) {
 					Point2D_F64 p = pointsGui.get(i);
-					canvas.drawCircle((float) p.x, (float) p.y, 6, paintPoint);
+					canvas.drawCircle((float) p.x, (float) p.y, radius, paintPoint);
 				}
 			}
 		}

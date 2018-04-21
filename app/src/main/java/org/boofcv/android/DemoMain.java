@@ -16,7 +16,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.util.Size;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -126,8 +125,6 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 			if (preference == null) {
 				preference = new DemoPreference();
 				setDefaultPreferences();
-			} else if (changedPreferences) {
-				loadIntrinsic();
 			}
 		}
 	}
@@ -303,7 +300,7 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		}
 
 		if( !specs.isEmpty() ) {
-			loadIntrinsic();
+			loadIntrinsics(this,preference.cameraId, preference.calibration,null);
 		}
 	}
 
@@ -333,25 +330,31 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		alert.show();
 	}
 
-	private void loadIntrinsic() {
-		preference.reset();
-		try {
-			File directory = new File(getExternalFilesDir(null),"calibration");
-			String name = "cam"+preference.cameraId+".txt";
-			File file = new File(directory,name);
-			if( file.exists() ) {
-				FileInputStream fos = new FileInputStream(file);
+	public static void loadIntrinsics(Activity activity,
+									  String cameraId,
+									  List<CameraPinholeRadial> intrinsics,
+									  List<File> locations ) {
+		intrinsics.clear();
+		if( locations != null )
+			locations.clear();
+
+		File directory = new File(activity.getExternalFilesDir(null),"calibration");
+		File files[] = directory.listFiles();
+		if( files == null )
+			return;
+		String prefix = "camera"+cameraId;
+		for( File f : files ) {
+			if( !f.getName().startsWith(prefix))
+				continue;
+			try {
+				FileInputStream fos = new FileInputStream(f);
 				Reader reader = new InputStreamReader(fos);
 				CameraPinholeRadial intrinsic = CalibrationIO.load(reader);
-				preference.add(intrinsic);
-				Log.i(TAG,"Loaded camera intrinsics for "+preference.cameraId);
-			} else {
-				Log.w(TAG,"Intrinsic parameters for camera "+preference.cameraId+" doesn't exit");
-			}
-		} catch (RuntimeException e) {
-			Log.w(TAG, "Failed to load intrinsic parameters: "+e.getClass().getSimpleName());
-			e.printStackTrace();
-		} catch (FileNotFoundException ignore) {
+				intrinsics.add(intrinsic);
+				if( locations != null ) {
+					locations.add(f);
+				}
+			} catch( RuntimeException | FileNotFoundException ignore ) {}
 		}
 	}
 

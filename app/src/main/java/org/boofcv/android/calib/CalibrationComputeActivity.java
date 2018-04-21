@@ -105,7 +105,7 @@ public class CalibrationComputeActivity extends Activity {
 					return;
 				}
 			}
-			String name = "cam"+ DemoMain.preference.cameraId+".txt";
+			String name = "camera"+ DemoMain.preference.cameraId+"_"+intrinsic.width+"x"+intrinsic.height+".txt";
 			File file = new File(directory,name);
 			FileOutputStream fos = new FileOutputStream(file);
 //			FileOutputStream fos = openFileOutput(name, Context.MODE_PRIVATE);
