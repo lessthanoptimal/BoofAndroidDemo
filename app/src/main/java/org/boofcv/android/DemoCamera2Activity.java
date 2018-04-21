@@ -218,7 +218,9 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
 
         }
 
-        if( DemoMain.preference.autoReduce && changeResolutionOnSlow && triggerSlow ) {
+        if( DemoMain.preference.resolution == 0 &&
+                DemoMain.preference.autoReduce &&
+                changeResolutionOnSlow && triggerSlow ) {
             handleReduceResolution(processor);
         }
     }
