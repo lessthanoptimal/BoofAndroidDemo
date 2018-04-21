@@ -28,9 +28,6 @@ TODO super pixels
 - New menu
 - Abort button and interrupt the thread some how
 TODO Delete unused activities using camera 1
-TODO use camera2 for info dialog
-TODO QR Code
-- tap to see info
 
 -------------------------------------------------
 Version 1.8.1

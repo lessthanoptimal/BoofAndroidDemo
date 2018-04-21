@@ -4,13 +4,38 @@
 			  android:layout_height="fill_parent"
 			  android:orientation="vertical" >
 
-	<android.widget.Toolbar
-		android:id="@+id/my_toolbar"
-		android:layout_width="match_parent"
+	<RelativeLayout
+		android:layout_width="fill_parent"
 		android:layout_height="?attr/actionBarSize"
-		android:background="?attr/colorPrimary"
-		android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-		/>
+		android:orientation="horizontal"
+		android:background="?attr/colorPrimary">
+
+		<RelativeLayout
+			android:id="@+id/logo_button"
+			android:layout_centerInParent="true"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content">
+		<ImageButton
+			android:layout_width="wrap_content"
+			android:layout_height="fill_parent"
+			android:layout_marginTop="6dp"
+			android:layout_marginBottom="6dp"
+			android:layout_centerInParent="true"
+			android:adjustViewBounds="true"
+			android:background="@drawable/roundedcorners"
+			android:onClick="pressedWebsite"
+			android:scaleType="fitCenter"
+			android:src="@drawable/boofcv_logo" />
+		</RelativeLayout>
+
+		<android.widget.Toolbar
+			android:id="@+id/my_toolbar"
+			android:layout_width="wrap_content"
+			android:layout_height="?attr/actionBarSize"
+			android:layout_alignRight="@id/logo_button"
+			android:background="?attr/colorPrimary"
+			android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+	</RelativeLayout>
 
 	<ExpandableListView
 		android:paddingLeft="16dp"
@@ -20,14 +45,6 @@
 		android:layout_weight="1"
 		android:id="@+id/DemoListView" android:layout_gravity="center"/>
 
-	<ImageButton
-		android:layout_width="wrap_content"
-		android:layout_height="40dp"
-		android:src="@drawable/boofcv_logo"
-		android:scaleType="fitCenter"
-		android:adjustViewBounds="true"
-		android:background="@drawable/roundedcorners"
-		android:onClick="pressedWebsite"
-		android:layout_gravity="center"/>
+
 </LinearLayout>
 
