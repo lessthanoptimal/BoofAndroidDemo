@@ -8,6 +8,7 @@ import android.graphics.Path;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -26,6 +27,8 @@ import boofcv.abst.fiducial.QrCodeDetector;
 import boofcv.alg.fiducial.qrcode.QrCode;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.struct.image.GrayU8;
+import georegression.metric.Intersection2D_F64;
+import georegression.struct.point.Point2D_F64;
 
 /**
  * Used to detect and read information from QR codes
@@ -43,7 +46,16 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
     // List of unique qr codes
     public static final Object uniqueLock = new Object();
     public static final Map<String,QrCode> unique = new HashMap<>();
+    // qr which has been selected and should be viewed
+    public static String selectedQR = null;
     // TODO don't use a static method and forget detection if the activity is exited by the user
+
+    // Location in image coordinates that the user is touching
+    Matrix viewToImage = new Matrix();
+    Point2D_F64 touched = new Point2D_F64();
+    boolean touching = false;
+    boolean touchProcessed = false;
+
 
     public QrCodeDetectActivity() {
         super(Resolution.HIGH);
@@ -65,6 +77,29 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
         textUnqiueCount.setText("0");
 
         setControls(controls);
+        displayView.setOnTouchListener(new TouchListener());
+    }
+
+    private class TouchListener implements View.OnTouchListener {
+
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            switch( motionEvent.getAction() ) {
+                case MotionEvent.ACTION_DOWN:{
+                    touching = true;
+                } break;
+
+                case MotionEvent.ACTION_UP:{
+                    touching = false;
+                } break;
+            }
+
+            if( touching ) {
+                applyToPoint(viewToImage,motionEvent.getX(),motionEvent.getY(),touched);
+            }
+
+            return true;
+        }
     }
 
     @Override
@@ -102,6 +137,11 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
 
         @Override
         public void initialize(int imageWidth, int imageHeight) {
+            touchProcessed = false;
+            selectedQR = null;
+            touching = false;
+            imageToView.invert(viewToImage);
+
             synchronized (uniqueLock) {
                 uniqueCount = unique.size();
             }
@@ -120,6 +160,10 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
                         for( int i = 0; i < detected.size; i++ ) {
                             QrCode qr = detected.get(i);
                             MiscUtil.renderPolygon(qr.bounds,path,canvas,colorDetected);
+
+                            if(touching && Intersection2D_F64.containConvex(qr.bounds,touched)) {
+                                selectedQR = qr.message;
+                            }
                         }
                         for( int i = 0; showFailures && i < failures.size; i++ ) {
                             QrCode qr = failures.get(i);
@@ -131,7 +175,13 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
                         // TODO implement this in the future
                     }break;
                 }
+            }
 
+            // touchProcessed is needed to prevent multiple intent from being sent
+            if( selectedQR != null && !touchProcessed ) {
+                touchProcessed = true;
+                Intent intent = new Intent(QrCodeDetectActivity.this, QrCodeListActivity.class );
+                startActivity(intent);
             }
         }
 

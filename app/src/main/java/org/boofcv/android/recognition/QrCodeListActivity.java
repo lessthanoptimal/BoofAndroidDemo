@@ -30,6 +30,7 @@ public class QrCodeListActivity extends AppCompatActivity {
     List<QrCode> qrcodes = new ArrayList<>();
 
     TextView textMessage;
+    ListView listView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +40,7 @@ public class QrCodeListActivity extends AppCompatActivity {
         setContentView(R.layout.qrcode_list);
 
         // Create the list of QR Codes
-        final ListView listView = findViewById(R.id.list_view);
+        listView = findViewById(R.id.list_view);
         ArrayList<String> listItems=new ArrayList<>();
         synchronized (uniqueLock) {
             for (QrCode qr : QrCodeDetectActivity.unique.values()) {
@@ -70,6 +71,26 @@ public class QrCodeListActivity extends AppCompatActivity {
             textMode.setText(""+qr.mode);
             textMessage.setText(""+qr.message);
         });
+
+        if( QrCodeDetectActivity.selectedQR != null ) {
+            moveToSelected(QrCodeDetectActivity.selectedQR);
+        }
+    }
+
+    private void moveToSelected( String target ) {
+        int matched = -1;
+        for (int i = 0; i < qrcodes.size(); i++) {
+            if( qrcodes.get(i).message.equals(target)) {
+                matched = i;
+                break;
+            }
+        }
+
+        if( matched != -1 ) {
+            listView.smoothScrollToPosition(matched);
+            listView.performItemClick(listView.getChildAt(matched),matched,
+                    listView.getItemIdAtPosition(matched));
+        }
     }
 
     public void pressedCopyMessage( View view ) {

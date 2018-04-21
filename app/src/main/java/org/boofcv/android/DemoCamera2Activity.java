@@ -463,7 +463,12 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
         }
     }
 
-    float pts[] = new float[2];
+    final float pts[] = new float[2];
+
+    /**
+     * Applies the matrix to the specified point. Make sure only ONE thread uses this at any
+     * moment.
+     */
     public void applyToPoint(Matrix matrix , double x , double y , Point2D_F64 out ) {
         pts[0] = (float)x;
         pts[1] = (float)y;
