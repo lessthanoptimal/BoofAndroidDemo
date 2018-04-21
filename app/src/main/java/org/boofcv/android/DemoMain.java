@@ -35,8 +35,7 @@ import org.boofcv.android.detect.DetectBlackPolygonActivity;
 import org.boofcv.android.detect.LineDisplayActivity;
 import org.boofcv.android.detect.PointDisplayActivity;
 import org.boofcv.android.detect.ScalePointDisplayActivity;
-import org.boofcv.android.detect.SegmentationDisplayActivity;
-import org.boofcv.android.ip.BinaryDisplayActivity;
+import org.boofcv.android.ip.BinaryOpsDisplayActivity;
 import org.boofcv.android.ip.BlurDisplayActivity;
 import org.boofcv.android.ip.EnhanceDisplayActivity;
 import org.boofcv.android.ip.GradientDisplayActivity;
@@ -47,6 +46,7 @@ import org.boofcv.android.recognition.FiducialSquareBinaryActivity;
 import org.boofcv.android.recognition.FiducialSquareImageActivity;
 import org.boofcv.android.recognition.ImageClassificationActivity;
 import org.boofcv.android.recognition.QrCodeDetectActivity;
+import org.boofcv.android.segmentation.SuperpixelDisplayActivity;
 import org.boofcv.android.sfm.DisparityActivity;
 import org.boofcv.android.sfm.MosaicDisplayActivity;
 import org.boofcv.android.sfm.StabilizeDisplayActivity;
@@ -136,6 +136,7 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 
 	private void createGroups() {
 		Group ip = new Group("Image Processing");
+		Group segment = new Group("Segmentation");
 		Group detect = new Group("Detection");
 		Group assoc = new Group("Association");
 		Group tracker = new Group("Tracking");
@@ -146,9 +147,11 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		ip.addChild("Blur",BlurDisplayActivity.class);
 		ip.addChild("Gradient",GradientDisplayActivity.class);
 		ip.addChild("Binarization",ThresholdDisplayActivity.class);
-		ip.addChild("Binary Ops",BinaryDisplayActivity.class);
+		ip.addChild("Binary Ops",BinaryOpsDisplayActivity.class);
 		ip.addChild("Enhance",EnhanceDisplayActivity.class);
 		ip.addChild("Transform",ImageTransformActivity.class);
+
+		segment.addChild("Superpixel",SuperpixelDisplayActivity.class);
 
 		detect.addChild("Corner/Blob",PointDisplayActivity.class);
 		detect.addChild("Scale Space",ScalePointDisplayActivity.class);
@@ -157,8 +160,6 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		detect.addChild("Contour Shapes",ContourShapeFittingActivity.class);
 		detect.addChild("Black Polygon",DetectBlackPolygonActivity.class);
 		detect.addChild("Black Ellipse",DetectBlackEllipseActivity.class);
-		// segmentation is just too slow right now
-		detect.addChild("Segmentation",SegmentationDisplayActivity.class);
 
 		assoc.addChild("Two Pictures",AssociationActivity.class);
 
@@ -183,6 +184,7 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		sfm.addChild("Mosaic",MosaicDisplayActivity.class);
 
 		groups.add(ip);
+		groups.add(segment);
 		groups.add(detect);
 		groups.add(assoc);
 		groups.add(tracker);

@@ -1,4 +1,4 @@
-package org.boofcv.android.detect;
+package org.boofcv.android.segmentation;
 
 import android.graphics.Canvas;
 import android.graphics.Matrix;
@@ -38,7 +38,7 @@ import boofcv.struct.image.Planar;
  *
  * @author Peter Abeles
  */
-public class SegmentationDisplayActivity extends DemoBitmapCamera2Activity
+public class SuperpixelDisplayActivity extends DemoBitmapCamera2Activity
 		implements AdapterView.OnItemSelectedListener
 {
 
@@ -49,7 +49,7 @@ public class SegmentationDisplayActivity extends DemoBitmapCamera2Activity
 
 	private GestureDetector mDetector;
 
-	public SegmentationDisplayActivity() {
+	public SuperpixelDisplayActivity() {
 		super(Resolution.MEDIUM);
 	}
 

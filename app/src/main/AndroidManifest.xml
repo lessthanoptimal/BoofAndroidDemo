@@ -45,7 +45,7 @@
         <activity android:name=".ip.BlurDisplayActivity"/>
         <activity android:name=".ip.EnhanceDisplayActivity"/>
         <activity android:name=".ip.GradientDisplayActivity"/>
-        <activity android:name=".ip.BinaryDisplayActivity"/>
+        <activity android:name=".ip.BinaryOpsDisplayActivity"/>
         <activity android:name=".detect.PointDisplayActivity" />
         <activity android:name=".detect.ScalePointDisplayActivity" />
         <activity android:name=".detect.LineDisplayActivity" />
@@ -72,7 +72,7 @@
         <activity android:name=".detect.ContourShapeFittingActivity"/>
         <activity android:name=".detect.CannyEdgeActivity"/>
         <activity android:name=".calib.UndistortDisplayActivity"/>
-        <activity android:name=".detect.SegmentationDisplayActivity"/>
+        <activity android:name=".segmentation.SuperpixelDisplayActivity"/>
         <activity android:name=".ip.ThresholdDisplayActivity"/>
         <activity android:name=".recognition.FiducialSquareBinaryActivity"/>
         <activity android:name=".recognition.FiducialSquareBinaryHelpActivity" />

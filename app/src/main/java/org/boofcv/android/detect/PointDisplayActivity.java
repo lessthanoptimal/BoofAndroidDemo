@@ -9,7 +9,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
 import android.widget.Spinner;
 
 import org.boofcv.android.DemoCamera2Activity;
@@ -19,11 +21,15 @@ import org.boofcv.android.R;
 import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
+import boofcv.abst.feature.detect.interest.ConfigFastCorner;
+import boofcv.abst.feature.detect.interest.GeneralToPointDetector;
+import boofcv.abst.feature.detect.interest.PointDetector;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.alg.feature.detect.interest.EasyGeneralFeatureDetector;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
+import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
@@ -40,6 +46,8 @@ public class PointDisplayActivity extends DemoCamera2Activity
 		implements AdapterView.OnItemSelectedListener  {
 
 	Spinner spinner;
+	SeekBar seekRadius;
+	CheckBox checkWeighted;
 
 	Paint paintMax,paintMin;
 	NonMaxSuppression nonmaxMax;
@@ -73,6 +81,18 @@ public class PointDisplayActivity extends DemoCamera2Activity
 		spinner.setAdapter(adapter);
 		spinner.setOnItemSelectedListener(this);
 
+		seekRadius = controls.findViewById(R.id.slider_radius);
+		seekRadius.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+			@Override
+			public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+				createNewProcessor();
+			}
+			@Override public void onStartTrackingTouch(SeekBar seekBar) {}
+			@Override public void onStopTrackingTouch(SeekBar seekBar) {}
+		});
+
+		checkWeighted = controls.findViewById(R.id.check_weighted);
+		checkWeighted.setOnCheckedChangeListener((compoundButton, b) -> createNewProcessor());
 
 		ConfigExtract configCorner = new ConfigExtract(2,20,3,true,false,true);
 		ConfigExtract configBlob = new ConfigExtract(2,20,3,true,true,true);
@@ -95,37 +115,60 @@ public class PointDisplayActivity extends DemoCamera2Activity
 	}
 
 	private void setSelection( int which ) {
-		GeneralFeatureIntensity<GrayU8, GrayS16> intensity;
+		PointDetector<GrayU8> detector=null;
+		GeneralFeatureIntensity<GrayU8, GrayS16> intensity=null;
 		NonMaxSuppression nonmax = nonmaxMax;
+
+
+		int featureRadius = seekRadius.getProgress()+1;
+		boolean weighted = checkWeighted.isChecked();
+
+		int pixelTol = 10 + (int)(200*(featureRadius/(double)seekRadius.getMax()));
+		ConfigFastCorner configFast = new ConfigFastCorner(pixelTol,9);
+
+		boolean enableRadius=false;
+		boolean enabledWeighted=false;
 
 		switch( which ) {
 			case 0:
-				intensity = FactoryIntensityPoint.shiTomasi(2,false,GrayS16.class);
+				enableRadius = true;
+				enabledWeighted = true;
+				intensity = FactoryIntensityPoint.shiTomasi(featureRadius,weighted,GrayS16.class);
 				break;
 
 			case 1:
-				intensity = FactoryIntensityPoint.harris(2, 0.04f, false, GrayS16.class);
+				enableRadius = true;
+				enabledWeighted = true;
+				intensity = FactoryIntensityPoint.harris(featureRadius, 0.04f, weighted, GrayS16.class);
 				break;
 
-			case 2:
-				intensity = FactoryIntensityPoint.fast(25,9,GrayU8.class);
-				nonmax = nonmaxCandidate;
-				break;
+			case 2: {
+				enableRadius = true;
+				detector = FactoryDetectPoint.createFast(configFast,GrayU8.class);
+			}break;
 
 			case 3:
-				intensity = (GeneralFeatureIntensity)FactoryIntensityPoint.laplacian();
+				enableRadius = true;
+				// less strict requirement since it can prune features with non-max
+				intensity = FactoryIntensityPoint.fast(
+						configFast.pixelTol,configFast.minContinuous,GrayU8.class);
 				nonmax = nonmaxMinMax;
 				break;
 
 			case 4:
-				intensity = FactoryIntensityPoint.kitros(GrayS16.class);
+				intensity = (GeneralFeatureIntensity)FactoryIntensityPoint.laplacian();
+				nonmax = nonmaxMinMax;
 				break;
 
 			case 5:
-				intensity = FactoryIntensityPoint.hessian(HessianBlobIntensity.Type.DETERMINANT,GrayS16.class);
+				intensity = FactoryIntensityPoint.kitros(GrayS16.class);
 				break;
 
 			case 6:
+				intensity = FactoryIntensityPoint.hessian(HessianBlobIntensity.Type.DETERMINANT,GrayS16.class);
+				break;
+
+			case 7:
 				intensity = FactoryIntensityPoint.hessian(HessianBlobIntensity.Type.TRACE,GrayS16.class);
 				nonmax = nonmaxMinMax;
 				break;
@@ -134,7 +177,13 @@ public class PointDisplayActivity extends DemoCamera2Activity
 				throw new RuntimeException("Unknown selection");
 		}
 
-		setProcessing(new PointProcessing(intensity,nonmax));
+		checkWeighted.setEnabled(enabledWeighted);
+		seekRadius.setEnabled(enableRadius);
+
+		if( intensity != null )
+			setProcessing(new PointProcessing(intensity,nonmax));
+		else
+			setProcessing(new PointProcessing(detector));
 	}
 
 	@Override
@@ -146,7 +195,7 @@ public class PointDisplayActivity extends DemoCamera2Activity
 	public void onNothingSelected(AdapterView<?> adapterView) {}
 
 	protected class PointProcessing extends DemoProcessingAbstract<GrayU8> {
-		EasyGeneralFeatureDetector<GrayU8, GrayS16> detector;
+		PointDetector<GrayU8> detector;
 
 		NonMaxSuppression nonmax;
 
@@ -162,13 +211,25 @@ public class PointDisplayActivity extends DemoCamera2Activity
 			GeneralFeatureDetector<GrayU8, GrayS16> general =
 					new GeneralFeatureDetector<GrayU8, GrayS16>(intensity, nonmax);
 
-			detector = new EasyGeneralFeatureDetector<>(general, GrayU8.class, GrayS16.class);
+			detector = new GeneralToPointDetector<>(general, GrayU8.class, GrayS16.class);
 			this.nonmax = nonmax;
+		}
+
+		public PointProcessing(PointDetector<GrayU8> detector ) {
+			super(ImageType.single(GrayU8.class));
+			this.detector = detector;
 		}
 
 		@Override
 		public void initialize(int imageWidth, int imageHeight) {
 			radius = 3 * screenDensityAdjusted();
+
+			if( nonmax != null ) {
+				// adjust the non-max region based on image size
+				nonmax.setSearchRadius(3 * imageWidth / 320);
+				EasyGeneralFeatureDetector easy = (EasyGeneralFeatureDetector)detector;
+				easy.getDetector().setMaxFeatures(200 * imageWidth / 320);
+			}
 		}
 
 		@Override
@@ -190,25 +251,17 @@ public class PointDisplayActivity extends DemoCamera2Activity
 
 		@Override
 		public void process(GrayU8 gray) {
-			// adjust the non-max region based on image size
-			nonmax.setSearchRadius(3 * gray.width / 320);
-			detector.getDetector().setMaxFeatures(200 * gray.width / 320);
-			detector.detect(gray, null);
+			detector.process(gray);
 
 			synchronized (lockGui) {
 				maximumsGUI.reset();
 				minimumsGUI.reset();
 
-				QueueCorner maximums = detector.getMaximums();
-				QueueCorner minimums = detector.getMinimums();
-
-				for (int i = 0; i < maximums.size; i++) {
-					Point2D_I16 p = maximums.get(i);
-					maximumsGUI.grow().set(p);
-				}
-				for (int i = 0; i < minimums.size; i++) {
-					Point2D_I16 p = minimums.get(i);
-					minimumsGUI.grow().set(p);
+				if( detector.totalSets() == 1 ) {
+					maximumsGUI.addAll(detector.getPointSet(0));
+				} else {
+					minimumsGUI.addAll(detector.getPointSet(0));
+					maximumsGUI.addAll(detector.getPointSet(1));
 				}
 			}
 		}

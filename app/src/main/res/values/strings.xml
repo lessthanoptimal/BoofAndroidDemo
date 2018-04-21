@@ -95,6 +95,7 @@
         <item>Shi-Tomasi</item>
         <item>Harris</item>
         <item>FAST</item>
+        <item>FAST Intensity</item>
         <item>Laplacian</item>
         <item>KitRos</item>
         <item>Hessian Det</item>

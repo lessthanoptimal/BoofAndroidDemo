@@ -4,7 +4,7 @@ import boofcv.abst.feature.describe.ConfigBrief;
 import boofcv.abst.feature.describe.DescribeRegionPoint;
 import boofcv.abst.feature.detdesc.ConfigCompleteSift;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
-import boofcv.abst.feature.detect.interest.ConfigFast;
+import boofcv.abst.feature.detect.interest.ConfigFastCorner;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
 import boofcv.abst.feature.detect.interest.ConfigSiftDetector;
@@ -93,7 +93,7 @@ public class CreateDetectorDescriptor {
 				break;
 
 			case DETECT_FAST:
-				general = FactoryDetectPoint.createFast(new ConfigFast(20,9),new ConfigGeneralDetector(150,3,20), imageType);
+				general = FactoryDetectPoint.createFast(new ConfigFastCorner(20,9),new ConfigGeneralDetector(150,3,20), imageType);
 				break;
 
 			default:

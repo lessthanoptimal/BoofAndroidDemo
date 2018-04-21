@@ -27,7 +27,7 @@ import boofcv.struct.image.GrayU8;
  *
  * @author Peter Abeles
  */
-public class BinaryDisplayActivity extends DemoBitmapCamera2Activity
+public class BinaryOpsDisplayActivity extends DemoBitmapCamera2Activity
 		implements SeekBar.OnSeekBarChangeListener ,
 		CompoundButton.OnCheckedChangeListener,
 		AdapterView.OnItemSelectedListener {
@@ -36,7 +36,7 @@ public class BinaryDisplayActivity extends DemoBitmapCamera2Activity
 	double threshold;
 	int action;
 
-	public BinaryDisplayActivity() {
+	public BinaryOpsDisplayActivity() {
 		super(Resolution.MEDIUM);
 	}
 
@@ -45,7 +45,7 @@ public class BinaryDisplayActivity extends DemoBitmapCamera2Activity
 		super.onCreate(savedInstanceState);
 
 		LayoutInflater inflater = getLayoutInflater();
-		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.binary_controls,null);
+		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.binary_ops_controls,null);
 
 		SeekBar seek = controls.findViewById(R.id.slider_threshold);
 		seek.setOnSeekBarChangeListener(this);

@@ -23,10 +23,15 @@ Date: 2018
 - Added GMM to background
 - Mosaic and Stabilize
   * Added SURF tracker option
+- Point/Corner detector
+  * more controls
+  * another variant of FAST
 
-TODO super pixels
+TODO: super pixels
 - New menu
 - Abort button and interrupt the thread some how
+TODO: Color histogram image segmentation
+      touch screen/draw square segment based on histogram
 
 -------------------------------------------------
 Version 1.8.1
