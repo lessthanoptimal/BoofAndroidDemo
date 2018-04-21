@@ -323,11 +323,11 @@ public class DisparityActivity extends DemoCamera2Activity
 			boolean computedFeatures = false;
 			// compute image features for left or right depending on user selection
 			if( target == 1 ) {
-				setProgressMessage("Detecting Features Left");
+				setProgressMessage("Detecting Features Left", false);
 				disparity.setSource(gray);
 				computedFeatures = true;
 			} else if( target == 2 ) {
-				setProgressMessage("Detecting Features Right");
+				setProgressMessage("Detecting Features Right", false);
 				disparity.setDestination(gray);
 				computedFeatures = true;
 			}
@@ -347,10 +347,10 @@ public class DisparityActivity extends DemoCamera2Activity
 			if( disparity.disparityAlg != null ) {
 				if( computedFeatures && visualize.hasLeft && visualize.hasRight ) {
 					// rectify the images and compute the disparity
-					setProgressMessage("Rectifying");
+					setProgressMessage("Rectifying", false);
 					boolean success = disparity.rectifyImage();
 					if( success ) {
-						setProgressMessage("Disparity");
+						setProgressMessage("Disparity", false);
 						disparity.computeDisparity();
 						synchronized ( lockGui ) {
 							disparityMin = disparity.getDisparityAlg().getMinDisparity();
@@ -372,7 +372,7 @@ public class DisparityActivity extends DemoCamera2Activity
 					}
 				} else if( changeDisparityAlg != -1 && visualize.hasLeft && visualize.hasRight ) {
 					// recycle the rectified image but compute the disparity using the new algorithm
-					setProgressMessage("Disparity");
+					setProgressMessage("Disparity", false);
 					disparity.computeDisparity();
 
 					synchronized ( lockGui ) {

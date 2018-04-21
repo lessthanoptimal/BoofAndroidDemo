@@ -399,8 +399,9 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
      * displayed.  Function blocks until the dialog has been declared.
      *
      * @param message Text shown in dialog
+     * @param cancelable
      */
-    protected void setProgressMessage(final String message) {
+    protected void setProgressMessage(final String message, boolean cancelable) {
         runOnUiThread(() -> {
             synchronized ( lockProgress ) {
                 if( progressDialog != null ) {
@@ -409,6 +410,15 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
                     return;
                 }
                 progressDialog = new ProgressDialog(this);
+                if( cancelable ) {
+                    progressDialog.setCancelable(true);
+                    progressDialog.setOnCancelListener(dialogInterface -> {
+                        synchronized ( lockProgress ) {
+                            progressDialog = null;
+                        }
+                        progressCanceled();
+                    });
+                }
                 progressDialog.setMessage(message);
                 progressDialog.setIndeterminate(true);
                 progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -431,6 +441,8 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
             Thread.yield();
         }
     }
+
+    protected void progressCanceled(){}
 
     /**
      * Dismisses the progress dialog.  Can be called even if there is no progressDialog being shown.

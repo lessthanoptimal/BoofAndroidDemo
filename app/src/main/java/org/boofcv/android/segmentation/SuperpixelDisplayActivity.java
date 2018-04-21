@@ -3,7 +3,7 @@ package org.boofcv.android.segmentation;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.os.Bundle;
-import android.view.GestureDetector;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -27,6 +27,7 @@ import boofcv.android.VisualizeImageData;
 import boofcv.factory.segmentation.ConfigSlic;
 import boofcv.factory.segmentation.FactoryImageSegmentation;
 import boofcv.factory.segmentation.FactorySegmentationAlg;
+import boofcv.misc.Stoppable;
 import boofcv.struct.feature.ColorQueue_F32;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
@@ -41,13 +42,12 @@ import boofcv.struct.image.Planar;
 public class SuperpixelDisplayActivity extends DemoBitmapCamera2Activity
 		implements AdapterView.OnItemSelectedListener
 {
+	private static final String TAG = "Superpixel";
 
 	Spinner spinnerView;
 
-	Mode mode = Mode.VIEW_VIDEO;
-	boolean hasSegment = false;
+	Mode mode = Mode.VIDEO;
 
-	private GestureDetector mDetector;
 
 	public SuperpixelDisplayActivity() {
 		super(Resolution.MEDIUM);
@@ -58,7 +58,7 @@ public class SuperpixelDisplayActivity extends DemoBitmapCamera2Activity
 		super.onCreate(savedInstanceState);
 
 		LayoutInflater inflater = getLayoutInflater();
-		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.select_algorithm,null);
+		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.superpixel_controls,null);
 
 		setControls(controls);
 
@@ -69,13 +69,26 @@ public class SuperpixelDisplayActivity extends DemoBitmapCamera2Activity
 		spinnerView.setAdapter(adapter);
 		spinnerView.setOnItemSelectedListener(this);
 
-		mDetector = new GestureDetector(this, new MyGestureDetector(displayView));
-		displayView.setOnTouchListener((v, event) -> {
-            mDetector.onTouchEvent(event);
+		displayView.setOnTouchListener((view, motionEvent) -> {
+			if( motionEvent.getAction() != MotionEvent.ACTION_DOWN )
+				return false;
+			Log.i(TAG,"on touch. Mode = "+mode);
+            if( mode == Mode.VIDEO) {
+                mode = Mode.PROCESS;
+                return true;
+            } else if( mode == Mode.PROCESS )
+                return false;
+            mode = Mode.values()[2+(mode.ordinal()-1)%3];
+			Log.i(TAG," After Mode = "+mode);
             return true;
         });
 
 		Toast.makeText(this,"FAST DEVICES ONLY! Can take minutes.",Toast.LENGTH_LONG).show();
+	}
+
+	public void pressedReset( View view ) {
+		if( mode != Mode.PROCESS )
+			mode = Mode.VIDEO;
 	}
 
 	@Override
@@ -89,10 +102,7 @@ public class SuperpixelDisplayActivity extends DemoBitmapCamera2Activity
 	}
 
 	private void startSegmentProcess(int pos) {
-
-		mode = Mode.VIEW_VIDEO;
-		hasSegment = false;
-
+		mode = Mode.VIDEO;
 		ImageType<Planar<GrayU8>> type = ImageType.pl(3, GrayU8.class);
 
 		switch (pos) {
@@ -117,27 +127,6 @@ public class SuperpixelDisplayActivity extends DemoBitmapCamera2Activity
 	@Override
 	public void onNothingSelected(AdapterView<?> adapterView) {}
 
-	protected class MyGestureDetector extends GestureDetector.SimpleOnGestureListener {
-		View v;
-
-		public MyGestureDetector(View v) {
-			this.v = v;
-		}
-
-		@Override
-		public boolean onDown(MotionEvent e) {
-			// toggle just displaying the video feed versus a segmented image
-			switch( mode ) {
-				case VIEW_VIDEO:mode = Mode.VIEW_MEAN;break;
-				case VIEW_MEAN:mode = Mode.VIEW_LINES;break;
-				case VIEW_LINES:mode = Mode.VIEW_VIDEO;break;
-			}
-			if( mode == Mode.VIEW_MEAN ) {
-				hasSegment = false;
-			}
-			return true;
-		}
-	}
 
 	protected class SegmentationProcessing extends DemoProcessingAbstract<Planar<GrayU8>> {
 		GrayS32 pixelToRegion;
@@ -167,44 +156,72 @@ public class SuperpixelDisplayActivity extends DemoBitmapCamera2Activity
 
 		@Override
 		public void process(Planar<GrayU8> input) {
-			if( mode != Mode.VIEW_VIDEO ) {
-				if( !hasSegment ) {
-					// save the current image
-					background.setTo(input);
-					hasSegment = true;
-					setProgressMessage("Slowly Segmenting");
-					segmentation.segment(input, pixelToRegion);
-
-					// Computes the mean color inside each region
-					ComputeRegionMeanColor colorize = FactorySegmentationAlg.regionMeanColor(input.getImageType());
-
-					int numSegments = segmentation.getTotalSuperpixels();
-
-					segmentColor.resize(numSegments);
-					regionMemberCount.resize(numSegments);
-
-					ImageSegmentationOps.countRegionPixels(pixelToRegion, numSegments, regionMemberCount.data);
-					colorize.process(background,pixelToRegion,regionMemberCount,segmentColor);
-
-					hideProgressDialog();
+			if (mode == Mode.VIDEO) {
+				convertToBitmapDisplay(input);
+			} else if( mode == Mode.PROCESS ) {
+				// save the current image
+				background.setTo(input);
+				setProgressMessage("Segmenting", true);
+				segmentation.segment(input, pixelToRegion);
+				if( wasStopped() ) {
+					Log.d(TAG,"Was stopped!!!");
+					mode = Mode.VIDEO;
+					return;
 				}
+				// Computes the mean color inside each region
+
+				ComputeRegionMeanColor colorize = FactorySegmentationAlg.regionMeanColor(input.getImageType());
+
+				int numSegments = segmentation.getTotalSuperpixels();
+
+				segmentColor.resize(numSegments);
+				regionMemberCount.resize(numSegments);
+
+				ImageSegmentationOps.countRegionPixels(pixelToRegion, numSegments, regionMemberCount.data);
+				colorize.process(background,pixelToRegion,regionMemberCount,segmentColor);
+
+				hideProgressDialog();
+				mode = Mode.SHOW_MEAN;
+			} else {
 				synchronized (bitmapLock) {
-					VisualizeImageData.regionsColor(pixelToRegion, segmentColor, bitmap, bitmapTmp);
-					if (mode == Mode.VIEW_LINES) {
+					if (mode == Mode.SHOW_IMAGE) {
+						ConvertBitmap.planarToBitmap(background, bitmap, bitmapTmp);
+					} else if (mode == Mode.SHOW_MEAN) {
+						VisualizeImageData.regionsColor(pixelToRegion, segmentColor, bitmap, bitmapTmp);
+					} else if (mode == Mode.SHOW_LINES) {
+						VisualizeImageData.regionsColor(pixelToRegion, segmentColor, bitmap, bitmapTmp);
 						VisualizeImageData.regionBorders(pixelToRegion, 0xFF0000, bitmap, bitmapTmp);
 					}
 				}
-			} else {
-				synchronized (bitmapLock) {
-					ConvertBitmap.planarToBitmap(input, bitmap, bitmapTmp);
-				}
 			}
+		}
+
+		private boolean wasStopped() {
+			try {
+				return ((Stoppable)segmentation).isStopRequested();
+			} catch( RuntimeException ignore){
+				return false;
+			}
+		}
+
+		public void requestStop() {
+			try {
+				((Stoppable)segmentation).requestStop();
+			} catch( RuntimeException ignore){}
 		}
 	}
 
+	@Override
+	protected void progressCanceled() {
+		Log.d(TAG,"Requesting stop.");
+		((SegmentationProcessing)processor).requestStop();
+	}
+
 	enum Mode {
-		VIEW_VIDEO,
-		VIEW_MEAN,
-		VIEW_LINES
+		VIDEO,
+		PROCESS,
+		SHOW_MEAN,
+		SHOW_LINES,
+		SHOW_IMAGE
 	}
 }

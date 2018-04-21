@@ -227,7 +227,7 @@ public class AssociationActivity extends DemoCamera2Activity
 			if( changedAlg ) {
 				changedAlg = false;
 				if( visualize.hasLeft || visualize.hasRight ) {
-					setProgressMessage("Detect/Describe images");
+					setProgressMessage("Detect/Describe images", false);
 				}
 
 				// recompute image features with the newly selected algorithm
@@ -249,7 +249,7 @@ public class AssociationActivity extends DemoCamera2Activity
 
 			// compute image features for left or right depending on user selection
 			if( target != 0 )
-				setProgressMessage("Detect/Describe image");
+				setProgressMessage("Detect/Describe image", false);
 
 			if( target == 1 ) {
 				detDesc.detect(gray);
@@ -271,7 +271,7 @@ public class AssociationActivity extends DemoCamera2Activity
 
 			// associate image features
 			if( computedFeatures && visualize.hasLeft && visualize.hasRight ) {
-				setProgressMessage("Associating");
+				setProgressMessage("Associating", false);
 				associate.setSource(listSrc);
 				associate.setDestination(listDst);
 				associate.associate();
