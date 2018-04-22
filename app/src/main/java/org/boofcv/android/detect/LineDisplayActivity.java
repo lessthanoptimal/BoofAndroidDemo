@@ -186,7 +186,7 @@ public class LineDisplayActivity extends DemoCamera2Activity
 
 		@Override
 		public void onDraw(Canvas canvas, Matrix imageToView) {
-			canvas.setMatrix(imageToView);
+			canvas.concat(imageToView);
 			synchronized (lockGui) {
 				for( LineSegment2D_F32 s : lines.toList() )  {
 					canvas.drawLine(s.a.x,s.a.y,s.b.x,s.b.y,paint);

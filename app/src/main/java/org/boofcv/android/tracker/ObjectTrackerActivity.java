@@ -221,7 +221,7 @@ public class ObjectTrackerActivity extends DemoCamera2Activity
 		@Override
 		public void onDraw(Canvas canvas, Matrix imageToView) {
 
-			canvas.setMatrix(imageToView);
+			canvas.concat(imageToView);
 			if( mode == 1 ) {
 				Point2D_F64 a = new Point2D_F64();
 				Point2D_F64 b = new Point2D_F64();

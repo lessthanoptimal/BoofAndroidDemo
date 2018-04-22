@@ -211,7 +211,7 @@ public class ContourShapeFittingActivity extends DemoBitmapCamera2Activity
 		@Override
 		public void onDraw(Canvas canvas, Matrix imageToView) {
 			drawBitmap(canvas,imageToView);
-			canvas.setMatrix(imageToView);
+			canvas.concat(imageToView);
 			synchronized (lockGui) {
 				for(int i = 0; i < ellipsesVis.size; i++ ) {
 					EllipseRotated_F64 ellipse = ellipsesVis.get(i);
@@ -281,7 +281,7 @@ public class ContourShapeFittingActivity extends DemoBitmapCamera2Activity
 		@Override
 		public void onDraw(Canvas canvas, Matrix imageToView) {
 			drawBitmap(canvas,imageToView);
-			canvas.setMatrix(imageToView);
+			canvas.concat(imageToView);
 			synchronized (lockGui) {
 				for( int i = 0; i < visPoly.size; i++ ) {
 					Polygon2D_I32 poly = visPoly.get(i);

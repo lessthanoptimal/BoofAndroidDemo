@@ -147,7 +147,7 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
 
         @Override
         public void onDraw(Canvas canvas, Matrix imageToView) {
-            canvas.setMatrix(imageToView);
+            canvas.concat(imageToView);
             synchronized (lockGui) {
                 if( oldValue != uniqueCount ) {
                     oldValue = uniqueCount;

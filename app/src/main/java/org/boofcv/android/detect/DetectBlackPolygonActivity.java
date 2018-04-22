@@ -251,7 +251,7 @@ public class DetectBlackPolygonActivity extends DemoBitmapCamera2Activity
 				canvas.drawBitmap(bitmap, imageToView, null);
 			}
 
-			canvas.setMatrix(imageToView);
+			canvas.concat(imageToView);
 			synchronized (copy) {
 				for( int i = 0; i < copy.size; i++ ) {
 					Polygon2D_F64 s = copy.get(i);

@@ -177,7 +177,7 @@ implements CompoundButton.OnCheckedChangeListener
 			if( !showFeatures )
 				return;
 
-			canvas.setMatrix(imageToView);
+			canvas.concat(imageToView);
 			synchronized (lockGui) {
 				Point2D_F64 p0 = corners.p0;
 				Point2D_F64 p1 = corners.p1;

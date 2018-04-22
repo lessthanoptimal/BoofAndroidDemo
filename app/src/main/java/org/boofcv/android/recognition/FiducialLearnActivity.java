@@ -161,7 +161,7 @@ public class FiducialLearnActivity extends DemoCamera2Activity
 
 			boolean selected = false;
 			synchronized (lockGui) {
-				canvas.setMatrix(imageToView);
+				canvas.concat(imageToView);
 				for (int i = 0; i < numDetected; i++) {
 					FiducialDetector.Detected d = detected[i];
 

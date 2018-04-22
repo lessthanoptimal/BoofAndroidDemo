@@ -225,7 +225,7 @@ public class AssociationVisualize {
 		renderToScreen.postScale((float)scale,(float)scale);
 		renderToScreen.postTranslate((float)tranX,(float)tranY);
 
-		canvas.setMatrix(renderToScreen);
+		canvas.concat(renderToScreen);
 
 		int startX = bitmapSrc.getWidth()+SEPARATION;
 

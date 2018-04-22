@@ -79,6 +79,7 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
     private Rect bounds0 = new Rect();
     private Rect bounds1 = new Rect();
     private Rect bounds2 = new Rect();
+    private final Matrix tempMatrix = new Matrix();
 
     public DemoCamera2Activity(Resolution resolution) {
         super.targetResolution = resolutionToPixels(resolution);
@@ -96,6 +97,18 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
         paintText.setTextAlign(Paint.Align.LEFT);
         paintText.setARGB(0xFF,0xFF,0xB0,0);
         paintText.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD));
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // this is an attempt to prevent the leaked window error.
+        synchronized (lockProgress) {
+            if( progressDialog != null ) {
+                progressDialog.dismiss();
+                progressDialog = null;
+            }
+        }
     }
 
     /**
@@ -347,7 +360,11 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
      * Renders how fast the algorithm and rendering is running
      */
     private void renderSpeed(Canvas canvas, double processPeriod, double renderPeriod) {
-        canvas.setMatrix(identity);
+        // attempt to bring it back to the original origin
+        // can't just set to identity because on older phones there
+        // will be an offset and getMatrix() doesn't include that info...
+        canvas.getMatrix().invert(tempMatrix);
+        canvas.concat(tempMatrix);
 
         Locale local = Locale.getDefault();
         String line0 = String.format(local,"%dx%d",bitmap.getWidth(),bitmap.getHeight());
@@ -404,6 +421,9 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
      */
     protected void setProgressMessage(final String message, boolean cancelable) {
         runOnUiThread(() -> {
+            if( isFinishing() || isDestroyed() )
+                return;
+
             synchronized ( lockProgress ) {
                 if( progressDialog != null ) {
                     // a dialog is already open, change the message

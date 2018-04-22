@@ -167,7 +167,7 @@ public class DetectBlackEllipseActivity extends DemoBitmapCamera2Activity
 		public void onDraw(Canvas canvas, Matrix imageToView) {
 			drawBitmap(canvas,imageToView);
 
-			canvas.setMatrix(imageToView);
+			canvas.concat(imageToView);
 			synchronized (lockGui) {
 				for (EllipseRotated_F64 ellipse : ellipses.toList()) {
 

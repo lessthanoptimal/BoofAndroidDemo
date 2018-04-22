@@ -56,7 +56,7 @@ public class ScalePointDisplayActivity extends DemoCamera2Activity
 		paintMax.setStrokeWidth(strokeWidth);
 
 		LayoutInflater inflater = getLayoutInflater();
-		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.detect_point_controls,null);
+		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.select_algorithm,null);
 
 		spinner = controls.findViewById(R.id.spinner_algs);
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
@@ -124,7 +124,7 @@ public class ScalePointDisplayActivity extends DemoCamera2Activity
 
 		@Override
 		public void onDraw(Canvas canvas, Matrix imageToView) {
-			canvas.setMatrix(imageToView);
+			canvas.concat(imageToView);
 			synchronized (lockGui) {
 				for (int i = 0; i < foundGUI.size(); i++) {
 					ScalePoint p = foundGUI.get(i);

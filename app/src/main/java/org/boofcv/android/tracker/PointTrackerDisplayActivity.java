@@ -71,7 +71,7 @@ public abstract class PointTrackerDisplayActivity extends DemoCamera2Activity {
 		@Override
 		public void onDraw(Canvas canvas, Matrix imageToView) {
 
-			canvas.setMatrix(imageToView);
+			canvas.concat(imageToView);
 			synchronized (lockTracks) {
 				for (int i = 0; i < trackSrc.size(); i++) {
 					Point2D_F64 s = trackSrc.get(i);

@@ -132,13 +132,13 @@ public class CannyEdgeActivity extends DemoCamera2Activity
 			int height = bitmap.getHeight();
 			int wh = width+height;
 			canvas.save();
-			canvas.setMatrix(imageToView);
+			canvas.concat(imageToView);
 			canvas.drawRect(0,0,width,height,paintFade);
 
 			if( lineLimit ) {
 				canvas.restore();
 				canvas.drawText("Too Many\nPoints", 80, 80, paintText);
-				canvas.setMatrix(imageToView);
+				canvas.concat(imageToView);
 			}
 
 			if( !colorize )

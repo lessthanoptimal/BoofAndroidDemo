@@ -235,7 +235,7 @@ public class PointDisplayActivity extends DemoCamera2Activity
 		@Override
 		public void onDraw(Canvas canvas, Matrix imageToView) {
 
-			canvas.setMatrix(imageToView);
+			canvas.concat(imageToView);
 			synchronized (lockGui) {
 				for (int i = 0; i < maximumsGUI.size; i++) {
 					Point2D_I16 p = maximumsGUI.get(i);

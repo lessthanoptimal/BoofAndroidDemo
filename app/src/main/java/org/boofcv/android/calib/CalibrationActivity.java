@@ -236,7 +236,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 			}
 
 			synchronized (lockGUI) {
-				canvas.setMatrix(imageToView);
+				canvas.concat(imageToView);
 
 				// draw shapes for debugging purposes
 				for (List<Point2D_I32> l : debugQuads) {

@@ -228,7 +228,7 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 			}
 
 			canvas.save();
-			canvas.setMatrix(imageToView);
+			canvas.concat(imageToView);
 			synchronized (listPose) {
 				for ( int i = 0; i < listPose.size; i++ ) {
 					double width = listWidths.get(i);

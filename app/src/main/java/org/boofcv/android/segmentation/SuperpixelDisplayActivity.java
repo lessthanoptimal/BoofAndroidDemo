@@ -198,6 +198,13 @@ public class SuperpixelDisplayActivity extends DemoBitmapCamera2Activity
 			}
 		}
 
+		@Override
+		public void stop() {
+			if( mode == Mode.PROCESS ) {
+				requestStop();
+			}
+		}
+
 		private boolean wasStopped() {
 			try {
 				return ((Stoppable)segmentation).isStopRequested();
