@@ -130,8 +130,8 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 	}
 
 	@Override
-	protected void onCameraResolutionChange(int width, int height) {
-		super.onCameraResolutionChange(width, height);
+	protected void onCameraResolutionChange(int width, int height, int sensorOrientation) {
+		super.onCameraResolutionChange(width, height,sensorOrientation);
 		synchronized (bitmapLock) {
 			if (bitmap.getWidth() != width || bitmap.getHeight() != height)
 				bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
@@ -217,8 +217,8 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 		}
 
 		@Override
-		public void initialize(int imageWidth, int imageHeight) {
-			float density = screenDensityAdjusted();
+		public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
+			float density = cameraToDisplayDensity;
 			paintFailed.setStrokeWidth(7f*density);
 			radius = 6*density;
 		}

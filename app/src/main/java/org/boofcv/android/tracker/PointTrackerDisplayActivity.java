@@ -63,9 +63,9 @@ public abstract class PointTrackerDisplayActivity extends DemoCamera2Activity {
 		}
 
 		@Override
-		public void initialize(int imageWidth, int imageHeight) {
-			paintLine.setStrokeWidth(3*screenDensityAdjusted());
-			circleRadius = 2*screenDensityAdjusted();
+		public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
+			paintLine.setStrokeWidth(3*cameraToDisplayDensity);
+			circleRadius = 2*cameraToDisplayDensity;
 		}
 
 		@Override

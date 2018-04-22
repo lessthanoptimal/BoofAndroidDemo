@@ -115,7 +115,7 @@ public class UndistortDisplayActivity extends DemoBitmapCamera2Activity
 		}
 
 		@Override
-		public void initialize(int imageWidth, int imageHeight) {
+		public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
 			undistorted = imageType.createImage(imageWidth,imageHeight);
 
 			CameraPinholeRadial intrinsic = DemoMain.preference.lookup(

@@ -136,14 +136,14 @@ public class FiducialLearnActivity extends DemoCamera2Activity
 		}
 
 		@Override
-		public void initialize(int imageWidth, int imageHeight) {
+		public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
 			paintBorder.setColor(Color.BLACK);
 			paintBorder.setStyle(Paint.Style.STROKE);
-			paintBorder.setStrokeWidth(3*screenDensityAdjusted());
+			paintBorder.setStrokeWidth(3*cameraToDisplayDensity);
 
 			paintInside.setColor(Color.RED);
 			paintInside.setStyle(Paint.Style.STROKE);
-			paintInside.setStrokeWidth(2*screenDensityAdjusted());
+			paintInside.setStrokeWidth(2*cameraToDisplayDensity);
 
 			double fov[] = cameraNominalFov();
 			CameraPinholeRadial intrinsic = MiscUtil.checkThenInventIntrinsic(imageWidth,imageHeight,fov[0],fov[1]);

@@ -158,9 +158,9 @@ public class DetectBlackEllipseActivity extends DemoBitmapCamera2Activity
 		}
 
 		@Override
-		public void initialize(int imageWidth, int imageHeight) {
+		public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
 			binary.reshape(imageWidth,imageHeight);
-			paint.setStrokeWidth(5.0f*screenDensityAdjusted());
+			paint.setStrokeWidth(5.0f*cameraToDisplayDensity);
 		}
 
 		@Override

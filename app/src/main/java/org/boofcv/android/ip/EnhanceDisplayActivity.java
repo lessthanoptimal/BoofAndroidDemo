@@ -134,7 +134,7 @@ public class EnhanceDisplayActivity extends DemoBitmapCamera2Activity
 		}
 
 		@Override
-		public void initialize(int imageWidth, int imageHeight) {
+		public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
 			enhanced.reshape(imageWidth,imageHeight);
 		}
 
@@ -156,7 +156,7 @@ public class EnhanceDisplayActivity extends DemoBitmapCamera2Activity
 		}
 
 		@Override
-		public void initialize(int imageWidth, int imageHeight) {
+		public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
 			gray.reshape(imageWidth,imageHeight);
 			enhanced.reshape(imageWidth,imageHeight);
 		}

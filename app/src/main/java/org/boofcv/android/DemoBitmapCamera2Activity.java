@@ -21,8 +21,8 @@ public abstract class DemoBitmapCamera2Activity extends DemoCamera2Activity {
     }
 
     @Override
-    protected void onCameraResolutionChange(int width, int height) {
-        super.onCameraResolutionChange(width, height);
+    protected void onCameraResolutionChange(int width, int height, int sensorOrientation) {
+        super.onCameraResolutionChange(width, height,sensorOrientation);
         synchronized (bitmapLock) {
             if (bitmap.getWidth() != width || bitmap.getHeight() != height)
                 bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);

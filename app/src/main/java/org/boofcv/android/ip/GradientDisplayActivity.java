@@ -107,7 +107,7 @@ implements AdapterView.OnItemSelectedListener
 		}
 
 		@Override
-		public void initialize(int imageWidth, int imageHeight) {
+		public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
 			derivX = new GrayS16(imageWidth,imageHeight);
 			derivY = new GrayS16(imageWidth,imageHeight);
 		}

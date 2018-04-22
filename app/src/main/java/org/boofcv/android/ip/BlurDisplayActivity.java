@@ -135,7 +135,7 @@ public class BlurDisplayActivity extends DemoBitmapCamera2Activity
 		}
 
 		@Override
-		public void initialize(int imageWidth, int imageHeight) {
+		public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
 			blurred = new GrayU8(imageWidth,imageHeight);
 		}
 

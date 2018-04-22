@@ -116,7 +116,7 @@ public class CannyEdgeActivity extends DemoCamera2Activity
 		}
 
 		@Override
-		public void initialize(int imageWidth, int imageHeight) {
+		public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
 			// predeclare some memory
 			synchronized (contours) {
 				contours.growArray(5000);

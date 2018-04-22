@@ -96,7 +96,7 @@ public class ColorHistogramSegmentationActivity extends DemoBitmapCamera2Activit
         }
 
         @Override
-        public void initialize(int imageWidth, int imageHeight) {
+        public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
         }
 
         @Override

@@ -180,7 +180,7 @@ public class LineDisplayActivity extends DemoCamera2Activity
 
 
 		@Override
-		public void initialize(int imageWidth, int imageHeight) {
+		public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
 
 		}
 

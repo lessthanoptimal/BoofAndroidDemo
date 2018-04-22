@@ -135,7 +135,7 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
         }
 
         @Override
-        public void initialize(int imageWidth, int imageHeight) {
+        public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
             touchProcessed = false;
             selectedQR = null;
             touching = false;

@@ -144,7 +144,7 @@ public class SuperpixelDisplayActivity extends DemoBitmapCamera2Activity
 		}
 
 		@Override
-		public void initialize(int imageWidth, int imageHeight) {
+		public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
 			pixelToRegion = new GrayS32(imageWidth,imageHeight);
 			background = new Planar<>(GrayU8.class, imageWidth, imageHeight, 3);
 		}

@@ -134,13 +134,13 @@ public class ContourShapeFittingActivity extends DemoBitmapCamera2Activity
 		protected abstract void finalizeShapes();
 
 		@Override
-		public void initialize(int imageWidth, int imageHeight) {
+		public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
 			binary = new GrayU8(imageWidth,imageHeight);
 			filtered1 = new GrayU8(imageWidth,imageHeight);
 			contourOutput = new GrayS32(imageWidth,imageHeight);
 
 			paint.setStyle(Paint.Style.STROKE);
-			paint.setStrokeWidth(3f*screenDensityAdjusted());
+			paint.setStrokeWidth(3f*cameraToDisplayDensity);
 			paint.setColor(Color.RED);
 		}
 

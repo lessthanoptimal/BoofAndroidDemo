@@ -112,7 +112,7 @@ public class BinaryOpsDisplayActivity extends DemoBitmapCamera2Activity
 		}
 
 		@Override
-		public void initialize(int imageWidth, int imageHeight) {
+		public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
 			binary = new GrayU8(imageWidth,imageHeight);
 			afterOps = new GrayU8(imageWidth,imageHeight);
 		}

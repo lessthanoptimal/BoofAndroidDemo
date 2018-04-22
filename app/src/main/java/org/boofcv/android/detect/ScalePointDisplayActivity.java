@@ -118,8 +118,8 @@ public class ScalePointDisplayActivity extends DemoCamera2Activity
 		}
 
 		@Override
-		public void initialize(int imageWidth, int imageHeight) {
-			density = screenDensityAdjusted();
+		public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
+			density = cameraToDisplayDensity;
 		}
 
 		@Override

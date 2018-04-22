@@ -141,7 +141,7 @@ implements CompoundButton.OnCheckedChangeListener
 		}
 
 		@Override
-		public void initialize(int imageWidth, int imageHeight) {
+		public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
 
 			outputWidth = imageWidth*2;
 			outputHeight = imageHeight*2;
@@ -151,7 +151,7 @@ implements CompoundButton.OnCheckedChangeListener
 			}
 
 			int rotation = getWindowManager().getDefaultDisplay().getRotation();
-			videoToDisplayMatrix(outputWidth, outputHeight,mSensorOrientation,
+			videoToDisplayMatrix(outputWidth, outputHeight,sensorOrientation,
 					viewWidth,viewHeight,rotation*90, stretchToFill,imageToView);
 
 			int tx = outputWidth/2 - imageWidth/4;
@@ -162,7 +162,7 @@ implements CompoundButton.OnCheckedChangeListener
 
 			alg.configure(outputWidth,outputHeight,init);
 
-			float density = screenDensityAdjusted();
+			float density = cameraToDisplayDensity;
 			radius = 3*density;
 			paintBorder.setStrokeWidth(8*density);
 

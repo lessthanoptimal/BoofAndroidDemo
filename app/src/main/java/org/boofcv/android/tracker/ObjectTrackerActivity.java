@@ -205,11 +205,11 @@ public class ObjectTrackerActivity extends DemoCamera2Activity
 		}
 
 		@Override
-		public void initialize(int imageWidth, int imageHeight) {
+		public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
 			this.width = imageWidth;
 			this.height = imageHeight;
 
-			float density = screenDensityAdjusted();
+			float density = cameraToDisplayDensity;
 			paintSelected.setStrokeWidth(5f*density);
 			paintLine0.setStrokeWidth(5f*density);
 			paintLine1.setStrokeWidth(5f*density);

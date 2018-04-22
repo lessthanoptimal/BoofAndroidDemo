@@ -189,7 +189,7 @@ public class StaticBackgroundMotionActivity extends DemoBitmapCamera2Activity
 		}
 
 		@Override
-		public void initialize(int imageWidth, int imageHeight) {
+		public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
 			binary.reshape(imageWidth, imageHeight);
 			work.reshape(imageWidth, imageHeight);
 			scaled.reshape(imageWidth/3,imageHeight/3);

@@ -186,7 +186,7 @@ public class AssociationActivity extends DemoCamera2Activity
 		}
 
 		@Override
-		public void initialize(int imageWidth, int imageHeight) {
+		public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
 			visualize.initializeImages( imageWidth, imageHeight );
 			changedAlg = true;
 		}

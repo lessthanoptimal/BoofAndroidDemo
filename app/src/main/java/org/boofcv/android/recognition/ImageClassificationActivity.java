@@ -210,7 +210,7 @@ public class ImageClassificationActivity extends DemoBitmapCamera2Activity
         }
 
         @Override
-        public void initialize(int imageWidth, int imageHeight) {
+        public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
             workImage.reshape(imageWidth,imageHeight);
         }
 

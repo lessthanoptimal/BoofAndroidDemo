@@ -14,7 +14,7 @@ import boofcv.struct.image.ImageType;
  * @param <T>
  */
 public interface DemoProcessing<T extends ImageBase<T>> {
-    void initialize( int imageWidth , int imageHeight );
+    void initialize(int imageWidth, int imageHeight, int sensorOrientation);
 
     /**
      * Invoked by Android GUI thread.  Should be run as fast as possible to avoid making the GUI feel sluggish.

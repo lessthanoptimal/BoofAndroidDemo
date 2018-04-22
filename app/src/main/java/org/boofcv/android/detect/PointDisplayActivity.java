@@ -221,8 +221,8 @@ public class PointDisplayActivity extends DemoCamera2Activity
 		}
 
 		@Override
-		public void initialize(int imageWidth, int imageHeight) {
-			radius = 3 * screenDensityAdjusted();
+		public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
+			radius = 3 * cameraToDisplayDensity;
 
 			if( nonmax != null ) {
 				// adjust the non-max region based on image size

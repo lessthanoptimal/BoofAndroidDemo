@@ -1,7 +1,6 @@
 package org.boofcv.android;
 
 import android.app.ProgressDialog;
-import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
@@ -13,7 +12,6 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.Size;
 import android.view.MotionEvent;
@@ -40,8 +38,12 @@ import georegression.struct.point.Point2D_F64;
  */
 public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
 
+    //######## Start variables owned by lock
     protected final Object lockProcessor = new Object();
     protected DemoProcessing processor;
+    // camera width and height when processor was initialized
+    protected int cameraWidth,cameraHeight,cameraOrientation;
+    //####### END
 
     // If true it will show the processed image, otherwise it will
     // display the input image
@@ -50,8 +52,6 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
     // Used to inform the user that its doing some calculations
     ProgressDialog progressDialog;
     protected final Object lockProgress = new Object();
-
-    protected DisplayMetrics displayMetrics;
 
     //START Timing data structures locked on super.lockTiming
     protected int totalFramesProcessed; // total frames processed for the specific processing algorithm
@@ -90,7 +90,6 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        displayMetrics = Resources.getSystem().getDisplayMetrics();
 
         paintText.setStrokeWidth(3*displayMetrics.density);
         paintText.setTextSize(24*displayMetrics.density);
@@ -141,13 +140,19 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
     }
 
     @Override
-    protected void onCameraResolutionChange( int width , int height ) {
+    protected void onCameraResolutionChange( int width , int height, int cameraOrientation ) {
         Log.i("Demo","onCameraResolutionChange called. "+width+"x"+height);
-        super.onCameraResolutionChange(width,height);
+        super.onCameraResolutionChange(width,height,cameraOrientation);
         triggerSlow = false;
-        DemoProcessing p = processor;
+        DemoProcessing p;
+        synchronized ( lockProcessor) {
+            p = processor;
+            this.cameraWidth = width;
+            this.cameraHeight = height;
+            this.cameraOrientation = cameraOrientation;
+        }
         if( p != null ) {
-            p.initialize(width,height);
+            p.initialize(cameraWidth,cameraHeight, cameraOrientation);
         } else {
             Log.i("Demo","  processor is null");
         }
@@ -226,7 +231,7 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
     }
 
     private void handleReduceResolution(DemoProcessing processor) {
-        int original = mCameraSize.getWidth()*mCameraSize.getHeight();
+        int original = cameraWidth*cameraHeight;
         targetResolution = Math.max(320*240,original/4);
         if( original != targetResolution ) {
             // Prevent new instances from launching. I hope. Not sure if this will work if
@@ -289,15 +294,11 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
             setImageType(processor.getImageType(),processor.getColorFormat());
             this.processor = processor;
 
-            // If the camera has already started running initialize it now. otherwise it will
-            // be initialized when the size is set
-            Size s = this.mCameraSize;
-            if( s != null ) {
-                Log.i("Demo","initializing processor "+s.getWidth()+"x"+s.getHeight());
-                processor.initialize(s.getWidth(),s.getHeight());
-            } else {
-                Log.i("Demo","skipping initializing processor. size not known");
-            }
+            // The camera may or may not be running at this point. That means cameraWidth/Height
+            // might not have a valid value. Worst case initialize() will be called again in
+            // the future
+            Log.i("Demo","initializing processor "+cameraWidth+"x"+cameraHeight);
+            processor.initialize(cameraWidth,cameraHeight, cameraOrientation);
 
             synchronized (lockTiming) {
                 totalFramesProcessed = 0;
@@ -497,24 +498,8 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
         out.y = pts[1];
     }
 
-    /**
-     * Some times the size of a font of stroke needs to be specified in the input image
-     * but then gets scaled to image resolution. This compensates for that.
-     */
-    public float screenDensityAdjusted() {
-        if( mCameraSize == null )
-            return displayMetrics.density;
-
-        int rotation = getWindowManager().getDefaultDisplay().getRotation();
-        int screenWidth = (rotation==0||rotation==2)?displayMetrics.widthPixels:displayMetrics.heightPixels;
-        int cameraWidth = mSensorOrientation==0||mSensorOrientation==180?
-                mCameraSize.getWidth():mCameraSize.getHeight();
-
-        return displayMetrics.density*cameraWidth/screenWidth;
-    }
-
     public CameraPinholeRadial lookupIntrinsics() {
-        return DemoMain.preference.lookup(mCameraSize.getWidth(),mCameraSize.getHeight());
+        return DemoMain.preference.lookup(cameraWidth,cameraHeight);
     }
 
     /**

@@ -106,7 +106,7 @@ public class ImageTransformActivity extends DemoBitmapCamera2Activity
 		}
 
 		@Override
-		public void initialize(int imageWidth, int imageHeight) {
+		public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
 			grayF = new GrayF32(imageWidth,imageHeight);
 			transform = new InterleavedF32(imageWidth,imageHeight,2);
 		}
@@ -150,7 +150,7 @@ public class ImageTransformActivity extends DemoBitmapCamera2Activity
 		}
 
 		@Override
-		public void initialize(int imageWidth, int imageHeight) {
+		public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
 			output = new GrayU8(imageWidth,imageHeight);
 		}
 
@@ -191,7 +191,7 @@ public class ImageTransformActivity extends DemoBitmapCamera2Activity
 		}
 
 		@Override
-		public void initialize(int imageWidth, int imageHeight) {
+		public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
 			ImageDimension d = UtilWavelet.transformDimension(imageWidth, imageHeight, waveletTran.getLevels() );
 			transform = new GrayS32(d.width,d.height);
 		}

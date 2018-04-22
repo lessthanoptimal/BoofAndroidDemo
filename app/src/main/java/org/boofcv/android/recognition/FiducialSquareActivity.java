@@ -200,7 +200,7 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 		}
 
 		@Override
-		public void initialize(int imageWidth, int imageHeight)
+		public void initialize(int imageWidth, int imageHeight, int sensorOrientation)
 		{
 			if( lookupIntrinsics() == null ) {
 				Toast.makeText(FiducialSquareActivity.this, "Calibrate camera for better results!", Toast.LENGTH_LONG).show();
@@ -208,13 +208,13 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 
 			// the adjustment requires knowing what the camera's resolution is. The camera
 			// must be initialized at this point
-			paintTextVideo.setTextSize(30*screenDensityAdjusted());
-			paintTextBorder.setTextSize(30*screenDensityAdjusted());
-			paintTextBorder.setStrokeWidth(3*screenDensityAdjusted());
-			paintLine0.setStrokeWidth(4f*screenDensityAdjusted());
-			paintLine1.setStrokeWidth(4f*screenDensityAdjusted());
-			paintLine2.setStrokeWidth(4f*screenDensityAdjusted());
-			paintLine3.setStrokeWidth(4f*screenDensityAdjusted());
+			paintTextVideo.setTextSize(30*cameraToDisplayDensity);
+			paintTextBorder.setTextSize(30*cameraToDisplayDensity);
+			paintTextBorder.setStrokeWidth(3*cameraToDisplayDensity);
+			paintLine0.setStrokeWidth(4f*cameraToDisplayDensity);
+			paintLine1.setStrokeWidth(4f*cameraToDisplayDensity);
+			paintLine2.setStrokeWidth(4f*cameraToDisplayDensity);
+			paintLine3.setStrokeWidth(4f*cameraToDisplayDensity);
 
 			double fov[] = cameraNominalFov();
 			intrinsic = MiscUtil.checkThenInventIntrinsic(imageWidth,imageHeight,fov[0],fov[1]);

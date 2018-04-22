@@ -154,10 +154,10 @@ implements CompoundButton.OnCheckedChangeListener
 		}
 
 		@Override
-		public void initialize(int imageWidth, int imageHeight) {
+		public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
 			alg.configure(imageWidth,imageHeight,null);
 
-			float density = screenDensityAdjusted();
+			float density = cameraToDisplayDensity;
 			radius = 3*density;
 			paintBorder.setStrokeWidth(5*density);
 		}

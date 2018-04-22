@@ -240,8 +240,8 @@ public class DetectBlackPolygonActivity extends DemoBitmapCamera2Activity
 		}
 
 		@Override
-		public void initialize(int imageWidth, int imageHeight) {
-			paint.setStrokeWidth(4.0f*screenDensityAdjusted());
+		public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
+			paint.setStrokeWidth(4.0f*cameraToDisplayDensity);
 			binary.reshape(imageWidth,imageHeight);
 		}
 
