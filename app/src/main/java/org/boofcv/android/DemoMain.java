@@ -14,7 +14,6 @@ import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Size;
@@ -66,7 +65,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.struct.calib.CameraPinholeRadial;
@@ -367,14 +365,14 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 
 	public static File getExternalDirectory( Activity activity ) {
 		// if possible use a public directory. If that fails use a private one
-		if(Objects.equals(Environment.getExternalStorageState(), Environment.MEDIA_MOUNTED)) {
-			File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
-			if( !dir.exists() )
-				dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-			return new File(dir,"org.boofcv.android");
-		} else {
+//		if(Objects.equals(Environment.getExternalStorageState(), Environment.MEDIA_MOUNTED)) {
+//			File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
+//			if( !dir.exists() )
+//				dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+//			return new File(dir,"org.boofcv.android");
+//		} else {
 			return activity.getExternalFilesDir(null);
-		}
+//		}
 	}
 
 	/* Creating the Hashmap for the row */

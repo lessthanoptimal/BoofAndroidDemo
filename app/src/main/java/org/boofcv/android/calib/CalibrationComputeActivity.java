@@ -1,13 +1,10 @@
 package org.boofcv.android.calib;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.os.Build;
+import android.media.MediaScannerConnection;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
@@ -102,11 +99,11 @@ public class CalibrationComputeActivity extends Activity {
 	public void pressedAccept( View v ) {
 		// save the found parameters to a file
 
-		if( !isStoragePermissionGranted() ) {
-			Toast toast = Toast.makeText(this, "Try again after granting permission", Toast.LENGTH_LONG);
-			toast.show();
-			return;
-		}
+//		if( !isStoragePermissionGranted() ) {
+//			Toast toast = Toast.makeText(this, "Try again after granting permission", Toast.LENGTH_LONG);
+//			toast.show();
+//			return;
+//		}
 
 
 		try {
@@ -130,6 +127,14 @@ public class CalibrationComputeActivity extends Activity {
 			CalibrationIO.save(intrinsic, writer);
 			fos.close();
 
+			// Scan it so that it will be visible to a computer when mounted
+			MediaScannerConnection.scanFile(this,
+					new String[] { file.getAbsolutePath() }, null,
+					(path, uri) -> {
+                        Log.i("ExternalStorage", "Scanned " + path + ":");
+                        Log.i("ExternalStorage", "-> uri=" + uri);
+                    });
+
 			// let it know that it needs to reload intrinsic parameters
 			DemoMain.changedPreferences = true;
 
@@ -146,33 +151,33 @@ public class CalibrationComputeActivity extends Activity {
 		}
 	}
 
-	public  boolean isStoragePermissionGranted() {
-		if (Build.VERSION.SDK_INT >= 23) {
-			if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-					== PackageManager.PERMISSION_GRANTED) {
-				Log.v(TAG,"Permission is granted");
-				return true;
-			} else {
-
-				Log.v(TAG,"Permission is revoked");
-				ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-				return false;
-			}
-		}
-		else { //permission is automatically granted on sdk<23 upon installation
-			Log.v(TAG,"Permission is granted");
-			return true;
-		}
-	}
-
-	@Override
-	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-		if(grantResults[0]== PackageManager.PERMISSION_GRANTED){
-			Log.v("Calibration","Permission: "+permissions[0]+ "was "+grantResults[0]);
-			//resume tasks needing this permission
-		}
-	}
+//	public  boolean isStoragePermissionGranted() {
+//		if (Build.VERSION.SDK_INT >= 23) {
+//			if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+//					== PackageManager.PERMISSION_GRANTED) {
+//				Log.v(TAG,"Permission is granted");
+//				return true;
+//			} else {
+//
+//				Log.v(TAG,"Permission is revoked");
+//				ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+//				return false;
+//			}
+//		}
+//		else { //permission is automatically granted on sdk<23 upon installation
+//			Log.v(TAG,"Permission is granted");
+//			return true;
+//		}
+//	}
+//
+//	@Override
+//	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+//		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//		if(grantResults[0]== PackageManager.PERMISSION_GRANTED){
+//			Log.v("Calibration","Permission: "+permissions[0]+ "was "+grantResults[0]);
+//			//resume tasks needing this permission
+//		}
+//	}
 
 	public void stopThread() {
 		if( thread != null ) {
