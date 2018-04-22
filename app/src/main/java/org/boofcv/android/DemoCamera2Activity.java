@@ -286,7 +286,7 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
                 this.processor.stop();
             }
             // switch it over to the new one
-            setImageType(processor.getImageType());
+            setImageType(processor.getImageType(),processor.getColorFormat());
             this.processor = processor;
 
             // If the camera has already started running initialize it now. otherwise it will
@@ -482,6 +482,14 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
      * moment.
      */
     public void applyToPoint(Matrix matrix , double x , double y , Point2D_F64 out ) {
+        pts[0] = (float)x;
+        pts[1] = (float)y;
+        matrix.mapPoints(pts);
+        out.x = pts[0];
+        out.y = pts[1];
+    }
+
+    public static void applyToPoint(Matrix matrix , double x , double y , Point2D_F64 out, float pts[] ) {
         pts[0] = (float)x;
         pts[1] = (float)y;
         matrix.mapPoints(pts);

@@ -6,7 +6,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 
 import org.boofcv.android.DemoCamera2Activity;
-import org.boofcv.android.DemoProcessing;
+import org.boofcv.android.DemoProcessingAbstract;
 import org.ddogleg.struct.FastQueue;
 
 import java.util.ArrayList;
@@ -15,7 +15,6 @@ import java.util.List;
 import boofcv.abst.feature.tracker.PointTrack;
 import boofcv.abst.feature.tracker.PointTracker;
 import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 
 /**
@@ -40,7 +39,7 @@ public abstract class PointTrackerDisplayActivity extends DemoCamera2Activity {
 		paintBlue.setStyle(Paint.Style.FILL);
 	}
 
-	protected class PointProcessing implements DemoProcessing<GrayU8> {
+	protected class PointProcessing extends DemoProcessingAbstract<GrayU8> {
 		PointTracker<GrayU8> tracker;
 
 		long tick;
@@ -59,6 +58,7 @@ public abstract class PointTrackerDisplayActivity extends DemoCamera2Activity {
 		float circleRadius;
 
 		public PointProcessing( PointTracker<GrayU8> tracker ) {
+			super(GrayU8.class);
 			this.tracker = tracker;
 		}
 
@@ -158,19 +158,6 @@ public abstract class PointTrackerDisplayActivity extends DemoCamera2Activity {
 			}
 
 			tick++;
-		}
-
-		@Override
-		public void stop() {}
-
-		@Override
-		public boolean isThreadSafe() {
-			return false;
-		}
-
-		@Override
-		public ImageType<GrayU8> getImageType() {
-			return ImageType.single(GrayU8.class);
 		}
 
 	}

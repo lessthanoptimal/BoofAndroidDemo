@@ -46,6 +46,7 @@ import org.boofcv.android.recognition.FiducialSquareBinaryActivity;
 import org.boofcv.android.recognition.FiducialSquareImageActivity;
 import org.boofcv.android.recognition.ImageClassificationActivity;
 import org.boofcv.android.recognition.QrCodeDetectActivity;
+import org.boofcv.android.segmentation.ColorHistogramSegmentationActivity;
 import org.boofcv.android.segmentation.SuperpixelDisplayActivity;
 import org.boofcv.android.sfm.DisparityActivity;
 import org.boofcv.android.sfm.MosaicDisplayActivity;
@@ -146,12 +147,13 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 
 		ip.addChild("Blur",BlurDisplayActivity.class);
 		ip.addChild("Gradient",GradientDisplayActivity.class);
-		ip.addChild("Binarization",ThresholdDisplayActivity.class);
 		ip.addChild("Binary Ops",BinaryOpsDisplayActivity.class);
 		ip.addChild("Enhance",EnhanceDisplayActivity.class);
 		ip.addChild("Transform",ImageTransformActivity.class);
 
 		segment.addChild("Superpixel",SuperpixelDisplayActivity.class);
+		segment.addChild("Color Histogram",ColorHistogramSegmentationActivity.class);
+		segment.addChild("Binarization",ThresholdDisplayActivity.class);
 
 		detect.addChild("Corner/Blob",PointDisplayActivity.class);
 		detect.addChild("Scale Space",ScalePointDisplayActivity.class);
@@ -166,9 +168,6 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		tracker.addChild("Object Tracking", ObjectTrackerActivity.class);
 		tracker.addChild("KLT Pyramid", KltDisplayActivity.class);
 		tracker.addChild("Motion Detection", StaticBackgroundMotionActivity.class);
-		// To most people the trackers below will look like a broken KLT
-//		tracker.addChild("Point: Det-Desc-Assoc", DdaTrackerDisplayActivity.class);
-//		tracker.addChild("Point: Combined", CombinedTrackerDisplayActivity.class);
 
 		recognition.addChild("QR Code", QrCodeDetectActivity.class);
 		recognition.addChild("Image Classification", ImageClassificationActivity.class);

@@ -15,7 +15,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import org.boofcv.android.DemoCamera2Activity;
-import org.boofcv.android.DemoProcessing;
+import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
 
 import boofcv.abst.tracker.ConfigComaniciu2003;
@@ -148,7 +148,7 @@ public class ObjectTrackerActivity extends DemoCamera2Activity
 		mode = 0;
 	}
 
-	protected class TrackingProcessing implements DemoProcessing {
+	protected class TrackingProcessing extends DemoProcessingAbstract {
 
 		TrackerObjectQuad tracker;
 		boolean visible;
@@ -164,9 +164,8 @@ public class ObjectTrackerActivity extends DemoCamera2Activity
 
 		int width,height;
 
-		Matrix viewToimage = new Matrix();
-
-		protected TrackingProcessing(TrackerObjectQuad tracker ) {
+		public TrackingProcessing(TrackerObjectQuad tracker ) {
+			super(tracker.getImageType());
 			mode = 0;
 			this.tracker = tracker;
 
@@ -227,23 +226,21 @@ public class ObjectTrackerActivity extends DemoCamera2Activity
 				Point2D_F64 a = new Point2D_F64();
 				Point2D_F64 b = new Point2D_F64();
 
-				if ( imageToView.invert(viewToimage)) {
-					applyToPoint(viewToimage, click0.x, click0.y, a);
-					applyToPoint(viewToimage, click1.x, click1.y, b);
+				applyToPoint(viewToImage, click0.x, click0.y, a);
+				applyToPoint(viewToImage, click1.x, click1.y, b);
 
-					double x0 = Math.min(a.x,b.x);
-					double x1 = Math.max(a.x,b.x);
-					double y0 = Math.min(a.y,b.y);
-					double y1 = Math.max(a.y,b.y);
+				double x0 = Math.min(a.x,b.x);
+				double x1 = Math.max(a.x,b.x);
+				double y0 = Math.min(a.y,b.y);
+				double y1 = Math.max(a.y,b.y);
 
-					canvas.drawRect((int) x0, (int) y0, (int) x1, (int) y1, paintSelected);
-				}
+				canvas.drawRect((int) x0, (int) y0, (int) x1, (int) y1, paintSelected);
 			} else if( mode == 2 ) {
-				if (!imageToView.invert(viewToimage)) {
+				if (!imageToView.invert(viewToImage)) {
 					return;
 				}
-				applyToPoint(viewToimage,click0.x, click0.y, location.a);
-				applyToPoint(viewToimage,click1.x, click1.y, location.c);
+				applyToPoint(viewToImage,click0.x, click0.y, location.a);
+				applyToPoint(viewToImage,click1.x, click1.y, location.c);
 
 				// make sure the user selected a valid region
 				makeInBounds(location.a);
@@ -287,21 +284,6 @@ public class ObjectTrackerActivity extends DemoCamera2Activity
 			} else if( mode == 4 ) {
 				visible = tracker.process(input,location);
 			}
-		}
-
-		@Override
-		public void stop() {
-
-		}
-
-		@Override
-		public boolean isThreadSafe() {
-			return false;
-		}
-
-		@Override
-		public ImageType getImageType() {
-			return tracker.getImageType();
 		}
 	}
 }

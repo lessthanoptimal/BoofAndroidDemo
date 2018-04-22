@@ -26,12 +26,7 @@ Date: 2018
 - Point/Corner detector
   * more controls
   * another variant of FAST
-
-TODO: super pixels
-- New menu
-- Abort button and interrupt the thread some how
-TODO: Color histogram image segmentation
-      touch screen/draw square segment based on histogram
+- Added color histogram segmentation
 
 -------------------------------------------------
 Version 1.8.1

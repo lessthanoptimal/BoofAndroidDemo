@@ -51,7 +51,6 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
     // TODO don't use a static method and forget detection if the activity is exited by the user
 
     // Location in image coordinates that the user is touching
-    Matrix viewToImage = new Matrix();
     Point2D_F64 touched = new Point2D_F64();
     boolean touching = false;
     boolean touchProcessed = false;
@@ -140,7 +139,6 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
             touchProcessed = false;
             selectedQR = null;
             touching = false;
-            imageToView.invert(viewToImage);
 
             synchronized (uniqueLock) {
                 uniqueCount = unique.size();

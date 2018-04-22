@@ -3,6 +3,7 @@ package org.boofcv.android;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 
+import boofcv.alg.color.ColorFormat;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
@@ -42,4 +43,6 @@ public interface DemoProcessing<T extends ImageBase<T>> {
     boolean isThreadSafe();
 
     ImageType<T> getImageType();
+
+    ColorFormat getColorFormat();
 }

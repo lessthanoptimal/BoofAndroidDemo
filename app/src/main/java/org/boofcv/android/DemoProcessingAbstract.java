@@ -1,5 +1,6 @@
 package org.boofcv.android;
 
+import boofcv.alg.color.ColorFormat;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 
@@ -33,5 +34,10 @@ public abstract class DemoProcessingAbstract<T extends ImageBase<T>> implements 
     @Override
     public ImageType<T> getImageType() {
         return imageType;
+    }
+
+    @Override
+    public ColorFormat getColorFormat() {
+        return ColorFormat.RGB;
     }
 }

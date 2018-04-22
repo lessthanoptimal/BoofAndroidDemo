@@ -18,6 +18,7 @@ import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.Stoppable;
 
 import boofcv.abst.segmentation.ImageSuperpixels;
 import boofcv.alg.segmentation.ComputeRegionMeanColor;
@@ -27,7 +28,6 @@ import boofcv.android.VisualizeImageData;
 import boofcv.factory.segmentation.ConfigSlic;
 import boofcv.factory.segmentation.FactoryImageSegmentation;
 import boofcv.factory.segmentation.FactorySegmentationAlg;
-import boofcv.misc.Stoppable;
 import boofcv.struct.feature.ColorQueue_F32;
 import boofcv.struct.image.GrayS32;
 import boofcv.struct.image.GrayU8;
@@ -162,7 +162,9 @@ public class SuperpixelDisplayActivity extends DemoBitmapCamera2Activity
 				// save the current image
 				background.setTo(input);
 				setProgressMessage("Segmenting", true);
-				segmentation.segment(input, pixelToRegion);
+				try {
+					segmentation.segment(input, pixelToRegion);
+				} catch( Stoppable.Stopped ignore ){}
 				if( wasStopped() ) {
 					Log.d(TAG,"Was stopped!!!");
 					mode = Mode.VIDEO;

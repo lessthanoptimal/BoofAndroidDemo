@@ -13,7 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.SeekBar;
 
 import org.boofcv.android.DemoCamera2Activity;
-import org.boofcv.android.DemoProcessing;
+import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_I32;
@@ -27,7 +27,6 @@ import boofcv.alg.feature.detect.edge.EdgeSegment;
 import boofcv.factory.feature.detect.edge.FactoryEdgeDetectors;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_I32;
 
 /**
@@ -89,7 +88,7 @@ public class CannyEdgeActivity extends DemoCamera2Activity
 		colorize = b;
 	}
 
-	protected class CannyProcessing implements DemoProcessing<GrayU8> {
+	protected class CannyProcessing extends DemoProcessingAbstract<GrayU8> {
 		CannyEdge<GrayU8,GrayS16> canny;
 
 		private final FastQueue<Point2D_I32> contours = new FastQueue<>(Point2D_I32.class,true);
@@ -103,6 +102,7 @@ public class CannyEdgeActivity extends DemoCamera2Activity
 		boolean lineLimit = false;
 
 		public CannyProcessing() {
+			super(GrayU8.class);
 			this.canny = FactoryEdgeDetectors.canny(2, true, true, GrayU8.class, GrayS16.class);
 
 			paintLine.setStrokeWidth(1);
@@ -128,12 +128,15 @@ public class CannyEdgeActivity extends DemoCamera2Activity
 
 		@Override
 		public void onDraw(Canvas canvas, Matrix imageToView) {
-			Matrix original = canvas.getMatrix();
+			int width = bitmap.getWidth();
+			int height = bitmap.getHeight();
+			int wh = width+height;
+			canvas.save();
 			canvas.setMatrix(imageToView);
-			canvas.drawRect(0,0,bitmap.getWidth(),bitmap.getHeight(),paintFade);
+			canvas.drawRect(0,0,width,height,paintFade);
 
 			if( lineLimit ) {
-				canvas.setMatrix(original);
+				canvas.restore();
 				canvas.drawText("Too Many\nPoints", 80, 80, paintText);
 				canvas.setMatrix(imageToView);
 			}
@@ -148,19 +151,26 @@ public class CannyEdgeActivity extends DemoCamera2Activity
 				for (int i = 0; i < edgeLengths.size; i++) {
 					int length = edgeLengths.get(i);
 
-					if (length <= 0)
-						continue;
+					// Color is supposed to help you pick out individual lines
+					// Before it was random and might cause a seizure. This now computes the
+					// color based on its location.  much easier on the eyes but not as easy
+					// to pick out individual lines
+					if( colorize && i >= nextColor) {
+						Point2D_I32 p = contours.get(pointIndex);
+
+						int red = (int)(0xFF*(1.0-(p.x/(double)width)));
+						int green = (int)(0xFF*(1.0-(p.y/(double)height)));
+						int blue = (int)(0xFF*((p.x+p.y)/(double)wh));
+
+						// draw all points from the same shape  the same color
+						paintLine.setARGB(0xFF,red,green,blue);
+						nextColor += colorEdges.get(edgeIndex++);
+					}
 
 					// Renders much faster drawing rects than a path
 					for (int j = 0; j < length; j++) {
 						Point2D_I32 p = contours.get(pointIndex++);
 						canvas.drawRect(p.x,p.y,p.x+1,p.y+1,paintLine);
-					}
-					if( colorize && i >= nextColor) {
-						// draw all points from the same shape
-						// the same color
-						paintLine.setColor(rand.nextInt());
-						nextColor += colorEdges.get(edgeIndex++);
 					}
 				}
 			}
@@ -199,19 +209,6 @@ public class CannyEdgeActivity extends DemoCamera2Activity
 					colorEdges.add( e.segments.size() );
 				}
 			}
-		}
-
-		@Override
-		public void stop() {}
-
-		@Override
-		public boolean isThreadSafe() {
-			return false;
-		}
-
-		@Override
-		public ImageType<GrayU8> getImageType() {
-			return ImageType.single(GrayU8.class);
 		}
 	}
 }

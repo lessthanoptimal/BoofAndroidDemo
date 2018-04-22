@@ -1,7 +1,6 @@
 TODO: Added Equirectangular to Pinhole camera
   * Provide example image.
 
-TODO: Proper implementation of FAST features
 TODO: Binary blob/contour demonstration
   * show inner/outer/pixels
 TODO: Add distort MLS example

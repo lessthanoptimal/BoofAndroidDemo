@@ -106,7 +106,6 @@ public class FiducialLearnActivity extends DemoCamera2Activity
 		GrowQueue_I32 indexes = new GrowQueue_I32();
 		GrowQueue_F64 area = new GrowQueue_F64();
 
-		Matrix viewToImage = new Matrix();
 		Path path = new Path();
 		Polygon2D_F64 polygon = new Polygon2D_F64(4);
 
@@ -157,7 +156,6 @@ public class FiducialLearnActivity extends DemoCamera2Activity
 		public void onDraw(Canvas canvas, Matrix imageToView) {
 
 			if( touched) {
-				imageToView.invert(viewToImage);
 				applyToPoint(viewToImage,touch.x,touch.y,touch);
 			}
 

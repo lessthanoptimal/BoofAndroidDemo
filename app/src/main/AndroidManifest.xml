@@ -73,6 +73,7 @@
         <activity android:name=".detect.CannyEdgeActivity"/>
         <activity android:name=".calib.UndistortDisplayActivity"/>
         <activity android:name=".segmentation.SuperpixelDisplayActivity"/>
+        <activity android:name=".segmentation.ColorHistogramSegmentationActivity"/>
         <activity android:name=".ip.ThresholdDisplayActivity"/>
         <activity android:name=".recognition.FiducialSquareBinaryActivity"/>
         <activity android:name=".recognition.FiducialSquareBinaryHelpActivity" />

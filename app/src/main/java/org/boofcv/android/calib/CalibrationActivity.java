@@ -17,7 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.boofcv.android.DemoProcessing;
+import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
 import org.boofcv.android.recognition.ConfigAllCalibration;
 import org.boofcv.android.recognition.SelectCalibrationFiducial;
@@ -39,10 +39,11 @@ import boofcv.alg.fiducial.calib.circle.DetectCircleRegularGrid;
 import boofcv.alg.fiducial.calib.grid.DetectSquareGridFiducial;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.android.ConvertBitmap;
+import boofcv.android.VisualizeImageData;
 import boofcv.factory.fiducial.FactoryFiducialCalibration;
 import boofcv.struct.geo.PointIndex2D_F64;
 import boofcv.struct.image.GrayF32;
-import boofcv.struct.image.ImageType;
+import boofcv.struct.image.GrayU8;
 import georegression.metric.UtilAngle;
 import georegression.struct.curve.EllipseRotated_F64;
 import georegression.struct.point.Point2D_F64;
@@ -199,7 +200,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 		}
 	}
 
-	private class DetectTarget implements DemoProcessing<GrayF32> {
+	private class DetectTarget extends DemoProcessingAbstract<GrayF32> {
 
 		DetectorFiducialCalibration detector;
 
@@ -211,6 +212,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 		float radius;
 
 		protected DetectTarget( DetectorFiducialCalibration detector ) {
+			super(GrayF32.class);
 			this.detector = detector;
 		}
 
@@ -286,10 +288,8 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 			if( timeResume > System.currentTimeMillis() )
 				return;
 
-			synchronized (bitmapLock) {
-				ConvertBitmap.grayToBitmap(input, bitmap, bitmapTmp);
-			}
 
+			GrayU8 binary = null;
 			boolean detected = false;
 			showDetectDebug = false;
 			if( captureRequested ) {
@@ -314,35 +314,31 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 					if( detector instanceof CalibrationDetectorChessboard) {
 						DetectChessboardFiducial<GrayF32> alg = ((CalibrationDetectorChessboard) detector).getAlgorithm();
 						extractQuads(alg.getFindSeeds().getDetectorSquare().getPolygons(null,null));
+						binary = alg.getBinary();
 					} else if( detector instanceof CalibrationDetectorSquareGrid) {
 						DetectSquareGridFiducial<GrayF32> alg = ((CalibrationDetectorSquareGrid) detector).getAlgorithm();
 						extractQuads(alg.getDetectorSquare().getPolygons(null,null));
+						binary = alg.getBinary();
 					} else if( detector instanceof CalibrationDetectorCircleHexagonalGrid) {
 						DetectCircleHexagonalGrid<GrayF32> alg = ((CalibrationDetectorCircleHexagonalGrid) detector).getDetector();
 						debugEllipses.clear();
 						debugEllipses.addAll(alg.getEllipseDetector().getFoundEllipses(null));
+						binary = alg.getBinary();
 					} else if( detector instanceof CalibrationDetectorCircleRegularGrid) {
 						DetectCircleRegularGrid<GrayF32> alg = ((CalibrationDetectorCircleRegularGrid) detector).getDetector();
 						debugEllipses.clear();
 						debugEllipses.addAll(alg.getEllipseDetector().getFoundEllipses(null));
+						binary = alg.getBinary();
 					}
 				}
 			}
-		}
 
-		@Override
-		public void stop() {
-
-		}
-
-		@Override
-		public boolean isThreadSafe() {
-			return false;
-		}
-
-		@Override
-		public ImageType<GrayF32> getImageType() {
-			return ImageType.single(GrayF32.class);
+			synchronized (bitmapLock) {
+				if( binary != null )
+					VisualizeImageData.binaryToBitmap(binary,false,bitmap,bitmapTmp);
+				else
+					ConvertBitmap.grayToBitmap(input, bitmap, bitmapTmp);
+			}
 		}
 
 		protected void extractQuads( List<Polygon2D_F64> squares ) {
