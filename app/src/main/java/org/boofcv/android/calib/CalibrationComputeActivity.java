@@ -1,9 +1,13 @@
 package org.boofcv.android.calib;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
@@ -30,6 +34,8 @@ import boofcv.io.calibration.CalibrationIO;
 import boofcv.struct.calib.CameraPinholeRadial;
 import georegression.struct.point.Point2D_F64;
 
+import static org.boofcv.android.DemoMain.getExternalDirectory;
+
 /**
  * After images have been collected in the {@link CalibrationActivity}, this activity is brought up which computes
  * the calibration parameters and shows the user its progress.  After the parameters have been computed the user
@@ -38,6 +44,8 @@ import georegression.struct.point.Point2D_F64;
  * @author Peter Abeles
  */
 public class CalibrationComputeActivity extends Activity {
+
+	public static String TAG = "Calibration";
 
 	// image information which is to be processed
 	public static List<CalibrationObservation> images;
@@ -94,12 +102,21 @@ public class CalibrationComputeActivity extends Activity {
 	public void pressedAccept( View v ) {
 		// save the found parameters to a file
 
+		if( !isStoragePermissionGranted() ) {
+			Toast toast = Toast.makeText(this, "Try again after granting permission", Toast.LENGTH_LONG);
+			toast.show();
+			return;
+		}
+
+
 		try {
 			// save to disk
-			File directory = new File(getExternalFilesDir(null),"calibration");
+			File directory = new File(getExternalDirectory(this),"calibration");
 			if( !directory.exists() ) {
-				if( !directory.mkdir() ) {
+				if( !directory.mkdirs() ) {
 					Log.d("calibration","Failed to create output directory");
+					Log.d("calibration",directory.getAbsolutePath());
+					// request permission when it is not granted.
 					Toast toast = Toast.makeText(this, "Failed to create output directory", Toast.LENGTH_LONG);
 					toast.show();
 					return;
@@ -126,6 +143,34 @@ public class CalibrationComputeActivity extends Activity {
 			Log.d("calibration","Saving intrinsic failed. "+e.getMessage());
 			Toast toast = Toast.makeText(this, "IOException when saving intrinsic!", Toast.LENGTH_LONG);
 			toast.show();
+		}
+	}
+
+	public  boolean isStoragePermissionGranted() {
+		if (Build.VERSION.SDK_INT >= 23) {
+			if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+					== PackageManager.PERMISSION_GRANTED) {
+				Log.v(TAG,"Permission is granted");
+				return true;
+			} else {
+
+				Log.v(TAG,"Permission is revoked");
+				ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+				return false;
+			}
+		}
+		else { //permission is automatically granted on sdk<23 upon installation
+			Log.v(TAG,"Permission is granted");
+			return true;
+		}
+	}
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+		if(grantResults[0]== PackageManager.PERMISSION_GRANTED){
+			Log.v("Calibration","Permission: "+permissions[0]+ "was "+grantResults[0]);
+			//resume tasks needing this permission
 		}
 	}
 

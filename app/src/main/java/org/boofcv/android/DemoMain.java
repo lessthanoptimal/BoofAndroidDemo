@@ -14,6 +14,7 @@ import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Size;
@@ -65,6 +66,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.struct.calib.CameraPinholeRadial;
@@ -126,6 +128,8 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 			if (preference == null) {
 				preference = new DemoPreference();
 				setDefaultPreferences();
+			} else {
+				loadIntrinsics(this,preference.cameraId, preference.calibration,null);
 			}
 		}
 	}
@@ -339,7 +343,9 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		if( locations != null )
 			locations.clear();
 
-		File directory = new File(activity.getExternalFilesDir(null),"calibration");
+		File directory = new File(getExternalDirectory(activity),"calibration");
+		if( !directory.exists() )
+			return;
 		File files[] = directory.listFiles();
 		if( files == null )
 			return;
@@ -356,6 +362,18 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 					locations.add(f);
 				}
 			} catch( RuntimeException | FileNotFoundException ignore ) {}
+		}
+	}
+
+	public static File getExternalDirectory( Activity activity ) {
+		// if possible use a public directory. If that fails use a private one
+		if(Objects.equals(Environment.getExternalStorageState(), Environment.MEDIA_MOUNTED)) {
+			File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
+			if( !dir.exists() )
+				dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+			return new File(dir,"org.boofcv.android");
+		} else {
+			return activity.getExternalFilesDir(null);
 		}
 	}
 
