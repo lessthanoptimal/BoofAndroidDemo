@@ -26,7 +26,8 @@ public class AboutActivity extends Activity {
 			"<p>The application's source code is available on " +
 			"<a href=\"https://github.com/lessthanoptimal/BoofAndroidDemo\">GitHub</a>." +
 			"<p>Written by Peter Abeles</p>" +
-			"<p>BoofCV Version = "+ BoofVersion.VERSION+"<br>"+
+			"<p>BoofDemo Version = "+BuildConfig.VERSION_CODE+"<br>"+
+			"BoofCV Version = "+ BoofVersion.VERSION+"<br>"+
 			"BoofCV GIT SHA = "+ BoofVersion.GIT_SHA+"</p>";
 
 
