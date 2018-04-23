@@ -13,7 +13,6 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import org.boofcv.android.R;
 
@@ -58,18 +57,10 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 		builder.setView(controls);
 		builder.setCancelable(true);
 		builder.setPositiveButton("OK", (dialogInterface, i) -> {
-            cc.targetType = indexToCalib(spinnerTarget.getSelectedItemPosition());
-
-            int numCols = Integer.parseInt(textCols.getText().toString());
-            int numRows = Integer.parseInt(textRows.getText().toString());
-
-            if (numCols > 0 && numRows > 0) {
-                setRowCol(numRows,numCols);
-                success.run();
-            } else {
-                Toast.makeText(activity, "Invalid configuration!", Toast.LENGTH_SHORT).show();
-            }
-        });
+			// saved values will be valid even if what's displayed isn't
+			cc.targetType = indexToCalib(spinnerTarget.getSelectedItemPosition());
+			success.run();
+		});
 
 		spinnerTarget = controls.findViewById(R.id.spinner_type);
 		textRows = controls.findViewById(R.id.text_rows);
@@ -296,6 +287,28 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 
 	@Override
 	public ConfigAllCalibration getConfigAllCalibration() {
-		return cc;
+		// return a copy so that there's no chance of it modifying internal configurations while
+		// it tweaks the settings
+		ConfigAllCalibration copy = new ConfigAllCalibration();
+
+		copy.chessboard.numRows = cc.chessboard.numRows;
+		copy.chessboard.numCols = cc.chessboard.numCols;
+
+		copy.squareGrid.numRows = cc.squareGrid.numRows;
+		copy.squareGrid.numCols = cc.squareGrid.numCols;
+		copy.squareGrid.spaceWidth = cc.squareGrid.spaceWidth;
+		copy.squareGrid.squareWidth = cc.squareGrid.squareWidth;
+
+		copy.circleGrid.numRows = cc.circleGrid.numRows;
+		copy.circleGrid.numCols = cc.circleGrid.numCols;
+		copy.circleGrid.circleDiameter = cc.circleGrid.circleDiameter;
+		copy.circleGrid.centerDistance = cc.circleGrid.centerDistance;
+
+		copy.hexagonal.numRows = cc.hexagonal.numRows;
+		copy.hexagonal.numCols = cc.hexagonal.numCols;
+		copy.hexagonal.circleDiameter = cc.hexagonal.circleDiameter;
+		copy.hexagonal.centerDistance = cc.hexagonal.centerDistance;
+
+		return copy;
 	}
 }

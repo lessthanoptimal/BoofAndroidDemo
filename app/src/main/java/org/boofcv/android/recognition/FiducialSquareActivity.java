@@ -27,6 +27,8 @@ import boofcv.abst.fiducial.CalibrationFiducialDetector;
 import boofcv.abst.fiducial.FiducialDetector;
 import boofcv.abst.fiducial.SquareBase_to_FiducialDetector;
 import boofcv.abst.fiducial.calib.CalibrationDetectorChessboard;
+import boofcv.abst.fiducial.calib.CalibrationDetectorCircleHexagonalGrid;
+import boofcv.abst.fiducial.calib.CalibrationDetectorCircleRegularGrid;
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.alg.distort.LensDistortionOps;
@@ -61,10 +63,13 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 	Class help;
 
 	// this text is displayed
-	String textToDraw = "";
+	protected String textToDraw = "";
 
 	// If true then the background will be the thresholded image
-	boolean showThreshold = true;
+	protected boolean showThreshold = false;
+
+	// if false it won't process images
+	protected volatile boolean detectFiducial = true;
 
 	protected boolean disableControls = false;
 
@@ -102,14 +107,8 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 						createNewProcessor();
 					}
 				}
-
-				@Override
-				public void onStartTrackingTouch(SeekBar seekBar) {
-				}
-
-				@Override
-				public void onStopTrackingTouch(SeekBar seekBar) {
-				}
+				@Override public void onStartTrackingTouch(SeekBar seekBar) {}
+				@Override public void onStopTrackingTouch(SeekBar seekBar) {}
 			});
 			toggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 synchronized (lock) {
@@ -149,7 +148,8 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 
 	@Override
 	public void createNewProcessor() {
-		setProcessing(new FiducialProcessor(createDetector()) );
+		if( detectFiducial )
+			setProcessing(new FiducialProcessor(createDetector()) );
 	}
 
 	protected abstract FiducialDetector<GrayU8> createDetector();
@@ -246,19 +246,30 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 		@Override
 		public void process( T input )
 		{
+			if( !detectFiducial) {
+				ConvertBitmap.boofToBitmap(input, bitmap, bitmapTmp);
+				return;
+			}
+
 			detector.detect(input);
 
 			synchronized (bitmapLock) {
-				if (showThreshold) {
+				if (!showThreshold) {
 					ConvertBitmap.boofToBitmap(input, bitmap, bitmapTmp);
 				} else {
-					GrayU8 binary = null;
+					GrayU8 binary;
 					if (detector instanceof CalibrationFiducialDetector) {
 						DetectorFiducialCalibration a = ((CalibrationFiducialDetector) detector).getCalibDetector();
 						if (a instanceof CalibrationDetectorChessboard) {
 							binary = ((CalibrationDetectorChessboard) a).getAlgorithm().getBinary();
-						} else {
+						} else if( a instanceof CalibrationDetectorSquareGrid ){
 							binary = ((CalibrationDetectorSquareGrid) a).getAlgorithm().getBinary();
+						} else if( a instanceof CalibrationDetectorCircleHexagonalGrid){
+							binary = ((CalibrationDetectorCircleHexagonalGrid) a).getDetector().getBinary();
+						} else if( a instanceof CalibrationDetectorCircleRegularGrid){
+							binary = ((CalibrationDetectorCircleRegularGrid) a).getDetector().getBinary();
+						} else {
+							throw new RuntimeException("Unknown class "+a.getClass().getSimpleName());
 						}
 					} else {
 						binary = ((SquareBase_to_FiducialDetector) detector).getAlgorithm().getBinary();

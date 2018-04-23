@@ -21,10 +21,15 @@ public class FiducialCalibrationActivity extends FiducialSquareActivity {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		// don't start processing fiducials until the user has selected the specifics
+		detectFiducial = false;
 		super.onCreate(savedInstanceState);
 
 		SelectCalibrationFiducial dialog = new SelectCalibrationFiducial(cc);
-		dialog.show(this, this::createNewProcessor);
+		dialog.show(this, ()->{
+			detectFiducial=true;//needs to be before createNewProcessor
+			createNewProcessor();
+		});
 	}
 
 	@Override
