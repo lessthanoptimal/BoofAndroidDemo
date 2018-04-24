@@ -175,7 +175,7 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		recognition.addChild("Image Classification", ImageClassificationActivity.class);
 		recognition.addChild("Square Binary",FiducialSquareBinaryActivity.class);
 		recognition.addChild("Square Image",FiducialSquareImageActivity.class);
-		recognition.addChild("Calib Targets",FiducialCalibrationActivity.class);
+		recognition.addChild("Calibration Targets",FiducialCalibrationActivity.class);
 
 		calib.addChild("Calibrate",CalibrationActivity.class);
 		calib.addChild("Undistort",UndistortDisplayActivity.class);
