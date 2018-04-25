@@ -291,6 +291,7 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 		// it tweaks the settings
 		ConfigAllCalibration copy = new ConfigAllCalibration();
 
+		copy.targetType = cc.targetType;
 		copy.chessboard.numRows = cc.chessboard.numRows;
 		copy.chessboard.numCols = cc.chessboard.numCols;
 
