@@ -4,7 +4,7 @@ Change Log for BoofCV Demonstration App
 
 -------------------------------------------------
 Version 2.0
-Date: 2018
+Date: 2018-04-24
 
 - Updated to BoofCV v0.30
 - Ported activities over to Camera2 API
