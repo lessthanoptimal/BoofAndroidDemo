@@ -48,7 +48,6 @@ public class UndistortDisplayActivity extends DemoBitmapCamera2Activity
 
 	boolean isColor = false;
 
-	ImageDistort removeDistortion;
 
 	public UndistortDisplayActivity() {
 		super(Resolution.MEDIUM);
@@ -106,6 +105,8 @@ public class UndistortDisplayActivity extends DemoBitmapCamera2Activity
 
 	protected class UndistortProcessing extends DemoProcessingAbstract {
 		ImageBase undistorted;
+		ImageDistort removeDistortion;
+
 		public UndistortProcessing( ImageType imageType ) {
 			super(imageType);
 
@@ -121,14 +122,7 @@ public class UndistortDisplayActivity extends DemoBitmapCamera2Activity
 			CameraPinholeRadial intrinsic = DemoMain.preference.lookup(
 					imageWidth,imageHeight);
 
-			if( intrinsic == null ) {
-				UndistortDisplayActivity.this.runOnUiThread(()->{
-					Toast toast = Toast.makeText(UndistortDisplayActivity.this,
-							"Can't find calibration for this resolution!", Toast.LENGTH_LONG);
-					toast.show();
-					UndistortDisplayActivity.this.finish();
-				});
-			} else {
+			if( intrinsic != null ) {
 				// define the transform.  Cache the results for quick rendering later on
 				CameraPinhole desired = new CameraPinhole();
 				desired.set(intrinsic);
@@ -147,22 +141,24 @@ public class UndistortDisplayActivity extends DemoBitmapCamera2Activity
 		@Override
 		public void onDraw(Canvas canvas, Matrix imageToView) {
 			if (removeDistortion == null) {
-				Log.e("Undistort","No intrinsic!");
+//				Log.e("Undistort","No intrinsic!");
 				Paint paint = new Paint();
 				paint.setColor(Color.RED);
-				paint.setTextSize(canvas.getWidth() / 10);
+				paint.setTextSize(canvas.getWidth() / 12);
 				int textLength = (int) paint.measureText("Calibrate Camera First");
 
 				canvas.drawText("Calibrate Camera First", (canvas.getWidth() - textLength) / 2, canvas.getHeight() / 2, paint);
 			} else {
-				Log.e("Drawing bitmap","Has intrinsic!");
+//				Log.e("Drawing bitmap","Has intrinsic!");
 				drawBitmap(canvas,imageToView);
 			}
 		}
 
 		@Override
 		public void process(ImageBase input) {
-			Log.e("Undistort","process called");
+			if( removeDistortion == null )
+				return;
+
 			removeDistortion.apply(input,undistorted);
 			synchronized (bitmapLock) {
 				ConvertBitmap.boofToBitmap(undistorted, bitmap, bitmapTmp);
