@@ -3,6 +3,12 @@ Change Log for BoofCV Demonstration App
 (year)-(month)-(day)
 
 -------------------------------------------------
+Version 2.0.3
+Date: 2018-04-25
+
+- Fixed crash bug in BoofCV's ConvertYuv420_888
+
+-------------------------------------------------
 Version 2.0.2
 Date: 2018-04-25
 
