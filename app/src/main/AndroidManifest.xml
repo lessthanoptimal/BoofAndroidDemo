@@ -13,6 +13,7 @@
         android:required="false" />
 
     <application
+        android:name="org.boofcv.android.DemoApplication"
         android:allowBackup="true"
         android:hardwareAccelerated="true"
         android:icon="@drawable/ic_launcher"

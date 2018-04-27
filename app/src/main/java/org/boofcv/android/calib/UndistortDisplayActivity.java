@@ -15,7 +15,6 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import org.boofcv.android.DemoBitmapCamera2Activity;
-import org.boofcv.android.DemoMain;
 import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
 
@@ -47,7 +46,6 @@ public class UndistortDisplayActivity extends DemoBitmapCamera2Activity
 	ToggleButton toggleColor;
 
 	boolean isColor = false;
-
 
 	public UndistortDisplayActivity() {
 		super(Resolution.MEDIUM);
@@ -91,7 +89,7 @@ public class UndistortDisplayActivity extends DemoBitmapCamera2Activity
 
 	@Override
 	public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-		if( DemoMain.preference.calibration.isEmpty() ) {
+		if( app.preference.calibration.isEmpty() ) {
 			Toast toast = Toast.makeText(UndistortDisplayActivity.this,
 					"You must first calibrate the camera!", Toast.LENGTH_LONG);
 			toast.show();
@@ -110,7 +108,7 @@ public class UndistortDisplayActivity extends DemoBitmapCamera2Activity
 		public UndistortProcessing( ImageType imageType ) {
 			super(imageType);
 
-			if (DemoMain.preference.calibration.isEmpty() ) {
+			if (app.preference.calibration.isEmpty() ) {
 				return;
 			}
 		}
@@ -119,7 +117,7 @@ public class UndistortDisplayActivity extends DemoBitmapCamera2Activity
 		public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
 			undistorted = imageType.createImage(imageWidth,imageHeight);
 
-			CameraPinholeRadial intrinsic = DemoMain.preference.lookup(
+			CameraPinholeRadial intrinsic = app.preference.lookup(
 					imageWidth,imageHeight);
 
 			if( intrinsic != null ) {

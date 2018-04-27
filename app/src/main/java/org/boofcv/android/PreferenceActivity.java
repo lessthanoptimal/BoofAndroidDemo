@@ -35,13 +35,17 @@ public class PreferenceActivity extends Activity
 	List<CameraSpecs> specs;
 	String[] cameras;
 
+	DemoApplication app;
+
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		app = (DemoApplication)getApplication();
+
 		setContentView(R.layout.preference_activity);
 
-		specs = DemoMain.specs;
-		preference = DemoMain.preference;
+		specs = app.specs;
+		preference = app.preference;
 
 		checkSpeed = findViewById(R.id.checkbox_speed);
 		checkReduce = findViewById(R.id.checkbox_reduce);
@@ -91,7 +95,7 @@ public class PreferenceActivity extends Activity
 		ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_spinner_item);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-		CameraSpecs specs = DemoMain.defaultCameraSpecs();
+		CameraSpecs specs = DemoMain.defaultCameraSpecs(app);
 		adapter.add("Automatic");
 		for (int i = 0; i < specs.sizes.size(); i++ ) {
 			Size s = specs.sizes.get(i);
@@ -120,7 +124,7 @@ public class PreferenceActivity extends Activity
 		} else if( spinnerResolution == adapterView ) {
 			preference.resolution = pos;
 		}
-		DemoMain.changedPreferences = true;
+		app.changedPreferences = true;
 	}
 
 	@Override

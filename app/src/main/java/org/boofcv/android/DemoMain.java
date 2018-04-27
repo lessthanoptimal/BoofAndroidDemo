@@ -73,18 +73,11 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 
 	public static final String TAG = "DemoMain";
 
-	// contains information on all the cameras.  less error prone and easier to deal with
-	public static List<CameraSpecs> specs = new ArrayList<CameraSpecs>();
-
-	// specifies which camera to use an image size
-	public static DemoPreference preference;
-	// If another activity modifies the demo preferences this needs to be set to true so that it knows to reload
-	// camera parameters.
-	public static boolean changedPreferences = false;
-
 	List<Group> groups = new ArrayList<>();
 
 	boolean waitingCameraPermissions = true;
+
+	DemoApplication app;
 
 	/**
 	 * Called when the activity is first created.
@@ -93,6 +86,8 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+
+		app = (DemoApplication)getApplication();
 
 		loadCameraSpecs();
 		createGroups();
@@ -123,11 +118,11 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 	protected void onResume() {
 		super.onResume();
 		if( !waitingCameraPermissions ) {
-			if (preference == null) {
-				preference = new DemoPreference();
+			if (app.preference == null) {
+				app.preference = new DemoPreference();
 				setDefaultPreferences();
 			} else {
-				loadIntrinsics(this,preference.cameraId, preference.calibration,null);
+				loadIntrinsics(this,app.preference.cameraId, app.preference.calibration,null);
 			}
 		}
 	}
@@ -243,7 +238,7 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 
                 for ( String cameraId : cameras ) {
                     CameraSpecs c = new CameraSpecs();
-                    specs.add(c);
+					app.specs.add(c);
                     c.deviceId = cameraId;
                     CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
                     Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
@@ -272,7 +267,6 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 				// If request is cancelled, the result arrays are empty.
 				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 					loadCameraSpecs();
-					preference = new DemoPreference();
 					setDefaultPreferences();
 				} else {
 					dialogNoCameraPermission();
@@ -283,27 +277,27 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 	}
 
 	private void setDefaultPreferences() {
-		preference.showSpeed = false;
-		preference.autoReduce = true;
+		app.preference.showSpeed = false;
+		app.preference.autoReduce = true;
 
 		// There are no cameras.  This is possible due to the hardware camera setting being set to false
 		// which was a work around a bad design decision where front facing cameras wouldn't be accepted as hardware
 		// which is an issue on tablets with only front facing cameras
-		if( specs.size() == 0 ) {
+		if( app.specs.size() == 0 ) {
 			dialogNoCamera();
 		}
 		// select a front facing camera as the default
-		for (int i = 0; i < specs.size(); i++) {
-		    CameraSpecs c = specs.get(i);
+		for (int i = 0; i < app.specs.size(); i++) {
+		    CameraSpecs c = app.specs.get(i);
 
-            preference.cameraId = c.deviceId;
+            app.preference.cameraId = c.deviceId;
             if( c.facingBack) {
 				break;
 			}
 		}
 
-		if( !specs.isEmpty() ) {
-			loadIntrinsics(this,preference.cameraId, preference.calibration,null);
+		if( !app.specs.isEmpty() ) {
+			loadIntrinsics(this, app.preference.cameraId, app.preference.calibration,null);
 		}
 	}
 
@@ -442,17 +436,17 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		}
 	}
 
-	public static CameraSpecs defaultCameraSpecs() {
-		for( int i = 0; i < specs.size(); i++ ) {
-			CameraSpecs s = specs.get(i);
-			if( s.deviceId.equals(preference.cameraId))
+	public static CameraSpecs defaultCameraSpecs( DemoApplication app ) {
+		for(int i = 0; i < app.specs.size(); i++ ) {
+			CameraSpecs s = app.specs.get(i);
+			if( s.deviceId.equals(app.preference.cameraId))
 				return s;
 		}
 		throw new RuntimeException("Can't find default camera");
 	}
-	public static CameraSpecs cameraSpecs( String cameraId ) {
-		for( int i = 0; i < specs.size(); i++ ) {
-			CameraSpecs s = specs.get(i);
+	public static CameraSpecs cameraSpecs( DemoApplication app , String cameraId ) {
+		for(int i = 0; i < app.specs.size(); i++ ) {
+			CameraSpecs s = app.specs.get(i);
 			if( s.deviceId.equals(cameraId))
 				return s;
 		}

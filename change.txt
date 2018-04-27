@@ -3,6 +3,13 @@ Change Log for BoofCV Demonstration App
 (year)-(month)-(day)
 
 -------------------------------------------------
+Version 2.1
+Date: 2018
+
+- Removed static variables from main activity and moved to DemoApplication
+  this prevents them from being discarded if the activity is unloaded
+
+-------------------------------------------------
 Version 2.0.4
 Date: 2018-04-25
 

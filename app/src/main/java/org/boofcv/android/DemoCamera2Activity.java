@@ -81,6 +81,8 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
     private Rect bounds2 = new Rect();
     private final Matrix tempMatrix = new Matrix();
 
+    protected DemoApplication app;
+
     public DemoCamera2Activity(Resolution resolution) {
         super.targetResolution = resolutionToPixels(resolution);
 
@@ -91,6 +93,8 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        app = (DemoApplication)getApplication();
 
         paintText.setStrokeWidth(3*displayMetrics.density);
         paintText.setTextSize(24*displayMetrics.density);
@@ -129,18 +133,18 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
 
     @Override
     protected boolean selectCamera( String cameraId , CameraCharacteristics characteristics) {
-        return cameraId.equals(DemoMain.preference.cameraId);
+        return cameraId.equals(app.preference.cameraId);
     }
 
     @Override
     protected int selectResolution(int widthTexture, int heightTexture, Size[] resolutions) {
         // Auto mode on resolution
-        if (DemoMain.preference.resolution == 0)
+        if (app.preference.resolution == 0)
             return super.selectResolution(widthTexture, heightTexture, resolutions);
 
         // A specific on requested
-        CameraSpecs s = DemoMain.defaultCameraSpecs();
-        Size target = s.sizes.get( DemoMain.preference.resolution-1);
+        CameraSpecs s = DemoMain.defaultCameraSpecs(app);
+        Size target = s.sizes.get( app.preference.resolution-1);
         for( int i = 0; i < resolutions.length; i++  ) {
             Size r = resolutions[i];
             if( r.getWidth() == target.getWidth() && r.getHeight() == r.getHeight() ) {
@@ -236,8 +240,8 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
 
         }
 
-        if( DemoMain.preference.resolution == 0 &&
-                DemoMain.preference.autoReduce &&
+        if( app.preference.resolution == 0 &&
+                app.preference.autoReduce &&
                 changeResolutionOnSlow && triggerSlow ) {
             handleReduceResolution(processor);
         }
@@ -352,7 +356,7 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
             renderPeriod = periodRender.getAverage();
             processPeriod = periodProcess.getAverage();
         }
-        if( DemoMain.preference.showSpeed)
+        if( app.preference.showSpeed)
             renderSpeed(canvas, processPeriod, renderPeriod);
     }
 
@@ -519,7 +523,7 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
     }
 
     public CameraPinholeRadial lookupIntrinsics() {
-        return DemoMain.preference.lookup(cameraWidth,cameraHeight);
+        return app.preference.lookup(cameraWidth,cameraHeight);
     }
 
     /**

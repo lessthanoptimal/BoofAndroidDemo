@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.boofcv.android.DemoApplication;
 import org.boofcv.android.DemoMain;
 import org.boofcv.android.R;
 
@@ -58,9 +59,13 @@ public class CalibrationComputeActivity extends Activity {
 	CalibrationThread thread;
 	private volatile boolean threadRunning = false;
 
+	DemoApplication app;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		app = (DemoApplication)getApplication();
 
 		setContentView(R.layout.calibration_compute_view);
 
@@ -119,7 +124,7 @@ public class CalibrationComputeActivity extends Activity {
 					return;
 				}
 			}
-			String name = "camera"+ DemoMain.preference.cameraId+"_"+intrinsic.width+"x"+intrinsic.height+".txt";
+			String name = "camera"+ app.preference.cameraId+"_"+intrinsic.width+"x"+intrinsic.height+".txt";
 			File file = new File(directory,name);
 			FileOutputStream fos = new FileOutputStream(file);
 //			FileOutputStream fos = openFileOutput(name, Context.MODE_PRIVATE);
@@ -136,7 +141,7 @@ public class CalibrationComputeActivity extends Activity {
                     });
 
 			// let it know that it needs to reload intrinsic parameters
-			DemoMain.changedPreferences = true;
+			app.changedPreferences = true;
 
 			// switch back to the main menu
 			Intent intent = new Intent(this, DemoMain.class);

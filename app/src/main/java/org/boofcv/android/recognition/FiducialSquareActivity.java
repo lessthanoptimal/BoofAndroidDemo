@@ -217,7 +217,7 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 			paintLine3.setStrokeWidth(4f*cameraToDisplayDensity);
 
 			double fov[] = cameraNominalFov();
-			intrinsic = MiscUtil.checkThenInventIntrinsic(imageWidth,imageHeight,fov[0],fov[1]);
+			intrinsic = MiscUtil.checkThenInventIntrinsic(app,imageWidth,imageHeight,fov[0],fov[1]);
 			detector.setLensDistortion(LensDistortionOps.narrow(intrinsic),imageWidth,imageHeight);
 		}
 

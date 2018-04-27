@@ -4,7 +4,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
 
-import org.boofcv.android.DemoMain;
+import org.boofcv.android.DemoApplication;
 
 import boofcv.struct.calib.CameraPinholeRadial;
 import georegression.struct.point.Point2D_F64;
@@ -15,10 +15,12 @@ import georegression.struct.shapes.Polygon2D_F64;
  */
 public class MiscUtil {
 
-	public static CameraPinholeRadial checkThenInventIntrinsic( int width , int height ,
-																double hfov , double vfov) {
+	public static CameraPinholeRadial checkThenInventIntrinsic(
+			DemoApplication app,
+			int width , int height ,
+			double hfov , double vfov) {
 
-		CameraPinholeRadial intrinsic = DemoMain.preference.lookup(width, height);
+		CameraPinholeRadial intrinsic = app.preference.lookup(width, height);
 
 		// make sure the camera is calibrated first
 		if( intrinsic == null ) {
