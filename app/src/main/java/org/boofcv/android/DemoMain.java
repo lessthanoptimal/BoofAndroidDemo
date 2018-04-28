@@ -88,6 +88,8 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		setContentView(R.layout.main);
 
 		app = (DemoApplication)getApplication();
+		if( app == null )
+			throw new RuntimeException("App is null!");
 
 		loadCameraSpecs();
 		createGroups();
@@ -277,6 +279,9 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 	}
 
 	private void setDefaultPreferences() {
+		if( app.preference == null ) {
+			app.preference = new DemoPreference();
+		}
 		app.preference.showSpeed = false;
 		app.preference.autoReduce = true;
 

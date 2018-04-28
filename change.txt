@@ -8,6 +8,9 @@ Date: 2018
 
 - Removed static variables from main activity and moved to DemoApplication
   this prevents them from being discarded if the activity is unloaded
+  * Not everyone on the internet agrees with this approach
+- Faster binary contour. This makes almost all fiducial detectors faster.
+- TODO Handle the camera opening really slowly, well after the UI has started
 
 -------------------------------------------------
 Version 2.0.4
