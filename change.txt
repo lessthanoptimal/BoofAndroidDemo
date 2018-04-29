@@ -3,14 +3,14 @@ Change Log for BoofCV Demonstration App
 (year)-(month)-(day)
 
 -------------------------------------------------
-Version 2.1
-Date: 2018
+Version 2.0.5
+Date: 2018-04-28
 
 - Removed static variables from main activity and moved to DemoApplication
   this prevents them from being discarded if the activity is unloaded
   * Not everyone on the internet agrees with this approach
 - Faster binary contour. This makes almost all fiducial detectors faster.
-- TODO Handle the camera opening really slowly, well after the UI has started
+- Added ACRA for detailed error reports on a crash
 
 -------------------------------------------------
 Version 2.0.4

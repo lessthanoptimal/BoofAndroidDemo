@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="acra_toast">Reporting Crash. This will get fixed!</string>
     <string name="app_name">BoofDemo</string>
     <string-array name="binary_filters">
         <item>None</item>

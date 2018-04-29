@@ -244,7 +244,6 @@ implements CompoundButton.OnCheckedChangeListener
 				if( !inside ) {
 					alg.setOriginToCurrent();
 				}
-
 			} else {
 				resetRequested = false;
 				alg.reset();
