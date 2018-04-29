@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import boofcv.BoofVersion;
+
 /**
  * Used for storage of global variables. These were originally static variables that could
  * get discarded if the main activity was unloaded.
@@ -37,8 +39,12 @@ public class DemoApplication extends Application{
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
 
+        ACRA.getErrorReporter().putCustomData("BOOFCV-VERSION", BoofVersion.VERSION);
+        ACRA.getErrorReporter().putCustomData("BOOFCV-GIT-SHA", BoofVersion.GIT_SHA);
+        ACRA.getErrorReporter().putCustomData("BOOFCV-GIT-SHA", BoofVersion.GIT_DATE);
+
         // Only post bugs if in release mode
-        if( BuildConfig.BUILD_TYPE.equals("release"))
+//        if( BuildConfig.BUILD_TYPE.equals("release"))
             ACRA.init(this);
     }
 }

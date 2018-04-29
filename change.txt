@@ -3,6 +3,13 @@ Change Log for BoofCV Demonstration App
 (year)-(month)-(day)
 
 -------------------------------------------------
+Version 2.0.7
+Date: 2018-04-29
+
+- Stale BoofCV was included in previous release
+- More info in About dialog and ACRA report
+
+-------------------------------------------------
 Version 2.0.6
 Date: 2018-04-29
 

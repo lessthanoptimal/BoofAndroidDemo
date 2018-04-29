@@ -26,9 +26,12 @@ public class AboutActivity extends Activity {
 			"<p>The application's source code is available on " +
 			"<a href=\"https://github.com/lessthanoptimal/BoofAndroidDemo\">GitHub</a>." +
 			"<p>Written by Peter Abeles</p>" +
-			"<p>BoofDemo Version = "+BuildConfig.VERSION_CODE+"<br>"+
-			"BoofCV Version = "+ BoofVersion.VERSION+"<br>"+
-			"BoofCV GIT SHA = "+ BoofVersion.GIT_SHA+"</p>";
+			"<p>" +
+			"BoofDemo Code    = "+ BuildConfig.VERSION_CODE+"<br>"+
+			"BoofDemo Version = "+ BuildConfig.VERSION_NAME+"<br>" +
+			"BoofCV Version   = "+ BoofVersion.VERSION+"<br>"+
+			"BoofCV GIT DATE  = "+ BoofVersion.GIT_DATE+"<br>" +
+			"BoofCV GIT SHA   = "+ BoofVersion.GIT_SHA+"</p>";
 
 
 	public void onCreate(Bundle savedInstanceState) {
