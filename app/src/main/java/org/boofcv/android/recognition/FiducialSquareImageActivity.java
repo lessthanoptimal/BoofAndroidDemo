@@ -35,21 +35,30 @@ public class FiducialSquareImageActivity extends FiducialSquareActivity
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		// hold off until it has a chance to load the fiducial camera
+		detectFiducial = false;
 		super.onCreate(savedInstanceState);
 	}
 
 	@Override
 	protected void onResume() {
-		manager = new FiducialManager(this);
-		manager.loadList();
-		list = manager.copyList();
-
+		synchronized (this) {
+			manager = new FiducialManager(this);
+			manager.loadList();
+			list = manager.copyList();
+		}
 		if( list.size() == 0 ) {
 			textToDraw = "ADD FIDUCIALS!";
 		} else {
 			textToDraw = null;
 		}
 		super.onResume();
+
+		// The camera might have initialized before this function is called. In that scenario
+		// we need to create a new processor since the manager might not have been initialized yet
+		detectFiducial = true;
+		if( isCameraInitialized() )
+			createNewProcessor();
 	}
 
 	public void pressedLibrary( View view ) {
@@ -73,11 +82,17 @@ public class FiducialSquareImageActivity extends FiducialSquareActivity
 			detector = FactoryFiducial.squareImage(config, configThreshold, GrayU8.class);
 		}
 
-		for (int i = 0; i < list.size(); i++) {
-			GrayU8 binary = manager.loadBinaryImage(list.get(i).id);
-			BinaryImageOps.invert(binary,binary);
-			PixelMath.multiply(binary,255,0,255,binary);
-			detector.addPatternImage(binary,125,list.get(i).sideLength);
+		// need to check for this just in case my fix earlier doesn't work
+		// a detector is always created after the manager has been loaded
+		synchronized (this) {
+			if (list != null && manager != null) {
+				for (int i = 0; i < list.size(); i++) {
+					GrayU8 binary = manager.loadBinaryImage(list.get(i).id);
+					BinaryImageOps.invert(binary, binary);
+					PixelMath.multiply(binary, 255, 0, 255, binary);
+					detector.addPatternImage(binary, 125, list.get(i).sideLength);
+				}
+			}
 		}
 
 		return detector;

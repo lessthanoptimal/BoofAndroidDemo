@@ -37,7 +37,8 @@ public class DemoApplication extends Application{
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
 
-        // The following line triggers the initialization of ACRA
-        ACRA.init(this);
+        // Only post bugs if in release mode
+        if( BuildConfig.BUILD_TYPE.equals("release"))
+            ACRA.init(this);
     }
 }

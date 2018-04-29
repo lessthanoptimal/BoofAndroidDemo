@@ -3,6 +3,14 @@ Change Log for BoofCV Demonstration App
 (year)-(month)-(day)
 
 -------------------------------------------------
+Version 2.0.6
+Date: 2018-04-29
+
+- Fix for YUV_420_888 problem using ACRA crash report
+- Fix for premature creation of image square fiducial
+- Fixed potential camera related null pointer exceptions
+
+-------------------------------------------------
 Version 2.0.5
 Date: 2018-04-28
 
