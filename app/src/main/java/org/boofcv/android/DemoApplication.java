@@ -45,7 +45,7 @@ public class DemoApplication extends Application{
 
         ACRA.getErrorReporter().putCustomData("BOOFCV-VERSION", BoofVersion.VERSION);
         ACRA.getErrorReporter().putCustomData("BOOFCV-GIT-SHA", BoofVersion.GIT_SHA);
-        ACRA.getErrorReporter().putCustomData("BOOFCV-GIT-SHA", BoofVersion.GIT_DATE);
+        ACRA.getErrorReporter().putCustomData("BOOFCV-GIT-DATE", BoofVersion.GIT_DATE);
 
     }
 }
