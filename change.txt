@@ -4,7 +4,7 @@ Change Log for BoofCV Demonstration App
 
 
 -------------------------------------------------
-Version 2.1
+Version 2.0.8
 Date: 2018
 - DemoProcessing contract more explicitly defined
   * Process and visualize only called after initialize is called
@@ -15,8 +15,6 @@ Date: 2018
 - Fix/Avoid null pointer on app.preference by making sure it's never null
 - Safely close the downloading dialog for classifiers
 - Classifier download will gracefully abort now
-
-TODO determine if ACRA is including the version info which was added
 
 -------------------------------------------------
 Version 2.0.7
