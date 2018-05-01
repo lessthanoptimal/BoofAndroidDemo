@@ -12,6 +12,7 @@ Date: 2018
   * This should fix a known crash bug and solve a few unknown ones
 - YUV conversion
   * Fixed overflow in Y if last row is smaller.
+- Fix/Avoid null pointer on app.preference by making sure it's never null
 
 TODO determine if ACRA is including the version info which was added
 TODO

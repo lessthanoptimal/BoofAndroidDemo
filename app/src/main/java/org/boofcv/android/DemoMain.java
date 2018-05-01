@@ -119,13 +119,8 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if( !waitingCameraPermissions ) {
-			if (app.preference == null) {
-				app.preference = new DemoPreference();
-				setDefaultPreferences();
-			} else {
-				loadIntrinsics(this,app.preference.cameraId, app.preference.calibration,null);
-			}
+		if( !waitingCameraPermissions && app.changedPreferences ) {
+			loadIntrinsics(this,app.preference.cameraId, app.preference.calibration,null);
 		}
 	}
 
@@ -258,6 +253,9 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
             } catch (CameraAccessException e) {
                 throw new RuntimeException("No camera access??? Wasn't it just granted?");
             }
+
+            // Now that it can read the camera set the default settings
+            setDefaultPreferences();
 		}
 	}
 
@@ -279,9 +277,6 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 	}
 
 	private void setDefaultPreferences() {
-		if( app.preference == null ) {
-			app.preference = new DemoPreference();
-		}
 		app.preference.showSpeed = false;
 		app.preference.autoReduce = true;
 

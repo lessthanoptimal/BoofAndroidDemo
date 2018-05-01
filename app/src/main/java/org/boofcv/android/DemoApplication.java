@@ -30,7 +30,7 @@ public class DemoApplication extends Application{
     // contains information on all the cameras.  less error prone and easier to deal with
     public final List<CameraSpecs> specs = new ArrayList<CameraSpecs>();
     // specifies which camera to use an image size
-    public DemoPreference preference;
+    public DemoPreference preference = new DemoPreference();
     // If another activity modifies the demo preferences this needs to be set to true so that it knows to reload
     // camera parameters.
     public boolean changedPreferences = false;

@@ -95,9 +95,11 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Assign app before letting the parent initialize because there's a chance the camera
+        // could be initialized before this gets assigned and generate a NPE
+        app = (DemoApplication)getApplication();
         super.onCreate(savedInstanceState);
 
-        app = (DemoApplication)getApplication();
 
         paintText.setStrokeWidth(3*displayMetrics.density);
         paintText.setTextSize(24*displayMetrics.density);
