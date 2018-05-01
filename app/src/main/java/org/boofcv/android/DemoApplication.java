@@ -40,12 +40,13 @@ public class DemoApplication extends Application{
         super.attachBaseContext(base);
 
         // Only post bugs if in release mode
-//        if( BuildConfig.BUILD_TYPE.equals("release"))
+        if( BuildConfig.BUILD_TYPE.equals("release")) {
             ACRA.init(this);
 
-        ACRA.getErrorReporter().putCustomData("BOOFCV-VERSION", BoofVersion.VERSION);
-        ACRA.getErrorReporter().putCustomData("BOOFCV-GIT-SHA", BoofVersion.GIT_SHA);
-        ACRA.getErrorReporter().putCustomData("BOOFCV-GIT-DATE", BoofVersion.GIT_DATE);
+            ACRA.getErrorReporter().putCustomData("BOOFCV-VERSION", BoofVersion.VERSION);
+            ACRA.getErrorReporter().putCustomData("BOOFCV-GIT-SHA", BoofVersion.GIT_SHA);
+            ACRA.getErrorReporter().putCustomData("BOOFCV-GIT-DATE", BoofVersion.GIT_DATE);
+        }
 
     }
 }

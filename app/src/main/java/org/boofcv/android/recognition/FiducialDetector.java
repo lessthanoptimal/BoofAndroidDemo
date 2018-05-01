@@ -35,9 +35,9 @@ public class FiducialDetector extends BaseDetectFiducialSquare<GrayU8> {
 	private FastQueue<GrayU8> foundBinary;
 
 	public FiducialDetector() {
-		super(FactoryThresholdBinary.globalOtsu(0, 255, true, GrayU8.class), FactoryShapeDetector.polygon(
-						new ConfigPolygonDetector(false, 4, 4), GrayU8.class),
-				0.25, 0.5, squareLength + squareLength, GrayU8.class);
+		super(FactoryThresholdBinary.globalOtsu(0, 255, true, GrayU8.class),
+				FactoryShapeDetector.polygon(new ConfigPolygonDetector(false, 4, 4), GrayU8.class),
+				false,0.25, 0.5, squareLength + squareLength, GrayU8.class);
 
 		foundBinary = new FastQueue<GrayU8>(GrayU8.class,true) {
 			@Override

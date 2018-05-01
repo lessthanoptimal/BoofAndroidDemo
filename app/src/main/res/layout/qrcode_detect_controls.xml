@@ -1,39 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-			  android:orientation="horizontal"
+			  android:orientation="vertical"
 			  android:layout_width="match_parent"
 			  android:layout_height="match_parent">
 
-	<TextView
-		android:layout_width="70dip"
+	<LinearLayout android:orientation="horizontal"
+		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:layout_gravity="center"
-		android:gravity="center"
-		android:text="Unique"
-		android:textSize="18sp"/>
+		android:gravity="center">
+		<Spinner
+			android:id="@+id/spinner_algs"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:gravity="center"
+			android:layout_gravity="center" />
 
-	<TextView
-		android:id="@+id/total_unique"
-		android:layout_width="50dip"
-		android:layout_height="wrap_content"
-		android:layout_gravity="center"
-		android:gravity="center"
-		android:textSize="18sp"/>
+		<ToggleButton android:id="@+id/show_failures"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:textOn="Hide Errors"
+			android:textOff="Show Errors"
+			android:checked="false"/>
+	</LinearLayout>
 
-	<ToggleButton android:id="@+id/show_failures"
-		android:layout_width="wrap_content"
+	<LinearLayout android:orientation="horizontal"
+		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:textOn="Hide"
-		android:textOff="Show"
-		android:checked="false"/>
+		android:gravity="center">
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center"
+			android:gravity="center"
+			android:text="Detected"
+			android:textSize="18sp"/>
 
-	<Button
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_marginLeft="10dip"
-		android:text="List"
-		android:onClick="pressedListView"
-		android:layout_gravity="center"/>
+		<TextView
+			android:id="@+id/total_unique"
+			android:layout_width="50dip"
+			android:layout_height="wrap_content"
+			android:layout_gravity="center"
+			android:gravity="center"
+			android:textSize="18sp"/>
+
+		<Button
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_marginLeft="10dip"
+			android:text="List"
+			android:onClick="pressedListView"
+			android:layout_gravity="center"/>
+	</LinearLayout>
 
 </LinearLayout>

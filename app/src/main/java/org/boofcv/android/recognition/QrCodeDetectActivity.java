@@ -10,7 +10,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
@@ -25,7 +28,10 @@ import java.util.Map;
 
 import boofcv.abst.fiducial.QrCodeDetector;
 import boofcv.alg.fiducial.qrcode.QrCode;
+import boofcv.factory.fiducial.ConfigQrCode;
 import boofcv.factory.fiducial.FactoryFiducial;
+import boofcv.factory.filter.binary.ConfigThreshold;
+import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.struct.image.GrayU8;
 import georegression.metric.Intersection2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -56,6 +62,10 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
     boolean touchProcessed = false;
 
 
+    // Which standard configuration to use
+    Detector detectorType = Detector.STANDARD;
+    Spinner spinnerDetector;
+
     public QrCodeDetectActivity() {
         super(Resolution.HIGH);
         super.changeResolutionOnSlow = true;
@@ -68,6 +78,14 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
         LayoutInflater inflater = getLayoutInflater();
         LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.qrcode_detect_controls,null);
 
+        spinnerDetector = controls.findViewById(R.id.spinner_algs);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.qrcode_detectors, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerDetector.setAdapter(adapter);
+        spinnerDetector.setSelection(detectorType.ordinal());
+        spinnerDetector.setOnItemSelectedListener(new SelectedListener());
+
         final ToggleButton toggle = controls.findViewById(R.id.show_failures);
         toggle.setChecked(showFailures);
         toggle.setOnCheckedChangeListener((buttonView, isChecked) -> showFailures = isChecked);
@@ -77,6 +95,20 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
 
         setControls(controls);
         displayView.setOnTouchListener(new TouchListener());
+    }
+
+    private class SelectedListener implements AdapterView.OnItemSelectedListener {
+
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            detectorType = Detector.values()[position];
+            createNewProcessor();
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+
+        }
     }
 
     private class TouchListener implements View.OnTouchListener {
@@ -113,7 +145,7 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
 
     protected class QrCodeProcessing extends DemoProcessingAbstract<GrayU8> {
 
-        QrCodeDetector<GrayU8> detector = FactoryFiducial.qrcode(null,GrayU8.class);
+        QrCodeDetector<GrayU8> detector;
 
         FastQueue<QrCode> detected = new FastQueue<>(QrCode.class,true);
         FastQueue<QrCode> failures = new FastQueue<>(QrCode.class,true);
@@ -127,6 +159,24 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
 
         public QrCodeProcessing() {
             super(GrayU8.class);
+
+            ConfigQrCode config = new ConfigQrCode();
+
+            switch( detectorType ) {
+
+                case FAST:{
+                    config.threshold = ConfigThreshold.global(ThresholdType.GLOBAL_OTSU);
+                }break;
+
+                case ROBUST:{
+                    ConfigThreshold configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN,15);
+                    configThreshold.scale = 1.00;
+
+                    config.threshold = configThreshold;
+                }break;
+            }
+
+            detector = FactoryFiducial.qrcode(config,GrayU8.class);
 
             colorDetected.setARGB(0xA0,0,0xFF,0);
             colorDetected.setStyle(Paint.Style.FILL);
@@ -220,4 +270,11 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
         NORMAL,
         GRAPH
     }
+
+    enum Detector {
+        STANDARD,
+        FAST,
+        ROBUST
+    }
+
 }

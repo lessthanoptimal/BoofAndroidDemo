@@ -2,10 +2,16 @@ Change Log for BoofCV Demonstration App
 
 (year)-(month)-(day)
 
+-------------------------------------------------
+Version 2.0.9
+Date: 2018-05
+
+- Added more QR Code Detector controls
 
 -------------------------------------------------
 Version 2.0.8
-Date: 2018
+Date: 2018-04-30
+
 - DemoProcessing contract more explicitly defined
   * Process and visualize only called after initialize is called
   * Initialize only called once the camera is fully initialized and the resolution known
