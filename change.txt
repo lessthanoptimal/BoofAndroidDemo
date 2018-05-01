@@ -2,6 +2,20 @@ Change Log for BoofCV Demonstration App
 
 (year)-(month)-(day)
 
+
+-------------------------------------------------
+Version 2.1
+Date: 2018
+- DemoProcessing contract more explicitly defined
+  * Process and visualize only called after initialize is called
+  * Initialize only called once the camera is fully initialized and the resolution known
+  * This should fix a known crash bug and solve a few unknown ones
+- YUV conversion
+  * Fixed overflow in Y if last row is smaller.
+
+TODO determine if ACRA is including the version info which was added
+TODO
+
 -------------------------------------------------
 Version 2.0.7
 Date: 2018-04-29

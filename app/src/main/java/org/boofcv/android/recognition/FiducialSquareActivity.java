@@ -202,6 +202,10 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 		@Override
 		public void initialize(int imageWidth, int imageHeight, int sensorOrientation)
 		{
+			// sanity check requirements
+			if( imageWidth == 0 || imageHeight == 0 )
+				throw new RuntimeException("BUG! Called with zero width and height");
+
 			if( lookupIntrinsics() == null ) {
 				Toast.makeText(FiducialSquareActivity.this, "Calibrate camera for better results!", Toast.LENGTH_LONG).show();
 			}

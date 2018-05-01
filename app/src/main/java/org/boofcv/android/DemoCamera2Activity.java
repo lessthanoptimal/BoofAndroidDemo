@@ -41,6 +41,9 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
     //######## Start variables owned by lock
     protected final Object lockProcessor = new Object();
     protected DemoProcessing processor;
+    // if false no processor functions will be called. Will not be set to true until the
+    // resolution is known and init has been called
+    protected boolean cameraInitialized;
     // camera width and height when processor was initialized
     protected int cameraWidth,cameraHeight,cameraOrientation;
     //####### END
@@ -68,7 +71,7 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
     // NOTE: The current approach isn't perfect. it's possible for an old do nothing visual to
     //       mark this variable as false before the now one is passed in
 
-    // if a process is taking too long poentially trigger a change in resolution to sleep things up
+    // if a process is taking too long potentially trigger a change in resolution to sleep things up
     protected boolean changeResolutionOnSlow = false;
     protected boolean triggerSlow;
     protected final static double TRIGGER_HORIBLY_SLOW = 2000.0;
@@ -173,6 +176,11 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
         } else {
             Log.i("Demo","  processor is null");
         }
+        // Wait until initialize has been called to prevent it from being called twice immediately
+        // and to prevent process or visualize from being initialize has been called
+        synchronized (lockProcessor) {
+            this.cameraInitialized = true;
+        }
     }
 
     public void activateTouchToShowInput() {
@@ -200,11 +208,9 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
         }
         DemoProcessing processor;
         synchronized (lockProcessor) {
+            if( !cameraInitialized || this.processor == null )
+                return;
             processor = this.processor;
-        }
-
-        if( processor == null) {
-            return;
         }
 
         if( !processor.isThreadSafe() && threadPool.getMaximumPoolSize() > 1 )
@@ -217,7 +223,7 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
 
             double milliseconds = (after-before)*1e-6;
 
-            double timeProcess,timeConvert;
+//            double timeProcess,timeConvert;
             synchronized (lockTiming) {
                 totalFramesProcessed++;
                 // give it a few frames to warm up
@@ -229,8 +235,8 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
                     triggerSlow |= milliseconds >= TRIGGER_HORIBLY_SLOW;
                 }
 
-                timeProcess = periodProcess.getAverage();
-                timeConvert = periodConvert.getAverage();
+//                timeProcess = periodProcess.getAverage();
+//                timeConvert = periodConvert.getAverage();
             }
 
             if( verbose ) {
@@ -254,6 +260,7 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
             // Prevent new instances from launching. I hope. Not sure if this will work if
             // there's multiple worker threads
             synchronized (lockProcessor) {
+                cameraInitialized = false;
                 this.processor = null;
                 if( processor != null ) {
                     processor.stop();
@@ -311,17 +318,19 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
             setImageType(processor.getImageType(),processor.getColorFormat());
             this.processor = processor;
 
-            // The camera may or may not be running at this point. That means cameraWidth/Height
-            // might not have a valid value. Worst case initialize() will be called again in
-            // the future
-            Log.i("Demo","initializing processor "+cameraWidth+"x"+cameraHeight);
-            processor.initialize(cameraWidth,cameraHeight, cameraOrientation);
-
-            synchronized (lockTiming) {
-                totalFramesProcessed = 0;
-                periodProcess.reset();
-                periodRender.reset();
+            // If the camera is not initialized then all these values are not known. It will be
+            // initialized when they are known
+            // This must also be called before leaving the lock to prevent process or visualize
+            // from being called on it before initialize has completed
+            if( cameraInitialized ) {
+                Log.i("Demo", "initializing processor " + cameraWidth + "x" + cameraHeight);
+                processor.initialize(cameraWidth, cameraHeight, cameraOrientation);
             }
+        }
+        synchronized (lockTiming) {
+            totalFramesProcessed = 0;
+            periodProcess.reset();
+            periodRender.reset();
         }
     }
 
@@ -337,9 +346,10 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
                 }
             }
         } else {
-            DemoProcessing processor;
+            DemoProcessing processor = null;
             synchronized (lockProcessor) {
-                processor = this.processor;
+                if( cameraInitialized )
+                    processor = this.processor;
             }
             if (processor != null)
                 processor.onDraw(canvas, imageToView);

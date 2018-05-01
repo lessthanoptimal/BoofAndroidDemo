@@ -55,10 +55,11 @@ public class FiducialSquareImageActivity extends FiducialSquareActivity
 		super.onResume();
 
 		// The camera might have initialized before this function is called. In that scenario
-		// we need to create a new processor since the manager might not have been initialized yet
+		// it didn't have any markers loaded yet
 		detectFiducial = true;
-		if( isCameraInitialized() )
+		if( cameraInitialized ) { // not locking here since only one variable needs to be read
 			createNewProcessor();
+		}
 	}
 
 	public void pressedLibrary( View view ) {

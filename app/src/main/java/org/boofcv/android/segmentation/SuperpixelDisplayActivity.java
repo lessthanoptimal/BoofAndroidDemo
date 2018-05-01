@@ -223,7 +223,10 @@ public class SuperpixelDisplayActivity extends DemoBitmapCamera2Activity
 	@Override
 	protected void progressCanceled() {
 		Log.d(TAG,"Requesting stop.");
-		((SegmentationProcessing)processor).requestStop();
+		synchronized (lockProcessor ) {
+			if( processor != null )
+				((SegmentationProcessing) processor).requestStop();
+		}
 	}
 
 	enum Mode {
