@@ -28,7 +28,7 @@ import boofcv.BoofVersion;
         httpMethod = HttpSender.Method.POST)
 public class DemoApplication extends Application{
     // contains information on all the cameras.  less error prone and easier to deal with
-    public final List<CameraSpecs> specs = new ArrayList<CameraSpecs>();
+    public final List<CameraSpecs> specs = new ArrayList<>();
     // specifies which camera to use an image size
     public DemoPreference preference = new DemoPreference();
     // If another activity modifies the demo preferences this needs to be set to true so that it knows to reload
@@ -39,12 +39,13 @@ public class DemoApplication extends Application{
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
 
+        // Only post bugs if in release mode
+//        if( BuildConfig.BUILD_TYPE.equals("release"))
+            ACRA.init(this);
+
         ACRA.getErrorReporter().putCustomData("BOOFCV-VERSION", BoofVersion.VERSION);
         ACRA.getErrorReporter().putCustomData("BOOFCV-GIT-SHA", BoofVersion.GIT_SHA);
         ACRA.getErrorReporter().putCustomData("BOOFCV-GIT-SHA", BoofVersion.GIT_DATE);
 
-        // Only post bugs if in release mode
-//        if( BuildConfig.BUILD_TYPE.equals("release"))
-            ACRA.init(this);
     }
 }

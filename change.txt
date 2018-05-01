@@ -13,9 +13,10 @@ Date: 2018
 - YUV conversion
   * Fixed overflow in Y if last row is smaller.
 - Fix/Avoid null pointer on app.preference by making sure it's never null
+- Safely close the downloading dialog for classifiers
+- Classifier download will gracefully abort now
 
 TODO determine if ACRA is including the version info which was added
-TODO
 
 -------------------------------------------------
 Version 2.0.7

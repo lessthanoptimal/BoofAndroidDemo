@@ -77,6 +77,9 @@ public class ImageClassificationActivity extends DemoBitmapCamera2Activity
         super(Resolution.R640x480);
     }
 
+    // only modify on UI thread
+    private DownloadNetworkModel download;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,6 +106,12 @@ public class ImageClassificationActivity extends DemoBitmapCamera2Activity
             mDetector.onTouchEvent(event);
             return true;
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        abortDownload();
+        super.onDestroy();
     }
 
     @Override
@@ -180,8 +189,22 @@ public class ImageClassificationActivity extends DemoBitmapCamera2Activity
 
     private void download( final String path ) {
         runOnUiThread(() -> {
-            deactiveControls();
-            new DownloadNetworkModel().execute(path);
+            if( download != null ) {
+                Toast.makeText(this,"Already downloading a model!",Toast.LENGTH_SHORT).show();
+            } else {
+                deactiveControls();
+                download = new DownloadNetworkModel();
+                download.execute(path);
+            }
+        });
+    }
+
+    private void abortDownload() {
+        runOnUiThread(() -> {
+            if( download != null ) {
+                download.stopRequested = true;
+                download.dismissDialog();
+            }
         });
     }
 
@@ -302,22 +325,14 @@ public class ImageClassificationActivity extends DemoBitmapCamera2Activity
 
         if( decompressedPath.exists() ) {
             if( verbose )
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(ImageClassificationActivity.this,
-                                "Deleting "+modelName,Toast.LENGTH_SHORT).show();
-                    }});
+                runOnUiThread(() -> Toast.makeText(ImageClassificationActivity.this,
+                        "Deleting "+modelName,Toast.LENGTH_SHORT).show());
 
             deleteDir(decompressedPath);
         } else {
             if( verbose )
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(ImageClassificationActivity.this,
-                                "Nothing to delete",Toast.LENGTH_SHORT).show();
-                    }});
+                runOnUiThread(() -> Toast.makeText(ImageClassificationActivity.this,
+                        "Nothing to delete",Toast.LENGTH_SHORT).show());
         }
     }
 
@@ -337,6 +352,8 @@ public class ImageClassificationActivity extends DemoBitmapCamera2Activity
     class DownloadNetworkModel extends AsyncTask<String, String, String> {
         private final String TAG = "ICA";
         private ProgressDialog pDialog;
+        private boolean stopRequested = false;
+
         /**
          * Before starting background thread Show Progress Bar Dialog
          */
@@ -360,7 +377,6 @@ public class ImageClassificationActivity extends DemoBitmapCamera2Activity
         @Override
         protected String doInBackground(String... f_url) {
             Thread.currentThread().setName("DownloadModel");
-            int count;
             File destinationZip,initialPath,decompressedPath;
             final String fileName;
             try {
@@ -393,29 +409,37 @@ public class ImageClassificationActivity extends DemoBitmapCamera2Activity
                 return null;
             }
 
-            // Try loading the model now that it's downloaded
-            try {
-                runOnUiThread(() -> pDialog.setMessage("Decompressing "+fileName));
-
-                Log.i(TAG,"Decompressing "+decompressedPath.getPath());
-                setStatus(ImageClassificationActivity.Status.DECOMPRESSING);
-
-                deleteModelData(false); // clean up first
-
-                ZipFile zipFile = new ZipFile(destinationZip);
-                zipFile.extractAll(initialPath.getAbsolutePath());
-                if( !destinationZip.delete() ) {
-                    Log.e("Error: ","Failed to delete "+destinationZip.getName());
+            if( stopRequested ) {
+                Log.i(TAG, "Download stop requested. Cleaning up. ");
+                if (destinationZip.exists() && !destinationZip.delete()) {
+                    Log.e("Error: ", "Failed to delete " + destinationZip.getName());
                 }
+                setStatus(ImageClassificationActivity.Status.IDLE);
+            } else {
+                // Try loading the model now that it's downloaded
+                try {
+                    runOnUiThread(() -> pDialog.setMessage("Decompressing " + fileName));
 
-                runOnUiThread(() -> pDialog.setMessage("Loading "+modelName));
-                setStatus(ImageClassificationActivity.Status.LOADING);
-                classifier.loadModel(decompressedPath);
-                setStatus( ImageClassificationActivity.Status.IDLE);
-            } catch( ZipException | IOException e ) {
-                Log.w(TAG,"Failed to load model on second attempt.");
-                e.printStackTrace();
-                setStatus(ImageClassificationActivity.Status.ERROR);
+                    Log.i(TAG, "Decompressing " + decompressedPath.getPath());
+                    setStatus(ImageClassificationActivity.Status.DECOMPRESSING);
+
+                    deleteModelData(false); // clean up first
+
+                    ZipFile zipFile = new ZipFile(destinationZip);
+                    zipFile.extractAll(initialPath.getAbsolutePath());
+                    if (!destinationZip.delete()) {
+                        Log.e("Error: ", "Failed to delete " + destinationZip.getName());
+                    }
+
+                    runOnUiThread(() -> pDialog.setMessage("Loading " + modelName));
+                    setStatus(ImageClassificationActivity.Status.LOADING);
+                    classifier.loadModel(decompressedPath);
+                    setStatus(ImageClassificationActivity.Status.IDLE);
+                } catch (ZipException | IOException e) {
+                    Log.w(TAG, "Failed to load model on second attempt.");
+                    e.printStackTrace();
+                    setStatus(ImageClassificationActivity.Status.ERROR);
+                }
             }
 
             return null;
@@ -448,7 +472,7 @@ public class ImageClassificationActivity extends DemoBitmapCamera2Activity
             byte data[] = new byte[1024];
             long total = 0;
 
-            while ((count = input.read(data)) != -1 ) {
+            while ((count = input.read(data)) != -1 && !stopRequested ) {
                 total += count;
                 // publishing the progress....
                 // After this onProgressUpdate will be called
@@ -482,8 +506,15 @@ public class ImageClassificationActivity extends DemoBitmapCamera2Activity
         @Override
         protected void onPostExecute(String file_url) {
             Log.i(TAG,"onPostExecute()");
+            download = null;
             // dismiss the dialog after the file was downloaded
-            runOnUiThread(()->pDialog.dismiss());
+            runOnUiThread(()->dismissDialog());
+        }
+
+        public void dismissDialog() {
+            if( pDialog.isShowing() ) {
+                pDialog.dismiss();
+            }
         }
     }
 
