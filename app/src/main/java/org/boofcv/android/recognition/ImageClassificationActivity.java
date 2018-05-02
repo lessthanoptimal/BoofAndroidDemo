@@ -418,7 +418,7 @@ public class ImageClassificationActivity extends DemoBitmapCamera2Activity
                 if (destinationZip.exists() && !destinationZip.delete()) {
                     Log.e("Error: ", "Failed to delete " + destinationZip.getName());
                 }
-                setStatus(ImageClassificationActivity.Status.IDLE);
+                setStatus(ImageClassificationActivity.Status.WAITING);
             } else {
                 // Try loading the model now that it's downloaded
                 try {
@@ -561,10 +561,9 @@ public class ImageClassificationActivity extends DemoBitmapCamera2Activity
         LOADING,
         DOWNLOADING,
         DECOMPRESSING,
-        IDLE,
+        IDLE, // model has been loaded if in this state
         PROCESSING,
         CLASSIFIED,
-        USER_CANCEL,
         ERROR
     }
 }
