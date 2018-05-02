@@ -20,12 +20,13 @@
 			android:scaleType="fitCenter"
 			android:src="@drawable/boofcv_logo" />
 
-		<android.widget.Toolbar
+		<android.support.v7.widget.Toolbar
 			android:id="@+id/my_toolbar"
 			android:layout_width="wrap_content"
 			android:layout_height="?attr/actionBarSize"
 			android:layout_alignRight="@id/logo_button"
 			android:background="#A1A1A1"
+			android:elevation="4dp"
 			android:textColorSecondary="#111111"/>
 
 	</RelativeLayout>

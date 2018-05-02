@@ -26,7 +26,8 @@ import boofcv.BoofVersion;
 @AcraCore(reportFormat= StringFormat.JSON)
 @AcraHttpSender(uri = "https://collector.tracepot.com/034cb7eb",
         httpMethod = HttpSender.Method.POST)
-public class DemoApplication extends Application{
+public class DemoApplication extends Application
+{
     // contains information on all the cameras.  less error prone and easier to deal with
     public final List<CameraSpecs> specs = new ArrayList<>();
     // specifies which camera to use an image size

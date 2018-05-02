@@ -7,6 +7,11 @@ Version 2.0.9
 Date: 2018-05
 
 - Added more QR Code Detector controls
+- Attempts to catch and recover from out of memory errors when a new process is init
+- Main activity now uses AppCompatActivity so that the ToolBar works on older devices
+
+TODO Camera already open bug
+TODO classify cancel download when back is pressed
 
 -------------------------------------------------
 Version 2.0.8

@@ -38,6 +38,8 @@ import georegression.struct.point.Point2D_F64;
  */
 public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
 
+    private static final String TAG = "DemoCamera2";
+
     //######## Start variables owned by lock
     protected final Object lockProcessor = new Object();
     protected DemoProcessing processor;
@@ -174,7 +176,19 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
             this.cameraOrientation = cameraOrientation;
         }
         if( p != null ) {
-            p.initialize(cameraWidth,cameraHeight, cameraOrientation);
+            try {
+                p.initialize(cameraWidth, cameraHeight, cameraOrientation);
+            } catch( OutOfMemoryError e ) {
+                synchronized ( lockProcessor) {
+                    processor = null; // free memory
+                }
+                e.printStackTrace();
+                Log.e(TAG,"Out of memory. "+e.getMessage());
+                runOnUiThread(()->{
+                    finish();
+                    Toast.makeText(this,"Out of Memory. Try lower resolution",Toast.LENGTH_LONG).show();
+                });
+            }
         } else {
             Log.i("Demo","  processor is null");
         }

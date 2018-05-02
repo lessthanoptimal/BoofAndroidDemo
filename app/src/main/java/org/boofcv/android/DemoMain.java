@@ -16,6 +16,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Size;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,7 +25,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
-import android.widget.Toolbar;
 
 import org.boofcv.android.assoc.AssociationActivity;
 import org.boofcv.android.calib.CalibrationActivity;
@@ -69,7 +70,7 @@ import java.util.Map;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.struct.calib.CameraPinholeRadial;
 
-public class DemoMain extends Activity implements ExpandableListView.OnChildClickListener {
+public class DemoMain extends AppCompatActivity implements ExpandableListView.OnChildClickListener {
 
 	public static final String TAG = "DemoMain";
 
@@ -113,7 +114,7 @@ public class DemoMain extends Activity implements ExpandableListView.OnChildClic
 		listView.setOnChildClickListener(this);
 
 		Toolbar toolbar = findViewById(R.id.my_toolbar);
-		setActionBar(toolbar);
+		setSupportActionBar(toolbar);
 	}
 
 	@Override

@@ -226,6 +226,8 @@ public class DisparityActivity extends DemoCamera2Activity
 		@Override
 		public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
 			intrinsic = lookupIntrinsics();
+			if( intrinsic == null )
+				return;
 
 			DetectDescribePoint<GrayF32, BrightFeature> detDesc =
 					FactoryDetectDescribe.surfFast(null,null,null,GrayF32.class);
