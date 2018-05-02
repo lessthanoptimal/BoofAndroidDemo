@@ -1,6 +1,7 @@
 package org.boofcv.android.recognition;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
@@ -349,7 +350,9 @@ public class ImageClassificationActivity extends DemoBitmapCamera2Activity
     /**
      * Background Async Task to download file
      */
-    class DownloadNetworkModel extends AsyncTask<String, String, String> {
+    class DownloadNetworkModel extends AsyncTask<String, String, String>
+        implements DialogInterface.OnCancelListener
+    {
         private final String TAG = "ICA";
         private ProgressDialog pDialog;
         private boolean stopRequested = false;
@@ -366,7 +369,8 @@ public class ImageClassificationActivity extends DemoBitmapCamera2Activity
                 pDialog.setIndeterminate(false);
                 pDialog.setMax(100);
                 pDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                pDialog.setCancelable(false);
+                pDialog.setCancelable(true);
+                pDialog.setOnCancelListener(this);
                 pDialog.show();
             });
         }
@@ -515,6 +519,11 @@ public class ImageClassificationActivity extends DemoBitmapCamera2Activity
             if( pDialog.isShowing() ) {
                 pDialog.dismiss();
             }
+        }
+
+        @Override
+        public void onCancel(DialogInterface dialogInterface) {
+            stopRequested = true;
         }
     }
 

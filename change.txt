@@ -9,9 +9,12 @@ Date: 2018-05
 - Added more QR Code Detector controls
 - Attempts to catch and recover from out of memory errors when a new process is init
 - Main activity now uses AppCompatActivity so that the ToolBar works on older devices
+- (BoofCV) Designed to handle camera being closed while opening a camera
+- Can now cancel a download for image classify
 
-TODO Camera already open bug
-TODO classify cancel download when back is pressed
+TODO classify rotate input image into standard orientation
+
+TODO Figure out why green on that one phone
 
 -------------------------------------------------
 Version 2.0.8
