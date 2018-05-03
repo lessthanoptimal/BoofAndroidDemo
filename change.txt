@@ -3,6 +3,15 @@ Change Log for BoofCV Demonstration App
 (year)-(month)-(day)
 
 -------------------------------------------------
+Version 2.0.10
+Date: 2018-05
+
+- Catch camera2 exception when not present, shows a dialog, and exits
+- (BoofCV) More new logic in an attempt to prevent a camera from being opened twice
+- (BoofCV) Correctly shuts down preview reader
+- More useful debug info
+
+-------------------------------------------------
 Version 2.0.9
 Date: 2018-05-02
 

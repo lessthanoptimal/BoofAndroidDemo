@@ -92,7 +92,15 @@ public class DemoMain extends AppCompatActivity implements ExpandableListView.On
 		if( app == null )
 			throw new RuntimeException("App is null!");
 
-		loadCameraSpecs();
+		try {
+            loadCameraSpecs();
+        } catch( NoClassDefFoundError e ) {
+		    // Some people like trying to run this app on really old versions of android and
+            // seem to enjoy crashing and reporting the errors.
+		    e.printStackTrace();
+            abortDialog("Camera2 API Required");
+            return;
+        }
 		createGroups();
 
 		ExpandableListView listView = findViewById(R.id.DemoListView);
@@ -445,12 +453,19 @@ public class DemoMain extends AppCompatActivity implements ExpandableListView.On
 		}
 		throw new RuntimeException("Can't find default camera");
 	}
-	public static CameraSpecs cameraSpecs( DemoApplication app , String cameraId ) {
-		for(int i = 0; i < app.specs.size(); i++ ) {
-			CameraSpecs s = app.specs.get(i);
-			if( s.deviceId.equals(cameraId))
-				return s;
-		}
-		return null;
-	}
+
+    /**
+     * Displays a warning dialog and then exits the activity
+     */
+    private void abortDialog( String message ) {
+        AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+        alertDialog.setTitle("Fatal error");
+        alertDialog.setMessage(message);
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                (dialog, which) -> {
+                    dialog.dismiss();
+                    DemoMain.this.finish();
+                });
+        alertDialog.show();
+    }
 }
