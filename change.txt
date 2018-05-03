@@ -4,17 +4,15 @@ Change Log for BoofCV Demonstration App
 
 -------------------------------------------------
 Version 2.0.9
-Date: 2018-05
+Date: 2018-05-02
 
 - Added more QR Code Detector controls
 - Attempts to catch and recover from out of memory errors when a new process is init
 - Main activity now uses AppCompatActivity so that the ToolBar works on older devices
 - (BoofCV) Designed to handle camera being closed while opening a camera
 - Can now cancel a download for image classify
-
-TODO classify rotate input image into standard orientation
-
-TODO Figure out why green on that one phone
+- Changed min API to 22 because there's a camera2 API bug in 21 that breaks color images
+- Rotates images in classification activity which improves results
 
 -------------------------------------------------
 Version 2.0.8

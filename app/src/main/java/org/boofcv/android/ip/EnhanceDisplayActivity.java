@@ -21,6 +21,7 @@ import boofcv.alg.misc.ImageStatistics;
 import boofcv.android.ConvertBitmap;
 import boofcv.core.image.ConvertImage;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
 
@@ -112,15 +113,9 @@ public class EnhanceDisplayActivity extends DemoBitmapCamera2Activity
 		startEnhance(spinnerView.getSelectedItemPosition(),isChecked);
 	}
 
-	protected void renderOutput(GrayU8 output ) {
+	protected void renderOutput( ImageBase output ) {
 		synchronized (bitmapLock) {
-			ConvertBitmap.grayToBitmap(output, bitmap, bitmapTmp);
-		}
-	}
-
-	protected void renderOutput( Planar<GrayU8> output ) {
-		synchronized (bitmapLock) {
-			ConvertBitmap.planarToBitmap(output, bitmap, bitmapTmp);
+			ConvertBitmap.boofToBitmap(output, bitmap, bitmapTmp);
 		}
 	}
 

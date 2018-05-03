@@ -5,10 +5,10 @@ android {
 
     defaultConfig {
         applicationId "org.boofcv.android"
-        minSdkVersion 21
+        minSdkVersion 22
         targetSdkVersion 27
         versionCode 22
-        versionName "2.0.9-SNAPSHOT"
+        versionName "2.0.9"
     }
 
     buildTypes {

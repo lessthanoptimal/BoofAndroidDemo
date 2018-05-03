@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Locale;
 
 import boofcv.abst.scene.ImageClassifier;
+import boofcv.alg.misc.GImageMiscOps;
 import boofcv.core.image.ConvertImage;
 import boofcv.factory.scene.ClassifierAndSource;
 import boofcv.factory.scene.FactoryImageClassifier;
@@ -54,6 +55,7 @@ import boofcv.struct.image.Planar;
  */
 public class ImageClassificationActivity extends DemoBitmapCamera2Activity
         implements AdapterView.OnItemSelectedListener {
+    private static final String TAG = "Classify";
     public static final String MODEL_PATH = "classifier_models";
 
     Spinner spinnerClassifier;
@@ -67,6 +69,8 @@ public class ImageClassificationActivity extends DemoBitmapCamera2Activity
     Status status = Status.INITIALIZING;
 
     Planar<GrayF32> workImage = ImageType.pl(3, GrayF32.class).createImage(1,1);
+    Planar<GrayF32> workImage2 = ImageType.pl(3, GrayF32.class).createImage(1,1);
+
     long startTime;
 
     // Progress Dialog
@@ -236,6 +240,7 @@ public class ImageClassificationActivity extends DemoBitmapCamera2Activity
         @Override
         public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
             workImage.reshape(imageWidth,imageHeight);
+            workImage2.reshape(imageHeight,imageWidth);
         }
 
         @Override
@@ -292,9 +297,7 @@ public class ImageClassificationActivity extends DemoBitmapCamera2Activity
         @Override
         public void process(InterleavedU8 input) {
 
-            if( status == Status.CLASSIFIED || status == Status.PROCESSING ) {
-                convertToBitmapDisplay(workImage);
-            } else {
+            if( status != Status.CLASSIFIED && status != Status.PROCESSING ) {
                 convertToBitmapDisplay(input);
             }
 
@@ -305,9 +308,43 @@ public class ImageClassificationActivity extends DemoBitmapCamera2Activity
                 } else if (status == Status.IDLE) {
                     startTime = System.currentTimeMillis();
                     status = Status.PROCESSING;
+                    convertToBitmapDisplay(input);
                     ConvertImage.convertU8F32(input,workImage);
+
+                    // rotate so that it appears to the CNN the say way to appears to the user
+                    int displayRotation = (getWindowManager().getDefaultDisplay().getRotation())*90;
+                    int total = cameraOrientation - displayRotation;
+                    if( total < 0 ) {
+                        total += 360;
+                    }
+                    total %= 360;
+
+                    Log.d(TAG,"display "+displayRotation+" camera "+cameraOrientation+" total "+total);
+
+                    Planar<GrayF32> adjusted;
+                    switch( total ) {
+                        case 0:
+                            adjusted = workImage;
+                            break;
+                        case 90:
+                            GImageMiscOps.rotateCW(workImage,workImage2);
+                            adjusted = workImage2;
+                            break;
+                        case 180:
+                            GImageMiscOps.rotateCW(workImage,workImage2);
+                            GImageMiscOps.rotateCW(workImage2,workImage);
+                            adjusted = workImage;
+                            break;
+                        case 270:
+                            GImageMiscOps.rotateCCW(workImage,workImage2);
+                            adjusted = workImage2;
+                            break;
+                        default:
+                            throw new RuntimeException("Unexpected angle "+total);
+                    }
+
                     deactiveControls();
-                    new ProcessImageTask(workImage).execute();
+                    new ProcessImageTask(adjusted).execute();
                 } else if( status == Status.CLASSIFIED ) {
                     status = Status.IDLE;
                 }
@@ -544,7 +581,9 @@ public class ImageClassificationActivity extends DemoBitmapCamera2Activity
 
     private void setStatus( Status status ) {
 
-        if( status == Status.IDLE || status == Status.ERROR || status == Status.CLASSIFIED) {
+        if( status == Status.IDLE || status == Status.WAITING ||
+                status == Status.ERROR || status == Status.CLASSIFIED)
+        {
             runOnUiThread(() -> {
                 if( !guiEnabled ) {
                     activateControls();
