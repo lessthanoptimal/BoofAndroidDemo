@@ -30,6 +30,8 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 	EditText textWidth;
 	EditText textSpace;
 
+	DrawCalibrationFiducial vis;
+
 	double valueWidth,valueSpace;
 	TextWatcher watcherWidth,watcherSpace;
 
@@ -71,30 +73,10 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 		updateControlValues();
 
 		final FrameLayout preview = controls.findViewById(R.id.target_frame);
-		final DrawCalibrationFiducial vis = new DrawCalibrationFiducial(activity,this);
+		vis = new DrawCalibrationFiducial(activity,this);
 		preview.addView(vis);
 
 		final AlertDialog dialog = builder.create();
-
-		TextWatcher watcher = new TextWatcher() {
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-				try {
-					int numRows = Integer.parseInt(textRows.getText().toString());
-					int numCols = Integer.parseInt(textCols.getText().toString());
-					if( numCols > 0 || numRows > 0  )
-						setRowCol(numRows,numCols);
-
-					vis.invalidate();
-				} catch( NumberFormatException ignore ){}
-			}
-
-			@Override
-			public void afterTextChanged(Editable s) {}
-		};
 
 		AdapterView.OnItemSelectedListener spinnerSelected = new AdapterView.OnItemSelectedListener() {
 
@@ -120,48 +102,87 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
 
 			@Override
-			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+			@Override
+			public void afterTextChanged(Editable editable) {
 				try {
-					double v = Double.parseDouble(charSequence.toString());
+					double v = Double.parseDouble(editable.toString());
 					if( v > 0 ) {
 						valueWidth = v;
 						setSpaceWidth(valueSpace, valueWidth);
 						vis.invalidate();
+					} else {
+						textWidth.setText(""+valueWidth);
 					}
-				} catch( NumberFormatException ignore ){}
+				} catch( NumberFormatException ignore ){
+					textWidth.setText(""+valueWidth);
+				}
 			}
-
-			@Override
-			public void afterTextChanged(Editable editable) {}
 		};
 		watcherSpace = new TextWatcher() {
-			@Override
 			public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
 
 			@Override
-			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+			public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+			@Override
+			public void afterTextChanged(Editable editable) {
 				try {
-					double v = Double.parseDouble(charSequence.toString());
+					double v = Double.parseDouble(editable.toString());
 					if( v > 0 ) {
 						valueSpace = v;
 						setSpaceWidth(valueSpace, valueWidth);
 						vis.invalidate();
+					} else {
+						textSpace.setText(""+valueSpace);
 					}
-				} catch( NumberFormatException ignore ){}
+				} catch( NumberFormatException ignore ){
+					textSpace.setText(""+valueSpace);
+				}
 			}
-
-			@Override
-			public void afterTextChanged(Editable editable) {}
 		};
 
-		textRows.addTextChangedListener(watcher);
-		textCols.addTextChangedListener(watcher);
+		textRows.addTextChangedListener(new TextWatcherShape(textRows));
+		textCols.addTextChangedListener(new TextWatcherShape(textCols));
 		textWidth.addTextChangedListener(watcherWidth);
 		textSpace.addTextChangedListener(watcherSpace);
 		spinnerTarget.setOnItemSelectedListener(spinnerSelected);
 
 		setupTargetSpinner(activity);
 		dialog.show();
+	}
+
+	private class TextWatcherShape implements TextWatcher {
+
+		EditText owner;
+		String before="";
+
+		public TextWatcherShape(EditText owner) {
+			this.owner = owner;
+		}
+
+		@Override
+		public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+			before = s.toString();
+		}
+
+		@Override
+		public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+		@Override
+		public void afterTextChanged(Editable s) {
+			try {
+				int numRows = Integer.parseInt(textRows.getText().toString());
+				int numCols = Integer.parseInt(textCols.getText().toString());
+				if( numCols > 0 || numRows > 0  )
+					setRowCol(numRows,numCols);
+
+				vis.invalidate();
+			} catch( NumberFormatException e ){
+				owner.setText(before);
+			}
+		}
 	}
 
 	private void setRowCol( int numRows , int numCols ) {

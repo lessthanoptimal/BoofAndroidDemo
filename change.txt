@@ -4,7 +4,7 @@ Change Log for BoofCV Demonstration App
 
 -------------------------------------------------
 Version 2.0.10
-Date: 2018-05
+Date: 2018-05-05
 
 - Catch camera2 exception when not present, shows a dialog, and exits
 - (BoofCV) More new logic in an attempt to prevent a camera from being opened twice
@@ -14,6 +14,7 @@ Date: 2018-05
 - DetectBlackPolygon makes sure number of sizes text isn't empty
 - Square Fiducials
   * Fixed bug in BoofCV where a previous bug fix made there be too many points
+- Sanity check text in calibration
 
 -------------------------------------------------
 Version 2.0.9
