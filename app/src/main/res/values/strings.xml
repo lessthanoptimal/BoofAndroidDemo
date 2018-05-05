@@ -95,7 +95,6 @@
     <string-array name="qrcode_detectors">
         <item>STANDARD</item>
         <item>FAST</item>
-        <item>ROBUST</item>
     </string-array>
 
     <string-array name="point_features">

@@ -167,13 +167,6 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
                 case FAST:{
                     config.threshold = ConfigThreshold.global(ThresholdType.GLOBAL_OTSU);
                 }break;
-
-                case ROBUST:{
-                    ConfigThreshold configThreshold = ConfigThreshold.local(ThresholdType.LOCAL_MEAN,15);
-                    configThreshold.scale = 1.00;
-
-                    config.threshold = configThreshold;
-                }break;
             }
 
             detector = FactoryFiducial.qrcode(config,GrayU8.class);
@@ -273,8 +266,7 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
 
     enum Detector {
         STANDARD,
-        FAST,
-        ROBUST
+        FAST
     }
 
 }

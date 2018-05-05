@@ -161,8 +161,20 @@ public class DetectBlackPolygonActivity extends DemoBitmapCamera2Activity
 	}
 
 	private void checkUpdateSides() {
-		int min = Integer.parseInt(editMin.getText().toString());
-		int max = Integer.parseInt(editMax.getText().toString());
+		String textMin = editMin.getText().toString();
+		if( textMin.isEmpty() ) {
+			editMin.setText(""+minSides);
+			return;
+		}
+
+		String textMax = editMax.getText().toString();
+		if( textMax.isEmpty() ) {
+			editMax.setText(""+maxSides);
+			return;
+		}
+
+		int min = Integer.parseInt(textMin);
+		int max = Integer.parseInt(textMax);
 
 		boolean changed = false;
 		if( min < MIN_SIDES ) {

@@ -1,3 +1,5 @@
+TODO: Move ACRA into a resourceso that people building from source
+      don't send me bug reports
 TODO: Added Equirectangular to Pinhole camera
   * Provide example image.
 

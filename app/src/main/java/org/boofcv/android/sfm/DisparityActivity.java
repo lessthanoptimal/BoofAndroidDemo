@@ -288,6 +288,9 @@ public class DisparityActivity extends DemoCamera2Activity
 		@Override
 		public void process(GrayF32 gray) {
 
+			if( intrinsic == null )
+				return;
+
 			int target = 0;
 
 			// process GUI interactions
