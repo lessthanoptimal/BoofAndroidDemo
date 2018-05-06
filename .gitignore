@@ -23,3 +23,5 @@ build/
 *.iml
 app/app.iml
 .idea/*
+
+acra.txt

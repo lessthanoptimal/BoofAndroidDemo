@@ -2,15 +2,22 @@ package org.boofcv.android;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.res.AssetManager;
+import android.os.Build;
 
 import org.acra.ACRA;
 import org.acra.annotation.AcraCore;
-import org.acra.annotation.AcraHttpSender;
-import org.acra.annotation.AcraLimiter;
-import org.acra.annotation.AcraToast;
+import org.acra.config.CoreConfigurationBuilder;
+import org.acra.config.HttpSenderConfigurationBuilder;
+import org.acra.config.LimiterConfigurationBuilder;
+import org.acra.config.ToastConfigurationBuilder;
 import org.acra.data.StringFormat;
 import org.acra.sender.HttpSender;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -21,11 +28,7 @@ import boofcv.BoofVersion;
  * Used for storage of global variables. These were originally static variables that could
  * get discarded if the main activity was unloaded.
  */
-@AcraToast( resText = R.string.acra_toast)
-@AcraLimiter(period = 10, periodUnit = TimeUnit.MINUTES)
-@AcraCore(reportFormat= StringFormat.JSON)
-@AcraHttpSender(uri = "https://collector.tracepot.com/034cb7eb",
-        httpMethod = HttpSender.Method.POST)
+@AcraCore(buildConfigClass = BuildConfig.class)
 public class DemoApplication extends Application
 {
     // contains information on all the cameras.  less error prone and easier to deal with
@@ -40,14 +43,42 @@ public class DemoApplication extends Application
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
 
+        // Don't initialize error reporting if no destination is specified
+        // or if someone is trying to run it on an unsupported android device
+        String address = loadAcraAddress(this);
+        if( address == null)
+            return;
+
+        CoreConfigurationBuilder builder = new CoreConfigurationBuilder(this);
+        builder.setBuildConfigClass(BuildConfig.class).setReportFormat(StringFormat.JSON);
+        builder.getPluginConfigurationBuilder(ToastConfigurationBuilder.class).setResText(R.string.acra_toast);
+        builder.getPluginConfigurationBuilder(LimiterConfigurationBuilder.class).
+                setPeriod(10).setPeriodUnit(TimeUnit.MINUTES);
+        builder.getPluginConfigurationBuilder(HttpSenderConfigurationBuilder.class).
+                setUri(address).setHttpMethod(HttpSender.Method.POST);
+
         // Only post bugs if in release mode
-        if( BuildConfig.BUILD_TYPE.equals("release")) {
-            ACRA.init(this);
+        ACRA.init(this,builder);
 
-            ACRA.getErrorReporter().putCustomData("BOOFCV-VERSION", BoofVersion.VERSION);
-            ACRA.getErrorReporter().putCustomData("BOOFCV-GIT-SHA", BoofVersion.GIT_SHA);
-            ACRA.getErrorReporter().putCustomData("BOOFCV-GIT-DATE", BoofVersion.GIT_DATE);
+        ACRA.getErrorReporter().putCustomData("BOOFCV-VERSION", BoofVersion.VERSION);
+        ACRA.getErrorReporter().putCustomData("BOOFCV-GIT-SHA", BoofVersion.GIT_SHA);
+        ACRA.getErrorReporter().putCustomData("BOOFCV-GIT-DATE", BoofVersion.GIT_DATE);
+    }
+
+    public static String loadAcraAddress( Context context ) {
+        if( Build.VERSION.SDK_INT < 22 )
+            return null;
+
+        if( !BuildConfig.BUILD_TYPE.equals("release"))
+            return null;
+
+        try {
+            AssetManager am = context.getAssets();
+            InputStream is = am.open("acra.txt");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+            return reader.readLine();
+        } catch( RuntimeException | IOException e ) {
+            return null;
         }
-
     }
 }

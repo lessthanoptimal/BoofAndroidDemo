@@ -7,8 +7,8 @@ android {
         applicationId "org.boofcv.android"
         minSdkVersion 22
         targetSdkVersion 27
-        versionCode 23
-        versionName "2.0.10"
+        versionCode 24
+        versionName "2.0.11"
     }
 
     buildTypes {

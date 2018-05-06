@@ -1,0 +1,1 @@
+To upload bug reports create a file called acra.txt with the destination address in this directory

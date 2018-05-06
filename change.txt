@@ -3,6 +3,16 @@ Change Log for BoofCV Demonstration App
 (year)-(month)-(day)
 
 -------------------------------------------------
+Version 2.0.11
+Date: 2018-05
+
+- Move ACRA destination address into an asset to prevent people from smalling the bug reports
+
+TODO sanity check selected calibration target for 4 points .. etc
+TODO: Added Equirectangular to Pinhole camera
+  * Provide example image.
+
+-------------------------------------------------
 Version 2.0.10
 Date: 2018-05-05
 

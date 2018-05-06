@@ -6,9 +6,9 @@
 		  android:title="Preferences"
 		  app:showAsAction="never" />
 	<item android:id="@+id/info"
-		  android:title="Info"
+		  android:title="Camera Info"
 		  app:showAsAction="never" />
 	<item android:id="@+id/about"
-		  android:title="About"
+		  android:title="About App"
 		  app:showAsAction="never"/>
 </menu>

@@ -11,6 +11,14 @@ Build Variants
 * fast Turns off debugging and runs at full speed
 * release Is for release and requires encryption keys
 
+# Crash Reporting
+
+ACRA is used to report crashes. To prevent me from getting spammed by weird errors when people
+hack this code the destination address for ACRA isn't checked into the repository. To
+add error reporting create a text file with the address here:
+
+app/src/main/asserts/acra.txt
+
 # Usage
 
 See this old blog post
