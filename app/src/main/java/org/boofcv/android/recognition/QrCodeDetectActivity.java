@@ -30,8 +30,6 @@ import boofcv.abst.fiducial.QrCodeDetector;
 import boofcv.alg.fiducial.qrcode.QrCode;
 import boofcv.factory.fiducial.ConfigQrCode;
 import boofcv.factory.fiducial.FactoryFiducial;
-import boofcv.factory.filter.binary.ConfigThreshold;
-import boofcv.factory.filter.binary.ThresholdType;
 import boofcv.struct.image.GrayU8;
 import georegression.metric.Intersection2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -160,13 +158,16 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
         public QrCodeProcessing() {
             super(GrayU8.class);
 
-            ConfigQrCode config = new ConfigQrCode();
+            ConfigQrCode config;
 
             switch( detectorType ) {
-
                 case FAST:{
-                    config.threshold = ConfigThreshold.global(ThresholdType.GLOBAL_OTSU);
+                    config = ConfigQrCode.fast();
                 }break;
+
+                default: {
+                    config = new ConfigQrCode();
+                }
             }
 
             detector = FactoryFiducial.qrcode(config,GrayU8.class);
