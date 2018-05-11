@@ -20,6 +20,8 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import org.acra.ACRA;
+
 import java.util.Locale;
 
 import boofcv.android.ConvertBitmap;
@@ -167,6 +169,9 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
     protected void onCameraResolutionChange( int width , int height, int cameraOrientation ) {
         Log.i("Demo","onCameraResolutionChange called. "+width+"x"+height);
         super.onCameraResolutionChange(width,height,cameraOrientation);
+
+        ACRA.getErrorReporter().putCustomData("Resolution", width+" x "+height);
+
         triggerSlow = false;
         DemoProcessing p;
         synchronized ( lockProcessor) {
@@ -185,7 +190,7 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
                 e.printStackTrace();
                 Log.e(TAG,"Out of memory. "+e.getMessage());
                 runOnUiThread(()->{
-                    finish();
+                    finish(); // leave the activity
                     Toast.makeText(this,"Out of Memory. Try lower resolution",Toast.LENGTH_LONG).show();
                 });
             }
@@ -234,7 +239,15 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
 
         if( processor.getImageType().isSameType(image.getImageType())) {
             long before = System.nanoTime();
-            processor.process(image);
+            try {
+                processor.process(image);
+            } catch( OutOfMemoryError e ) {
+                runOnUiThread(()->{
+                    finish(); // leave the activity
+                    Toast.makeText(this,"Out of Memory. Try lower resolution",Toast.LENGTH_LONG).show();
+                });
+                return;
+            }
             long after = System.nanoTime();
 
             double milliseconds = (after-before)*1e-6;

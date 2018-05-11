@@ -8,6 +8,8 @@ Date: 2018-05
 
 - Move ACRA destination address into an asset to prevent people from smalling the bug reports
 - (BoofCV) Attempt to fix image already closed exception
+- Added camera resolution metadata to exception report
+- Attempts to try to recover from out of memory exceptions better
 
 TODO sanity check selected calibration target for 4 points .. etc
 TODO: Added Equirectangular to Pinhole camera
