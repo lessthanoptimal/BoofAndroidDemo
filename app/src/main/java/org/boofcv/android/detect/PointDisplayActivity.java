@@ -29,7 +29,6 @@ import boofcv.alg.feature.detect.interest.EasyGeneralFeatureDetector;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
-import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
@@ -125,6 +124,7 @@ public class PointDisplayActivity extends DemoCamera2Activity
 
 		int pixelTol = 10 + (int)(200*(featureRadius/(double)seekRadius.getMax()));
 		ConfigFastCorner configFast = new ConfigFastCorner(pixelTol,9);
+		configFast.maxFeatures = 0.02;
 
 		boolean enableRadius=false;
 		boolean enabledWeighted=false;
@@ -142,12 +142,7 @@ public class PointDisplayActivity extends DemoCamera2Activity
 				intensity = FactoryIntensityPoint.harris(featureRadius, 0.04f, weighted, GrayS16.class);
 				break;
 
-			case 2: {
-				enableRadius = true;
-				detector = FactoryDetectPoint.createFast(configFast,GrayU8.class);
-			}break;
-
-			case 3:
+			case 2:
 				enableRadius = true;
 				// less strict requirement since it can prune features with non-max
 				intensity = FactoryIntensityPoint.fast(
@@ -155,20 +150,20 @@ public class PointDisplayActivity extends DemoCamera2Activity
 				nonmax = nonmaxMinMax;
 				break;
 
-			case 4:
+			case 3:
 				intensity = (GeneralFeatureIntensity)FactoryIntensityPoint.laplacian();
 				nonmax = nonmaxMinMax;
 				break;
 
-			case 5:
+			case 4:
 				intensity = FactoryIntensityPoint.kitros(GrayS16.class);
 				break;
 
-			case 6:
+			case 5:
 				intensity = FactoryIntensityPoint.hessian(HessianBlobIntensity.Type.DETERMINANT,GrayS16.class);
 				break;
 
-			case 7:
+			case 6:
 				intensity = FactoryIntensityPoint.hessian(HessianBlobIntensity.Type.TRACE,GrayS16.class);
 				nonmax = nonmaxMinMax;
 				break;
@@ -228,7 +223,9 @@ public class PointDisplayActivity extends DemoCamera2Activity
 				// adjust the non-max region based on image size
 				nonmax.setSearchRadius(3 * imageWidth / 320);
 				EasyGeneralFeatureDetector easy = (EasyGeneralFeatureDetector)detector;
-				easy.getDetector().setMaxFeatures(200 * imageWidth / 320);
+				int totalSets = easy.getDetector().isDetectMaximums() ? 1 : 0;
+				totalSets += easy.getDetector().isDetectMinimums() ? 1 : 0;
+				easy.getDetector().setMaxFeatures(200 * imageWidth / (320*totalSets) );
 			}
 		}
 
