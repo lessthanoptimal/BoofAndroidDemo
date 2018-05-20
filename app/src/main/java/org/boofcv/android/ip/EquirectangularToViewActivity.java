@@ -188,7 +188,6 @@ public class EquirectangularToViewActivity extends Activity {
                 renderNow = new RenderView();
                 new Thread(renderNow,"RenderEqui").start();
             } else {
-                Log.i(TAG,"pendingRender=true");
                 pendingRender = true;
             }
         }
@@ -306,20 +305,23 @@ public class EquirectangularToViewActivity extends Activity {
 
         @Override
         public void onDraw(Canvas canvas) {
+
             float W = canvas.getWidth();
             float H = canvas.getHeight();
 
-            float scale = Math.min(W/outputBitmap.getWidth(),H/outputBitmap.getHeight());
-
-
-            float offsetX=(W-outputBitmap.getWidth()*scale)/2;
-            float offsetY=(H-outputBitmap.getHeight()*scale)/2;
-
-            imageToView.reset();
-            imageToView.postScale(scale,scale);
-            imageToView.postTranslate(offsetX,offsetY);
-
             synchronized (lockOutput) {
+                if( outputBitmap == null )
+                    return;
+
+                float scale = Math.min(W/outputBitmap.getWidth(),H/outputBitmap.getHeight());
+
+                float offsetX=(W-outputBitmap.getWidth()*scale)/2;
+                float offsetY=(H-outputBitmap.getHeight()*scale)/2;
+
+                imageToView.reset();
+                imageToView.postScale(scale,scale);
+                imageToView.postTranslate(offsetX,offsetY);
+
                 canvas.drawBitmap(outputBitmap,imageToView,null);
             }
 
