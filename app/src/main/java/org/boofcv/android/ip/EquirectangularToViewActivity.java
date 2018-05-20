@@ -44,7 +44,6 @@ import georegression.struct.EulerType;
 /**
  * Shows an equirectangular image with a pinhole camera super imposed on top of it.
  */
-// TODO change view using touch
 public class EquirectangularToViewActivity extends Activity {
 
 
@@ -112,6 +111,8 @@ public class EquirectangularToViewActivity extends Activity {
         setContentView(R.layout.equirectangular);
 
         FrameLayout surfaceLayout = findViewById(R.id.image_frame);
+        view = new DisplayView(this);
+        surfaceLayout.addView(view);
 
         Spinner spinner = findViewById(R.id.spinner_equi_models);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
@@ -130,9 +131,6 @@ public class EquirectangularToViewActivity extends Activity {
             }
         });
 
-
-        view = new DisplayView(this);
-        surfaceLayout.addView(view);
 
         mDetector = new GestureDetectorCompat(this,new TouchControls());
    }
@@ -268,7 +266,8 @@ public class EquirectangularToViewActivity extends Activity {
                 synchronized (lockOutput) {
                     ConvertBitmap.boofToBitmap(renderImage, outputBitmap, bitmapTmp);
                 }
-                runOnUiThread(() -> view.invalidate());
+                if( view != null )
+                    runOnUiThread(() -> view.invalidate());
 
                 synchronized (lockThread) {
                     if( pendingRender ) {
