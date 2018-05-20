@@ -64,6 +64,7 @@
         <activity android:name=".segmentation.SuperpixelDisplayActivity"/>
         <activity android:name=".segmentation.ColorHistogramSegmentationActivity"/>
         <activity android:name=".ip.ThresholdDisplayActivity"/>
+        <activity android:name=".ip.EquirectangularToPinholeActivity"/>
         <activity android:name=".recognition.FiducialSquareBinaryActivity"/>
         <activity android:name=".recognition.FiducialSquareBinaryHelpActivity" />
         <activity android:name=".recognition.FiducialSquareImageActivity"/>
