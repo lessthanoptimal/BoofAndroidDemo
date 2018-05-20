@@ -39,7 +39,7 @@ import org.boofcv.android.detect.ScalePointDisplayActivity;
 import org.boofcv.android.ip.BinaryOpsDisplayActivity;
 import org.boofcv.android.ip.BlurDisplayActivity;
 import org.boofcv.android.ip.EnhanceDisplayActivity;
-import org.boofcv.android.ip.EquirectangularToPinholeActivity;
+import org.boofcv.android.ip.EquirectangularToViewActivity;
 import org.boofcv.android.ip.GradientDisplayActivity;
 import org.boofcv.android.ip.ImageTransformActivity;
 import org.boofcv.android.ip.ThresholdDisplayActivity;
@@ -154,7 +154,7 @@ public class DemoMain extends AppCompatActivity implements ExpandableListView.On
 		ip.addChild("Binary Ops",BinaryOpsDisplayActivity.class);
 		ip.addChild("Enhance",EnhanceDisplayActivity.class);
 		ip.addChild("Transform",ImageTransformActivity.class);
-		ip.addChild("Equirectangular",EquirectangularToPinholeActivity.class);
+		ip.addChild("Equirectangular",EquirectangularToViewActivity.class);
 
 		segment.addChild("Superpixel",SuperpixelDisplayActivity.class);
 		segment.addChild("Color Histogram",ColorHistogramSegmentationActivity.class);

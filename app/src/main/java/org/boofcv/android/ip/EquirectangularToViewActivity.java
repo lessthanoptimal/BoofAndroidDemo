@@ -14,14 +14,19 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
+import android.widget.Spinner;
 
 import org.boofcv.android.R;
 import org.ejml.data.FMatrixRMaj;
 import org.ejml.dense.row.CommonOps_FDRM;
 
 import boofcv.alg.distort.ImageDistort;
-import boofcv.alg.distort.spherical.PinholeToEquirectangular_F32;
+import boofcv.alg.distort.spherical.CameraToEquirectangular_F32;
+import boofcv.alg.distort.spherical.CylinderToEquirectangular_F32;
 import boofcv.alg.interpolate.InterpolatePixel;
 import boofcv.alg.interpolate.InterpolationType;
 import boofcv.android.ConvertBitmap;
@@ -29,39 +34,48 @@ import boofcv.core.image.border.BorderType;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
 import boofcv.struct.calib.CameraPinhole;
+import boofcv.struct.calib.CameraUniversalOmni;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.Planar;
 import georegression.geometry.ConvertRotation3D_F32;
+import georegression.metric.UtilAngle;
 import georegression.struct.EulerType;
 
 /**
  * Shows an equirectangular image with a pinhole camera super imposed on top of it.
  */
 // TODO change view using touch
-public class EquirectangularToPinholeActivity extends Activity {
+public class EquirectangularToViewActivity extends Activity {
+
 
     public static final String TAG = "Equirectangular";
 
     private GestureDetectorCompat mDetector;
+
+
+    // BEGIN lock
     final Object controlLock = new Object();
     final FMatrixRMaj workR = CommonOps_FDRM.identity(3);
+    // END
 
-    CameraPinhole pinholeModel = new CameraPinhole(200,200,0,250,250,500,500);
 
-    PinholeToEquirectangular_F32 pinholeToEqui;
+    // BEGIN Lock
+    final Object controlDistort = new Object();
+    CameraToEquirectangular_F32 cameraToEqui = new CameraToEquirectangular_F32();
+    CylinderToEquirectangular_F32 cylinderToEqui = new CylinderToEquirectangular_F32();
     ImageDistort<Planar<GrayU8>,Planar<GrayU8>> distorter;
+    // END
 
-    Planar<GrayU8> equiImage = new Planar<>(GrayU8.class,1,1,3);
-    Planar<GrayU8> pinholeImage;
-    byte[] bitmapTmp = new byte[1];
-
-    protected Matrix imageToView = new Matrix();
-
+    // BEGIN Lock
     final Object lockOutput = new Object();
-    Bitmap workBitmap;
     Bitmap outputBitmap;
+    Planar<GrayU8> equiImage = new Planar<>(GrayU8.class,1,1,3);
+    Planar<GrayU8> renderImage = new Planar<>(GrayU8.class,1,1,3);
+    byte[] bitmapTmp = new byte[1];
+    // END
 
     DisplayView view;
+    ModeType renderModel;
 
     // Forgot how to create a thread pool that discards has a pool size of 2 and discards
     // the most recently added. So i just wrote my own in a few lines of code
@@ -79,49 +93,95 @@ public class EquirectangularToPinholeActivity extends Activity {
             actionBar.hide();
         }
 
-        setContentView(R.layout.equirectangular);
-
-        FrameLayout surfaceLayout = findViewById(R.id.image_frame);
-
-        view = new DisplayView(this);
-        surfaceLayout.addView(view);
-
-        mDetector = new GestureDetectorCompat(this,new TouchControls());
-
-        workBitmap = Bitmap.createBitmap(pinholeModel.width,pinholeModel.height, Bitmap.Config.ARGB_8888);
-        outputBitmap = Bitmap.createBitmap(pinholeModel.width,pinholeModel.height, Bitmap.Config.ARGB_8888);
-        bitmapTmp = ConvertBitmap.declareStorage(outputBitmap, bitmapTmp);
-
-        Log.i(TAG, "outputBitmap = "+outputBitmap.getWidth()+"x"+outputBitmap.getHeight());
-
+        // Initialize data structures. listener might be called right away once GUI is initialized
         Bitmap icon = BitmapFactory.decodeResource(getResources(),R.drawable.canyon360);
-
-        Log.i(TAG, "icon = "+icon.getWidth()+"x"+icon.getHeight());
-
+        Log.i(TAG, "equi icon = "+icon.getWidth()+"x"+icon.getHeight());
         equiImage.reshape(icon.getWidth(),icon.getHeight());
         ConvertBitmap.bitmapToBoof(icon,equiImage,null);
-
-        // Declare storage for pinhole camera image
-        pinholeImage = equiImage.createNew(pinholeModel.width, pinholeModel.height);
 
         // Create the image distorter which will render the image
         InterpolatePixel<Planar<GrayU8>> interp = FactoryInterpolation.
                 createPixel(0, 255, InterpolationType.BILINEAR, BorderType.EXTENDED, equiImage.getImageType());
         distorter = FactoryDistort.distort(false,interp,equiImage.getImageType());
 
-        // This is where the magic is done.  It defines the transform rfom equirectangular to pinhole
-        pinholeToEqui = new PinholeToEquirectangular_F32();
-        pinholeToEqui.setEquirectangularShape(equiImage.width,equiImage.height);
-        pinholeToEqui.setPinhole(pinholeModel);
+        // This is where the magic is done.  It defines the transform from equirectangular to pinhole
+        cameraToEqui.setEquirectangularShape(equiImage.width,equiImage.height);
+        cylinderToEqui.setEquirectangularShape(equiImage.width,equiImage.height);
 
-        // Pass in the transform to the image distorter
-        distorter.setModel(pinholeToEqui);
+        // Now setup the GUI
+        setContentView(R.layout.equirectangular);
 
-        renderView();
+        FrameLayout surfaceLayout = findViewById(R.id.image_frame);
 
+        Spinner spinner = findViewById(R.id.spinner_equi_models);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.equi_models, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                changeModel(500,500,ModeType.values()[position]);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+
+        view = new DisplayView(this);
+        surfaceLayout.addView(view);
+
+        mDetector = new GestureDetectorCompat(this,new TouchControls());
    }
 
-   private void renderView() {
+   private void changeModel( int width , int height , ModeType type ) {
+
+       if( renderModel == type )
+           return;
+       renderModel = type;
+
+       synchronized (controlDistort) {
+           synchronized (lockOutput) {
+               renderImage.reshape(width, height);
+               outputBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+               bitmapTmp = ConvertBitmap.declareStorage(outputBitmap, bitmapTmp);
+           }
+
+           switch (type) {
+               case PINHOLE: {
+                   CameraPinhole model = new CameraPinhole(width / 2, height / 2, 0,
+                           width / 2, height / 2, width, height);
+                   cameraToEqui.setCameraModel(model);
+                   distorter.setModel(cameraToEqui);
+               } break;
+
+               case FISHEYE: {
+                   CameraUniversalOmni model = new CameraUniversalOmni(20);
+                   model.fsetK(width*1.35, height*1.35, 0,
+                           width / 2, height / 2, width, height);
+                   model.fsetMirror(3f);
+                   model.fsetRadial(7.308e-1f,1.855e1f);
+                   model.fsetTangental(-1.288e-2f,-1.1342e-2f);
+                   cameraToEqui.setCameraModel(model);
+                   distorter.setModel(cameraToEqui);
+               } break;
+
+               case CYLINDER: {
+                   double vfov = UtilAngle.radian(120);
+                   cylinderToEqui.configure(width, height, (float)vfov);
+                   this.distorter.setModel(cylinderToEqui);
+               } break;
+
+           }
+       }
+
+       renderView();
+   }
+
+    private void renderView() {
         synchronized (lockThread) {
             if( renderNow == null ) {
                 pendingRender = false;
@@ -188,17 +248,26 @@ public class EquirectangularToPinholeActivity extends Activity {
     }
 
     class RenderView implements Runnable {
+
+        FMatrixRMaj controlR = new FMatrixRMaj(3,3);
+
         @Override
         public void run() {
             while( true ) {
                 synchronized (controlLock) {
-                    FMatrixRMaj tmp = pinholeToEqui.getRotation().copy();
-                    CommonOps_FDRM.mult(tmp,workR,pinholeToEqui.getRotation());
+                    controlR.set(workR);
                     CommonOps_FDRM.setIdentity(workR);
                 }
-                distorter.apply(equiImage, pinholeImage);
+
+                synchronized (controlDistort) {
+                    FMatrixRMaj tmp = cameraToEqui.getRotation().copy();
+                    CommonOps_FDRM.mult(tmp,controlR,cameraToEqui.getRotation());
+                    tmp = cylinderToEqui.getRotation().copy();
+                    CommonOps_FDRM.mult(tmp,controlR,cylinderToEqui.getRotation());
+                    distorter.apply(equiImage, renderImage);
+                }
                 synchronized (lockOutput) {
-                    ConvertBitmap.boofToBitmap(pinholeImage, outputBitmap, bitmapTmp);
+                    ConvertBitmap.boofToBitmap(renderImage, outputBitmap, bitmapTmp);
                 }
                 runOnUiThread(() -> view.invalidate());
 
@@ -220,7 +289,7 @@ public class EquirectangularToPinholeActivity extends Activity {
     public class DisplayView extends SurfaceView implements SurfaceHolder.Callback {
 
         SurfaceHolder mHolder;
-        Canvas outputCanvas = new Canvas();
+        protected Matrix imageToView = new Matrix();
 
         public DisplayView(Context context) {
             super(context);
@@ -264,5 +333,11 @@ public class EquirectangularToPinholeActivity extends Activity {
 
         @Override
         public void surfaceDestroyed(SurfaceHolder surfaceHolder) {}
+    }
+
+    enum ModeType {
+        PINHOLE,
+        FISHEYE,
+        CYLINDER
     }
 }
