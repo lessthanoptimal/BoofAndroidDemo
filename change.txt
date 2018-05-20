@@ -3,8 +3,8 @@ Change Log for BoofCV Demonstration App
 (year)-(month)-(day)
 
 -------------------------------------------------
-Version 2.0.11
-Date: 2018-05
+Version 2.1
+Date: 2018-05-19
 
 - Move ACRA destination address into an asset to prevent people from smalling the bug reports
 - (BoofCV) Attempt to fix image already closed exception
@@ -12,8 +12,6 @@ Date: 2018-05
 - Attempts to try to recover from out of memory exceptions better
 - Only one variant of Fast Corner is selectable now
 - Added Equirectangular to different camera models
-
-TODO sanity check selected calibration target for 4 points .. etc
 
 -------------------------------------------------
 Version 2.0.10
