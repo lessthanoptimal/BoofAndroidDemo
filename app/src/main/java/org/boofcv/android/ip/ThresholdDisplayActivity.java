@@ -181,9 +181,7 @@ public class ThresholdDisplayActivity extends DemoBitmapCamera2Activity
 
 		@Override
 		public void onDraw(Canvas canvas, Matrix imageToView) {
-			synchronized (bitmapLock) {
-				canvas.drawBitmap(bitmap, imageToView, null);
-			}
+			canvas.drawBitmap(bitmap, imageToView, null);
 		}
 
 		@Override
@@ -197,9 +195,7 @@ public class ThresholdDisplayActivity extends DemoBitmapCamera2Activity
 
 			if (filter != null) {
 				filter.process(input, binary);
-				synchronized (bitmapLock) {
-					VisualizeImageData.binaryToBitmap(binary, false, bitmap, bitmapTmp);
-				}
+				VisualizeImageData.binaryToBitmap(binary, false, bitmap, bitmapTmp);
 			}
 		}
 	}

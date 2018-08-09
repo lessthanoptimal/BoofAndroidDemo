@@ -64,7 +64,7 @@ public class DisparityActivity extends DemoCamera2Activity
 
 	public DisparityActivity() {
 		super(Resolution.R640x480);
-		super.showBitmap = false;
+		super.autoConvertToBitmap = false;
 	}
 
 	@Override

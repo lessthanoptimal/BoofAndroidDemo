@@ -156,12 +156,10 @@ public class ContourShapeFittingActivity extends DemoBitmapCamera2Activity
 			BinaryImageOps.removePointNoise(binary, filtered1);
 
 			// draw binary image for output
-			synchronized (bitmapLock) {
-				if( showBinary ) {
-					VisualizeImageData.binaryToBitmap(filtered1, false, bitmap, bitmapTmp);
-				} else {
-					ConvertBitmap.boofToBitmap(input,bitmap,bitmapTmp);
-				}
+			if( showBinary ) {
+				VisualizeImageData.binaryToBitmap(filtered1, false, bitmap, bitmapTmp);
+			} else {
+				ConvertBitmap.boofToBitmap(input,bitmap,bitmapTmp);
 			}
 
 			// draw the ellipses

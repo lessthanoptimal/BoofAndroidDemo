@@ -114,9 +114,7 @@ public class EnhanceDisplayActivity extends DemoBitmapCamera2Activity
 	}
 
 	protected void renderOutput( ImageBase output ) {
-		synchronized (bitmapLock) {
-			ConvertBitmap.boofToBitmap(output, bitmap, bitmapTmp);
-		}
+		ConvertBitmap.boofToBitmap(output, bitmap, bitmapTmp);
 	}
 
 	protected abstract class EnhanceProcessing extends DemoProcessingAbstract<GrayU8> {

@@ -62,7 +62,7 @@ public class AssociationActivity extends DemoCamera2Activity
 
 	public AssociationActivity() {
 		super(Resolution.R640x480);
-		super.showBitmap = false;
+		super.autoConvertToBitmap = false;
 	}
 
 	@Override

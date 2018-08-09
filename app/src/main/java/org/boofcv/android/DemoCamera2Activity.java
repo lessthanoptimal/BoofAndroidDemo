@@ -93,7 +93,7 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
     public DemoCamera2Activity(Resolution resolution) {
         super.targetResolution = resolutionToPixels(resolution);
 
-        super.showBitmap = true;
+        super.autoConvertToBitmap = true;
         super.visualizeOnlyMostRecent = true;
     }
 
@@ -222,9 +222,7 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
             return;
 
         if( !showProcessed) {
-            synchronized (bitmapLock) {
-                ConvertBitmap.boofToBitmap(image, bitmap, bitmapTmp);
-            }
+            ConvertBitmap.boofToBitmap(image, bitmap, bitmapTmp);
             return;
         }
         DemoProcessing processor;
@@ -369,10 +367,8 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
         super.onDrawFrame(view,canvas);
 
         if( !showProcessed ) {
-            if( !showBitmap ) { // if true then it has already been rendered
-                synchronized (bitmapLock) {
-                    canvas.drawBitmap(bitmap, imageToView, null);
-                }
+            if( !autoConvertToBitmap ) { // if true then it has already been rendered
+                canvas.drawBitmap(bitmap, imageToView, null);
             }
         } else {
             DemoProcessing processor = null;

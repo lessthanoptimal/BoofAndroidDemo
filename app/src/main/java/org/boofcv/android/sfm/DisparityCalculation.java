@@ -2,7 +2,6 @@ package org.boofcv.android.sfm;
 
 import android.util.Log;
 
-import org.ddogleg.fitting.modelset.DistanceFromModel;
 import org.ddogleg.fitting.modelset.ModelGenerator;
 import org.ddogleg.fitting.modelset.ModelManager;
 import org.ddogleg.fitting.modelset.ModelMatcher;
@@ -24,6 +23,7 @@ import boofcv.alg.descriptor.UtilFeature;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.filter.derivative.LaplacianEdge;
+import boofcv.alg.geo.DistanceFromModelMultiView;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
@@ -220,10 +220,10 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 		ModelGenerator<Se3_F64, AssociatedPair> generateEpipolarMotion =
 				new Se3FromEssentialGenerator(essentialAlg, triangulate);
 
-		DistanceFromModel<Se3_F64, AssociatedPair> distanceSe3 =
-				new DistanceSe3SymmetricSq(triangulate,
-						intrinsic.fx, intrinsic.fy, intrinsic.skew,
-						intrinsic.fx, intrinsic.fy, intrinsic.skew);
+		DistanceFromModelMultiView<Se3_F64, AssociatedPair> distanceSe3 =
+				new DistanceSe3SymmetricSq(triangulate);
+		distanceSe3.setIntrinsic(0,intrinsic);
+		distanceSe3.setIntrinsic(1,intrinsic);
 
 		// 1/2 a pixel tolerance for RANSAC inliers
 		double ransacTOL = 0.5 * 0.5 * 2.0;
@@ -276,7 +276,7 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 		RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();
 
 		// original camera calibration matrices
-		DMatrixRMaj K = PerspectiveOps.calibrationMatrix(intrinsic, (DMatrixRMaj)null);
+		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(intrinsic, (DMatrixRMaj)null);
 
 		rectifyAlg.process(K, new Se3_F64(), K, leftToRight);
 

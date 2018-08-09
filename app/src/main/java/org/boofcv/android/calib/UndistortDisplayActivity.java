@@ -158,9 +158,7 @@ public class UndistortDisplayActivity extends DemoBitmapCamera2Activity
 				return;
 
 			removeDistortion.apply(input,undistorted);
-			synchronized (bitmapLock) {
-				ConvertBitmap.boofToBitmap(undistorted, bitmap, bitmapTmp);
-			}
+			ConvertBitmap.boofToBitmap(undistorted, bitmap, bitmapTmp);
 		}
 	}
 }

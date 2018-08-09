@@ -227,9 +227,7 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 
 		@Override
 		public void onDraw(Canvas canvas, Matrix imageToView) {
-			synchronized (bitmapLock) {
-				canvas.drawBitmap(bitmap,imageToView,null);
-			}
+			canvas.drawBitmap(bitmap,imageToView,null);
 
 			canvas.save();
 			canvas.concat(imageToView);
@@ -257,29 +255,27 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 
 			detector.detect(input);
 
-			synchronized (bitmapLock) {
-				if (!showThreshold) {
-					ConvertBitmap.boofToBitmap(input, bitmap, bitmapTmp);
-				} else {
-					GrayU8 binary;
-					if (detector instanceof CalibrationFiducialDetector) {
-						DetectorFiducialCalibration a = ((CalibrationFiducialDetector) detector).getCalibDetector();
-						if (a instanceof CalibrationDetectorChessboard) {
-							binary = ((CalibrationDetectorChessboard) a).getAlgorithm().getBinary();
-						} else if( a instanceof CalibrationDetectorSquareGrid ){
-							binary = ((CalibrationDetectorSquareGrid) a).getAlgorithm().getBinary();
-						} else if( a instanceof CalibrationDetectorCircleHexagonalGrid){
-							binary = ((CalibrationDetectorCircleHexagonalGrid) a).getDetector().getBinary();
-						} else if( a instanceof CalibrationDetectorCircleRegularGrid){
-							binary = ((CalibrationDetectorCircleRegularGrid) a).getDetector().getBinary();
-						} else {
-							throw new RuntimeException("Unknown class "+a.getClass().getSimpleName());
-						}
+			if (!showThreshold) {
+				ConvertBitmap.boofToBitmap(input, bitmap, bitmapTmp);
+			} else {
+				GrayU8 binary;
+				if (detector instanceof CalibrationFiducialDetector) {
+					DetectorFiducialCalibration a = ((CalibrationFiducialDetector) detector).getCalibDetector();
+					if (a instanceof CalibrationDetectorChessboard) {
+						binary = ((CalibrationDetectorChessboard) a).getAlgorithm().getBinary();
+					} else if( a instanceof CalibrationDetectorSquareGrid ){
+						binary = ((CalibrationDetectorSquareGrid) a).getAlgorithm().getBinary();
+					} else if( a instanceof CalibrationDetectorCircleHexagonalGrid){
+						binary = ((CalibrationDetectorCircleHexagonalGrid) a).getDetector().getBinary();
+					} else if( a instanceof CalibrationDetectorCircleRegularGrid){
+						binary = ((CalibrationDetectorCircleRegularGrid) a).getDetector().getBinary();
 					} else {
-						binary = ((SquareBase_to_FiducialDetector) detector).getAlgorithm().getBinary();
+						throw new RuntimeException("Unknown class "+a.getClass().getSimpleName());
 					}
-					VisualizeImageData.binaryToBitmap(binary, false,bitmap, bitmapTmp);
+				} else {
+					binary = ((SquareBase_to_FiducialDetector) detector).getAlgorithm().getBinary();
 				}
+				VisualizeImageData.binaryToBitmap(binary, false,bitmap, bitmapTmp);
 			}
 
 			// save the results for displaying in the UI thread

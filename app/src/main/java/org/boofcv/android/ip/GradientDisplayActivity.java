@@ -114,17 +114,13 @@ implements AdapterView.OnItemSelectedListener
 
 		@Override
 		public void onDraw(Canvas canvas, Matrix imageToView) {
-			synchronized (bitmapLock) {
-				drawBitmap(canvas,imageToView);
-			}
+			drawBitmap(canvas,imageToView);
 		}
 
 		@Override
 		public void process(GrayU8 input) {
 			gradient.process(input,derivX,derivY);
-			synchronized (bitmapLock ) {
-				VisualizeImageData.colorizeGradient(derivX,derivY,-1,bitmap,bitmapTmp);
-			}
+			VisualizeImageData.colorizeGradient(derivX,derivY,-1,bitmap,bitmapTmp);
 		}
 	}
 }
