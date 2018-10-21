@@ -93,7 +93,7 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
     public DemoCamera2Activity(Resolution resolution) {
         super.targetResolution = resolutionToPixels(resolution);
 
-        super.autoConvertToBitmap = true;
+        super.bitmapMode = BitmapMode.UNSAFE;
         super.visualizeOnlyMostRecent = true;
     }
 
@@ -367,7 +367,7 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
         super.onDrawFrame(view,canvas);
 
         if( !showProcessed ) {
-            if( !autoConvertToBitmap ) { // if true then it has already been rendered
+            if( bitmapMode == BitmapMode.NONE ) { // if true then it has already been rendered
                 canvas.drawBitmap(bitmap, imageToView, null);
             }
         } else {

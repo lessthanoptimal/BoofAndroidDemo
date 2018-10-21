@@ -92,7 +92,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 		super(Resolution.R640x480);
 
 		// this activity wants control over what is shown
-		super.autoConvertToBitmap = false;
+		super.bitmapMode = BitmapMode.NONE;
 
 		paintPoint.setColor(Color.RED);
 		paintPoint.setStyle(Paint.Style.FILL);

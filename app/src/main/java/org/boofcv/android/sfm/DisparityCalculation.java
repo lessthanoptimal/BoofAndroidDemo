@@ -2,10 +2,7 @@ package org.boofcv.android.sfm;
 
 import android.util.Log;
 
-import org.ddogleg.fitting.modelset.ModelGenerator;
-import org.ddogleg.fitting.modelset.ModelManager;
 import org.ddogleg.fitting.modelset.ModelMatcher;
-import org.ddogleg.fitting.modelset.ransac.Ransac;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.FMatrixRMaj;
@@ -17,22 +14,20 @@ import java.util.List;
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.disparity.StereoDisparity;
-import boofcv.abst.geo.Estimate1ofEpipolar;
-import boofcv.abst.geo.TriangulateTwoViewsCalibrated;
 import boofcv.alg.descriptor.UtilFeature;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.filter.derivative.LaplacianEdge;
-import boofcv.alg.geo.DistanceFromModelMultiView;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
-import boofcv.alg.geo.robust.DistanceSe3SymmetricSq;
-import boofcv.alg.geo.robust.Se3FromEssentialGenerator;
+import boofcv.alg.geo.robust.RansacMultiView;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderType;
+import boofcv.factory.geo.ConfigEssential;
+import boofcv.factory.geo.ConfigRansac;
 import boofcv.factory.geo.EnumEssential;
-import boofcv.factory.geo.FactoryMultiView;
+import boofcv.factory.geo.FactoryMultiViewRobust;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.feature.AssociatedIndex;
@@ -40,7 +35,6 @@ import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.ImageType;
-import georegression.fitting.se.ModelManagerSe3_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
 
@@ -214,25 +208,17 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 	public Se3_F64 estimateCameraMotion( List<AssociatedPair> matchedNorm )
 	{
 		numInside++;
-		System.out.println("DISPARITY "+numInside);
-		Estimate1ofEpipolar essentialAlg = FactoryMultiView.computeEssential_1(EnumEssential.NISTER_5, 5);
-		TriangulateTwoViewsCalibrated triangulate = FactoryMultiView.triangulateTwoGeometric();
-		ModelGenerator<Se3_F64, AssociatedPair> generateEpipolarMotion =
-				new Se3FromEssentialGenerator(essentialAlg, triangulate);
+		ConfigEssential configEssential = new ConfigEssential();
+		configEssential.which = EnumEssential.NISTER_5;
+		configEssential.numResolve = 5;
 
-		DistanceFromModelMultiView<Se3_F64, AssociatedPair> distanceSe3 =
-				new DistanceSe3SymmetricSq(triangulate);
-		distanceSe3.setIntrinsic(0,intrinsic);
-		distanceSe3.setIntrinsic(1,intrinsic);
-
-		// 1/2 a pixel tolerance for RANSAC inliers
-		double ransacTOL = 0.5 * 0.5 * 2.0;
-
-		ModelManager<Se3_F64> mm = new ModelManagerSe3_F64();
-
-		ModelMatcher<Se3_F64, AssociatedPair> epipolarMotion =
-				new Ransac<Se3_F64, AssociatedPair>(2323, mm,generateEpipolarMotion, distanceSe3,
-						300, ransacTOL);
+		ConfigRansac configRansac = new ConfigRansac();
+		configRansac.maxIterations = 400;
+		configRansac.inlierThreshold = 0.15;
+		RansacMultiView<Se3_F64, AssociatedPair> epipolarMotion =
+				FactoryMultiViewRobust.baselineRansac(configEssential,configRansac);
+		epipolarMotion.setIntrinsic(0,intrinsic);
+		epipolarMotion.setIntrinsic(1,intrinsic);
 
 		if (!epipolarMotion.process(matchedNorm)) {
 			numInside--;
@@ -249,7 +235,7 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 	 * Save a list of inliers in pixel coordinates
 	 */
 	private void createInliersList( ModelMatcher<Se3_F64, AssociatedPair> epipolarMotion ) {
-		inliersPixel = new ArrayList<AssociatedPair>();
+		inliersPixel = new ArrayList<>();
 
 		FastQueue<AssociatedIndex> matches = associate.getMatches();
 

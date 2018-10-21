@@ -17,7 +17,7 @@ public abstract class DemoBitmapCamera2Activity extends DemoCamera2Activity {
 
     public DemoBitmapCamera2Activity(Resolution resolution) {
         super(resolution);
-        super.autoConvertToBitmap = false;
+        super.bitmapMode = BitmapMode.NONE;
     }
 
     @Override

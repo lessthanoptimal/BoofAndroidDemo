@@ -44,7 +44,7 @@ public class CannyEdgeActivity extends DemoCamera2Activity
 
 	public CannyEdgeActivity() {
 		super(Resolution.MEDIUM);
-		super.autoConvertToBitmap = true;
+		super.bitmapMode = BitmapMode.UNSAFE;
 		super.changeResolutionOnSlow = true;
 	}
 

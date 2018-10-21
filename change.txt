@@ -3,10 +3,20 @@ Change Log for BoofCV Demonstration App
 (year)-(month)-(day)
 
 -------------------------------------------------
+Version 2.2
+Date: 2018-10-21
+
+- Updated to stable 0.31 of BoofCV
+- Visualization uses unsafe buffering for speed
+  * There could be visual artifacts
+- Added NICK thresholding
+- Re-tuned stereo disparity making it a bit easy to get good results
+
+-------------------------------------------------
 Version 2.1
 Date: 2018-05-19
 
-- Move ACRA destination address into an asset to prevent people from smalling the bug reports
+- Move ACRA destination address into an asset to prevent people from sending the bug reports
 - (BoofCV) Attempt to fix image already closed exception
 - Added camera resolution metadata to exception report
 - Attempts to try to recover from out of memory exceptions better

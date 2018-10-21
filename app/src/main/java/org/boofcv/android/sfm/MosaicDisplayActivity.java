@@ -60,7 +60,7 @@ implements CompoundButton.OnCheckedChangeListener
 
 	public MosaicDisplayActivity() {
 		super(Resolution.R320x240);
-		super.autoConvertToBitmap = false;
+		super.bitmapMode = BitmapMode.NONE;
 	}
 
 	@Override
