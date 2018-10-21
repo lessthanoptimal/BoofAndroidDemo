@@ -185,15 +185,13 @@ public class SuperpixelDisplayActivity extends DemoBitmapCamera2Activity
 				hideProgressDialog();
 				mode = Mode.SHOW_MEAN;
 			} else {
-				synchronized (bitmapLock) {
-					if (mode == Mode.SHOW_IMAGE) {
-						ConvertBitmap.planarToBitmap(background, bitmap, bitmapTmp);
-					} else if (mode == Mode.SHOW_MEAN) {
-						VisualizeImageData.regionsColor(pixelToRegion, segmentColor, bitmap, bitmapTmp);
-					} else if (mode == Mode.SHOW_LINES) {
-						VisualizeImageData.regionsColor(pixelToRegion, segmentColor, bitmap, bitmapTmp);
-						VisualizeImageData.regionBorders(pixelToRegion, 0xFF0000, bitmap, bitmapTmp);
-					}
+				if (mode == Mode.SHOW_IMAGE) {
+					ConvertBitmap.planarToBitmap(background, bitmap, bitmapTmp);
+				} else if (mode == Mode.SHOW_MEAN) {
+					VisualizeImageData.regionsColor(pixelToRegion, segmentColor, bitmap, bitmapTmp);
+				} else if (mode == Mode.SHOW_LINES) {
+					VisualizeImageData.regionsColor(pixelToRegion, segmentColor, bitmap, bitmapTmp);
+					VisualizeImageData.regionBorders(pixelToRegion, 0xFF0000, bitmap, bitmapTmp);
 				}
 			}
 		}

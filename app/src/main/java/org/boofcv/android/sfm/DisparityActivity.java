@@ -64,7 +64,7 @@ public class DisparityActivity extends DemoCamera2Activity
 
 	public DisparityActivity() {
 		super(Resolution.R640x480);
-		super.showBitmap = false;
+		super.bitmapMode = BitmapMode.NONE;
 	}
 
 	@Override
@@ -220,7 +220,7 @@ public class DisparityActivity extends DemoCamera2Activity
 
 
 			return FactoryStereoDisparity.regionSubpixelWta(which,
-					5, 40, 5, 5, 100, 1, 0.1, GrayF32.class);
+					5, 60, 5, 5, 100, 1, 0.1, GrayF32.class);
 		}
 
 		@Override

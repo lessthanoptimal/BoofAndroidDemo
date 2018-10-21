@@ -123,7 +123,7 @@ public class ThresholdDisplayActivity extends DemoBitmapCamera2Activity
 	}
 
 	private void adjustLocalBlockEnabled(ToggleButton toggle) {
-		toggle.setEnabled(selectedAlg >= 5);
+		toggle.setEnabled(selectedAlg >= 6);
 	}
 
 	@Override
@@ -154,12 +154,15 @@ public class ThresholdDisplayActivity extends DemoBitmapCamera2Activity
 				return FactoryThresholdBinary.localSauvola(ConfigLength.fixed(width),0.3f,down,GrayU8.class);
 
 			case 5:
-				return FactoryThresholdBinary.blockMean(ConfigLength.fixed(blockWidth),0.95,down,localBlock,GrayU8.class);
+				return FactoryThresholdBinary.localNick(ConfigLength.fixed(width),-0.2f,down,GrayU8.class);
 
 			case 6:
-				return FactoryThresholdBinary.blockMinMax(ConfigLength.fixed(blockWidth),0.95,down,2,localBlock,GrayU8.class);
+				return FactoryThresholdBinary.blockMean(ConfigLength.fixed(blockWidth),0.95,down,localBlock,GrayU8.class);
 
 			case 7:
+				return FactoryThresholdBinary.blockMinMax(ConfigLength.fixed(blockWidth),0.95,down,2,localBlock,GrayU8.class);
+
+			case 8:
 				return FactoryThresholdBinary.blockOtsu(true,ConfigLength.fixed(blockWidth),0,0.95,down,localBlock,GrayU8.class);
 		}
 
@@ -181,9 +184,7 @@ public class ThresholdDisplayActivity extends DemoBitmapCamera2Activity
 
 		@Override
 		public void onDraw(Canvas canvas, Matrix imageToView) {
-			synchronized (bitmapLock) {
-				canvas.drawBitmap(bitmap, imageToView, null);
-			}
+			canvas.drawBitmap(bitmap, imageToView, null);
 		}
 
 		@Override
@@ -197,9 +198,7 @@ public class ThresholdDisplayActivity extends DemoBitmapCamera2Activity
 
 			if (filter != null) {
 				filter.process(input, binary);
-				synchronized (bitmapLock) {
-					VisualizeImageData.binaryToBitmap(binary, false, bitmap, bitmapTmp);
-				}
+				VisualizeImageData.binaryToBitmap(binary, false, bitmap, bitmapTmp);
 			}
 		}
 	}

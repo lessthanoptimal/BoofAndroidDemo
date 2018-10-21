@@ -126,9 +126,7 @@ public class ImageTransformActivity extends DemoBitmapCamera2Activity
 			PixelMath.log(grayF,grayF);
 			float max = ImageStatistics.maxAbs(grayF);
 			PixelMath.multiply(grayF, 255f / max, grayF);
-			synchronized (bitmapLock) {
-				ConvertBitmap.grayToBitmap(grayF, bitmap, bitmapTmp);
-			}
+			ConvertBitmap.grayToBitmap(grayF, bitmap, bitmapTmp);
 		}
 	}
 
@@ -172,9 +170,7 @@ public class ImageTransformActivity extends DemoBitmapCamera2Activity
 				height += l.getHeight();
 			}
 
-			synchronized (bitmapLock) {
-				ConvertBitmap.grayToBitmap(this.output, bitmap, bitmapTmp);
-			}
+			ConvertBitmap.grayToBitmap(this.output, bitmap, bitmapTmp);
 		}
 	}
 
@@ -210,12 +206,10 @@ public class ImageTransformActivity extends DemoBitmapCamera2Activity
 
 			// if needed, crop the transform for visualization
 			GrayS32 transform = this.transform;
-			synchronized (bitmapLock) {
-				if (transform.width != bitmap.getWidth() || transform.height != bitmap.getHeight())
-					transform = transform.subimage(0, 0, bitmap.getWidth(), bitmap.getHeight(), null);
+			if (transform.width != bitmap.getWidth() || transform.height != bitmap.getHeight())
+				transform = transform.subimage(0, 0, bitmap.getWidth(), bitmap.getHeight(), null);
 
-				VisualizeImageData.grayMagnitude(transform, 255, bitmap, bitmapTmp);
-			}
+			VisualizeImageData.grayMagnitude(transform, 255, bitmap, bitmapTmp);
 		}
 	}
 }

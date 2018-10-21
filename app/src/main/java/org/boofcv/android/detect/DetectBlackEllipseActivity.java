@@ -196,12 +196,10 @@ public class DetectBlackEllipseActivity extends DemoBitmapCamera2Activity
 				inputToBinary.process(input,binary);
 			}
 
-			synchronized (bitmapLock) {
-				if (showInput) {
-					ConvertBitmap.boofToBitmap(input, bitmap, bitmapTmp);
-				} else {
-					VisualizeImageData.binaryToBitmap(binary, false, bitmap, bitmapTmp);
-				}
+			if (showInput) {
+				ConvertBitmap.boofToBitmap(input, bitmap, bitmapTmp);
+			} else {
+				VisualizeImageData.binaryToBitmap(binary, false, bitmap, bitmapTmp);
 			}
 
 			detector.process(input,binary);

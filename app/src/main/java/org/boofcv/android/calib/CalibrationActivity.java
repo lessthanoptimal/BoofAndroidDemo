@@ -92,7 +92,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 		super(Resolution.R640x480);
 
 		// this activity wants control over what is shown
-		super.showBitmap = false;
+		super.bitmapMode = BitmapMode.NONE;
 
 		paintPoint.setColor(Color.RED);
 		paintPoint.setStyle(Paint.Style.FILL);
@@ -132,11 +132,9 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 	@Override
 	protected void onCameraResolutionChange(int width, int height, int sensorOrientation) {
 		super.onCameraResolutionChange(width, height,sensorOrientation);
-		synchronized (bitmapLock) {
-			if (bitmap.getWidth() != width || bitmap.getHeight() != height)
-				bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-			bitmapTmp = ConvertBitmap.declareStorage(bitmap, bitmapTmp);
-		}
+		if (bitmap.getWidth() != width || bitmap.getHeight() != height)
+			bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+		bitmapTmp = ConvertBitmap.declareStorage(bitmap, bitmapTmp);
 		if( lookupIntrinsics() != null ) {
 			runOnUiThread(()-> Toast.makeText(this, "Camera already calibrated", Toast.LENGTH_SHORT).show());
 		}
@@ -225,9 +223,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 
 		@Override
 		public void onDraw(Canvas canvas, Matrix imageToView) {
-			synchronized (bitmapLock) {
-				canvas.drawBitmap(bitmap, imageToView, null);
-			}
+			canvas.drawBitmap(bitmap, imageToView, null);
 
 			if( processRequested ) {
 				processRequested = false;
@@ -333,12 +329,10 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 				}
 			}
 
-			synchronized (bitmapLock) {
-				if( binary != null )
-					VisualizeImageData.binaryToBitmap(binary,false,bitmap,bitmapTmp);
-				else
-					ConvertBitmap.grayToBitmap(input, bitmap, bitmapTmp);
-			}
+			if( binary != null )
+				VisualizeImageData.binaryToBitmap(binary,false,bitmap,bitmapTmp);
+			else
+				ConvertBitmap.grayToBitmap(input, bitmap, bitmapTmp);
 		}
 
 		protected void extractQuads( List<Polygon2D_F64> squares ) {

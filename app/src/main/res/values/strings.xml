@@ -37,6 +37,7 @@
         <item>Local: Mean</item>
         <item>Local: Gaussian</item>
         <item>Local: Sauvola</item>
+        <item>Local: NICK</item>
         <item>Block: Mean</item>
         <item>Block: Min-Max</item>
         <item>Block: Otsu</item>

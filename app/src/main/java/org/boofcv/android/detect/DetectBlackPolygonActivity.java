@@ -259,9 +259,7 @@ public class DetectBlackPolygonActivity extends DemoBitmapCamera2Activity
 
 		@Override
 		public void onDraw(Canvas canvas, Matrix imageToView) {
-			synchronized (bitmapLock) {
-				canvas.drawBitmap(bitmap, imageToView, null);
-			}
+			canvas.drawBitmap(bitmap, imageToView, null);
 
 			canvas.concat(imageToView);
 			synchronized (copy) {
@@ -295,12 +293,10 @@ public class DetectBlackPolygonActivity extends DemoBitmapCamera2Activity
 				}
 			}
 
-			synchronized (bitmapLock) {
-				if (showInput) {
-					ConvertBitmap.boofToBitmap(image, bitmap,bitmapTmp );
-				} else {
-					VisualizeImageData.binaryToBitmap(binary, false, bitmap, bitmapTmp);
-				}
+			if (showInput) {
+				ConvertBitmap.boofToBitmap(image, bitmap,bitmapTmp );
+			} else {
+				VisualizeImageData.binaryToBitmap(binary, false, bitmap, bitmapTmp);
 			}
 		}
 	}

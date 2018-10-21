@@ -60,7 +60,7 @@ implements CompoundButton.OnCheckedChangeListener
 
 	public MosaicDisplayActivity() {
 		super(Resolution.R320x240);
-		super.showBitmap = false;
+		super.bitmapMode = BitmapMode.NONE;
 	}
 
 	@Override
@@ -145,10 +145,8 @@ implements CompoundButton.OnCheckedChangeListener
 
 			outputWidth = imageWidth*2;
 			outputHeight = imageHeight*2;
-			synchronized (bitmapLock) {
-				bitmap = Bitmap.createBitmap(outputWidth, outputHeight, Bitmap.Config.ARGB_8888);
-				bitmapTmp = ConvertBitmap.declareStorage(bitmap,bitmapTmp);
-			}
+			bitmap = Bitmap.createBitmap(outputWidth, outputHeight, Bitmap.Config.ARGB_8888);
+			bitmapTmp = ConvertBitmap.declareStorage(bitmap,bitmapTmp);
 
 			int rotation = getWindowManager().getDefaultDisplay().getRotation();
 			videoToDisplayMatrix(outputWidth, outputHeight,sensorOrientation,
@@ -170,9 +168,7 @@ implements CompoundButton.OnCheckedChangeListener
 
 		@Override
 		public void onDraw(Canvas canvas, Matrix imageToView) {
-			synchronized (bitmapLock) {
-				canvas.drawBitmap(bitmap,imageToView,null);
-			}
+			canvas.drawBitmap(bitmap,imageToView,null);
 
 			if( !showFeatures )
 				return;
@@ -208,9 +204,7 @@ implements CompoundButton.OnCheckedChangeListener
 			if( !resetRequested && alg.process(gray) ) {
 				GrayU8 stitched = alg.getStitchedImage();
 
-				synchronized (bitmapLock) {
-					ConvertBitmap.grayToBitmap(stitched,bitmap,bitmapTmp);
-				}
+				ConvertBitmap.grayToBitmap(stitched,bitmap,bitmapTmp);
 
 				synchronized ( lockGui ) {
 

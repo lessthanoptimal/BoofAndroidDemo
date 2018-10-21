@@ -98,9 +98,7 @@ public class BinaryOpsDisplayActivity extends DemoBitmapCamera2Activity
 	public void onNothingSelected(AdapterView<?> adapterView) {}
 
 	protected void convertToOutput(GrayU8 binary ) {
-		synchronized (bitmapLock) {
-			VisualizeImageData.binaryToBitmap(binary, false,bitmap, bitmapTmp);
-		}
+		VisualizeImageData.binaryToBitmap(binary, false,bitmap, bitmapTmp);
 	}
 
 	protected class ThresholdProcessing extends DemoProcessingAbstract<GrayU8> {

@@ -195,9 +195,7 @@ implements CompoundButton.OnCheckedChangeListener
 		@Override
 		public void process(GrayU8 gray) {
 			if( !resetRequested && alg.process(gray) ) {
-				synchronized (bitmapLock) {
-					convertToBitmapDisplay(alg.getStitchedImage());
-				}
+				convertToBitmapDisplay(alg.getStitchedImage());
 				synchronized ( lockGui ) {
 					alg.getImageCorners(gray.width,gray.height,corners);
 

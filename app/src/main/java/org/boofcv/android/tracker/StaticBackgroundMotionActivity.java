@@ -199,9 +199,7 @@ public class StaticBackgroundMotionActivity extends DemoBitmapCamera2Activity
 
 		@Override
 		public void onDraw(Canvas canvas, Matrix imageToView) {
-			synchronized (bitmapLock) {
-				drawBitmap(canvas,imageToView);
-			}
+			drawBitmap(canvas,imageToView);
 		}
 
 		@Override
@@ -214,12 +212,10 @@ public class StaticBackgroundMotionActivity extends DemoBitmapCamera2Activity
 				model.segment(input, binary);
 				model.updateBackground(input);
 			}
-			synchronized (bitmapLock) {
-				if( showProcessed )
-					convertBinaryToBitmapDisplay(binary);
-				else
-					convertToBitmapDisplay(input);
-			}
+			if( showProcessed )
+				convertBinaryToBitmapDisplay(binary);
+			else
+				convertToBitmapDisplay(input);
 		}
 	}
 }

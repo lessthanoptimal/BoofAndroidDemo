@@ -120,39 +120,35 @@ public class ColorHistogramSegmentationActivity extends DemoBitmapCamera2Activit
             }
 
             if( mode == Mode.VIDEO ) {
-                synchronized (bitmapLock) {
-                    ConvertBitmap.boofToBitmap(ColorFormat.YUV, input, bitmap, bitmapTmp);
-                }
+                ConvertBitmap.boofToBitmap(ColorFormat.YUV, input, bitmap, bitmapTmp);
             } else if( mode == Mode.SEGMENTING ) {
-                synchronized (bitmapLock) {
-                    int tolerance = ColorHistogramSegmentationActivity.this.tolerance;
-                    tolerance *= tolerance;
-                    ImplConvertBitmap.interleavedYuvToArgb8888(input,bitmapTmp);
-                    int indexDst = 0;
-                    for (int y = 0; y < input.height; y++) {
-                        int indexSrc = input.startIndex + y*input.stride;
-                        for (int x = 0; x < input.width; x++) {
-                            int Y = input.data[indexSrc++]&0xFF;
-                            int u = input.data[indexSrc++]&0xFF;
-                            int v = input.data[indexSrc++]&0xFF;
+                int tolerance = ColorHistogramSegmentationActivity.this.tolerance;
+                tolerance *= tolerance;
+                ImplConvertBitmap.interleavedYuvToArgb8888(input,bitmapTmp);
+                int indexDst = 0;
+                for (int y = 0; y < input.height; y++) {
+                    int indexSrc = input.startIndex + y*input.stride;
+                    for (int x = 0; x < input.width; x++) {
+                        int Y = input.data[indexSrc++]&0xFF;
+                        int u = input.data[indexSrc++]&0xFF;
+                        int v = input.data[indexSrc++]&0xFF;
 
-                            int du = valueU-u;
-                            int dv = valueV-v;
+                        int du = valueU-u;
+                        int dv = valueV-v;
 
-                            // if Y is close to saturation and color information isn't reliable
-                            // make it black too
-                            if( Y < 15 || Y > 240 || du*du + dv*dv > tolerance ) {
-                                bitmapTmp[indexDst++] = 0;
-                                bitmapTmp[indexDst++] = 0;
-                                bitmapTmp[indexDst++] = 0;
-                                bitmapTmp[indexDst++] = (byte)255;
-                            } else {
-                                indexDst += 4;
-                            }
+                        // if Y is close to saturation and color information isn't reliable
+                        // make it black too
+                        if( Y < 15 || Y > 240 || du*du + dv*dv > tolerance ) {
+                            bitmapTmp[indexDst++] = 0;
+                            bitmapTmp[indexDst++] = 0;
+                            bitmapTmp[indexDst++] = 0;
+                            bitmapTmp[indexDst++] = (byte)255;
+                        } else {
+                            indexDst += 4;
                         }
                     }
-                    bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(bitmapTmp));
                 }
+                bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(bitmapTmp));
             }
         }
 
