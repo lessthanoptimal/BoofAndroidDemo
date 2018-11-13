@@ -24,6 +24,7 @@ import org.ddogleg.struct.GrowQueue_I64;
 
 import boofcv.abst.fiducial.CalibrationFiducialDetector;
 import boofcv.abst.fiducial.FiducialDetector;
+import boofcv.abst.fiducial.FiducialStability;
 import boofcv.abst.fiducial.SquareBase_to_FiducialDetector;
 import boofcv.abst.fiducial.calib.CalibrationDetectorChessboard;
 import boofcv.abst.fiducial.calib.CalibrationDetectorCircleHexagonalGrid;
@@ -157,6 +158,8 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 	{
 		FiducialDetector<T> detector;
 
+		Paint paintStability = new Paint();
+		Paint paintStabilityBad = new Paint();
 		Paint paintSelected = new Paint();
 		Paint paintLine0 = new Paint();
 		Paint paintLine1 = new Paint();
@@ -168,6 +171,10 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 
 		Rect bounds = new Rect();
 
+		double currentStability;
+		double maxStability = 0.3;
+		FiducialStability stabilityResults = new FiducialStability();
+
 		final FastQueue<Se3_F64> listPose = new FastQueue<>(Se3_F64.class,true);
 		final GrowQueue_F64 listWidths = new GrowQueue_F64();
 		final GrowQueue_I64 listIDs = new GrowQueue_I64();
@@ -177,6 +184,11 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 			super(detector.getInputType());
 
 			this.detector = detector;
+
+			paintStability.setColor(Color.argb(0xFF / 2, 0, 0xFF, 0));
+			paintStability.setStyle(Paint.Style.FILL);
+			paintStabilityBad.setColor(Color.argb(0xFF / 2, 0xFF, 0, 0));
+			paintStabilityBad.setStyle(Paint.Style.FILL);
 
 			paintSelected.setColor(Color.argb(0xFF / 2, 0xFF, 0, 0));
 
@@ -232,6 +244,8 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 		public void onDraw(Canvas canvas, Matrix imageToView) {
 			canvas.drawBitmap(bitmap,imageToView,null);
 
+			double stability;
+
 			canvas.save();
 			canvas.concat(imageToView);
 			synchronized (listPose) {
@@ -240,9 +254,20 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 					long id = listIDs.get(i);
 					drawCube(id, listPose.get(i), intrinsic, width, canvas);
 				}
+
+				stability = currentStability/maxStability;
 			}
 
 			canvas.restore();
+
+			// draw stability bar
+			float w = canvas.getWidth()/10;
+			float bottom = canvas.getHeight()/4;
+			if( stability > 0.5 )
+				canvas.drawRect(0,(float)((1.0 - stability)*bottom),w,bottom,paintStabilityBad);
+			else
+				canvas.drawRect(0,(float)((1.0 - stability)*bottom),w,bottom,paintStability);
+
 			if( textToDraw != null ) {
 				renderDrawText(canvas);
 			}
@@ -257,6 +282,7 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 			}
 
 			detector.detect(input);
+
 
 			if (!showThreshold) {
 				ConvertBitmap.boofToBitmap(input, bitmap, bitmapTmp);
@@ -287,7 +313,11 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 				listWidths.reset();
 				listIDs.reset();
 
+				currentStability = 0;
 				for (int i = 0; i < detector.totalFound(); i++) {
+					detector.computeStability(i,1.5,stabilityResults);
+					currentStability = Math.max(stabilityResults.orientation,currentStability);
+
 					detector.getFiducialToCamera(i, targetToCamera);
 					listPose.grow().set(targetToCamera);
 					listWidths.add(detector.getWidth(i));

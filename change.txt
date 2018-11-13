@@ -3,6 +3,14 @@ Change Log for BoofCV Demonstration App
 (year)-(month)-(day)
 
 -------------------------------------------------
+Version 2.3
+Date: 2018-
+
+- Updated to stable 0.32 of BoofCV
+- More accurate uncalibrated intrinsics
+- Added stability bar to square fiducials
+
+-------------------------------------------------
 Version 2.2
 Date: 2018-10-21
 
