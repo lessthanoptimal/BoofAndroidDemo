@@ -21,7 +21,7 @@ import boofcv.alg.filter.derivative.LaplacianEdge;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
-import boofcv.alg.geo.robust.RansacMultiView;
+import boofcv.alg.geo.robust.ModelMatcherMultiview;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderType;
 import boofcv.factory.geo.ConfigEssential;
@@ -215,7 +215,7 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 		ConfigRansac configRansac = new ConfigRansac();
 		configRansac.maxIterations = 400;
 		configRansac.inlierThreshold = 0.15;
-		RansacMultiView<Se3_F64, AssociatedPair> epipolarMotion =
+		ModelMatcherMultiview<Se3_F64, AssociatedPair> epipolarMotion =
 				FactoryMultiViewRobust.baselineRansac(configEssential,configRansac);
 		epipolarMotion.setIntrinsic(0,intrinsic);
 		epipolarMotion.setIntrinsic(1,intrinsic);

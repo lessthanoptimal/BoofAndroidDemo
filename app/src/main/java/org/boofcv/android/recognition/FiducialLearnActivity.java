@@ -145,8 +145,7 @@ public class FiducialLearnActivity extends DemoCamera2Activity
 			paintInside.setStyle(Paint.Style.STROKE);
 			paintInside.setStrokeWidth(2*cameraToDisplayDensity);
 
-			double fov[] = cameraNominalFov();
-			CameraPinholeRadial intrinsic = MiscUtil.checkThenInventIntrinsic(app,imageWidth,imageHeight,fov[0],fov[1]);
+			CameraPinholeRadial intrinsic = lookupIntrinsics();
 			LensDistortionNarrowFOV distort = LensDistortionOps.narrow(intrinsic);
 			detector.configure(distort, intrinsic.width, intrinsic.height, true);
 			numDetected = 0;

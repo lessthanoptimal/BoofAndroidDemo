@@ -558,8 +558,19 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
     }
 
     public CameraPinholeRadial lookupIntrinsics() {
-        return app.preference.lookup(cameraWidth,cameraHeight);
+        // look up the camera parameters. If it hasn't been calibrated used what camera2 says
+        CameraPinholeRadial intrinsic = app.preference.lookup(cameraWidth,cameraHeight);
+        if( intrinsic == null ) {
+            intrinsic = new CameraPinholeRadial();
+            cameraIntrinsicNominal(intrinsic);
+        }
+        return intrinsic;
     }
+
+    public boolean isCameraCalibrated() {
+        return app.preference.lookup(cameraWidth,cameraHeight) != null;
+    }
+
 
     /**
      * Algorithm which require an exact resolution should request

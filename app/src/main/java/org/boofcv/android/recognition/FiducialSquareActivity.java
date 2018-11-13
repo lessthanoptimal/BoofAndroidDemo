@@ -18,7 +18,6 @@ import android.widget.ToggleButton;
 import org.boofcv.android.DemoBitmapCamera2Activity;
 import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
-import org.boofcv.android.misc.MiscUtil;
 import org.ddogleg.struct.FastQueue;
 import org.ddogleg.struct.GrowQueue_F64;
 import org.ddogleg.struct.GrowQueue_I64;
@@ -206,7 +205,7 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 			if( imageWidth == 0 || imageHeight == 0 )
 				throw new RuntimeException("BUG! Called with zero width and height");
 
-			if( lookupIntrinsics() == null ) {
+			if( !isCameraCalibrated() ) {
 				Toast.makeText(FiducialSquareActivity.this, "Calibrate camera for better results!", Toast.LENGTH_LONG).show();
 			}
 
@@ -220,9 +219,13 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 			paintLine2.setStrokeWidth(4f*cameraToDisplayDensity);
 			paintLine3.setStrokeWidth(4f*cameraToDisplayDensity);
 
-			double fov[] = cameraNominalFov();
-			intrinsic = MiscUtil.checkThenInventIntrinsic(app,imageWidth,imageHeight,fov[0],fov[1]);
+			intrinsic = lookupIntrinsics();
 			detector.setLensDistortion(LensDistortionOps.narrow(intrinsic),imageWidth,imageHeight);
+
+//			Log.i(TAG,"intrinsic fx = "+intrinsic.fx+" fy = "+intrinsic.fy);
+//			Log.i(TAG,"intrinsic cx = "+intrinsic.cx+" cy = "+intrinsic.cy);
+//			Log.i(TAG,"intrinsic width = "+intrinsic.width+"  imgW = "+imageWidth);
+
 		}
 
 		@Override

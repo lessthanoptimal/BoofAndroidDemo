@@ -147,7 +147,7 @@ public class DisparityActivity extends DemoCamera2Activity
 		public boolean onDown(MotionEvent e) {
 
 			// make sure the camera is calibrated first
-			if( lookupIntrinsics() == null ) {
+			if( !isCameraCalibrated() ) {
 				Toast.makeText(DisparityActivity.this, "You must first calibrate the camera!", Toast.LENGTH_SHORT).show();
 				return false;
 			}
@@ -225,9 +225,10 @@ public class DisparityActivity extends DemoCamera2Activity
 
 		@Override
 		public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
-			intrinsic = lookupIntrinsics();
-			if( intrinsic == null )
+			if( !isCameraCalibrated() )
 				return;
+
+			intrinsic = lookupIntrinsics();
 
 			DetectDescribePoint<GrayF32, BrightFeature> detDesc =
 					FactoryDetectDescribe.surfFast(null,null,null,GrayF32.class);
