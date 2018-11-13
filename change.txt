@@ -9,6 +9,7 @@ Date: 2018-
 - Updated to stable 0.32 of BoofCV
 - More accurate uncalibrated intrinsics
 - Added stability bar to square fiducials
+- 3D cubes on top of QR
 
 -------------------------------------------------
 Version 2.2

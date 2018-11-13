@@ -21,18 +21,22 @@ import org.boofcv.android.DemoCamera2Activity;
 import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
 import org.boofcv.android.misc.MiscUtil;
+import org.boofcv.android.misc.RenderCube3D;
 import org.ddogleg.struct.FastQueue;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import boofcv.abst.fiducial.QrCodeDetector;
+import boofcv.abst.fiducial.QrCodeDetectorPnP;
+import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.fiducial.qrcode.QrCode;
 import boofcv.factory.fiducial.ConfigQrCode;
 import boofcv.factory.fiducial.FactoryFiducial;
+import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.GrayU8;
 import georegression.metric.Intersection2D_F64;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.se.Se3_F64;
 
 /**
  * Used to detect and read information from QR codes
@@ -143,7 +147,7 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
 
     protected class QrCodeProcessing extends DemoProcessingAbstract<GrayU8> {
 
-        QrCodeDetector<GrayU8> detector;
+        QrCodeDetectorPnP<GrayU8> detector;
 
         FastQueue<QrCode> detected = new FastQueue<>(QrCode.class,true);
         FastQueue<QrCode> failures = new FastQueue<>(QrCode.class,true);
@@ -154,6 +158,10 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
 
         int uniqueCount = 0;
         int oldValue = -1;
+
+        final FastQueue<Se3_F64> listPose = new FastQueue<>(Se3_F64.class,true);
+        RenderCube3D renderCube = new RenderCube3D();
+        CameraPinholeRadial intrinsic;
 
         public QrCodeProcessing() {
             super(GrayU8.class);
@@ -170,7 +178,7 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
                 }
             }
 
-            detector = FactoryFiducial.qrcode(config,GrayU8.class);
+            detector = FactoryFiducial.qrcode3D(config,GrayU8.class);
 
             colorDetected.setARGB(0xA0,0,0xFF,0);
             colorDetected.setStyle(Paint.Style.FILL);
@@ -183,6 +191,10 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
             touchProcessed = false;
             selectedQR = null;
             touching = false;
+
+            renderCube.initialize(cameraToDisplayDensity);
+            intrinsic = lookupIntrinsics();
+            detector.setLensDistortion(LensDistortionOps.narrow(intrinsic),imageWidth,imageHeight);
 
             synchronized (uniqueLock) {
                 uniqueCount = unique.size();
@@ -217,6 +229,10 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
                         // TODO implement this in the future
                     }break;
                 }
+
+                for ( int i = 0; i < listPose.size; i++ ) {
+                    renderCube.drawCube("", listPose.get(i), intrinsic, 1, canvas);
+                }
             }
 
             // touchProcessed is needed to prevent multiple intent from being sent
@@ -229,10 +245,10 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
 
         @Override
         public void process(GrayU8 input) {
-            detector.process(input);
+            detector.detect(input);
 
             synchronized (uniqueLock) {
-                for (QrCode qr : detector.getDetections()) {
+                for (QrCode qr : detector.getDetector().getDetections()) {
                     if (qr.message == null) {
                         Log.e(TAG, "qr with null message?!?");
                     }
@@ -246,15 +262,20 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
 
             synchronized (lockGui) {
                 detected.reset();
-                for (QrCode qr : detector.getDetections()) {
+                for (QrCode qr : detector.getDetector().getDetections()) {
                     detected.grow().set(qr);
                 }
 
                 failures.reset();
-                for (QrCode qr : detector.getFailures()) {
+                for (QrCode qr : detector.getDetector().getFailures()) {
                     if( qr.failureCause.ordinal() >= QrCode.Failure.ERROR_CORRECTION.ordinal()) {
                         failures.grow().set(qr);
                     }
+                }
+
+                listPose.reset();
+                for (int i = 0; i < detector.totalFound(); i++) {
+                    detector.getFiducialToCamera(i, listPose.grow());
                 }
             }
         }
