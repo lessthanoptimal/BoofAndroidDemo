@@ -220,7 +220,7 @@ public class DisparityActivity extends DemoCamera2Activity
 
 
 			return FactoryStereoDisparity.regionSubpixelWta(which,
-					5, 60, 5, 5, 100, 1, 0.1, GrayF32.class);
+					5, 120, 5, 5, 100, 1, 0.1, GrayF32.class);
 		}
 
 		@Override
