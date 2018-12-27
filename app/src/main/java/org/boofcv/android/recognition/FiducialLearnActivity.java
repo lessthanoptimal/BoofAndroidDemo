@@ -30,8 +30,8 @@ import org.ddogleg.struct.GrowQueue_I32;
 import java.util.List;
 
 import boofcv.alg.distort.LensDistortionNarrowFOV;
-import boofcv.alg.distort.LensDistortionOps;
 import boofcv.android.VisualizeImageData;
+import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
@@ -146,7 +146,7 @@ public class FiducialLearnActivity extends DemoCamera2Activity
 			paintInside.setStrokeWidth(2*cameraToDisplayDensity);
 
 			CameraPinholeRadial intrinsic = lookupIntrinsics();
-			LensDistortionNarrowFOV distort = LensDistortionOps.narrow(intrinsic);
+			LensDistortionNarrowFOV distort = LensDistortionFactory.narrow(intrinsic);
 			detector.configure(distort, intrinsic.width, intrinsic.height, true);
 			numDetected = 0;
 		}

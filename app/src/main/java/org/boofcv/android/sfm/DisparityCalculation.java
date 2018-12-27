@@ -16,7 +16,6 @@ import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.disparity.StereoDisparity;
 import boofcv.alg.descriptor.UtilFeature;
 import boofcv.alg.distort.ImageDistort;
-import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.filter.derivative.LaplacianEdge;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
@@ -24,6 +23,7 @@ import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.alg.geo.robust.ModelMatcherMultiview;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.core.image.border.BorderType;
+import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.factory.geo.ConfigEssential;
 import boofcv.factory.geo.ConfigRansac;
 import boofcv.factory.geo.EnumEssential;
@@ -180,7 +180,7 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 	 */
 	public List<AssociatedPair> convertToNormalizedCoordinates() {
 
-		Point2Transform2_F64 tran = LensDistortionOps.narrow(intrinsic).undistort_F64(true,false);
+		Point2Transform2_F64 tran = LensDistortionFactory.narrow(intrinsic).undistort_F64(true,false);
 
 		List<AssociatedPair> calibratedFeatures = new ArrayList<>();
 

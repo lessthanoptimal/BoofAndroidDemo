@@ -32,9 +32,9 @@ import boofcv.abst.fiducial.calib.CalibrationDetectorCircleHexagonalGrid;
 import boofcv.abst.fiducial.calib.CalibrationDetectorCircleRegularGrid;
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
-import boofcv.alg.distort.LensDistortionOps;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
+import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.struct.calib.CameraPinholeRadial;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
@@ -208,7 +208,7 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 			renderCube.initialize(cameraToDisplayDensity);
 
 			intrinsic = lookupIntrinsics();
-			detector.setLensDistortion(LensDistortionOps.narrow(intrinsic),imageWidth,imageHeight);
+			detector.setLensDistortion(LensDistortionFactory.narrow(intrinsic),imageWidth,imageHeight);
 
 //			Log.i(TAG,"intrinsic fx = "+intrinsic.fx+" fy = "+intrinsic.fy);
 //			Log.i(TAG,"intrinsic cx = "+intrinsic.cx+" cy = "+intrinsic.cy);

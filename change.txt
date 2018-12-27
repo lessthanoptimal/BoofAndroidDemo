@@ -4,7 +4,7 @@ Change Log for BoofCV Demonstration App
 
 -------------------------------------------------
 Version 2.3
-Date: 2018-
+Date: 2018-12-26
 
 - Updated to stable 0.32 of BoofCV
 - More accurate uncalibrated intrinsics

@@ -28,8 +28,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import boofcv.abst.fiducial.QrCodeDetectorPnP;
-import boofcv.alg.distort.LensDistortionOps;
 import boofcv.alg.fiducial.qrcode.QrCode;
+import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.factory.fiducial.ConfigQrCode;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.struct.calib.CameraPinholeRadial;
@@ -194,7 +194,7 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
 
             renderCube.initialize(cameraToDisplayDensity);
             intrinsic = lookupIntrinsics();
-            detector.setLensDistortion(LensDistortionOps.narrow(intrinsic),imageWidth,imageHeight);
+            detector.setLensDistortion(LensDistortionFactory.narrow(intrinsic),imageWidth,imageHeight);
 
             synchronized (uniqueLock) {
                 uniqueCount = unique.size();
