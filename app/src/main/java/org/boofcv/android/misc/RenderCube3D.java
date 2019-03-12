@@ -6,7 +6,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 
 import boofcv.alg.geo.PerspectiveOps;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import georegression.struct.point.Point2D_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
@@ -58,7 +58,7 @@ public class RenderCube3D {
      * Draws a flat cube to show where the square fiducial is on the image
      *
      */
-    public void drawCube(String label , Se3_F64 targetToCamera , CameraPinholeRadial intrinsic , double width ,
+    public void drawCube(String label , Se3_F64 targetToCamera , CameraPinholeBrown intrinsic , double width ,
                          Canvas canvas )
     {
         double r = width/2.0;

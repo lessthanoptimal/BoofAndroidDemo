@@ -17,6 +17,12 @@
 		android:text="Auto Reduce"
 		android:id="@+id/checkbox_reduce" android:layout_gravity="center"/>
 
+	<CheckBox
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="Use Concurrent"
+		android:id="@+id/checkbox_concurrent" android:layout_gravity="center"/>
+
 	<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
 				 android:id="@+id/tableLayout1"
 				 android:layout_width="wrap_content"

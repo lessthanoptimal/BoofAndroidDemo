@@ -16,19 +16,19 @@ import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.disparity.StereoDisparity;
 import boofcv.alg.descriptor.UtilFeature;
 import boofcv.alg.distort.ImageDistort;
-import boofcv.alg.filter.derivative.LaplacianEdge;
+import boofcv.alg.filter.derivative.DerivativeLaplacian;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.alg.geo.robust.ModelMatcherMultiview;
 import boofcv.alg.misc.ImageMiscOps;
-import boofcv.core.image.border.BorderType;
 import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.factory.geo.ConfigEssential;
 import boofcv.factory.geo.ConfigRansac;
 import boofcv.factory.geo.EnumEssential;
 import boofcv.factory.geo.FactoryMultiViewRobust;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.border.BorderType;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
@@ -48,7 +48,7 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 
 	DetectDescribePoint<GrayF32,Desc> detDesc;
 	AssociateDescription<Desc> associate;
-	CameraPinholeRadial intrinsic;
+	CameraPinholeBrown intrinsic;
 
 	StereoDisparity<GrayF32, GrayF32> disparityAlg;
 
@@ -75,7 +75,7 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 
 	public DisparityCalculation(DetectDescribePoint<GrayF32, Desc> detDesc,
 								AssociateDescription<Desc> associate ,
-								CameraPinholeRadial intrinsic ) {
+								CameraPinholeBrown intrinsic ) {
 		this.detDesc = detDesc;
 		this.associate = associate;
 		this.intrinsic = intrinsic;
@@ -291,11 +291,11 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 		// Apply the Laplacian for some lighting invariance
 		ImageMiscOps.fill(rectifiedLeft,0);
 		distortLeft.apply(distortedLeft, rectifiedLeft);
-		LaplacianEdge.process(rectifiedLeft,edgeLeft);
+		DerivativeLaplacian.process(rectifiedLeft,edgeLeft,null);
 
 		ImageMiscOps.fill(rectifiedRight, 0);
 		distortRight.apply(distortedRight, rectifiedRight);
-		LaplacianEdge.process(rectifiedRight,edgeRight);
+		DerivativeLaplacian.process(rectifiedRight,edgeRight,null);
 	}
 
 	public List<AssociatedPair> getInliersPixel() {

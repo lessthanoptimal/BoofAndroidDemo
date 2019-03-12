@@ -19,6 +19,7 @@ import org.boofcv.android.R;
 import boofcv.alg.enhance.EnhanceImageOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.android.ConvertBitmap;
+import boofcv.concurrency.IWorkArrays;
 import boofcv.core.image.ConvertImage;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
@@ -34,6 +35,7 @@ public class EnhanceDisplayActivity extends DemoBitmapCamera2Activity
 		implements AdapterView.OnItemSelectedListener, CompoundButton.OnCheckedChangeListener
 {
 
+	IWorkArrays work = new IWorkArrays();
 	Spinner spinnerView;
 	CheckBox checkColor;
 
@@ -186,7 +188,7 @@ public class EnhanceDisplayActivity extends DemoBitmapCamera2Activity
 	protected class HistogramLocalProcessing extends EnhanceProcessing {
 		@Override
 		public void process(GrayU8 input) {
-			EnhanceImageOps.equalizeLocal(input, 50, enhanced, histogram, transform);
+			EnhanceImageOps.equalizeLocal(input, 50, enhanced, 256, work);
 			renderOutput(enhanced);
 		}
 	}
@@ -196,7 +198,7 @@ public class EnhanceDisplayActivity extends DemoBitmapCamera2Activity
 		@Override
 		public void process(Planar<GrayU8> input ) {
 			for( int i = 0; i < 3; i++ )
-				EnhanceImageOps.equalizeLocal(input.getBand(i), 50, enhanced.getBand(i), histogram, transform);
+				EnhanceImageOps.equalizeLocal(input.getBand(i), 50, enhanced.getBand(i), 256, work);
 			renderOutput(enhanced);
 		}
 	}

@@ -69,7 +69,7 @@ import java.util.List;
 import java.util.Map;
 
 import boofcv.io.calibration.CalibrationIO;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 
 public class DemoMain extends AppCompatActivity implements ExpandableListView.OnChildClickListener {
 
@@ -340,7 +340,7 @@ public class DemoMain extends AppCompatActivity implements ExpandableListView.On
 
 	public static void loadIntrinsics(Activity activity,
 									  String cameraId,
-									  List<CameraPinholeRadial> intrinsics,
+									  List<CameraPinholeBrown> intrinsics,
 									  List<File> locations ) {
 		intrinsics.clear();
 		if( locations != null )
@@ -359,7 +359,7 @@ public class DemoMain extends AppCompatActivity implements ExpandableListView.On
 			try {
 				FileInputStream fos = new FileInputStream(f);
 				Reader reader = new InputStreamReader(fos);
-				CameraPinholeRadial intrinsic = CalibrationIO.load(reader);
+				CameraPinholeBrown intrinsic = CalibrationIO.load(reader);
 				intrinsics.add(intrinsic);
 				if( locations != null ) {
 					locations.add(f);

@@ -26,8 +26,9 @@ import java.util.Locale;
 
 import boofcv.android.ConvertBitmap;
 import boofcv.android.camera2.VisualizeCamera2Activity;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.misc.MovingAverage;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.ImageBase;
 import georegression.struct.point.Point2D_F64;
 
@@ -104,6 +105,8 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
         app = (DemoApplication)getApplication();
         super.onCreate(savedInstanceState);
 
+        BoofConcurrency.USE_CONCURRENT = app.preference.useConcurrent;
+        Log.i(TAG,"USE_CONCURRENT = "+BoofConcurrency.USE_CONCURRENT);
 
         paintText.setStrokeWidth(3*displayMetrics.density);
         paintText.setTextSize(24*displayMetrics.density);
@@ -557,11 +560,11 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
         out.y = pts[1];
     }
 
-    public CameraPinholeRadial lookupIntrinsics() {
+    public CameraPinholeBrown lookupIntrinsics() {
         // look up the camera parameters. If it hasn't been calibrated used what camera2 says
-        CameraPinholeRadial intrinsic = app.preference.lookup(cameraWidth,cameraHeight);
+        CameraPinholeBrown intrinsic = app.preference.lookup(cameraWidth,cameraHeight);
         if( intrinsic == null ) {
-            intrinsic = new CameraPinholeRadial();
+            intrinsic = new CameraPinholeBrown();
             cameraIntrinsicNominal(intrinsic);
         }
         return intrinsic;

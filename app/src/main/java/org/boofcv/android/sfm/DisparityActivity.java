@@ -31,7 +31,7 @@ import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.feature.disparity.DisparityAlgorithms;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.image.GrayF32;
 
@@ -196,7 +196,7 @@ public class DisparityActivity extends DemoCamera2Activity
 
 		GrayF32 disparityImage;
 		int disparityMin,disparityMax;
-		CameraPinholeRadial intrinsic;
+		CameraPinholeBrown intrinsic;
 
 		public DisparityProcessing() {
 			super(GrayF32.class);

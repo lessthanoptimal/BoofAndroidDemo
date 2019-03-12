@@ -32,7 +32,7 @@ import boofcv.alg.fiducial.qrcode.QrCode;
 import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.factory.fiducial.ConfigQrCode;
 import boofcv.factory.fiducial.FactoryFiducial;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.GrayU8;
 import georegression.metric.Intersection2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -161,7 +161,7 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
 
         final FastQueue<Se3_F64> listPose = new FastQueue<>(Se3_F64.class,true);
         RenderCube3D renderCube = new RenderCube3D();
-        CameraPinholeRadial intrinsic;
+        CameraPinholeBrown intrinsic;
 
         public QrCodeProcessing() {
             super(GrayU8.class);

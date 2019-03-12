@@ -28,6 +28,7 @@ public class PreferenceActivity extends Activity
 
 	CheckBox checkSpeed;
 	CheckBox checkReduce;
+	CheckBox checkConcurrent;
 	Spinner spinnerCamera;
 	Spinner spinnerResolution;
 
@@ -49,6 +50,7 @@ public class PreferenceActivity extends Activity
 
 		checkSpeed = findViewById(R.id.checkbox_speed);
 		checkReduce = findViewById(R.id.checkbox_reduce);
+		checkConcurrent = findViewById(R.id.checkbox_concurrent);
 		spinnerCamera = findViewById(R.id.spinner_camera);
 		spinnerResolution = findViewById(R.id.spinner_resolution);
 
@@ -62,10 +64,12 @@ public class PreferenceActivity extends Activity
 		spinnerCamera.setSelection(cameraNameToIndex(preference.cameraId));
 		checkSpeed.setChecked(preference.showSpeed);
 		checkReduce.setChecked(preference.autoReduce);
+		checkConcurrent.setChecked(preference.useConcurrent);
 		setupResolutionSpinner(preference.resolution);
 
 		checkSpeed.setOnCheckedChangeListener(this);
 		checkReduce.setOnCheckedChangeListener(this);
+		checkConcurrent.setOnCheckedChangeListener(this);
 		spinnerCamera.setOnItemSelectedListener(this);
 		spinnerResolution.setOnItemSelectedListener(this);
 	}
@@ -137,5 +141,7 @@ public class PreferenceActivity extends Activity
 			preference.showSpeed = b;
 		else if( compoundButton == checkReduce )
 			preference.autoReduce = b;
+		else if( compoundButton == checkConcurrent )
+			preference.useConcurrent = b;
 	}
 }

@@ -151,19 +151,19 @@ public class ThresholdDisplayActivity extends DemoBitmapCamera2Activity
 				return FactoryThresholdBinary.localGaussian(ConfigLength.fixed(width),0.95,down,GrayU8.class);
 
 			case 4:
-				return FactoryThresholdBinary.localSauvola(ConfigLength.fixed(width),0.3f,down,GrayU8.class);
+				return FactoryThresholdBinary.localSauvola(ConfigLength.fixed(width),down,0.3f,GrayU8.class);
 
 			case 5:
-				return FactoryThresholdBinary.localNick(ConfigLength.fixed(width),-0.2f,down,GrayU8.class);
+				return FactoryThresholdBinary.localNick(ConfigLength.fixed(width),down,-0.2f,GrayU8.class);
 
 			case 6:
 				return FactoryThresholdBinary.blockMean(ConfigLength.fixed(blockWidth),0.95,down,localBlock,GrayU8.class);
 
 			case 7:
-				return FactoryThresholdBinary.blockMinMax(ConfigLength.fixed(blockWidth),0.95,down,2,localBlock,GrayU8.class);
+				return FactoryThresholdBinary.blockMinMax(ConfigLength.fixed(blockWidth),0.95,down,localBlock,2,GrayU8.class);
 
 			case 8:
-				return FactoryThresholdBinary.blockOtsu(true,ConfigLength.fixed(blockWidth),0,0.95,down,localBlock,GrayU8.class);
+				return FactoryThresholdBinary.blockOtsu(ConfigLength.fixed(blockWidth),0.95,down,localBlock,true,0.0,GrayU8.class);
 		}
 
 		throw new RuntimeException("Unknown selection "+selectedAlg);

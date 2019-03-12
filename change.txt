@@ -3,6 +3,13 @@ Change Log for BoofCV Demonstration App
 (year)-(month)-(day)
 
 -------------------------------------------------
+Version 2.4
+Date:
+
+- Updated to 0.33 of BoofCV
+- Toggle concurrent algorithms
+
+-------------------------------------------------
 Version 2.3
 Date: 2018-12-26
 

@@ -24,11 +24,11 @@ import boofcv.alg.distort.LensDistortionOps_F32;
 import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.android.ConvertBitmap;
-import boofcv.core.image.border.BorderType;
 import boofcv.factory.distort.FactoryDistort;
 import boofcv.factory.interpolate.FactoryInterpolation;
+import boofcv.struct.border.BorderType;
 import boofcv.struct.calib.CameraPinhole;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
@@ -117,7 +117,7 @@ public class UndistortDisplayActivity extends DemoBitmapCamera2Activity
 		public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
 			undistorted = imageType.createImage(imageWidth,imageHeight);
 
-			CameraPinholeRadial intrinsic = app.preference.lookup(
+			CameraPinholeBrown intrinsic = app.preference.lookup(
 					imageWidth,imageHeight);
 
 			if( intrinsic != null ) {

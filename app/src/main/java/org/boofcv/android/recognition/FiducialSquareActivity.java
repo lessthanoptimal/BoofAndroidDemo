@@ -35,7 +35,7 @@ import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
 import boofcv.factory.distort.LensDistortionFactory;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import georegression.struct.se.Se3_F64;
@@ -170,7 +170,7 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 		final FastQueue<Se3_F64> listPose = new FastQueue<>(Se3_F64.class,true);
 		final GrowQueue_F64 listWidths = new GrowQueue_F64();
 		final GrowQueue_I64 listIDs = new GrowQueue_I64();
-		CameraPinholeRadial intrinsic;
+		CameraPinholeBrown intrinsic;
 
 		protected FiducialProcessor( FiducialDetector<T> detector ) {
 			super(detector.getInputType());

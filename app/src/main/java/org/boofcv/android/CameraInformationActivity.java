@@ -16,7 +16,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 
 /**
  * Displays information on the camera(s) in a text view.
@@ -156,12 +156,12 @@ public class CameraInformationActivity extends Activity {
 			write("No cameras have ben calibrated. No Directory");
 			return;
 		}
-		List<CameraPinholeRadial> calibration = new ArrayList<>();
+		List<CameraPinholeBrown> calibration = new ArrayList<>();
 		List<File> locations = new ArrayList<>();
 		DemoMain.loadIntrinsics(this,which,calibration,locations);
 
 		for( int i = 0; i < calibration.size(); i++ ) {
-			CameraPinholeRadial intrinsic = calibration.get(i);
+			CameraPinholeBrown intrinsic = calibration.get(i);
 			write("Found intrinsic for camera " + which);
 			write(String.format("  Dimension %d %d", intrinsic.width, intrinsic.height));
 			write(String.format("  fx = %6.1f fy = %6.1f", intrinsic.fx, intrinsic.fy));

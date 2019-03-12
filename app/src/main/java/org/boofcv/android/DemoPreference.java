@@ -3,7 +3,7 @@ package org.boofcv.android;
 import java.util.ArrayList;
 import java.util.List;
 
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 
 /**
  * @author Peter Abeles
@@ -13,8 +13,9 @@ public class DemoPreference {
 	public String cameraId="";
 	public boolean showSpeed;
 	public boolean autoReduce;
+	public boolean useConcurrent=true;
 	public int resolution=0; // 0 = automatic resolution
-	public List<CameraPinholeRadial> calibration = new ArrayList<>();
+	public List<CameraPinholeBrown> calibration = new ArrayList<>();
 
 	public void reset() {
 		synchronized (lock) {
@@ -22,10 +23,10 @@ public class DemoPreference {
 		}
 	}
 
-	public void add( CameraPinholeRadial a ) {
+	public void add( CameraPinholeBrown a ) {
 		synchronized (lock) {
 			for( int i = calibration.size()-1; i >= 0; i-- ) {
-				CameraPinholeRadial c = calibration.get(i);
+				CameraPinholeBrown c = calibration.get(i);
 				if( c.width == a.width && c.height == a.height ) {
 					calibration.remove(i);
 				}
@@ -34,11 +35,11 @@ public class DemoPreference {
 		}
 	}
 
-	public CameraPinholeRadial lookup( int width , int height ) {
-		CameraPinholeRadial found = null;
+	public CameraPinholeBrown lookup( int width , int height ) {
+		CameraPinholeBrown found = null;
 		synchronized (lock) {
 			for( int i = 0; i < calibration.size(); i++ ) {
-				CameraPinholeRadial c = calibration.get(i);
+				CameraPinholeBrown c = calibration.get(i);
 				if( c.width == width && c.height == height ) {
 					found = c;
 				}

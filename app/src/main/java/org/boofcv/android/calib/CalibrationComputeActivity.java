@@ -29,7 +29,7 @@ import boofcv.abst.geo.calibration.ImageResults;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.calibration.CalibrationPlanarGridZhang99;
 import boofcv.io.calibration.CalibrationIO;
-import boofcv.struct.calib.CameraPinholeRadial;
+import boofcv.struct.calib.CameraPinholeBrown;
 import georegression.struct.point.Point2D_F64;
 
 import static org.boofcv.android.DemoMain.getExternalDirectory;
@@ -48,7 +48,7 @@ public class CalibrationComputeActivity extends Activity {
 	// image information which is to be processed
 	public static List<CalibrationObservation> images;
 	public static List<Point2D_F64> targetLayout;
-	public static CameraPinholeRadial intrinsic;
+	public static CameraPinholeBrown intrinsic;
 
 	TextView text;
 	Button buttonOK;
