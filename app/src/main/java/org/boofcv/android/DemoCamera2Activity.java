@@ -187,6 +187,7 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
             try {
                 p.initialize(cameraWidth, cameraHeight, cameraOrientation);
             } catch( OutOfMemoryError e ) {
+                ACRA.getErrorReporter().handleSilentException(e);
                 synchronized ( lockProcessor) {
                     processor = null; // free memory
                 }
@@ -243,6 +244,7 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
             try {
                 processor.process(image);
             } catch( OutOfMemoryError e ) {
+                ACRA.getErrorReporter().handleSilentException(e);
                 runOnUiThread(()->{
                     finish(); // leave the activity
                     Toast.makeText(this,"Out of Memory. Try lower resolution",Toast.LENGTH_LONG).show();
