@@ -2,6 +2,8 @@ Change Log for BoofCV Demonstration App
 
 (year)-(month)-(day)
 
+TODO improve performance by removing locks from visualization
+
 -------------------------------------------------
 Version 2.4.1
 Date: 2019-03-20
