@@ -13,7 +13,8 @@ public class DemoPreference {
 	public String cameraId="";
 	public boolean showSpeed;
 	public boolean autoReduce;
-	public boolean useConcurrent=true;
+	// JDK 1.8 features like streams and concurrency don't work prior to 24
+	public boolean useConcurrent=android.os.Build.VERSION.SDK_INT>=24;
 	public int resolution=0; // 0 = automatic resolution
 	public List<CameraPinholeBrown> calibration = new ArrayList<>();
 

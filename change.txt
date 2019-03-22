@@ -3,6 +3,14 @@ Change Log for BoofCV Demonstration App
 (year)-(month)-(day)
 
 -------------------------------------------------
+Version 2.4.1
+Date: 2019-03-20
+
+- TODO make sure acra still works
+- Disable threading if less than API 24 because of the lack of JDK 1.8 features
+  * If someone figures out how to get around this limitation let me know
+
+-------------------------------------------------
 Version 2.4
 Date: 2019-03-20
 

@@ -67,6 +67,11 @@ public class PreferenceActivity extends Activity
 		checkConcurrent.setChecked(preference.useConcurrent);
 		setupResolutionSpinner(preference.resolution);
 
+		// it will crash if turned on
+		if( android.os.Build.VERSION.SDK_INT < 24 ) {
+			checkConcurrent.setEnabled(false);
+		}
+
 		checkSpeed.setOnCheckedChangeListener(this);
 		checkReduce.setOnCheckedChangeListener(this);
 		checkConcurrent.setOnCheckedChangeListener(this);
