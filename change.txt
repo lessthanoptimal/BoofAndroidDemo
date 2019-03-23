@@ -8,7 +8,7 @@ TODO improve performance by removing locks from visualization
 Version 2.4.1
 Date: 2019-03-20
 
-- TODO make sure acra still works
+- ACRA was not actually fully enabled
 - Disable threading if less than API 24 because of the lack of JDK 1.8 features
   * If someone figures out how to get around this limitation let me know
 

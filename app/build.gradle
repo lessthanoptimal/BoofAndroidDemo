@@ -6,12 +6,10 @@ android {
     defaultConfig {
         applicationId "org.boofcv.android"
         // min SDK version is determined by when Camera2 API becomes functional
-        // there are issues with threading prior to 24 because of Java 1.8 support
-        // that's handled by turning off threads
         minSdkVersion 22
         targetSdkVersion 28
-        versionCode 27
-        versionName "2.4.0"
+        versionCode 28
+        versionName "2.4.1"
     }
 
     buildTypes {
@@ -50,7 +48,7 @@ configurations {
     all*.exclude group: "com.thoughtworks.xstream", module: "commons-compress"
 }
 
-def acraVersion = '5.1.3'
+def acraVersion = '5.3.0'
 
 dependencies {
     ['boofcv-android', 'boofcv-core'].each {

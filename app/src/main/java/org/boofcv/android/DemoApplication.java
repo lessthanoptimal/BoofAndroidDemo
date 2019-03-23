@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.os.Build;
+import android.util.Log;
 
 import org.acra.ACRA;
 import org.acra.annotation.AcraCore;
@@ -31,6 +32,8 @@ import boofcv.BoofVersion;
 @AcraCore(buildConfigClass = BuildConfig.class)
 public class DemoApplication extends Application
 {
+    public static final String TAG = "DEMOAPP";
+
     // contains information on all the cameras.  less error prone and easier to deal with
     public final List<CameraSpecs> specs = new ArrayList<>();
     // specifies which camera to use an image size
@@ -46,16 +49,24 @@ public class DemoApplication extends Application
         // Don't initialize error reporting if no destination is specified
         // or if someone is trying to run it on an unsupported android device
         String address = loadAcraAddress(this);
-        if( address == null)
+        if( address == null) {
+            Log.i(TAG,"Not reporting errors with ACRA");
             return;
+        }
 
         CoreConfigurationBuilder builder = new CoreConfigurationBuilder(this);
         builder.setBuildConfigClass(BuildConfig.class).setReportFormat(StringFormat.JSON);
+
         builder.getPluginConfigurationBuilder(ToastConfigurationBuilder.class).setResText(R.string.acra_toast);
+        builder.getPluginConfigurationBuilder(ToastConfigurationBuilder.class).setEnabled(true);
+
         builder.getPluginConfigurationBuilder(LimiterConfigurationBuilder.class).
                 setPeriod(10).setPeriodUnit(TimeUnit.MINUTES);
+        builder.getPluginConfigurationBuilder(LimiterConfigurationBuilder.class).setEnabled(true);
+
         builder.getPluginConfigurationBuilder(HttpSenderConfigurationBuilder.class).
                 setUri(address).setHttpMethod(HttpSender.Method.POST);
+        builder.getPluginConfigurationBuilder(HttpSenderConfigurationBuilder.class).setEnabled(true);
 
         // Only post bugs if in release mode
         ACRA.init(this,builder);
