@@ -106,6 +106,7 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
         super.onCreate(savedInstanceState);
 
         BoofConcurrency.USE_CONCURRENT = app.preference.useConcurrent;
+        ACRA.getErrorReporter().putCustomData("BOOFCV-CONCURRENT", ""+BoofConcurrency.USE_CONCURRENT);
         Log.i(TAG,"USE_CONCURRENT = "+BoofConcurrency.USE_CONCURRENT);
 
         paintText.setStrokeWidth(3*displayMetrics.density);
