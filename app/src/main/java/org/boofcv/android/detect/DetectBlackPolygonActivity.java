@@ -210,7 +210,7 @@ public class DetectBlackPolygonActivity extends DemoBitmapCamera2Activity
 
 		switch( active ) {
 			case 0 :
-				inputToBinary = FactoryThresholdBinary.globalOtsu(0, 255, true, GrayU8.class);
+				inputToBinary = FactoryThresholdBinary.globalOtsu(0, 255, 1.0, true, GrayU8.class);
 				break;
 
 			case 1:

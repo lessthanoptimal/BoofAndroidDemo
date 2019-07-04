@@ -139,10 +139,10 @@ public class ThresholdDisplayActivity extends DemoBitmapCamera2Activity
 
 		switch (selectedAlg) {
 			case 0:
-				return FactoryThresholdBinary.globalOtsu(0,255,down,GrayU8.class);
+				return FactoryThresholdBinary.globalOtsu(0,255,1.0,down,GrayU8.class);
 
 			case 1:
-				return FactoryThresholdBinary.globalEntropy(0, 255, down, GrayU8.class);
+				return FactoryThresholdBinary.globalEntropy(0, 255, 1.0,down, GrayU8.class);
 
 			case 2:
 				return FactoryThresholdBinary.localMean(ConfigLength.fixed(width),0.95,down,GrayU8.class);

@@ -24,10 +24,10 @@ import java.util.List;
 import boofcv.abst.feature.detect.line.DetectLine;
 import boofcv.abst.feature.detect.line.DetectLineSegment;
 import boofcv.alg.feature.detect.line.LineImageOps;
-import boofcv.factory.feature.detect.line.ConfigHoughFoot;
-import boofcv.factory.feature.detect.line.ConfigHoughPolar;
-import boofcv.factory.feature.detect.line.FactoryDetectLineAlgs;
-import boofcv.struct.image.GrayS16;
+import boofcv.factory.feature.detect.line.ConfigHoughBinary;
+import boofcv.factory.feature.detect.line.ConfigHoughGradient;
+import boofcv.factory.feature.detect.line.ConfigParamPolar;
+import boofcv.factory.feature.detect.line.FactoryDetectLine;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import georegression.struct.line.LineParametric2D_F32;
@@ -115,13 +115,18 @@ public class LineDisplayActivity extends DemoCamera2Activity
 
 		switch( active ) {
 			case 0:
-				detector = FactoryDetectLineAlgs.houghFoot(
-						new ConfigHoughFoot(5,6,5,40,numLines),GrayU8.class,GrayS16.class);
+				detector = FactoryDetectLine.houghLineFoot(
+						new ConfigHoughGradient(numLines),null,GrayU8.class);
 				break;
 
 			case 1:
-				detector = FactoryDetectLineAlgs.houghPolar(
-						new ConfigHoughPolar(5,6,2,Math.PI/120.0,40,numLines),GrayU8.class,GrayS16.class);
+				detector = FactoryDetectLine.houghLinePolar(
+						new ConfigHoughGradient(numLines),new ConfigParamPolar(),GrayU8.class);
+				break;
+
+			case 2:
+				detector = FactoryDetectLine.houghLinePolar(
+						new ConfigHoughBinary(numLines),new ConfigParamPolar(),null,GrayU8.class);
 				break;
 
 			default:

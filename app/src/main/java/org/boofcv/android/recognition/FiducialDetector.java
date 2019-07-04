@@ -28,14 +28,14 @@ public class FiducialDetector extends BaseDetectFiducialSquare<GrayU8> {
 	private final static int w=32;
 	private final static int squareLength=w*4; // this must be a multiple of 16
 
-	private InputToBinary<GrayF32> threshold = FactoryThresholdBinary.globalOtsu(0,255,true,GrayF32.class);
+	private InputToBinary<GrayF32> threshold = FactoryThresholdBinary.globalOtsu(0,255,1.0,true,GrayF32.class);
 	private GrayF32 grayNoBorder = new GrayF32();
 
 	// All the images inside which it found
 	private FastQueue<GrayU8> foundBinary;
 
 	public FiducialDetector() {
-		super(FactoryThresholdBinary.globalOtsu(0, 255, true, GrayU8.class),
+		super(FactoryThresholdBinary.globalOtsu(0, 255, 1.0,true, GrayU8.class),
 				FactoryShapeDetector.polygon(new ConfigPolygonDetector(false, 4, 4), GrayU8.class),
 				false,0.25, 0.5, squareLength + squareLength, GrayU8.class);
 

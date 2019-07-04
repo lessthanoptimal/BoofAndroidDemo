@@ -212,18 +212,18 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 	private void setSpaceWidth(double space , double width ) {
 		switch( cc.targetType ) {
 			case SQUARE_GRID:{
-				cc.squareGrid.spaceWidth = space;
-				cc.squareGrid.squareWidth = width;
+				cc.squareGrid.shapeDistance = space;
+				cc.squareGrid.shapeSize = width;
 			} break;
 
 			case CIRCLE_HEXAGONAL:{
-				cc.hexagonal.centerDistance = space;
-				cc.hexagonal.circleDiameter = width;
+				cc.hexagonal.shapeDistance = space;
+				cc.hexagonal.shapeSize = width;
 			} break;
 
 			case CIRCLE_GRID:{
-				cc.circleGrid.centerDistance = space;
-				cc.circleGrid.circleDiameter = width;
+				cc.circleGrid.shapeDistance = space;
+				cc.circleGrid.shapeSize = width;
 			} break;
 		}
 	}
@@ -243,22 +243,22 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 			case SQUARE_GRID:{
 				numCols = cc.squareGrid.numCols;
 				numRows = cc.squareGrid.numRows;
-				valueSpace = cc.squareGrid.spaceWidth;
-				valueWidth = cc.squareGrid.squareWidth;
+				valueSpace = cc.squareGrid.shapeDistance;
+				valueWidth = cc.squareGrid.shapeSize;
 			} break;
 
 			case CIRCLE_HEXAGONAL:{
 				numCols = cc.hexagonal.numCols;
 				numRows = cc.hexagonal.numRows;
-				valueSpace = cc.circleGrid.centerDistance;
-				valueWidth = cc.circleGrid.circleDiameter;
+				valueSpace = cc.circleGrid.shapeDistance;
+				valueWidth = cc.circleGrid.shapeSize;
 			} break;
 
 			case CIRCLE_GRID:{
 				numCols = cc.circleGrid.numCols;
 				numRows = cc.circleGrid.numRows;
-				valueSpace = cc.circleGrid.centerDistance;
-				valueWidth = cc.circleGrid.circleDiameter;
+				valueSpace = cc.circleGrid.shapeDistance;
+				valueWidth = cc.circleGrid.shapeSize;
 			} break;
 
 			default:
@@ -313,23 +313,10 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 		ConfigAllCalibration copy = new ConfigAllCalibration();
 
 		copy.targetType = cc.targetType;
-		copy.chessboard.numRows = cc.chessboard.numRows;
-		copy.chessboard.numCols = cc.chessboard.numCols;
-
-		copy.squareGrid.numRows = cc.squareGrid.numRows;
-		copy.squareGrid.numCols = cc.squareGrid.numCols;
-		copy.squareGrid.spaceWidth = cc.squareGrid.spaceWidth;
-		copy.squareGrid.squareWidth = cc.squareGrid.squareWidth;
-
-		copy.circleGrid.numRows = cc.circleGrid.numRows;
-		copy.circleGrid.numCols = cc.circleGrid.numCols;
-		copy.circleGrid.circleDiameter = cc.circleGrid.circleDiameter;
-		copy.circleGrid.centerDistance = cc.circleGrid.centerDistance;
-
-		copy.hexagonal.numRows = cc.hexagonal.numRows;
-		copy.hexagonal.numCols = cc.hexagonal.numCols;
-		copy.hexagonal.circleDiameter = cc.hexagonal.circleDiameter;
-		copy.hexagonal.centerDistance = cc.hexagonal.centerDistance;
+		copy.chessboard.set(cc.chessboard);
+		copy.squareGrid.set(cc.squareGrid);
+		copy.circleGrid.set(cc.circleGrid);
+		copy.hexagonal.set(cc.hexagonal);
 
 		return copy;
 	}

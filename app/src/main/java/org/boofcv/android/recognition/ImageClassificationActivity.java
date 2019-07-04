@@ -135,10 +135,9 @@ public class ImageClassificationActivity extends DemoBitmapCamera2Activity
     }
 
     public void pressedDeleteModel( View view ) {
-        System.out.println("pressed delete model");
+        Log.i(TAG,"pressed delete model");
         if( status == Status.WAITING || status == Status.IDLE || status == Status.ERROR ) {
-            System.out.println("trying to delete");
-
+            Log.i(TAG,"trying to delete");
             deleteModelData(true);
         }
     }

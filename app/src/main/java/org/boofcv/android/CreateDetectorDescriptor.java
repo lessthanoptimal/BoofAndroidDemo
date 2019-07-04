@@ -7,6 +7,8 @@ import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.detect.interest.ConfigFastCorner;
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
+import boofcv.abst.feature.detect.interest.ConfigHarrisCorner;
+import boofcv.abst.feature.detect.interest.ConfigShiTomasi;
 import boofcv.abst.feature.detect.interest.ConfigSiftDetector;
 import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.abst.feature.orientation.OrientationImage;
@@ -85,11 +87,11 @@ public class CreateDetectorDescriptor {
 				return FactoryInterestPoint.sift(null,confDetectSift(),imageType);
 
 			case DETECT_SHITOMASI:
-				general = FactoryDetectPoint.createShiTomasi(confCorner(),false,derivType);
+				general = FactoryDetectPoint.createShiTomasi(confCorner(),new ConfigShiTomasi(false,3),derivType);
 				break;
 
 			case DETECT_HARRIS:
-				general = FactoryDetectPoint.createHarris(confCorner(), false, derivType);
+				general = FactoryDetectPoint.createHarris(confCorner(), new ConfigHarrisCorner(false,3),derivType);
 				break;
 
 			case DETECT_FAST:

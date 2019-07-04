@@ -7,10 +7,7 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.view.SurfaceView;
 
-import boofcv.abst.fiducial.calib.ConfigChessboard;
-import boofcv.abst.fiducial.calib.ConfigCircleHexagonalGrid;
-import boofcv.abst.fiducial.calib.ConfigCircleRegularGrid;
-import boofcv.abst.fiducial.calib.ConfigSquareGrid;
+import boofcv.abst.fiducial.calib.ConfigGridDimen;
 import georegression.metric.UtilAngle;
 
 
@@ -59,7 +56,7 @@ public class DrawCalibrationFiducial extends SurfaceView {
 		switch( cc.targetType ) {
 			case CHESSBOARD: {
 				// how wide a black square is
-				ConfigChessboard config = cc.chessboard;
+				ConfigGridDimen config = cc.chessboard;
 				int squareWidth = (int)Math.min(surfaceWidth/(config.numCols+1),surfaceHeight/(config.numRows+1));
 
 				int gridWidth = squareWidth*config.numCols;
@@ -77,8 +74,8 @@ public class DrawCalibrationFiducial extends SurfaceView {
 			// TODO update
 			case SQUARE_GRID: {
 				// how wide a black square is
-				ConfigSquareGrid config = cc.squareGrid;
-				double ratio = config.spaceWidth/config.squareWidth;
+				ConfigGridDimen config = cc.squareGrid;
+				double ratio = config.shapeDistance/config.shapeSize;
 				double unitsWidth = config.numCols + (config.numCols-1)*ratio;
 				double unitsHeight = config.numRows + (config.numRows-1)*ratio;
 
@@ -95,9 +92,9 @@ public class DrawCalibrationFiducial extends SurfaceView {
 			// TODO update
 			case CIRCLE_HEXAGONAL: {
 				// spacing between circle centers
-				ConfigCircleHexagonalGrid config = cc.hexagonal;
+				ConfigGridDimen config = cc.hexagonal;
 
-				double ratio = config.centerDistance/config.circleDiameter;
+				double ratio = config.shapeDistance/config.shapeSize;
 				double spaceX = ratio/2.0;
 				double spaceY = ratio*Math.sin(UtilAngle.radian(60));
 				double radius = 1.0/2.0;
@@ -119,10 +116,10 @@ public class DrawCalibrationFiducial extends SurfaceView {
 
 			case CIRCLE_GRID: {
 				// spacing between circle centers
-				ConfigCircleRegularGrid config = cc.circleGrid;
+				ConfigGridDimen config = cc.circleGrid;
 				int centerDistance = Math.min(
 						surfaceWidth/(config.numCols+1),surfaceHeight/(config.numRows+1));
-				int diameter = (int)(centerDistance*config.circleDiameter/config.centerDistance+0.5);
+				int diameter = (int)(centerDistance*config.shapeSize/config.shapeDistance+0.5);
 
 				int gridWidth  = centerDistance*(config.numCols-1) + diameter;
 				int gridHeight = centerDistance*(config.numRows-1) + diameter;

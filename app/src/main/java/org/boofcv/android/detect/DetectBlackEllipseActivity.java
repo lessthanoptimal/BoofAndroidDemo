@@ -116,7 +116,7 @@ public class DetectBlackEllipseActivity extends DemoBitmapCamera2Activity
 		synchronized (lockBinarization) {
 			switch (active) {
 				case 0:
-					inputToBinary = FactoryThresholdBinary.globalOtsu(0, 255, true, GrayU8.class);
+					inputToBinary = FactoryThresholdBinary.globalOtsu(0, 255, 1.0,true, GrayU8.class);
 					break;
 
 				case 1:

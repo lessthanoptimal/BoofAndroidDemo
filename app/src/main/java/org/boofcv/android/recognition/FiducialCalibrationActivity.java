@@ -36,13 +36,13 @@ public class FiducialCalibrationActivity extends FiducialSquareActivity {
 	protected FiducialDetector<GrayU8> createDetector() {
 
 		if( cc.targetType == CalibrationPatterns.CHESSBOARD ) {
-			return FactoryFiducial.calibChessboard(cc.chessboard, GrayU8.class);
+			return FactoryFiducial.calibChessboard(null,cc.chessboard, GrayU8.class);
 		} else if( cc.targetType == CalibrationPatterns.SQUARE_GRID ) {
-			return FactoryFiducial.calibSquareGrid(cc.squareGrid, GrayU8.class);
+			return FactoryFiducial.calibSquareGrid(null,cc.squareGrid, GrayU8.class);
 		} else if( cc.targetType == CalibrationPatterns.CIRCLE_HEXAGONAL ) {
-			return FactoryFiducial.calibCircleHexagonalGrid(cc.hexagonal, GrayU8.class);
+			return FactoryFiducial.calibCircleHexagonalGrid(null,cc.hexagonal, GrayU8.class);
 		} else if( cc.targetType == CalibrationPatterns.CIRCLE_GRID ) {
-			return FactoryFiducial.calibCircleRegularGrid(cc.circleGrid, GrayU8.class);
+			return FactoryFiducial.calibCircleRegularGrid(null,cc.circleGrid, GrayU8.class);
 		} else {
 			throw new RuntimeException("Unknown");
 		}

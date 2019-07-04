@@ -20,7 +20,8 @@
         android:label="@string/app_name"
         android:largeHeap="true"
         android:background="#111111"
-        android:theme="@style/Theme.AppCompat.NoActionBar" >
+        android:theme="@style/Theme.AppCompat.NoActionBar"
+        android:usesCleartextTraffic="true">
         <activity
             android:name=".DemoMain"
             android:label="">

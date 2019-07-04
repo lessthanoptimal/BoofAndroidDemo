@@ -142,11 +142,11 @@ public class BinaryOpsDisplayActivity extends DemoBitmapCamera2Activity
 					break;
 
 				case 5:
-					BinaryImageOps.edge4(binary, afterOps);
+					BinaryImageOps.edge4(binary, afterOps,false);
 					break;
 
 				case 6:
-					BinaryImageOps.edge8(binary, afterOps);
+					BinaryImageOps.edge8(binary, afterOps,false);
 					break;
 
 				case 7:

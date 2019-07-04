@@ -53,7 +53,7 @@ def acraVersion = '5.3.0'
 dependencies {
     ['boofcv-android', 'boofcv-core'].each {
         String a ->
-            implementation group: 'org.boofcv', name: a, version: '0.33.1'
+            implementation group: 'org.boofcv', name: a, version: '0.34'
     }
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:28.0.0'

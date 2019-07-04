@@ -267,7 +267,7 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 				if (detector instanceof CalibrationFiducialDetector) {
 					DetectorFiducialCalibration a = ((CalibrationFiducialDetector) detector).getCalibDetector();
 					if (a instanceof CalibrationDetectorChessboard) {
-						binary = ((CalibrationDetectorChessboard) a).getAlgorithm().getBinary();
+						binary = ((CalibrationDetectorChessboard) a).getDetector().getDetector().getBinary();
 					} else if( a instanceof CalibrationDetectorSquareGrid ){
 						binary = ((CalibrationDetectorSquareGrid) a).getAlgorithm().getBinary();
 					} else if( a instanceof CalibrationDetectorCircleHexagonalGrid){

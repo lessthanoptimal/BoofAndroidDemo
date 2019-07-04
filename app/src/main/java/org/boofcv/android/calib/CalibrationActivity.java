@@ -33,7 +33,6 @@ import boofcv.abst.fiducial.calib.CalibrationDetectorCircleRegularGrid;
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
 import boofcv.abst.fiducial.calib.CalibrationPatterns;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
-import boofcv.alg.fiducial.calib.chess.DetectChessboardFiducial;
 import boofcv.alg.fiducial.calib.circle.DetectCircleHexagonalGrid;
 import boofcv.alg.fiducial.calib.circle.DetectCircleRegularGrid;
 import boofcv.alg.fiducial.calib.grid.DetectSquareGridFiducial;
@@ -148,13 +147,13 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 		DetectorFiducialCalibration detector;
 
 		if( cc.targetType == CalibrationPatterns.CHESSBOARD ) {
-			detector = FactoryFiducialCalibration.chessboard(cc.chessboard);
+			detector = FactoryFiducialCalibration.chessboard(null,cc.chessboard);
 		} else if( cc.targetType == CalibrationPatterns.SQUARE_GRID ) {
-			detector = FactoryFiducialCalibration.squareGrid(cc.squareGrid);
+			detector = FactoryFiducialCalibration.squareGrid(null,cc.squareGrid);
 		} else if( cc.targetType == CalibrationPatterns.CIRCLE_HEXAGONAL ){
-			detector = FactoryFiducialCalibration.circleHexagonalGrid(cc.hexagonal);
+			detector = FactoryFiducialCalibration.circleHexagonalGrid(null,cc.hexagonal);
 		} else if( cc.targetType == CalibrationPatterns.CIRCLE_GRID ){
-			detector = FactoryFiducialCalibration.circleRegularGrid(cc.circleGrid);
+			detector = FactoryFiducialCalibration.circleRegularGrid(null,cc.circleGrid);
 		} else {
 			throw new RuntimeException("Unknown targetType "+cc.targetType);
 		}
@@ -205,6 +204,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 		FastQueue<Point2D_F64> pointsGui = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
 
 		final Object lockGUI = new Object();
+		List<Point2D_F64> debugPoints = new ArrayList<>();
 		List<List<Point2D_I32>> debugQuads = new ArrayList<>();
 		List<EllipseRotated_F64> debugEllipses = new ArrayList<>();
 		float radius;
@@ -235,6 +235,10 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 				canvas.concat(imageToView);
 
 				// draw shapes for debugging purposes
+				for ( Point2D_F64 p : debugPoints ) {
+					canvas.drawCircle((float) p.x, (float) p.y, radius, paintFailed);
+				}
+
 				for (List<Point2D_I32> l : debugQuads) {
 					for (int i = 1; i < l.size(); i++) {
 						Point2D_I32 c0 = l.get(i - 1);
@@ -299,6 +303,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 			// safely copy data into data structures used by GUI thread
 			synchronized ( lockGUI ) {
 				pointsGui.reset();
+				debugPoints.clear();
 				debugQuads.clear();
 				debugEllipses.clear();
 				if( detected ) {
@@ -308,9 +313,11 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 				} else if( showDetectDebug ) {
 					// show binary image to aid in debugging and detected rectangles
 					if( detector instanceof CalibrationDetectorChessboard) {
-						DetectChessboardFiducial<GrayF32> alg = ((CalibrationDetectorChessboard) detector).getAlgorithm();
-						extractQuads(alg.getFindSeeds().getDetectorSquare().getPolygons(null,null));
-						binary = alg.getBinary();
+						CalibrationObservation alg = ((CalibrationDetectorChessboard) detector).getDetectedPoints();
+						for (int i = 0; i < alg.points.size(); i++) {
+							debugPoints.add(alg.points.get(i));
+						}
+						binary = ((CalibrationDetectorChessboard) detector).getDetector().getDetector().getBinary();
 					} else if( detector instanceof CalibrationDetectorSquareGrid) {
 						DetectSquareGridFiducial<GrayF32> alg = ((CalibrationDetectorSquareGrid) detector).getAlgorithm();
 						extractQuads(alg.getDetectorSquare().getPolygons(null,null));
