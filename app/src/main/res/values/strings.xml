@@ -120,9 +120,9 @@
     </string-array>
 
     <string-array name="line_features">
-        <item>Hough Foot-Grad</item>
-        <item>Hough Polar-Grad</item>
-        <item>Hough Polar-Bin</item>
+        <item>Hough Foot</item>
+        <item>Hough Polar</item>
+        <item>Segments</item>
     </string-array>
 
     <string-array name="threshold_styles">

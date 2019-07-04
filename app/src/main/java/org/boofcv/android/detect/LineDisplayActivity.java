@@ -1,11 +1,14 @@
 package org.boofcv.android.detect;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
@@ -23,11 +26,16 @@ import java.util.List;
 
 import boofcv.abst.feature.detect.line.DetectLine;
 import boofcv.abst.feature.detect.line.DetectLineSegment;
+import boofcv.abst.feature.detect.line.HoughGradient_to_DetectLine;
 import boofcv.alg.feature.detect.line.LineImageOps;
+import boofcv.alg.misc.ImageStatistics;
+import boofcv.alg.misc.PixelMath;
+import boofcv.android.ConvertBitmap;
 import boofcv.factory.feature.detect.line.ConfigHoughBinary;
 import boofcv.factory.feature.detect.line.ConfigHoughGradient;
-import boofcv.factory.feature.detect.line.ConfigParamPolar;
+import boofcv.factory.feature.detect.line.ConfigLineRansac;
 import boofcv.factory.feature.detect.line.FactoryDetectLine;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import georegression.struct.line.LineParametric2D_F32;
@@ -52,6 +60,9 @@ public class LineDisplayActivity extends DemoCamera2Activity
 	// the number of lines its configured to detect
 	int numLines = 3;
 
+	// show hough transform in GUI
+	boolean showTransform = false;
+
 	public LineDisplayActivity() {
 		super(Resolution.MEDIUM);
 		super.changeResolutionOnSlow = true;
@@ -64,7 +75,6 @@ public class LineDisplayActivity extends DemoCamera2Activity
 		paint = new Paint();
 		paint.setColor(Color.RED);
 		paint.setStyle(Paint.Style.STROKE);
-		paint.setStrokeWidth(2.0f);
 
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.detect_line_controls,null);
@@ -88,6 +98,19 @@ public class LineDisplayActivity extends DemoCamera2Activity
 		// TODO This doesn't cover the back where the user dismisses the keyboard with the back button
 
 		setControls(controls);
+
+		activateTouchToShowTransform();
+	}
+
+	public void activateTouchToShowTransform() {
+		displayView.setOnTouchListener((view, motionEvent) -> {
+			if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+				showTransform = true;
+			} else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+				showTransform = false;
+			}
+			return true;
+		});
 	}
 
 	@Override
@@ -113,21 +136,27 @@ public class LineDisplayActivity extends DemoCamera2Activity
 		DetectLine<GrayU8> detector = null;
 		DetectLineSegment<GrayU8> detectorSegment = null;
 
+		ConfigHoughGradient configGrad = new ConfigHoughGradient(numLines);
+		ConfigHoughBinary configBin = new ConfigHoughBinary(numLines);
+
+		configGrad.thresholdEdge = 40;
+		configGrad.localMaxRadius = 5;
+		configGrad.minCounts = 10;
+
 		switch( active ) {
 			case 0:
-				detector = FactoryDetectLine.houghLineFoot(
-						new ConfigHoughGradient(numLines),null,GrayU8.class);
+				detector = FactoryDetectLine.houghLineFoot(configGrad,null,GrayU8.class);
 				break;
 
 			case 1:
-				detector = FactoryDetectLine.houghLinePolar(
-						new ConfigHoughGradient(numLines),new ConfigParamPolar(),GrayU8.class);
+				detector = FactoryDetectLine.houghLinePolar(configGrad,null,GrayU8.class);
 				break;
 
-			case 2:
-				detector = FactoryDetectLine.houghLinePolar(
-						new ConfigHoughBinary(numLines),new ConfigParamPolar(),null,GrayU8.class);
-				break;
+			case 2: {
+				ConfigLineRansac configSeg = new ConfigLineRansac();
+				configSeg.thresholdEdge = 50;
+				detectorSegment = FactoryDetectLine.lineRansac(null, GrayU8.class);
+			} break;
 
 			default:
 				throw new RuntimeException("Unknown selection");
@@ -146,7 +175,7 @@ public class LineDisplayActivity extends DemoCamera2Activity
 			if( numLines == num )
 				return;
 
-			if( num > 0 && num <= 30  ) {
+			if( num >= 0 && num <= 30  ) {
 				numLines = num;
 				createLineDetector();
 				return;
@@ -172,6 +201,9 @@ public class LineDisplayActivity extends DemoCamera2Activity
 
 		FastQueue<LineSegment2D_F32> lines = new FastQueue<LineSegment2D_F32>(LineSegment2D_F32.class,true);
 
+		GrayF32 transformLog = new GrayF32(1, 1);
+		Bitmap transformBitmap = null;
+        RectF dst = new RectF();
 
 		public LineProcessing(DetectLine<GrayU8> detector) {
 			super(ImageType.single(GrayU8.class));
@@ -186,15 +218,31 @@ public class LineDisplayActivity extends DemoCamera2Activity
 
 		@Override
 		public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
-
+            paint.setStrokeWidth(5.0f*cameraToDisplayDensity);
 		}
 
 		@Override
 		public void onDraw(Canvas canvas, Matrix imageToView) {
-			canvas.concat(imageToView);
 			synchronized (lockGui) {
-				for( LineSegment2D_F32 s : lines.toList() )  {
-					canvas.drawLine(s.a.x,s.a.y,s.b.x,s.b.y,paint);
+
+				if( showTransform && detector != null ) {
+					if( transformBitmap != null ) {
+						// TODO maintain transform image aspect ratio
+//						float scale = Math.min(canvas.getWidth()/(float)transformBitmap.getWidth(),
+//								canvas.getHeight()/(float)transformBitmap.getHeight());
+
+						dst.left = 0;
+						dst.right = canvas.getWidth();
+						dst.top = 0;
+						dst.bottom = canvas.getHeight();
+
+                        canvas.drawBitmap(transformBitmap, null,dst, null);
+                    }
+				} else {
+					canvas.concat(imageToView);
+					for( LineSegment2D_F32 s : lines.toList() )  {
+						canvas.drawLine(s.a.x,s.a.y,s.b.x,s.b.y,paint);
+					}
 				}
 			}
 		}
@@ -211,6 +259,19 @@ public class LineDisplayActivity extends DemoCamera2Activity
 						LineSegment2D_F32 ls = LineImageOps.convert(p, gray.width,gray.height);
 						lines.grow().set(ls.a,ls.b);
 					}
+
+					if( showTransform ) {
+						HoughGradient_to_DetectLine alg = (HoughGradient_to_DetectLine) detector;
+						PixelMath.log(alg.getHough().getTransform(), transformLog);
+						if( transformBitmap == null ||
+								transformBitmap.getWidth() != transformLog.getWidth() ||
+								transformBitmap.getHeight() != transformLog.getHeight() ) {
+							transformBitmap = Bitmap.createBitmap(transformLog.width,transformLog.height, Bitmap.Config.ARGB_8888);
+						}
+						float max = ImageStatistics.max(transformLog);
+						PixelMath.multiply(transformLog,255.0f/max,transformLog);
+						ConvertBitmap.grayToBitmap(transformLog,transformBitmap,null);
+                    }
 				}
 
 			} else {

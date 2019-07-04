@@ -33,6 +33,7 @@ import boofcv.abst.fiducial.calib.CalibrationDetectorCircleRegularGrid;
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
 import boofcv.abst.fiducial.calib.CalibrationPatterns;
 import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
+import boofcv.alg.feature.detect.chess.ChessboardCorner;
 import boofcv.alg.fiducial.calib.circle.DetectCircleHexagonalGrid;
 import boofcv.alg.fiducial.calib.circle.DetectCircleRegularGrid;
 import boofcv.alg.fiducial.calib.grid.DetectSquareGridFiducial;
@@ -313,9 +314,9 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 				} else if( showDetectDebug ) {
 					// show binary image to aid in debugging and detected rectangles
 					if( detector instanceof CalibrationDetectorChessboard) {
-						CalibrationObservation alg = ((CalibrationDetectorChessboard) detector).getDetectedPoints();
-						for (int i = 0; i < alg.points.size(); i++) {
-							debugPoints.add(alg.points.get(i));
+						FastQueue<ChessboardCorner> corners = ((CalibrationDetectorChessboard) detector).getDetector().getCorners();
+						for (int i = 0; i < corners.size(); i++) {
+							debugPoints.add(corners.get(i));
 						}
 						binary = ((CalibrationDetectorChessboard) detector).getDetector().getDetector().getBinary();
 					} else if( detector instanceof CalibrationDetectorSquareGrid) {

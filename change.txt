@@ -9,7 +9,10 @@ Version 2.5.0
 Date: 2019-07-03
 
 - Updated to 0.34 of BoofCV
-
+- Line detector
+  * visualization improvements
+  * Added line segment
+  * TODO fixed resolution drop
 
 -------------------------------------------------
 Version 2.4.1
