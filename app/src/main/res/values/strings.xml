@@ -120,8 +120,8 @@
     </string-array>
 
     <string-array name="line_features">
-        <item>Hough Foot</item>
         <item>Hough Polar</item>
+        <item>Hough Foot</item>
         <item>Segments</item>
     </string-array>
 

@@ -96,6 +96,8 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
 
         super.bitmapMode = BitmapMode.UNSAFE;
         super.visualizeOnlyMostRecent = true;
+
+//        super.verbose = true;
     }
 
     @Override
@@ -306,7 +308,6 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
                 Toast.makeText(DemoCamera2Activity.this,"Reducing resolution for performance",Toast.LENGTH_SHORT).show();
                 closeCamera();
                 openCamera(viewWidth,viewHeight);
-
             });
         } else {
             changeResolutionOnSlow = false;

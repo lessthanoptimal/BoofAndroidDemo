@@ -7,6 +7,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -31,7 +32,6 @@ import boofcv.alg.feature.detect.line.LineImageOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.misc.PixelMath;
 import boofcv.android.ConvertBitmap;
-import boofcv.factory.feature.detect.line.ConfigHoughBinary;
 import boofcv.factory.feature.detect.line.ConfigHoughGradient;
 import boofcv.factory.feature.detect.line.ConfigLineRansac;
 import boofcv.factory.feature.detect.line.FactoryDetectLine;
@@ -49,6 +49,7 @@ import georegression.struct.line.LineSegment2D_F32;
  */
 public class LineDisplayActivity extends DemoCamera2Activity
 		implements AdapterView.OnItemSelectedListener {
+	private static final String TAG = "LineActivity";
 
 	Paint paint;
 
@@ -71,6 +72,8 @@ public class LineDisplayActivity extends DemoCamera2Activity
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+//		Log.d(TAG,"onCreate called");
 
 		paint = new Paint();
 		paint.setColor(Color.RED);
@@ -125,8 +128,7 @@ public class LineDisplayActivity extends DemoCamera2Activity
 	}
 
 	private void setSelection( int which ) {
-		if( which == active )
-			return;
+//		Log.d(TAG,"Set selection. "+which+" "+active);
 		active = which;
 
 		createLineDetector();
@@ -137,7 +139,6 @@ public class LineDisplayActivity extends DemoCamera2Activity
 		DetectLineSegment<GrayU8> detectorSegment = null;
 
 		ConfigHoughGradient configGrad = new ConfigHoughGradient(numLines);
-		ConfigHoughBinary configBin = new ConfigHoughBinary(numLines);
 
 		configGrad.thresholdEdge = 40;
 		configGrad.localMaxRadius = 5;
@@ -145,11 +146,11 @@ public class LineDisplayActivity extends DemoCamera2Activity
 
 		switch( active ) {
 			case 0:
-				detector = FactoryDetectLine.houghLineFoot(configGrad,null,GrayU8.class);
+				detector = FactoryDetectLine.houghLinePolar(configGrad,null,GrayU8.class);
 				break;
 
 			case 1:
-				detector = FactoryDetectLine.houghLinePolar(configGrad,null,GrayU8.class);
+				detector = FactoryDetectLine.houghLineFoot(configGrad,null,GrayU8.class);
 				break;
 
 			case 2: {
@@ -162,6 +163,7 @@ public class LineDisplayActivity extends DemoCamera2Activity
 				throw new RuntimeException("Unknown selection");
 		}
 
+		Log.d(TAG,"setProcessing(stuff)");
 		if( detector != null )
 			setProcessing(new LineProcessing(detector));
 		else {
@@ -215,14 +217,20 @@ public class LineDisplayActivity extends DemoCamera2Activity
 			this.detectorSegment = detectorSegment;
 		}
 
-
 		@Override
 		public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
+//			Log.d(TAG,"initialize "+imageWidth);
             paint.setStrokeWidth(5.0f*cameraToDisplayDensity);
+			synchronized (lockGui) {
+				transformBitmap = null;
+				showTransform = false;
+			}
 		}
 
 		@Override
 		public void onDraw(Canvas canvas, Matrix imageToView) {
+//			Log.d(TAG,"onDraw ");
+
 			synchronized (lockGui) {
 
 				if( showTransform && detector != null ) {
@@ -249,6 +257,7 @@ public class LineDisplayActivity extends DemoCamera2Activity
 
 		@Override
 		public void process(GrayU8 gray) {
+//			Log.d(TAG,"process ");
 
 			if( detector != null ) {
 				List<LineParametric2D_F32> found = detector.detect(gray);

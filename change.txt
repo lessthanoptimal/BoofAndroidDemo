@@ -6,13 +6,13 @@ TODO improve performance by removing locks from visualization
 
 -------------------------------------------------
 Version 2.5.0
-Date: 2019-07-03
+Date: 2019-07-07
 
 - Updated to 0.34 of BoofCV
 - Line detector
-  * visualization improvements
+  * Visualization improvements
   * Added line segment
-  * TODO fixed resolution drop
+  * Fixed resolution reduction issue
 
 -------------------------------------------------
 Version 2.4.1
