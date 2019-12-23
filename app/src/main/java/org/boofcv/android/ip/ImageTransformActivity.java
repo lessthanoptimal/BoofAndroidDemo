@@ -123,7 +123,7 @@ public class ImageTransformActivity extends DemoBitmapCamera2Activity
 			dft.forward(grayF, transform);
 			DiscreteFourierTransformOps.shiftZeroFrequency(transform, true);
 			DiscreteFourierTransformOps.magnitude(transform, grayF);
-			PixelMath.log(grayF,grayF);
+			PixelMath.log(grayF,1.0f,grayF);
 			float max = ImageStatistics.maxAbs(grayF);
 			PixelMath.multiply(grayF, 255f / max, grayF);
 			ConvertBitmap.grayToBitmap(grayF, bitmap, bitmapTmp);

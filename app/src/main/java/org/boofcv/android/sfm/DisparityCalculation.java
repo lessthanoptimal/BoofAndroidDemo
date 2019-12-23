@@ -16,12 +16,10 @@ import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.disparity.StereoDisparity;
 import boofcv.alg.descriptor.UtilFeature;
 import boofcv.alg.distort.ImageDistort;
-import boofcv.alg.filter.derivative.DerivativeLaplacian;
 import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.alg.geo.robust.ModelMatcherMultiview;
-import boofcv.alg.misc.ImageMiscOps;
 import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.factory.geo.ConfigEssential;
 import boofcv.factory.geo.ConfigRansac;
@@ -34,6 +32,8 @@ import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
 import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageDimension;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
@@ -46,11 +46,11 @@ import georegression.struct.se.Se3_F64;
  */
 public class DisparityCalculation<Desc extends TupleDesc> {
 
-	DetectDescribePoint<GrayF32,Desc> detDesc;
+	DetectDescribePoint<GrayU8,Desc> detDesc;
 	AssociateDescription<Desc> associate;
 	CameraPinholeBrown intrinsic;
 
-	StereoDisparity<GrayF32, GrayF32> disparityAlg;
+	StereoDisparity<GrayU8, GrayF32> disparityAlg;
 
 	FastQueue<Desc> listSrc;
 	FastQueue<Desc> listDst;
@@ -59,21 +59,16 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 
 	List<AssociatedPair> inliersPixel;
 
-	boolean directionLeftToRight;
+	GrayU8 distortedLeft;
+	GrayU8 distortedRight;
+	GrayU8 rectifiedLeft;
+	GrayU8 rectifiedRight;
 
-	GrayF32 distortedLeft;
-	GrayF32 distortedRight;
-	GrayF32 rectifiedLeft;
-	GrayF32 rectifiedRight;
-
-	// Laplacian that has been applied to rectified images
-	GrayF32 edgeLeft;
-	GrayF32 edgeRight;
 
 	// has the disparity been computed
 	boolean computedDisparity = false;
 
-	public DisparityCalculation(DetectDescribePoint<GrayF32, Desc> detDesc,
+	public DisparityCalculation(DetectDescribePoint<GrayU8, Desc> detDesc,
 								AssociateDescription<Desc> associate ,
 								CameraPinholeBrown intrinsic ) {
 		this.detDesc = detDesc;
@@ -84,27 +79,25 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 		listDst = UtilFeature.createQueue(detDesc, 10);
 	}
 
-	public void setDisparityAlg(StereoDisparity<GrayF32, GrayF32> disparityAlg) {
+	public void setDisparityAlg(StereoDisparity<GrayU8, GrayF32> disparityAlg) {
 		this.disparityAlg = disparityAlg;
 	}
 
 	public void init( int width , int height ) {
-		distortedLeft = new GrayF32(width,height);
-		distortedRight = new GrayF32(width,height);
-		rectifiedLeft = new GrayF32(width,height);
-		rectifiedRight = new GrayF32(width,height);
-		edgeLeft = new GrayF32(width,height);
-		edgeRight = new GrayF32(width,height);
+		distortedLeft = new GrayU8(width,height);
+		distortedRight = new GrayU8(width,height);
+		rectifiedLeft = new GrayU8(width,height);
+		rectifiedRight = new GrayU8(width,height);
 	}
 
-	public void setSource( GrayF32 image ) {
+	public void setSource( GrayU8 image ) {
 		distortedLeft.setTo(image);
 		detDesc.detect(image);
 		describeImage(listSrc, locationSrc);
 		associate.setSource(listSrc);
 	}
 
-	public void setDestination( GrayF32 image ) {
+	public void setDestination( GrayU8 image ) {
 		distortedRight.setTo(image);
 		detDesc.detect(image);
 		describeImage(listDst, locationDst);
@@ -143,19 +136,6 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 			Log.e("disparity","  pairs.size = "+pairs.size());
 
 			return false;
-		} else if( leftToRight.getT().x > 0 ) {
-			// the user took a picture from right to left instead of left to right
-			// so now everything needs to be swapped
-			leftToRight = leftToRight.invert(null);
-			GrayF32 tmp = distortedLeft;
-			distortedLeft = distortedRight;
-			distortedRight = tmp;
-			tmp = edgeLeft;
-			edgeLeft = edgeRight;
-			edgeRight = tmp;
-			directionLeftToRight = false;
-		} else {
-			directionLeftToRight = true;
 		}
 
 		DMatrixRMaj rectifiedK = new DMatrixRMaj(3,3);
@@ -171,7 +151,7 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 		if( disparityAlg == null )
 			return;
 
-		disparityAlg.process(edgeLeft, edgeRight);
+		disparityAlg.process(rectifiedLeft, rectifiedRight);
 		computedDisparity = true;
 	}
 
@@ -267,6 +247,7 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 		rectifyAlg.process(K, new Se3_F64(), K, leftToRight);
 
 		// rectification matrix for each image
+		DMatrixRMaj rectRot = rectifyAlg.getRectifiedRotation();
 		DMatrixRMaj rect1 = rectifyAlg.getRect1();
 		DMatrixRMaj rect2 = rectifyAlg.getRect2();
 
@@ -280,22 +261,21 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 		rectifiedK.set(rectifyAlg.getCalibrationMatrix());
 
 		// Adjust the rectification to make the view area more useful
-//		RectifyImageOps.allInsideLeft(intrinsic, rect1, rect2, rectifiedK);
+		ImageDimension rectShape = new ImageDimension();
+		RectifyImageOps.fullViewLeft(intrinsic, rectRot, rect1, rect2, rectifiedK, rectShape);
+
+		rectifiedLeft.reshape(rectShape.width,rectShape.height);
+		rectifiedRight.reshape(rectShape.width,rectShape.height);
 
 		// undistorted and rectify images
-		ImageDistort<GrayF32,GrayF32> distortLeft =
-				RectifyImageOps.rectifyImage(intrinsic, rect1_f, BorderType.ZERO, ImageType.single(GrayF32.class));
-		ImageDistort<GrayF32,GrayF32> distortRight =
-				RectifyImageOps.rectifyImage(intrinsic, rect2_f, BorderType.ZERO, ImageType.single(GrayF32.class));
+		ImageDistort<GrayU8,GrayU8> distortLeft =
+				RectifyImageOps.rectifyImage(intrinsic, rect1_f, BorderType.EXTENDED, ImageType.single(GrayU8.class));
+		ImageDistort<GrayU8,GrayU8> distortRight =
+				RectifyImageOps.rectifyImage(intrinsic, rect2_f, BorderType.EXTENDED, ImageType.single(GrayU8.class));
 
 		// Apply the Laplacian for some lighting invariance
-		ImageMiscOps.fill(rectifiedLeft,0);
 		distortLeft.apply(distortedLeft, rectifiedLeft);
-		DerivativeLaplacian.process(rectifiedLeft,edgeLeft,null);
-
-		ImageMiscOps.fill(rectifiedRight, 0);
 		distortRight.apply(distortedRight, rectifiedRight);
-		DerivativeLaplacian.process(rectifiedRight,edgeRight,null);
 	}
 
 	public List<AssociatedPair> getInliersPixel() {
@@ -306,7 +286,7 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 		return disparityAlg.getDisparity();
 	}
 
-	public StereoDisparity<GrayF32, GrayF32> getDisparityAlg() {
+	public StereoDisparity<GrayU8, GrayF32> getDisparityAlg() {
 		return disparityAlg;
 	}
 
@@ -314,7 +294,4 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 		return computedDisparity;
 	}
 
-	public boolean isDirectionLeftToRight() {
-		return directionLeftToRight;
-	}
 }

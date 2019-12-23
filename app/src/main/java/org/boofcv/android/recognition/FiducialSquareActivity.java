@@ -27,7 +27,7 @@ import boofcv.abst.fiducial.CalibrationFiducialDetector;
 import boofcv.abst.fiducial.FiducialDetector;
 import boofcv.abst.fiducial.FiducialStability;
 import boofcv.abst.fiducial.SquareBase_to_FiducialDetector;
-import boofcv.abst.fiducial.calib.CalibrationDetectorChessboard;
+import boofcv.abst.fiducial.calib.CalibrationDetectorChessboardX;
 import boofcv.abst.fiducial.calib.CalibrationDetectorCircleHexagonalGrid;
 import boofcv.abst.fiducial.calib.CalibrationDetectorCircleRegularGrid;
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
@@ -266,8 +266,8 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 				GrayU8 binary;
 				if (detector instanceof CalibrationFiducialDetector) {
 					DetectorFiducialCalibration a = ((CalibrationFiducialDetector) detector).getCalibDetector();
-					if (a instanceof CalibrationDetectorChessboard) {
-						binary = ((CalibrationDetectorChessboard) a).getDetector().getDetector().getBinary();
+					if (a instanceof CalibrationDetectorChessboardX) {
+						binary = null;
 					} else if( a instanceof CalibrationDetectorSquareGrid ){
 						binary = ((CalibrationDetectorSquareGrid) a).getAlgorithm().getBinary();
 					} else if( a instanceof CalibrationDetectorCircleHexagonalGrid){
@@ -280,7 +280,10 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 				} else {
 					binary = ((SquareBase_to_FiducialDetector) detector).getAlgorithm().getBinary();
 				}
-				VisualizeImageData.binaryToBitmap(binary, false,bitmap, bitmapTmp);
+				if( binary != null )
+					VisualizeImageData.binaryToBitmap(binary, false,bitmap, bitmapTmp);
+				else
+					ConvertBitmap.boofToBitmap(input, bitmap, bitmapTmp);
 			}
 
 			// save the results for displaying in the UI thread

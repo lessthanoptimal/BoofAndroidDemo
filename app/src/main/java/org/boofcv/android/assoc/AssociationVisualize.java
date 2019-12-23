@@ -16,7 +16,8 @@ import java.util.Random;
 
 import boofcv.android.ConvertBitmap;
 import boofcv.struct.geo.AssociatedPair;
-import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.ImageGray;
+import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 
 /**
@@ -24,7 +25,7 @@ import georegression.struct.point.Point2D_F64;
  *
  * @author Peter Abeles
  */
-public class AssociationVisualize {
+public class AssociationVisualize<T extends ImageGray<T>> {
 
 	// seperation between the two images
 	public int SEPARATION;
@@ -40,8 +41,8 @@ public class AssociationVisualize {
 	public boolean hasLeft = false;
 	public boolean hasRight = false;
 
-	public GrayF32 graySrc;
-	public GrayF32 grayDst;
+	public T graySrc;
+	public T grayDst;
 	public Bitmap bitmapSrc;
 	public Bitmap bitmapDst;
 	public byte[] storage;
@@ -82,21 +83,16 @@ public class AssociationVisualize {
 	/**
 	 * Specifies size of input image and predeclares data structures
 	 */
-	public void initializeImages( int width , int height ) {
+	public void initializeImages( int width , int height , ImageType<T> imageType ) {
 		if( graySrc != null && graySrc.width == width && graySrc.height == height )
 			return;
 
-		graySrc = new GrayF32(width,height);
-		grayDst = new GrayF32(width,height);
+		graySrc = imageType.createImage(width,height);
+		grayDst = imageType.createImage(width,height);
 
 		bitmapSrc = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 		bitmapDst = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 		storage = ConvertBitmap.declareStorage(bitmapSrc, storage);
-
-		SEPARATION = (int)(width*0.05);
-
-		renderWidth = width*2 + SEPARATION;
-		renderHeight = height;
 	}
 
 	public int getOutputWidth() {
@@ -160,7 +156,7 @@ public class AssociationVisualize {
 	/**
 	 * Set the source (left) image
 	 */
-	public void setSource( GrayF32 image ) {
+	public void setSource( T image ) {
 		locationSrc.clear();
 		locationDst.clear();
 
@@ -176,7 +172,7 @@ public class AssociationVisualize {
 	/**
 	 * Set the destination (right) image
 	 */
-	public void setDestination( GrayF32 image ) {
+	public void setDestination( T image ) {
 		locationSrc.clear();
 		locationDst.clear();
 
@@ -218,6 +214,11 @@ public class AssociationVisualize {
 	}
 
 	public void render( View view , Canvas canvas , boolean showLeft , boolean showRight) {
+		SEPARATION = (int)(bitmapSrc.getWidth()*0.05);
+
+		renderWidth = bitmapSrc.getWidth()+bitmapDst.getWidth() + SEPARATION;
+		renderHeight = Math.max(bitmapSrc.getHeight(),bitmapDst.getHeight());
+
 		scale = Math.min(view.getWidth()/(double)renderWidth,view.getHeight()/(double)renderHeight);
 		tranX = (view.getWidth()-scale*renderWidth)/2;
 		tranY = (view.getHeight()-scale*renderHeight)/2;

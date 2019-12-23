@@ -271,7 +271,7 @@ public class LineDisplayActivity extends DemoCamera2Activity
 
 					if( showTransform ) {
 						HoughGradient_to_DetectLine alg = (HoughGradient_to_DetectLine) detector;
-						PixelMath.log(alg.getHough().getTransform(), transformLog);
+						PixelMath.log(alg.getHough().getTransform(), 1.0f,transformLog);
 						if( transformBitmap == null ||
 								transformBitmap.getWidth() != transformLog.getWidth() ||
 								transformBitmap.getHeight() != transformLog.getHeight() ) {

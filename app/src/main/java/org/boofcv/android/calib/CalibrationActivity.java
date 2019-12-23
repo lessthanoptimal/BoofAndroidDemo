@@ -27,7 +27,7 @@ import org.ddogleg.struct.FastQueue;
 import java.util.ArrayList;
 import java.util.List;
 
-import boofcv.abst.fiducial.calib.CalibrationDetectorChessboard;
+import boofcv.abst.fiducial.calib.CalibrationDetectorChessboardX;
 import boofcv.abst.fiducial.calib.CalibrationDetectorCircleHexagonalGrid;
 import boofcv.abst.fiducial.calib.CalibrationDetectorCircleRegularGrid;
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
@@ -148,7 +148,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 		DetectorFiducialCalibration detector;
 
 		if( cc.targetType == CalibrationPatterns.CHESSBOARD ) {
-			detector = FactoryFiducialCalibration.chessboard(null,cc.chessboard);
+			detector = FactoryFiducialCalibration.chessboardX(null,cc.chessboard);
 		} else if( cc.targetType == CalibrationPatterns.SQUARE_GRID ) {
 			detector = FactoryFiducialCalibration.squareGrid(null,cc.squareGrid);
 		} else if( cc.targetType == CalibrationPatterns.CIRCLE_HEXAGONAL ){
@@ -313,12 +313,12 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 						pointsGui.grow().set(p);
 				} else if( showDetectDebug ) {
 					// show binary image to aid in debugging and detected rectangles
-					if( detector instanceof CalibrationDetectorChessboard) {
-						FastQueue<ChessboardCorner> corners = ((CalibrationDetectorChessboard) detector).getDetector().getCorners();
+					if( detector instanceof CalibrationDetectorChessboardX) {
+						FastQueue<ChessboardCorner> corners = ((CalibrationDetectorChessboardX) detector).getDetector().getCorners();
 						for (int i = 0; i < corners.size(); i++) {
 							debugPoints.add(corners.get(i));
 						}
-						binary = ((CalibrationDetectorChessboard) detector).getDetector().getDetector().getBinary();
+						binary = null;
 					} else if( detector instanceof CalibrationDetectorSquareGrid) {
 						DetectSquareGridFiducial<GrayF32> alg = ((CalibrationDetectorSquareGrid) detector).getAlgorithm();
 						extractQuads(alg.getDetectorSquare().getPolygons(null,null));

@@ -46,7 +46,7 @@ public class AssociationActivity extends DemoCamera2Activity
 	Spinner spinnerDesc;
 	Spinner spinnerDet;
 
-	AssociationVisualize visualize;
+	AssociationVisualize<GrayF32> visualize;
 	// if true the algorithm changed and it should reprocess the images it has in memory
 	boolean changedAlg = false;
 
@@ -187,7 +187,7 @@ public class AssociationActivity extends DemoCamera2Activity
 
 		@Override
 		public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
-			visualize.initializeImages( imageWidth, imageHeight );
+			visualize.initializeImages( imageWidth, imageHeight , ImageType.SB_F32);
 			changedAlg = true;
 		}
 

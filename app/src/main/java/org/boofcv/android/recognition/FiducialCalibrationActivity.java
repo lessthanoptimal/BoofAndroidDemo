@@ -36,7 +36,7 @@ public class FiducialCalibrationActivity extends FiducialSquareActivity {
 	protected FiducialDetector<GrayU8> createDetector() {
 
 		if( cc.targetType == CalibrationPatterns.CHESSBOARD ) {
-			return FactoryFiducial.calibChessboard(null,cc.chessboard, GrayU8.class);
+			return FactoryFiducial.calibChessboardX(null,cc.chessboard, GrayU8.class);
 		} else if( cc.targetType == CalibrationPatterns.SQUARE_GRID ) {
 			return FactoryFiducial.calibSquareGrid(null,cc.squareGrid, GrayU8.class);
 		} else if( cc.targetType == CalibrationPatterns.CIRCLE_HEXAGONAL ) {

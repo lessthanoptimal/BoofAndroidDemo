@@ -1,5 +1,6 @@
 package org.boofcv.android.sfm;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -29,11 +30,17 @@ import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
-import boofcv.factory.feature.disparity.DisparityAlgorithms;
+import boofcv.factory.feature.disparity.ConfigDisparityBM;
+import boofcv.factory.feature.disparity.ConfigDisparityBMBest5;
+import boofcv.factory.feature.disparity.ConfigDisparitySGM;
+import boofcv.factory.feature.disparity.DisparityError;
+import boofcv.factory.feature.disparity.DisparitySgmError;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageType;
 
 /**
  * Computes the stereo disparity between two images captured by the camera.  The user selects the images and which
@@ -47,7 +54,7 @@ public class DisparityActivity extends DemoCamera2Activity
 	Spinner spinnerView;
 	Spinner spinnerAlgs;
 
-	AssociationVisualize visualize;
+	AssociationVisualize<GrayU8> visualize;
 
 	// indicate where the user touched the screen
 	volatile int touchEventType = 0;
@@ -190,37 +197,50 @@ public class DisparityActivity extends DemoCamera2Activity
 	}
 
 
-	protected class DisparityProcessing extends DemoProcessingAbstract<GrayF32> {
+	protected class DisparityProcessing extends DemoProcessingAbstract<GrayU8> {
 
 		DisparityCalculation<BrightFeature> disparity;
 
 		GrayF32 disparityImage;
-		int disparityMin,disparityMax;
+		int disparityMin, disparityRange;
 		CameraPinholeBrown intrinsic;
 
 		public DisparityProcessing() {
-			super(GrayF32.class);
+			super(GrayU8.class);
 		}
 
-		private StereoDisparity<GrayF32, GrayF32> createDisparity() {
+		private StereoDisparity<GrayU8, GrayF32> createDisparity() {
 
-			DisparityAlgorithms which;
 			switch( changeDisparityAlg ) {
-				case 0:
-					which = DisparityAlgorithms.RECT;
-					break;
-
-				case 1:
-					which = DisparityAlgorithms.RECT_FIVE;
-					break;
+				case 0: {
+					ConfigDisparityBM config = new ConfigDisparityBM();
+					config.disparityMin = 5;
+					config.disparityRange = 120;
+					config.errorType = DisparityError.CENSUS;
+					config.subpixel = true;
+					return FactoryStereoDisparity.blockMatch(config,GrayU8.class,GrayF32.class);
+				}
+				case 1: {
+					ConfigDisparityBMBest5 config = new ConfigDisparityBMBest5();
+					config.disparityMin = 5;
+					config.disparityRange = 120;
+					config.errorType = DisparityError.CENSUS;
+					config.subpixel = true;
+					return FactoryStereoDisparity.blockMatchBest5(config,GrayU8.class,GrayF32.class);
+				}
+				case 2: {
+					ConfigDisparitySGM config = new ConfigDisparitySGM();
+					config.disparityMin = 0;
+					config.disparityRange = 120;
+					config.errorType = DisparitySgmError.CENSUS;
+					config.useBlocks = true;
+					config.subpixel = true;
+					return FactoryStereoDisparity.sgm(config,GrayU8.class,GrayF32.class);
+				}
 
 				default:
 					throw new RuntimeException("Unknown algorithm "+changeDisparityAlg);
 			}
-
-
-			return FactoryStereoDisparity.regionSubpixelWta(which,
-					5, 120, 5, 5, 100, 1, 0.1, GrayF32.class);
 		}
 
 		@Override
@@ -230,8 +250,8 @@ public class DisparityActivity extends DemoCamera2Activity
 
 			intrinsic = lookupIntrinsics();
 
-			DetectDescribePoint<GrayF32, BrightFeature> detDesc =
-					FactoryDetectDescribe.surfFast(null,null,null,GrayF32.class);
+			DetectDescribePoint<GrayU8, BrightFeature> detDesc =
+					FactoryDetectDescribe.surfFast(null,null,null,GrayU8.class);
 
 			ScoreAssociation<BrightFeature> score = FactoryAssociation.defaultScore(BrightFeature.class);
 			AssociateDescription<BrightFeature> associate =
@@ -239,12 +259,15 @@ public class DisparityActivity extends DemoCamera2Activity
 
 			disparity = new DisparityCalculation<>(detDesc, associate, intrinsic);
 			disparityImage = new GrayF32(imageWidth,imageHeight);
-			visualize.initializeImages( imageWidth, imageHeight );
+			visualize.initializeImages( imageWidth, imageHeight , ImageType.SB_U8);
 			disparity.init(imageWidth,imageHeight);
 		}
 
 		@Override
 		public void onDraw(Canvas canvas, Matrix imageToView) {
+			// TODO Redo all of this it's a mess
+			// TODO add a preview image when selecting the view
+			// TODO show a 3D view of the disparity too. Tap to toggle to it?
 			if( intrinsic == null ) {
 				Paint paint = new Paint();
 				paint.setColor(Color.RED);
@@ -254,16 +277,30 @@ public class DisparityActivity extends DemoCamera2Activity
 				canvas.drawText("Calibrate Camera First", (canvas.getWidth() - textLength) / 2, canvas.getHeight() / 2, paint);
 			} else if( activeView == DView.DISPARITY ) {
 				// draw rectified image
+				int w = disparity.rectifiedLeft.width;
+				int h = disparity.rectifiedLeft.height;
+				Bitmap left =  Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+				Bitmap right =  Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+				visualize.bitmapSrc = left;
+				visualize.bitmapDst = right;
+
 				ConvertBitmap.grayToBitmap(disparity.rectifiedLeft, visualize.bitmapSrc, visualize.storage);
 
 				if( disparity.isDisparityAvailable() ) {
-					VisualizeImageData.disparity(disparityImage,disparityMin,disparityMax,0,
+					VisualizeImageData.disparity(disparityImage,disparityMin, disparityRange,0,
 							visualize.bitmapDst,visualize.storage);
 
 					visualize.render(displayView,canvas,true,true);
 				}
 			} else if( activeView == DView.RECTIFICATION ) {
 				canvas.save();
+				int w = disparity.rectifiedLeft.width;
+				int h = disparity.rectifiedLeft.height;
+				Bitmap left =  Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+				Bitmap right =  Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+				visualize.bitmapSrc = left;
+				visualize.bitmapDst = right;
+
 				ConvertBitmap.grayToBitmap(disparity.rectifiedLeft,visualize.bitmapSrc,visualize.storage);
 				ConvertBitmap.grayToBitmap(disparity.rectifiedRight,visualize.bitmapDst,visualize.storage);
 
@@ -278,6 +315,13 @@ public class DisparityActivity extends DemoCamera2Activity
 					canvas.drawLine(0,touchY,canvas.getWidth(),touchY,paint);
 				}
 			} else {
+				int w = visualize.graySrc.width;
+				int h = visualize.graySrc.height;
+				Bitmap left =  Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+				Bitmap right =  Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+				visualize.bitmapSrc = left;
+				visualize.bitmapDst = right;
+
 				// bit of a hack to reduce memory usage
 				ConvertBitmap.grayToBitmap(visualize.graySrc,visualize.bitmapSrc,visualize.storage);
 				ConvertBitmap.grayToBitmap(visualize.grayDst,visualize.bitmapDst,visualize.storage);
@@ -287,7 +331,7 @@ public class DisparityActivity extends DemoCamera2Activity
 		}
 
 		@Override
-		public void process(GrayF32 gray) {
+		public void process(GrayU8 gray) {
 
 			if( intrinsic == null )
 				return;
@@ -300,12 +344,7 @@ public class DisparityActivity extends DemoCamera2Activity
 					reset = false;
 					visualize.setSource(null);
 					visualize.setDestination(null);
-					runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							spinnerView.setSelection(0);
-						}
-					});
+					runOnUiThread(() -> spinnerView.setSelection(0));
 
 				}
 				if( touchEventType == 1 ) {
@@ -359,8 +398,8 @@ public class DisparityActivity extends DemoCamera2Activity
 						setProgressMessage("Disparity", false);
 						disparity.computeDisparity();
 						synchronized ( lockGui ) {
-							disparityMin = disparity.getDisparityAlg().getMinDisparity();
-							disparityMax = disparity.getDisparityAlg().getMaxDisparity();
+							disparityMin = disparity.getDisparityAlg().getDisparityMin();
+							disparityRange = disparity.getDisparityAlg().getDisparityRange();
 							disparityImage.setTo(disparity.getDisparity());
 							visualize.setMatches(disparity.getInliersPixel());
 							visualize.forgetSelection();
@@ -382,8 +421,8 @@ public class DisparityActivity extends DemoCamera2Activity
 					disparity.computeDisparity();
 
 					synchronized ( lockGui ) {
-						disparityMin = disparity.getDisparityAlg().getMinDisparity();
-						disparityMax = disparity.getDisparityAlg().getMaxDisparity();
+						disparityMin = disparity.getDisparityAlg().getDisparityMin();
+						disparityRange = disparity.getDisparityAlg().getDisparityRange();
 						disparityImage.setTo(disparity.getDisparity());
 					}
 				}

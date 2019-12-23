@@ -152,8 +152,21 @@
     </string-array>
 
     <string-array name="disparity_algs">
-        <item>Rect</item>
-        <item>5-Rect</item>
+        <item>BlockMatch</item>
+        <item>BlockMatch5</item>
+        <item>SGM</item>
+    </string-array>
+
+    <string-array name="disparity_bm_errors">
+        <item>Census</item>
+        <item>NCC</item>
+        <item>SAD</item>
+    </string-array>
+
+    <string-array name="disparity_sgm_errors">
+        <item>Census</item>
+        <item>HMI</item>
+        <item>SAD</item>
     </string-array>
 
     <string-array name="segmentation_algs">
