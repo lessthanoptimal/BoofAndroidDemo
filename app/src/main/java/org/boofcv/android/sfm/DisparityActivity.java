@@ -345,7 +345,6 @@ public class DisparityActivity extends DemoCamera2Activity
 					visualize.setSource(null);
 					visualize.setDestination(null);
 					runOnUiThread(() -> spinnerView.setSelection(0));
-
 				}
 				if( touchEventType == 1 ) {
 					// first see if there are any features to select
@@ -382,6 +381,8 @@ public class DisparityActivity extends DemoCamera2Activity
 					visualize.setSource(gray);
 				} else if( target == 2 ) {
 					visualize.setDestination(gray);
+				} else {
+					visualize.setPreview(gray);
 				}
 			}
 

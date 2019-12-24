@@ -5,13 +5,13 @@ Change Log for BoofCV Demonstration App
 TODO improve performance by removing locks from visualization
 
 -------------------------------------------------
-Version 2.5.0
+Version 2.6.0
 Date:
 
 - Updated to 0.35 of BoofCV
+- Associated View now shows a preview
 - TODO Stereo
   * Fix instability caused by dynamic rectified shape
-  * Preview image
   * Select error types
   * Support image type based on selected algoritghm, e.g. F32 for NCC
   * Show a 3D image

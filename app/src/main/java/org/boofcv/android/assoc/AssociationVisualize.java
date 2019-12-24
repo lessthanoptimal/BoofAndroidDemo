@@ -40,6 +40,8 @@ public class AssociationVisualize<T extends ImageGray<T>> {
 
 	public boolean hasLeft = false;
 	public boolean hasRight = false;
+	public boolean hasPreviewLeft = false;
+	public boolean hasPreviewRight = false;
 
 	public T graySrc;
 	public T grayDst;
@@ -75,9 +77,8 @@ public class AssociationVisualize<T extends ImageGray<T>> {
 		paintWideLine.setStrokeWidth(3);
 
 		textPaint.setColor(Color.CYAN);
-		textPaint.setTextSize(14*metrics.density);
-
-		paintLine.setStrokeWidth(2);
+		textPaint.setTextSize(16*metrics.density);
+		paintLine.setStrokeWidth(3);
 	}
 
 	/**
@@ -153,6 +154,18 @@ public class AssociationVisualize<T extends ImageGray<T>> {
 		return false;
 	}
 
+	public void setPreview( T image ) {
+		if( !hasLeft ) {
+			hasPreviewLeft = true;
+			graySrc.setTo(image);
+			ConvertBitmap.grayToBitmap(image, bitmapSrc, storage);
+		} else if( !hasRight ){
+			hasPreviewRight = true;
+			grayDst.setTo(image);
+			ConvertBitmap.grayToBitmap(image, bitmapDst, storage);
+		}
+	}
+
 	/**
 	 * Set the source (left) image
 	 */
@@ -161,6 +174,7 @@ public class AssociationVisualize<T extends ImageGray<T>> {
 		locationDst.clear();
 
 		if( image == null ) {
+			hasPreviewLeft = false;
 			hasLeft = false;
 		} else {
 			hasLeft = true;
@@ -177,6 +191,7 @@ public class AssociationVisualize<T extends ImageGray<T>> {
 		locationDst.clear();
 
 		if( image == null ) {
+			hasPreviewRight = false;
 			hasRight = false;
 		} else {
 			hasRight = true;
@@ -186,7 +201,7 @@ public class AssociationVisualize<T extends ImageGray<T>> {
 	}
 
 	public void render(View view , Canvas canvas) {
-		render(view,canvas,hasLeft,hasRight);
+		render(view,canvas,hasLeft|hasPreviewLeft,hasRight|hasPreviewRight);
 
 		int startX = bitmapSrc.getWidth()+SEPARATION;
 		// draw features and matches

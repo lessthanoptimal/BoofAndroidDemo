@@ -259,6 +259,8 @@ public class AssociationActivity extends DemoCamera2Activity
 				detDesc.detect(gray);
 				describeImage(listDst, locationDst);
 				computedFeatures = true;
+			} else {
+				visualize.setPreview(gray);
 			}
 
 			synchronized ( lockGui ) {

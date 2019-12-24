@@ -67,8 +67,6 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 	// if false it won't process images
 	protected volatile boolean detectFiducial = true;
 
-	protected boolean disableControls = false;
-
 	// Which layout it should use
 	int layout = R.layout.fiducial_controls;
 
@@ -88,40 +86,40 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 		final ToggleButton toggle = controls.findViewById(R.id.toggle_robust);
 		final SeekBar seek = controls.findViewById(R.id.slider_threshold);
 
-		if( disableControls ) {
-			toggle.setEnabled(false);
-			seek.setEnabled(false);
-		} else {
-			robust = toggle.isChecked();
-			binaryThreshold = seek.getProgress();
-
-			seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-				@Override
-				public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-					synchronized (lock) {
-						binaryThreshold = progress;
-						createNewProcessor();
-					}
-				}
-				@Override public void onStartTrackingTouch(SeekBar seekBar) {}
-				@Override public void onStopTrackingTouch(SeekBar seekBar) {}
-			});
-			toggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                synchronized (lock) {
-                    robust = isChecked;
-                    if (robust) {
-                        seek.setEnabled(false);
-                    } else {
-                        seek.setEnabled(true);
-                    }
-					createNewProcessor();
-                }
-            });
-		}
+		configureControls(toggle, seek);
 
 		setControls(controls);
 		displayView.setOnTouchListener(this);
 	}
+
+	protected void configureControls(ToggleButton toggle, SeekBar seek) {
+		robust = toggle.isChecked();
+		binaryThreshold = seek.getProgress();
+
+		seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+			@Override
+			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+				synchronized (lock) {
+					binaryThreshold = progress;
+					createNewProcessor();
+				}
+			}
+			@Override public void onStartTrackingTouch(SeekBar seekBar) {}
+			@Override public void onStopTrackingTouch(SeekBar seekBar) {}
+		});
+		toggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
+			synchronized (lock) {
+				robust = isChecked;
+				if (robust) {
+					seek.setEnabled(false);
+				} else {
+					seek.setEnabled(true);
+				}
+				createNewProcessor();
+			}
+		});
+	}
+
 
 	public void pressedHelp( View view ) {
 		Intent intent = new Intent(this, help );
