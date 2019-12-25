@@ -149,6 +149,7 @@
         <item>Association</item>
         <item>Rectification</item>
         <item>Disparity</item>
+        <item>Cloud 3D</item>
     </string-array>
 
     <string-array name="disparity_algs">

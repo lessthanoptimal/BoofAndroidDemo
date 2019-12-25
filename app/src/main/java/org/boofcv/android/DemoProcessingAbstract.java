@@ -2,6 +2,7 @@ package org.boofcv.android;
 
 import boofcv.alg.color.ColorFormat;
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageInterleaved;
 import boofcv.struct.image.ImageType;
 
 public abstract class DemoProcessingAbstract<T extends ImageBase<T>> implements DemoProcessing<T> {
@@ -18,7 +19,11 @@ public abstract class DemoProcessingAbstract<T extends ImageBase<T>> implements 
     }
 
     public DemoProcessingAbstract( Class type , int numBands ) {
-        imageType = ImageType.pl(numBands,type);
+        if( ImageInterleaved.class.isAssignableFrom(type) ) {
+            imageType = ImageType.il(numBands, type);
+        } else {
+            imageType = ImageType.pl(numBands, type);
+        }
     }
 
     @Override

@@ -53,7 +53,6 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 	CameraPinholeBrown intrinsic;
 
 	StereoDisparity<?, GrayF32> disparityAlg;
-    GrayF32 disparity;
 
 	FastQueue<Desc> listSrc;
 	FastQueue<Desc> listDst;
@@ -62,6 +61,8 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 
 	List<AssociatedPair> inliersPixel;
 
+	RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();
+
 	// mask that indicates which pixels are inside the image and which ones are outside
 	GrayU8 rectMask = new GrayU8(1,1);
 
@@ -69,6 +70,10 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 	GrayU8 distortedRight;
 	GrayU8 rectifiedLeft;
 	GrayU8 rectifiedRight;
+
+	// the new rectification matricies after they have been adjusted
+	DMatrixRMaj rectifiedK = new DMatrixRMaj(3,3);
+	DMatrixRMaj rectifiedR = new DMatrixRMaj(3,3);
 
 
 	// has the disparity been computed
@@ -144,8 +149,7 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 			return false;
 		}
 
-		DMatrixRMaj rectifiedK = new DMatrixRMaj(3,3);
-		rectifyImages(leftToRight, rectifiedK);
+		rectifyImages(leftToRight);
 
 		return true;
 	}
@@ -258,46 +262,42 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 	 * Remove lens distortion and rectify stereo images
 	 *
 	 * @param leftToRight    Camera motion from left to right
-	 * @param rectifiedK     Output camera calibration matrix for rectified camera
 	 */
-	public void rectifyImages(Se3_F64 leftToRight,
-							  DMatrixRMaj rectifiedK) {
-		RectifyCalibrated rectifyAlg = RectifyImageOps.createCalibrated();
-
+	public void rectifyImages(Se3_F64 leftToRight)
+	{
 		// original camera calibration matrices
 		DMatrixRMaj K = PerspectiveOps.pinholeToMatrix(intrinsic, (DMatrixRMaj)null);
 
 		rectifyAlg.process(K, new Se3_F64(), K, leftToRight);
 
 		// rectification matrix for each image
-		DMatrixRMaj rectRot = rectifyAlg.getRectifiedRotation();
 		DMatrixRMaj rect1 = rectifyAlg.getRect1();
 		DMatrixRMaj rect2 = rectifyAlg.getRect2();
 
-		FMatrixRMaj rect1_f = new FMatrixRMaj(3,3);
-		FMatrixRMaj rect2_f = new FMatrixRMaj(3,3);
-
-		ConvertMatrixData.convert(rect1,rect1_f);
-		ConvertMatrixData.convert(rect2,rect2_f);
-
-		// New calibration matrix,
+		// save calibration matrices
 		rectifiedK.set(rectifyAlg.getCalibrationMatrix());
+		rectifiedR.set(rectifyAlg.getRectifiedRotation());
 
 		// Adjust the rectification to make the view area more useful
 		ImageDimension rectShape = new ImageDimension();
-		RectifyImageOps.fullViewLeft(intrinsic, rectRot, rect1, rect2, rectifiedK, rectShape);
+		RectifyImageOps.fullViewLeft(intrinsic, rect1, rect2, rectifiedK, rectShape);
 
 		rectMask.reshape(rectShape.width,rectShape.height);
 		rectifiedLeft.reshape(rectShape.width,rectShape.height);
 		rectifiedRight.reshape(rectShape.width,rectShape.height);
 
 		// undistorted and rectify images
+		FMatrixRMaj rect1_f = new FMatrixRMaj(3,3);
+		FMatrixRMaj rect2_f = new FMatrixRMaj(3,3);
+
+		ConvertMatrixData.convert(rect1,rect1_f);
+		ConvertMatrixData.convert(rect2,rect2_f);
+
 		ImageDistort<GrayU8,GrayU8> distortLeft =
 				RectifyImageOps.rectifyImage(intrinsic, rect1_f, BorderType.EXTENDED, ImageType.single(GrayU8.class));
 		ImageDistort<GrayU8,GrayU8> distortRight =
 				RectifyImageOps.rectifyImage(intrinsic, rect2_f, BorderType.EXTENDED, ImageType.single(GrayU8.class));
 
-		// Apply the Laplacian for some lighting invariance
 		distortLeft.apply(distortedLeft, rectifiedLeft, rectMask);
 		distortRight.apply(distortedRight, rectifiedRight);
 	}
@@ -310,6 +310,10 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 		return disparityAlg.getDisparity();
 	}
 
+	public GrayU8 getDisparityMask() {
+		return rectMask;
+	}
+
 	public StereoDisparity<?, GrayF32> getDisparityAlg() {
 		return disparityAlg;
 	}
@@ -318,4 +322,7 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 		return computedDisparity;
 	}
 
+	public RectifyCalibrated getRectifyAlg() {
+		return rectifyAlg;
+	}
 }

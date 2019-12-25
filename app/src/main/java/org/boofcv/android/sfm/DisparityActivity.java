@@ -1,15 +1,22 @@
 package org.boofcv.android.sfm;
 
+import android.app.ActivityManager;
+import android.content.Context;
+import android.content.pm.ConfigurationInfo;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.TextureView;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
@@ -20,14 +27,21 @@ import org.boofcv.android.DemoCamera2Activity;
 import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
 import org.boofcv.android.assoc.AssociationVisualize;
+import org.boofcv.android.visalize.PointCloudSurfaceView;
+import org.ejml.data.DMatrixRMaj;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.disparity.StereoDisparity;
+import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
+import boofcv.core.image.ConvertImage;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.feature.disparity.ConfigDisparityBM;
@@ -37,10 +51,12 @@ import boofcv.factory.feature.disparity.DisparityError;
 import boofcv.factory.feature.disparity.DisparitySgmError;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.struct.calib.CameraPinholeBrown;
+import boofcv.struct.distort.Point2Transform2_F64;
 import boofcv.struct.feature.BrightFeature;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.image.InterleavedU8;
 
 /**
  * Computes the stereo disparity between two images captured by the camera.  The user selects the images and which
@@ -76,6 +92,11 @@ public class DisparityActivity extends DemoCamera2Activity
 
 	DView activeView = DView.ASSOCIATION;
 
+	boolean supportedGL=false;
+
+	PointCloudSurfaceView cloudView;
+	ViewGroup layoutViews;
+
 	public DisparityActivity() {
 		super(Resolution.R640x480);
 		super.bitmapMode = BitmapMode.NONE;
@@ -85,7 +106,9 @@ public class DisparityActivity extends DemoCamera2Activity
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		visualize = new AssociationVisualize(this);
+		supportedGL = hasGLES20();
+
+		visualize = new AssociationVisualize<>(this);
 
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.disparity_controls,null);
@@ -93,6 +116,14 @@ public class DisparityActivity extends DemoCamera2Activity
 		spinnerView = controls.findViewById(R.id.spinner_view);
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
 				R.array.disparity_views, android.R.layout.simple_spinner_item);
+		// if it doesn't support 3D rendering remove the cloud option
+		if( !hasGLES20() ) {
+			List<CharSequence> list = new ArrayList<>();
+			for( int i = 0; i < adapter.getCount()-1; i++ ) {
+				list.add(adapter.getItem(i));
+			}
+			adapter = new ArrayAdapter<>(this,android.R.layout.simple_spinner_item,list);
+		}
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinnerView.setAdapter(adapter);
 		spinnerView.setOnItemSelectedListener(this);
@@ -118,6 +149,29 @@ public class DisparityActivity extends DemoCamera2Activity
 	}
 
 	@Override
+	protected void startCamera(@NonNull ViewGroup layout, @Nullable TextureView view ) {
+		super.startCamera(layout,view);
+		this.layoutViews = layout;
+		cloudView = new PointCloudSurfaceView(this);
+	}
+
+	private void showCloud3D( boolean visible ) {
+		if( visible ) {
+			layoutViews.addView(cloudView,layoutViews.getChildCount(),
+					new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+		} else {
+			layoutViews.removeView(cloudView);
+		}
+	}
+
+	private boolean hasGLES20() {
+		ActivityManager am = (ActivityManager)
+				getSystemService(Context.ACTIVITY_SERVICE);
+		ConfigurationInfo info = am.getDeviceConfigurationInfo();
+		return info.reqGlEsVersion >= 0x20000;
+	}
+
+	@Override
 	protected void onResume() {
 		super.onResume();
 		visualize.setSource(null);
@@ -138,9 +192,12 @@ public class DisparityActivity extends DemoCamera2Activity
 			} else if( pos == 1 ) {
 				touchY = -1;
 				activeView = DView.RECTIFICATION;
-			} else {
+			} else if( pos == 2 ) {
 				activeView = DView.DISPARITY;
+			} else {
+				activeView = DView.CLOUD3D;
 			}
+			showCloud3D(activeView == DView.CLOUD3D);
 		} else if( adapterView == spinnerAlgs ) {
 			changeDisparityAlg = pos;
 
@@ -246,16 +303,18 @@ public class DisparityActivity extends DemoCamera2Activity
 	}
 
 
-	protected class DisparityProcessing extends DemoProcessingAbstract<GrayU8> {
+	protected class DisparityProcessing extends DemoProcessingAbstract<InterleavedU8> {
 
 		DisparityCalculation<BrightFeature> disparity;
 
+		InterleavedU8 colorLeft = new InterleavedU8(1,1,1);
+		GrayU8 gray = new GrayU8(1,1);
 		GrayF32 disparityImage;
 		int disparityMin, disparityRange;
 		CameraPinholeBrown intrinsic;
 
 		public DisparityProcessing() {
-			super(GrayU8.class);
+			super(InterleavedU8.class,3);
 		}
 
 		private StereoDisparity<?, GrayF32> createDisparity( int whichAlg ) {
@@ -369,10 +428,12 @@ public class DisparityActivity extends DemoCamera2Activity
 		}
 
 		@Override
-		public void process(GrayU8 gray) {
+		public void process(InterleavedU8 color) {
 
 			if( intrinsic == null )
 				return;
+
+			ConvertImage.average(color,gray);
 
 			int target = 0;
 
@@ -405,6 +466,8 @@ public class DisparityActivity extends DemoCamera2Activity
 			boolean computedFeatures = false;
 			// compute image features for left or right depending on user selection
 			if( target == 1 ) {
+				// save the color image for computing the point cloud
+				colorLeft.setTo(color);
 				setProgressMessage("Detecting Features Left", false);
 				disparity.setSource(gray);
 				computedFeatures = true;
@@ -441,16 +504,8 @@ public class DisparityActivity extends DemoCamera2Activity
 						GrayF32 computedDisparity = disparity.computeDisparity();
 						if( computedDisparity != null ) {
 							synchronized (lockGui) {
-								disparityMin = disparity.getDisparityAlg().getDisparityMin();
-								disparityRange = disparity.getDisparityAlg().getDisparityRange();
-								disparityImage.setTo(computedDisparity);
-								visualize.setMatches(disparity.getInliersPixel());
-								visualize.forgetSelection();
-
-								runOnUiThread(() -> {
-									spinnerView.setSelection(2); // switch to disparity view
-								});
-							}
+                                updateVisualizedDisparity(computedDisparity);
+                            }
 						}
 					} else {
 						synchronized ( lockGui ) {
@@ -466,9 +521,7 @@ public class DisparityActivity extends DemoCamera2Activity
 					GrayF32 computedDisparity = disparity.computeDisparity();
 					if( computedDisparity != null ) {
 						synchronized (lockGui) {
-							disparityMin = disparity.getDisparityAlg().getDisparityMin();
-							disparityRange = disparity.getDisparityAlg().getDisparityRange();
-							disparityImage.setTo(computedDisparity);
+                            updateVisualizedDisparity(computedDisparity);
 						}
 					}
 				}
@@ -479,11 +532,34 @@ public class DisparityActivity extends DemoCamera2Activity
 
 			hideProgressDialog();
 		}
-	}
+
+        private void updateVisualizedDisparity(GrayF32 computedDisparity) {
+            disparityMin = disparity.getDisparityAlg().getDisparityMin();
+            disparityRange = disparity.getDisparityAlg().getDisparityRange();
+            disparityImage.setTo(computedDisparity);
+            visualize.setMatches(disparity.getInliersPixel());
+            visualize.forgetSelection();
+
+            runOnUiThread(() -> {
+                DMatrixRMaj rectified1 = disparity.getRectifyAlg().getRect1();
+                DMatrixRMaj rectifiedK = disparity.rectifiedK;
+                DMatrixRMaj rectifiedR = disparity.rectifiedR;
+                Point2Transform2_F64 rectifiedToColor =
+                        RectifyImageOps.transformRectToPixel(intrinsic,rectified1);
+
+                cloudView.getRenderer().getCloud().disparityToCloud(
+                        colorLeft, computedDisparity,
+                        disparityMin,disparityRange,
+                        rectifiedToColor,rectifiedK,rectifiedR);
+                spinnerView.setSelection(2); // switch to disparity view
+            });
+        }
+    }
 
 	enum DView {
 		ASSOCIATION,
 		RECTIFICATION,
-		DISPARITY
+		DISPARITY,
+		CLOUD3D
 	}
 }
