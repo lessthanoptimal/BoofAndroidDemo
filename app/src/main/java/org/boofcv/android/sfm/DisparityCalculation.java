@@ -59,6 +59,9 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 
 	List<AssociatedPair> inliersPixel;
 
+	// mask that indicates which pixels are inside the image and which ones are outside
+	GrayU8 rectMask = new GrayU8(1,1);
+
 	GrayU8 distortedLeft;
 	GrayU8 distortedRight;
 	GrayU8 rectifiedLeft;
@@ -152,6 +155,8 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 			return;
 
 		disparityAlg.process(rectifiedLeft, rectifiedRight);
+		// Remove pixels in the rectified image which are not mapped to a pixel in the source image
+		RectifyImageOps.applyMask(disparityAlg.getDisparity(),rectMask,0);
 		computedDisparity = true;
 	}
 
@@ -264,6 +269,7 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 		ImageDimension rectShape = new ImageDimension();
 		RectifyImageOps.fullViewLeft(intrinsic, rectRot, rect1, rect2, rectifiedK, rectShape);
 
+		rectMask.reshape(rectShape.width,rectShape.height);
 		rectifiedLeft.reshape(rectShape.width,rectShape.height);
 		rectifiedRight.reshape(rectShape.width,rectShape.height);
 
@@ -274,7 +280,7 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 				RectifyImageOps.rectifyImage(intrinsic, rect2_f, BorderType.EXTENDED, ImageType.single(GrayU8.class));
 
 		// Apply the Laplacian for some lighting invariance
-		distortLeft.apply(distortedLeft, rectifiedLeft);
+		distortLeft.apply(distortedLeft, rectifiedLeft, rectMask);
 		distortRight.apply(distortedRight, rectifiedRight);
 	}
 

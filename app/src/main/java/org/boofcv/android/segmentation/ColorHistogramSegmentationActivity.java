@@ -124,7 +124,9 @@ public class ColorHistogramSegmentationActivity extends DemoBitmapCamera2Activit
             } else if( mode == Mode.SEGMENTING ) {
                 int tolerance = ColorHistogramSegmentationActivity.this.tolerance;
                 tolerance *= tolerance;
-                ImplConvertBitmap.interleavedYuvToArgb8888(input,bitmapTmp);
+                bitmapTmp.resize(input.width*input.height*4);
+                final byte[] dst = bitmapTmp.data;
+                ImplConvertBitmap.interleavedYuvToArgb8888(input,dst);
                 int indexDst = 0;
                 for (int y = 0; y < input.height; y++) {
                     int indexSrc = input.startIndex + y*input.stride;
@@ -139,16 +141,16 @@ public class ColorHistogramSegmentationActivity extends DemoBitmapCamera2Activit
                         // if Y is close to saturation and color information isn't reliable
                         // make it black too
                         if( Y < 15 || Y > 240 || du*du + dv*dv > tolerance ) {
-                            bitmapTmp[indexDst++] = 0;
-                            bitmapTmp[indexDst++] = 0;
-                            bitmapTmp[indexDst++] = 0;
-                            bitmapTmp[indexDst++] = (byte)255;
+                            dst[indexDst++] = 0;
+                            dst[indexDst++] = 0;
+                            dst[indexDst++] = 0;
+                            dst[indexDst++] = (byte)255;
                         } else {
                             indexDst += 4;
                         }
                     }
                 }
-                bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(bitmapTmp));
+                bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(dst));
             }
         }
 

@@ -134,7 +134,6 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 		super.onCameraResolutionChange(width, height,sensorOrientation);
 		if (bitmap.getWidth() != width || bitmap.getHeight() != height)
 			bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-		bitmapTmp = ConvertBitmap.declareStorage(bitmap, bitmapTmp);
 		if( isCameraCalibrated() ) {
 			runOnUiThread(()-> Toast.makeText(this, "Camera already calibrated", Toast.LENGTH_SHORT).show());
 		}

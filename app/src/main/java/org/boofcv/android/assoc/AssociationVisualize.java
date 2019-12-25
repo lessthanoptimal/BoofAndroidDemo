@@ -10,6 +10,8 @@ import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.View;
 
+import org.ddogleg.struct.GrowQueue_I8;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -47,7 +49,7 @@ public class AssociationVisualize<T extends ImageGray<T>> {
 	public T grayDst;
 	public Bitmap bitmapSrc;
 	public Bitmap bitmapDst;
-	public byte[] storage;
+	public GrowQueue_I8 storage = new GrowQueue_I8();
 
 	// transform between image and output
 	public Matrix renderToScreen = new Matrix();
@@ -93,7 +95,6 @@ public class AssociationVisualize<T extends ImageGray<T>> {
 
 		bitmapSrc = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 		bitmapDst = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-		storage = ConvertBitmap.declareStorage(bitmapSrc, storage);
 	}
 
 	public int getOutputWidth() {
@@ -158,10 +159,12 @@ public class AssociationVisualize<T extends ImageGray<T>> {
 		if( !hasLeft ) {
 			hasPreviewLeft = true;
 			graySrc.setTo(image);
+			bitmapSrc = ConvertBitmap.checkDeclare(image,bitmapSrc);
 			ConvertBitmap.grayToBitmap(image, bitmapSrc, storage);
 		} else if( !hasRight ){
 			hasPreviewRight = true;
 			grayDst.setTo(image);
+			bitmapDst = ConvertBitmap.checkDeclare(image,bitmapDst);
 			ConvertBitmap.grayToBitmap(image, bitmapDst, storage);
 		}
 	}
@@ -179,6 +182,7 @@ public class AssociationVisualize<T extends ImageGray<T>> {
 		} else {
 			hasLeft = true;
 			graySrc.setTo(image);
+			bitmapSrc = ConvertBitmap.checkDeclare(image,bitmapSrc);
 			ConvertBitmap.grayToBitmap(image,bitmapSrc,storage);
 		}
 	}
@@ -196,6 +200,7 @@ public class AssociationVisualize<T extends ImageGray<T>> {
 		} else {
 			hasRight = true;
 			grayDst.setTo(image);
+			bitmapDst = ConvertBitmap.checkDeclare(image,bitmapSrc);
 			ConvertBitmap.grayToBitmap(image,bitmapDst,storage);
 		}
 	}

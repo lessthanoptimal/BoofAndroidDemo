@@ -25,7 +25,6 @@ public abstract class DemoBitmapCamera2Activity extends DemoCamera2Activity {
         super.onCameraResolutionChange(width, height,sensorOrientation);
         if (bitmap.getWidth() != width || bitmap.getHeight() != height)
             bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        bitmapTmp = ConvertBitmap.declareStorage(bitmap, bitmapTmp);
     }
 
     protected void convertToBitmapDisplay(ImageBase image ) {

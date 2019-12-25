@@ -21,6 +21,7 @@ import android.widget.FrameLayout;
 import android.widget.Spinner;
 
 import org.boofcv.android.R;
+import org.ddogleg.struct.GrowQueue_I8;
 import org.ejml.data.FMatrixRMaj;
 import org.ejml.dense.row.CommonOps_FDRM;
 
@@ -70,7 +71,7 @@ public class EquirectangularToViewActivity extends Activity {
     Bitmap outputBitmap;
     Planar<GrayU8> equiImage = new Planar<>(GrayU8.class,1,1,3);
     Planar<GrayU8> renderImage = new Planar<>(GrayU8.class,1,1,3);
-    byte[] bitmapTmp = new byte[1];
+    final GrowQueue_I8 bitmapTmp = new GrowQueue_I8();
     // END
 
     DisplayView view;
@@ -145,7 +146,6 @@ public class EquirectangularToViewActivity extends Activity {
            synchronized (lockOutput) {
                renderImage.reshape(width, height);
                outputBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-               bitmapTmp = ConvertBitmap.declareStorage(outputBitmap, bitmapTmp);
            }
 
            switch (type) {

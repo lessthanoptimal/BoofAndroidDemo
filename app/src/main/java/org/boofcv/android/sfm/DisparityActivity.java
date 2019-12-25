@@ -1,6 +1,5 @@
 package org.boofcv.android.sfm;
 
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -211,27 +210,31 @@ public class DisparityActivity extends DemoCamera2Activity
 
 		private StereoDisparity<GrayU8, GrayF32> createDisparity() {
 
+			// Don't set to zero to avoid points at infinity when rending 3D
+			int disparityMin = 5;
+			int disparityRange = 120;
+
 			switch( changeDisparityAlg ) {
 				case 0: {
 					ConfigDisparityBM config = new ConfigDisparityBM();
-					config.disparityMin = 5;
-					config.disparityRange = 120;
+					config.disparityMin = disparityMin;
+					config.disparityRange = disparityRange;
 					config.errorType = DisparityError.CENSUS;
 					config.subpixel = true;
 					return FactoryStereoDisparity.blockMatch(config,GrayU8.class,GrayF32.class);
 				}
 				case 1: {
 					ConfigDisparityBMBest5 config = new ConfigDisparityBMBest5();
-					config.disparityMin = 5;
-					config.disparityRange = 120;
+					config.disparityMin = disparityMin;
+					config.disparityRange = disparityRange;
 					config.errorType = DisparityError.CENSUS;
 					config.subpixel = true;
 					return FactoryStereoDisparity.blockMatchBest5(config,GrayU8.class,GrayF32.class);
 				}
 				case 2: {
 					ConfigDisparitySGM config = new ConfigDisparitySGM();
-					config.disparityMin = 0;
-					config.disparityRange = 120;
+					config.disparityMin = disparityMin;
+					config.disparityRange = disparityRange;
 					config.errorType = DisparitySgmError.CENSUS;
 					config.useBlocks = true;
 					config.subpixel = true;
@@ -265,8 +268,6 @@ public class DisparityActivity extends DemoCamera2Activity
 
 		@Override
 		public void onDraw(Canvas canvas, Matrix imageToView) {
-			// TODO Redo all of this it's a mess
-			// TODO add a preview image when selecting the view
 			// TODO show a 3D view of the disparity too. Tap to toggle to it?
 			if( intrinsic == null ) {
 				Paint paint = new Paint();
@@ -277,30 +278,21 @@ public class DisparityActivity extends DemoCamera2Activity
 				canvas.drawText("Calibrate Camera First", (canvas.getWidth() - textLength) / 2, canvas.getHeight() / 2, paint);
 			} else if( activeView == DView.DISPARITY ) {
 				// draw rectified image
-				int w = disparity.rectifiedLeft.width;
-				int h = disparity.rectifiedLeft.height;
-				Bitmap left =  Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-				Bitmap right =  Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-				visualize.bitmapSrc = left;
-				visualize.bitmapDst = right;
-
+				visualize.bitmapSrc = ConvertBitmap.checkDeclare(disparity.rectifiedLeft,visualize.bitmapSrc);
 				ConvertBitmap.grayToBitmap(disparity.rectifiedLeft, visualize.bitmapSrc, visualize.storage);
 
 				if( disparity.isDisparityAvailable() ) {
-					VisualizeImageData.disparity(disparityImage,disparityMin, disparityRange,0,
+					visualize.bitmapDst = ConvertBitmap.checkDeclare(disparityImage,visualize.bitmapDst);
+					VisualizeImageData.disparity(disparityImage,disparityRange,0,
 							visualize.bitmapDst,visualize.storage);
 
 					visualize.render(displayView,canvas,true,true);
 				}
 			} else if( activeView == DView.RECTIFICATION ) {
 				canvas.save();
-				int w = disparity.rectifiedLeft.width;
-				int h = disparity.rectifiedLeft.height;
-				Bitmap left =  Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-				Bitmap right =  Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-				visualize.bitmapSrc = left;
-				visualize.bitmapDst = right;
 
+				visualize.bitmapSrc = ConvertBitmap.checkDeclare(disparity.rectifiedLeft,visualize.bitmapSrc);
+				visualize.bitmapDst = ConvertBitmap.checkDeclare(disparity.rectifiedRight,visualize.bitmapDst);
 				ConvertBitmap.grayToBitmap(disparity.rectifiedLeft,visualize.bitmapSrc,visualize.storage);
 				ConvertBitmap.grayToBitmap(disparity.rectifiedRight,visualize.bitmapDst,visualize.storage);
 
@@ -315,14 +307,8 @@ public class DisparityActivity extends DemoCamera2Activity
 					canvas.drawLine(0,touchY,canvas.getWidth(),touchY,paint);
 				}
 			} else {
-				int w = visualize.graySrc.width;
-				int h = visualize.graySrc.height;
-				Bitmap left =  Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-				Bitmap right =  Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-				visualize.bitmapSrc = left;
-				visualize.bitmapDst = right;
-
-				// bit of a hack to reduce memory usage
+				visualize.bitmapSrc = ConvertBitmap.checkDeclare(visualize.graySrc,visualize.bitmapSrc);
+				visualize.bitmapDst = ConvertBitmap.checkDeclare(visualize.grayDst,visualize.bitmapDst);
 				ConvertBitmap.grayToBitmap(visualize.graySrc,visualize.bitmapSrc,visualize.storage);
 				ConvertBitmap.grayToBitmap(visualize.grayDst,visualize.bitmapDst,visualize.storage);
 

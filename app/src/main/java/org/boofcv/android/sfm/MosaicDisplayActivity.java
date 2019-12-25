@@ -146,7 +146,6 @@ implements CompoundButton.OnCheckedChangeListener
 			outputWidth = imageWidth*2;
 			outputHeight = imageHeight*2;
 			bitmap = Bitmap.createBitmap(outputWidth, outputHeight, Bitmap.Config.ARGB_8888);
-			bitmapTmp = ConvertBitmap.declareStorage(bitmap,bitmapTmp);
 
 			int rotation = getWindowManager().getDefaultDisplay().getRotation();
 			videoToDisplayMatrix(outputWidth, outputHeight,sensorOrientation,

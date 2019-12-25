@@ -11,7 +11,6 @@ Date:
 - Updated to 0.35 of BoofCV
 - Associated View now shows a preview
 - TODO Stereo
-  * Fix instability caused by dynamic rectified shape
   * Select error types
   * Support image type based on selected algoritghm, e.g. F32 for NCC
   * Show a 3D image
