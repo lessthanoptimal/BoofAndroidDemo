@@ -11,9 +11,8 @@ Date:
 - Updated to 0.35 of BoofCV
 - Associated View now shows a preview
 - TODO Stereo
-  * Select error types
-  * Support image type based on selected algoritghm, e.g. F32 for NCC
   * Show a 3D image
+  * Save disparity and point cloud to disk
 - TODO Fix https://github.com/lessthanoptimal/BoofAndroidDemo/issues/12
 - TODO Fix https://github.com/lessthanoptimal/BoofAndroidDemo/issues/11
 - TODO Fix https://app.tracepot.com/app/74787/release/6a7ca5df00012423?ftfield=logcat&ftvalue=&page=1&fbpage=1

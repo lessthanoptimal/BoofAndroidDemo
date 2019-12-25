@@ -20,6 +20,7 @@ import boofcv.alg.geo.PerspectiveOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.alg.geo.robust.ModelMatcherMultiview;
+import boofcv.core.image.GConvertImage;
 import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.factory.geo.ConfigEssential;
 import boofcv.factory.geo.ConfigRansac;
@@ -34,6 +35,7 @@ import boofcv.struct.geo.AssociatedPair;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageDimension;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.se.Se3_F64;
@@ -50,7 +52,8 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 	AssociateDescription<Desc> associate;
 	CameraPinholeBrown intrinsic;
 
-	StereoDisparity<GrayU8, GrayF32> disparityAlg;
+	StereoDisparity<?, GrayF32> disparityAlg;
+    GrayF32 disparity;
 
 	FastQueue<Desc> listSrc;
 	FastQueue<Desc> listDst;
@@ -82,7 +85,7 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 		listDst = UtilFeature.createQueue(detDesc, 10);
 	}
 
-	public void setDisparityAlg(StereoDisparity<GrayU8, GrayF32> disparityAlg) {
+	public void setDisparityAlg(StereoDisparity<?, GrayF32> disparityAlg) {
 		this.disparityAlg = disparityAlg;
 	}
 
@@ -150,14 +153,29 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 	/**
 	 * Computes the disparity between the two rectified images
 	 */
-	public void computeDisparity() {
+	public GrayF32 computeDisparity() {
 		if( disparityAlg == null )
-			return;
+			return null;
 
-		disparityAlg.process(rectifiedLeft, rectifiedRight);
+		if( !rectifiedLeft.getImageType().isSameType(disparityAlg.getInputType())) {
+			// Need to copy the rectified image if it's not U8
+			ImageGray tmpLeft = (ImageGray)disparityAlg.getInputType().createImage(rectifiedLeft.width,rectifiedRight.height);
+			ImageGray tmpRight = (ImageGray)disparityAlg.getInputType().createImage(rectifiedLeft.width,rectifiedRight.height);
+
+			GConvertImage.convert(rectifiedLeft,tmpLeft);
+			GConvertImage.convert(rectifiedRight,tmpRight);
+
+			((StereoDisparity)disparityAlg).process(tmpLeft, tmpRight);
+		} else {
+			// sorry for the type-casting. hack to get around generics short coming
+			((StereoDisparity)disparityAlg).process(rectifiedLeft, rectifiedRight);
+		}
+
 		// Remove pixels in the rectified image which are not mapped to a pixel in the source image
-		RectifyImageOps.applyMask(disparityAlg.getDisparity(),rectMask,0);
+        GrayF32 disparity = disparityAlg.getDisparity();
+		RectifyImageOps.applyMask(disparity,rectMask,0);
 		computedDisparity = true;
+		return disparity;
 	}
 
 	/**
@@ -292,7 +310,7 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 		return disparityAlg.getDisparity();
 	}
 
-	public StereoDisparity<GrayU8, GrayF32> getDisparityAlg() {
+	public StereoDisparity<?, GrayF32> getDisparityAlg() {
 		return disparityAlg;
 	}
 

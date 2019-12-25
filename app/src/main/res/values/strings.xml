@@ -158,15 +158,15 @@
     </string-array>
 
     <string-array name="disparity_bm_errors">
+        <item>SAD</item>
         <item>Census</item>
         <item>NCC</item>
-        <item>SAD</item>
     </string-array>
 
     <string-array name="disparity_sgm_errors">
+        <item>SAD</item>
         <item>Census</item>
         <item>HMI</item>
-        <item>SAD</item>
     </string-array>
 
     <string-array name="segmentation_algs">

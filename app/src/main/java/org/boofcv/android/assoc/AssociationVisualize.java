@@ -200,7 +200,7 @@ public class AssociationVisualize<T extends ImageGray<T>> {
 		} else {
 			hasRight = true;
 			grayDst.setTo(image);
-			bitmapDst = ConvertBitmap.checkDeclare(image,bitmapSrc);
+			bitmapDst = ConvertBitmap.checkDeclare(image,bitmapDst);
 			ConvertBitmap.grayToBitmap(image,bitmapDst,storage);
 		}
 	}

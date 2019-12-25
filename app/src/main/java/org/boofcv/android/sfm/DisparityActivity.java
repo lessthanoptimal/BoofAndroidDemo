@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -52,6 +53,7 @@ public class DisparityActivity extends DemoCamera2Activity
 {
 	Spinner spinnerView;
 	Spinner spinnerAlgs;
+	Spinner spinnerError;
 
 	AssociationVisualize<GrayU8> visualize;
 
@@ -63,8 +65,14 @@ public class DisparityActivity extends DemoCamera2Activity
 
 	private GestureDetector mDetector;
 
+	// Which error models are selected for each disparity algorithm family
+	private DisparityError errorBM = DisparityError.CENSUS;
+	private DisparitySgmError errorSGM = DisparitySgmError.CENSUS;
+
+
 	// used to notify processor that the disparity algorithms need to be changed
-	int changeDisparityAlg = -1;
+	volatile int changeDisparityAlg = -1;
+    volatile int selectedDisparityAlg = 0;
 
 	DView activeView = DView.ASSOCIATION;
 
@@ -95,6 +103,10 @@ public class DisparityActivity extends DemoCamera2Activity
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinnerAlgs.setAdapter(adapter);
 		spinnerAlgs.setOnItemSelectedListener(this);
+
+		spinnerError = controls.findViewById(R.id.spinner_error);
+		setupErrorSpinner();
+		spinnerError.setOnItemSelectedListener(this);
 
 		setControls(controls);
 
@@ -131,7 +143,45 @@ public class DisparityActivity extends DemoCamera2Activity
 			}
 		} else if( adapterView == spinnerAlgs ) {
 			changeDisparityAlg = pos;
+
+			// update the list of possible error models
+			if( changeDisparityAlg != selectedDisparityAlg ) {
+				setupErrorSpinner();
+			}
+
+		} else if( adapterView == spinnerError ) {
+		    // Changing disparity can trigger this event to happen. If there is no actual change in
+            // error abort
+			if( isBlockMatch(selectedDisparityAlg)) {
+                DisparityError selected = DisparityError.values()[spinnerError.getSelectedItemPosition()];
+                if( selected == errorBM )
+                    return;
+                this.errorBM = selected;
+			} else {
+                DisparitySgmError selected = DisparitySgmError.values()[spinnerError.getSelectedItemPosition()];
+                if( selected == errorSGM )
+                    return;
+                this.errorSGM = selected;
+			}
+			changeDisparityAlg = selectedDisparityAlg;
 		}
+	}
+
+	private void setupErrorSpinner() {
+		int res = isBlockMatch(changeDisparityAlg) ?
+				R.array.disparity_bm_errors : R.array.disparity_sgm_errors;
+		int ordinal = isBlockMatch(changeDisparityAlg) ?
+				errorBM.ordinal() : errorSGM.ordinal();
+
+		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+				res, android.R.layout.simple_spinner_item);
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		spinnerError.setAdapter(adapter);
+		spinnerError.setSelection(ordinal,false);
+	}
+
+	private boolean isBlockMatch( int algIndex ) {
+		return algIndex < 2;
 	}
 
 	@Override
@@ -208,34 +258,36 @@ public class DisparityActivity extends DemoCamera2Activity
 			super(GrayU8.class);
 		}
 
-		private StereoDisparity<GrayU8, GrayF32> createDisparity() {
+		private StereoDisparity<?, GrayF32> createDisparity( int whichAlg ) {
 
 			// Don't set to zero to avoid points at infinity when rending 3D
 			int disparityMin = 5;
 			int disparityRange = 120;
 
-			switch( changeDisparityAlg ) {
+			switch( whichAlg ) {
 				case 0: {
 					ConfigDisparityBM config = new ConfigDisparityBM();
 					config.disparityMin = disparityMin;
 					config.disparityRange = disparityRange;
-					config.errorType = DisparityError.CENSUS;
+					config.errorType = errorBM;
 					config.subpixel = true;
-					return FactoryStereoDisparity.blockMatch(config,GrayU8.class,GrayF32.class);
+					Class inputType = errorBM.isCorrelation() ? GrayF32.class : GrayU8.class;
+					return FactoryStereoDisparity.blockMatch(config,inputType,GrayF32.class);
 				}
 				case 1: {
 					ConfigDisparityBMBest5 config = new ConfigDisparityBMBest5();
 					config.disparityMin = disparityMin;
 					config.disparityRange = disparityRange;
-					config.errorType = DisparityError.CENSUS;
+					config.errorType = errorBM;
 					config.subpixel = true;
-					return FactoryStereoDisparity.blockMatchBest5(config,GrayU8.class,GrayF32.class);
+					Class inputType = errorBM.isCorrelation() ? GrayF32.class : GrayU8.class;
+					return FactoryStereoDisparity.blockMatchBest5(config,inputType,GrayF32.class);
 				}
 				case 2: {
 					ConfigDisparitySGM config = new ConfigDisparitySGM();
 					config.disparityMin = disparityMin;
 					config.disparityRange = disparityRange;
-					config.errorType = DisparitySgmError.CENSUS;
+					config.errorType = errorSGM;
 					config.useBlocks = true;
 					config.subpixel = true;
 					return FactoryStereoDisparity.sgm(config,GrayU8.class,GrayF32.class);
@@ -372,8 +424,11 @@ public class DisparityActivity extends DemoCamera2Activity
 				}
 			}
 
+			int changeDisparityAlg = DisparityActivity.this.changeDisparityAlg;
 			if( changeDisparityAlg != -1 ) {
-				disparity.setDisparityAlg(createDisparity());
+                DisparityActivity.this.changeDisparityAlg = -1;
+                selectedDisparityAlg = changeDisparityAlg;
+				disparity.setDisparityAlg(createDisparity(changeDisparityAlg));
 			}
 
 			if( disparity.disparityAlg != null ) {
@@ -383,17 +438,19 @@ public class DisparityActivity extends DemoCamera2Activity
 					boolean success = disparity.rectifyImage();
 					if( success ) {
 						setProgressMessage("Disparity", false);
-						disparity.computeDisparity();
-						synchronized ( lockGui ) {
-							disparityMin = disparity.getDisparityAlg().getDisparityMin();
-							disparityRange = disparity.getDisparityAlg().getDisparityRange();
-							disparityImage.setTo(disparity.getDisparity());
-							visualize.setMatches(disparity.getInliersPixel());
-							visualize.forgetSelection();
+						GrayF32 computedDisparity = disparity.computeDisparity();
+						if( computedDisparity != null ) {
+							synchronized (lockGui) {
+								disparityMin = disparity.getDisparityAlg().getDisparityMin();
+								disparityRange = disparity.getDisparityAlg().getDisparityRange();
+								disparityImage.setTo(computedDisparity);
+								visualize.setMatches(disparity.getInliersPixel());
+								visualize.forgetSelection();
 
-							runOnUiThread(() -> {
-                                spinnerView.setSelection(2); // switch to disparity view
-                            });
+								runOnUiThread(() -> {
+									spinnerView.setSelection(2); // switch to disparity view
+								});
+							}
 						}
 					} else {
 						synchronized ( lockGui ) {
@@ -406,17 +463,21 @@ public class DisparityActivity extends DemoCamera2Activity
 					// recycle the rectified image but compute the disparity using the new algorithm
 					setProgressMessage("Disparity", false);
 					disparity.computeDisparity();
-
-					synchronized ( lockGui ) {
-						disparityMin = disparity.getDisparityAlg().getDisparityMin();
-						disparityRange = disparity.getDisparityAlg().getDisparityRange();
-						disparityImage.setTo(disparity.getDisparity());
+					GrayF32 computedDisparity = disparity.computeDisparity();
+					if( computedDisparity != null ) {
+						synchronized (lockGui) {
+							disparityMin = disparity.getDisparityAlg().getDisparityMin();
+							disparityRange = disparity.getDisparityAlg().getDisparityRange();
+							disparityImage.setTo(computedDisparity);
+						}
 					}
 				}
 			}
+			if( changeDisparityAlg != -1 ) {
+                Log.i("DISPARITY","process(gray) exit");
+            }
 
 			hideProgressDialog();
-			changeDisparityAlg = -1;
 		}
 	}
 

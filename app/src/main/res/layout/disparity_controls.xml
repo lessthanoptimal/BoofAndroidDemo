@@ -6,17 +6,24 @@
 			  android:layout_height="match_parent">
 
 	<Spinner
-			android:id="@+id/spinner_view"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:gravity="center"
-			android:layout_gravity="center" />
+		android:id="@+id/spinner_view"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:gravity="center"
+		android:layout_gravity="center" />
 	<Spinner
-			android:id="@+id/spinner_algs"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:gravity="center"
-			android:layout_gravity="center" />
+		android:id="@+id/spinner_algs"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:gravity="center"
+		android:layout_gravity="center" />
+
+	<Spinner
+		android:id="@+id/spinner_error"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:gravity="center"
+		android:layout_gravity="center" />
 
 	<Button
 		android:layout_width="wrap_content"
