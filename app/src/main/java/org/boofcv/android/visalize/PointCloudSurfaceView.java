@@ -15,7 +15,9 @@ public class PointCloudSurfaceView extends GLSurfaceView {
 
     final PointCloud3DRenderer renderer = new PointCloud3DRenderer();
     final ScaleGestureDetector mScaleDetector;
-    boolean previousScale=false;
+    boolean previousTwoTouch=false;
+
+    Motion motion=Motion.TRANSLATE;
 
     public PointCloudSurfaceView(Context context) {
         super(context);
@@ -33,33 +35,53 @@ public class PointCloudSurfaceView extends GLSurfaceView {
 
         mScaleDetector.onTouchEvent(e); // always returns true :-(
         if( mScaleDetector.isInProgress() ) {
-            previousScale = true;
-            return true;
-        } else if( previousScale ) {
-            // reset the location to avoid a large jump after pinching has stopped
-            previousScale = false;
-            previousX = x;
-            previousY = y;
+            previousTwoTouch = true;
             return true;
         }
 
-        // MotionEvent reports input details from the touch screen
-        // and other input controls. In this case, you are only
-        // interested in events where the touch position changed.
+        // When going from two to one touch it can cause a large jump in finger position
+        if( e.getPointerCount() == 1 && previousTwoTouch ) {
+            previousTwoTouch = false;
+            previousX = x;
+            previousY = y;
+        } else if( e.getPointerCount() == 2 ) {
+            previousTwoTouch = true;
+        }
 
 
         switch (e.getAction()) {
+            // Select type of motion depending on where in the image is initially touched
+            case MotionEvent.ACTION_DOWN:
+                if( x < getWidth()/8f )
+                    motion = Motion.ROTATE_X;
+                else if( y < getHeight()/8f )
+                    motion = Motion.ROTATE_Y;
+                else
+                    motion = Motion.TRANSLATE;
+                break;
             case MotionEvent.ACTION_MOVE:
+                if( motion == Motion.TRANSLATE ) {
+                    float dx = 5.0f * (x - previousX) / getWidth();
+                    float dy = 5.0f * (previousY - y) / getHeight();
 
-                float dx = 5.0f*(x - previousX)/getWidth();
-                float dy = 5.0f*(previousY - y)/getHeight();
-
-                synchronized (renderer.lock) {
-                    renderer.tranX += dx;
-                    renderer.tranY += dy;
+                    synchronized (renderer.lock) {
+                        renderer.tranX += dx;
+                        renderer.tranY += dy;
+                    }
+                } else if( motion == Motion.ROTATE_X ){
+                    float dy = 200.0f * (previousY - y) / getHeight();
+                    synchronized (renderer.lock) {
+                        renderer.rotX += dy;
+                    }
+                } else if( motion == Motion.ROTATE_Y ){
+                    float dx = 200.0f * (x - previousX) / getWidth();
+                    synchronized (renderer.lock) {
+                        renderer.rotZ += dx;
+                    }
                 }
 
                 requestRender();
+                break;
         }
 
         previousX = x;
@@ -87,4 +109,10 @@ public class PointCloudSurfaceView extends GLSurfaceView {
     public PointCloud3DRenderer getRenderer() {
         return renderer;
     }
+
+     enum Motion {
+         TRANSLATE,
+         ROTATE_X,
+         ROTATE_Y
+     }
 }

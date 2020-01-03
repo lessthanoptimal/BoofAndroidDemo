@@ -440,10 +440,17 @@ public class DisparityActivity extends DemoCamera2Activity
 			// process GUI interactions
 			synchronized ( lockGui ) {
 				if( reset ) {
+					// the user hit the reset button
 					reset = false;
-					visualize.setSource(null);
-					visualize.setDestination(null);
-					runOnUiThread(() -> spinnerView.setSelection(0));
+					if( activeView == DView.CLOUD3D ) {
+						// set the 3D camera back to its original location
+						runOnUiThread(() -> cloudView.getRenderer().setCameraToHome());
+					} else {
+						// clear results and start over
+						visualize.setSource(null);
+						visualize.setDestination(null);
+						runOnUiThread(() -> spinnerView.setSelection(0));
+					}
 				}
 				if( touchEventType == 1 ) {
 					// first see if there are any features to select

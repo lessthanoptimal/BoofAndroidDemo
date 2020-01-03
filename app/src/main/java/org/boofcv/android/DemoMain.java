@@ -56,7 +56,6 @@ import org.boofcv.android.sfm.StabilizeDisplayActivity;
 import org.boofcv.android.tracker.KltDisplayActivity;
 import org.boofcv.android.tracker.ObjectTrackerActivity;
 import org.boofcv.android.tracker.StaticBackgroundMotionActivity;
-import org.boofcv.android.visalize.PointCloudActivity;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -187,7 +186,6 @@ public class DemoMain extends AppCompatActivity implements ExpandableListView.On
 		sfm.addChild("Stereo",DisparityActivity.class);
 		sfm.addChild("Stabilization",StabilizeDisplayActivity.class);
 		sfm.addChild("Mosaic",MosaicDisplayActivity.class);
-		sfm.addChild("Point Cloud", PointCloudActivity.class);
 
 		groups.add(ip);
 		groups.add(segment);

@@ -22,9 +22,9 @@ import georegression.geometry.GeometryMath_F32;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F32;
 
+import static org.boofcv.android.visalize.PointCloud3DRenderer.MAX_RANGE;
 import static org.boofcv.android.visalize.PointCloud3DRenderer.checkError;
 
-// https://stackoverflow.com/questions/24055683/drawing-gl-points
 public class PointCloud3D {
 
     final int NUM_POINTS = 100;
@@ -32,11 +32,6 @@ public class PointCloud3D {
     private int COORDS_PER_VERTEX = 3; // (x,y,z)
 
     private final String vertexShaderCode =
-//            "attribute vec4 vPosition;" +
-//                    "void main() {" +
-//                    "  gl_Position = vec4(0, 0, 0, 1);" +
-//                    "  gl_PointSize = 2.0;" +
-//                    "}";
             "uniform mat4 uMVPMatrix;" +
             "attribute vec4 vPosition;" +
             "attribute vec4 vColorA;" +
@@ -51,10 +46,10 @@ public class PointCloud3D {
             "precision mediump float;" +
             "varying vec4 vColor;" +
             "void main() {" +
-//            "   gl_FragColor = vec4(1, 0, 1, 1);" +
             "   gl_FragColor = vec4(vColor.rgb, 1.0);" +
             "}";
 
+    // TODO turn into local variable to reduce memory?
     private GrowQueue_F32 points = new GrowQueue_F32();
     private GrowQueue_F32 colors = new GrowQueue_F32();
     private FloatBuffer vertexBuffer;
@@ -145,8 +140,8 @@ public class PointCloud3D {
 
         declarePoints(count);
 
-        // scale it so that z varies from 0 to 1.0
-        float scale = 50.0f*disparityMin/focalLengthX;
+        // scale it so that z varies from 0 to MAX_RANGE
+        float scale = MAX_RANGE*disparityMin/focalLengthX;
 
         int i = 0,j=0;
         for (int py = 0; py < disparity.height; py++) {
@@ -231,13 +226,6 @@ public class PointCloud3D {
         GLES20.glVertexAttribPointer(colorHandle, COORDS_PER_VERTEX,
                 GLES20.GL_FLOAT, false,
                 colorStride, colorBuffer);
-
-//        colorHandle = GLES20.glGetAttribLocation(mProgram, "vColorA");
-//        GLES20.glEnableVertexAttribArray(colorHandle);
-//        final int vertexStride = COORDS_PER_VERTEX * 4; // 4 bytes per vertex
-//        GLES20.glVertexAttribPointer(colorHandle, COORDS_PER_VERTEX,
-//                GLES20.GL_FLOAT, false,
-//                vertexStride, colorBuffer);
 
         // get handle to shape's transformation matrix
         vPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");
