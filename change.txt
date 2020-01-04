@@ -4,7 +4,7 @@ Change Log for BoofCV Demonstration App
 
 -------------------------------------------------
 Version 2.6.0
-Date:
+Date: 2020-01-04
 
 - Updated to 0.35 of BoofCV and an early version of 0.36 with some fixes
 - More concurrency

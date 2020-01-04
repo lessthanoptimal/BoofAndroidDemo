@@ -9,7 +9,7 @@ android {
         minSdkVersion 22
         targetSdkVersion 28
         versionCode 30
-        versionName "2.6-SNAPSHOT"
+        versionName "2.6"
     }
 
     buildTypes {
