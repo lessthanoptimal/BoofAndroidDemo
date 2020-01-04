@@ -89,8 +89,6 @@ public class DisparityActivity extends DemoCamera2Activity
 	Spinner spinnerError;
 	Button buttonSave;
 
-	AssociationVisualize<GrayU8> visualize;
-
 	// indicate where the user touched the screen
 	volatile int touchEventType = 0;
 	volatile int touchX;
@@ -104,13 +102,12 @@ public class DisparityActivity extends DemoCamera2Activity
 	private DisparitySgmError errorSGM = DisparitySgmError.CENSUS;
 
 	// used to notify processor that the disparity algorithms need to be changed
-	volatile int changeDisparityAlg = -1;
-	volatile int selectedDisparityAlg = 0;
+	volatile AlgType changeDisparityAlg = AlgType.NONE;
+	volatile AlgType selectedDisparityAlg = AlgType.BLOCK;
 
 	DView activeView = DView.ASSOCIATION;
 
-	boolean supportedGL=false;
-
+	// Used to display the found disparity as a 3D point cloud
 	PointCloudSurfaceView cloudView;
 	ViewGroup layoutViews;
 
@@ -126,10 +123,6 @@ public class DisparityActivity extends DemoCamera2Activity
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		supportedGL = hasGLES20();
-
-		visualize = new AssociationVisualize<>(this);
 
 		LayoutInflater inflater = getLayoutInflater();
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.disparity_controls,null);
@@ -161,7 +154,7 @@ public class DisparityActivity extends DemoCamera2Activity
 		spinnerAlgs.setOnItemSelectedListener(this);
 
 		spinnerError = controls.findViewById(R.id.spinner_error);
-		setupErrorSpinner();
+		setupErrorSpinner(selectedDisparityAlg);
 		spinnerError.setOnItemSelectedListener(this);
 
 		setControls(controls);
@@ -171,13 +164,14 @@ public class DisparityActivity extends DemoCamera2Activity
 			mDetector.onTouchEvent(event);
 			return true;
 		});
+
+		cloudView = new PointCloudSurfaceView(this);
 	}
 
 	@Override
 	protected void startCamera(@NonNull ViewGroup layout, @Nullable TextureView view ) {
 		super.startCamera(layout,view);
 		this.layoutViews = layout;
-		cloudView = new PointCloudSurfaceView(this);
 	}
 
 	private void showCloud3D( boolean visible ) {
@@ -199,9 +193,8 @@ public class DisparityActivity extends DemoCamera2Activity
 	@Override
 	protected void onResume() {
 		super.onResume();
-		visualize.setSource(null);
-		visualize.setDestination(null);
-		changeDisparityAlg = spinnerAlgs.getSelectedItemPosition();
+
+		changeView(DView.ASSOCIATION,false);
 	}
 
 	@Override
@@ -224,23 +217,26 @@ public class DisparityActivity extends DemoCamera2Activity
 			}
 			showCloud3D(activeView == DView.CLOUD3D);
 		} else if( adapterView == spinnerAlgs ) {
-			changeDisparityAlg = pos;
+			changeDisparityAlg = AlgType.values()[pos];
 
 			// update the list of possible error models
 			if( changeDisparityAlg != selectedDisparityAlg ) {
-				setupErrorSpinner();
+				setupErrorSpinner(changeDisparityAlg);
 			}
 
 		} else if( adapterView == spinnerError ) {
+			// this was called because the algorithm type changed. It can be ignored
+			if( changeDisparityAlg != AlgType.NONE )
+				return;
 			// Changing disparity can trigger this event to happen. If there is no actual change in
 			// error abort
 			if( isBlockMatch(selectedDisparityAlg)) {
-				DisparityError selected = DisparityError.values()[spinnerError.getSelectedItemPosition()];
+				DisparityError selected = DisparityError.values()[pos];
 				if( selected == errorBM )
 					return;
 				this.errorBM = selected;
 			} else {
-				DisparitySgmError selected = DisparitySgmError.values()[spinnerError.getSelectedItemPosition()];
+				DisparitySgmError selected = DisparitySgmError.values()[pos];
 				if( selected == errorSGM )
 					return;
 				this.errorSGM = selected;
@@ -249,10 +245,10 @@ public class DisparityActivity extends DemoCamera2Activity
 		}
 	}
 
-	private void setupErrorSpinner() {
-		int res = isBlockMatch(changeDisparityAlg) ?
+	private void setupErrorSpinner( AlgType type ) {
+		int res = isBlockMatch(type) ?
 				R.array.disparity_bm_errors : R.array.disparity_sgm_errors;
-		int ordinal = isBlockMatch(changeDisparityAlg) ?
+		int ordinal = isBlockMatch(type) ?
 				errorBM.ordinal() : errorSGM.ordinal();
 
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
@@ -260,10 +256,11 @@ public class DisparityActivity extends DemoCamera2Activity
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinnerError.setAdapter(adapter);
 		spinnerError.setSelection(ordinal,false);
+		adapter.notifyDataSetChanged();
 	}
 
-	private boolean isBlockMatch( int algIndex ) {
-		return algIndex < 2;
+	private boolean isBlockMatch( AlgType type ) {
+		return type.ordinal() < 2;
 	}
 
 	@Override
@@ -349,18 +346,11 @@ public class DisparityActivity extends DemoCamera2Activity
 			return true;
 		}
 
-		/**
-		 * If the user flings an image discard the results in the image
-		 */
 		@Override
 		public boolean onFling( MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-			if( activeView != DView.ASSOCIATION ) {
-				return false;
-			}
-
-			touchEventType = (int)e1.getX() < v.getWidth()/2 ? 2 : 3;
-
-			return true;
+		    // don't do anything on fling. It's too easy to accidentially discard when tapping
+            // on points
+			return false;
 		}
 
 		@Override
@@ -370,15 +360,23 @@ public class DisparityActivity extends DemoCamera2Activity
 				return false;
 			}
 
-			touchEventType = 4;
+			touchEventType = 2;
 			return true;
 		}
 	}
 
+	private void changeView( DView view , boolean saveEnabled ) {
+//        Log.i(TAG,"changeView() to "+view);
+
+        // immediately change the selected void to avoid flickering
+		this.activeView = view;
+		runOnUiThread(() -> {buttonSave.setEnabled(saveEnabled);spinnerView.setSelection(view.ordinal());});
+	}
 
 	protected class DisparityProcessing extends DemoProcessingAbstract<InterleavedU8> {
 
 		DisparityCalculation<BrightFeature> disparity;
+        AssociationVisualize<GrayU8> visualize;
 
 		InterleavedU8 colorLeft = new InterleavedU8(1,1,1);
 		GrayU8 gray = new GrayU8(1,1);
@@ -388,16 +386,17 @@ public class DisparityActivity extends DemoCamera2Activity
 
 		public DisparityProcessing() {
 			super(InterleavedU8.class,3);
+//			Log.i(TAG,"NEW DisparityProcessing() hash "+hashCode());
 		}
 
-		private StereoDisparity<?, GrayF32> createDisparity( int whichAlg ) {
+		private StereoDisparity<?, GrayF32> createDisparity( AlgType whichAlg ) {
 
 			// Don't set to zero to avoid points at infinity when rending 3D
 			int disparityMin = 5;
 			int disparityRange = 120;
 
 			switch( whichAlg ) {
-				case 0: {
+				case BLOCK: {
 					ConfigDisparityBM config = new ConfigDisparityBM();
 					config.disparityMin = disparityMin;
 					config.disparityRange = disparityRange;
@@ -406,7 +405,7 @@ public class DisparityActivity extends DemoCamera2Activity
 					Class inputType = errorBM.isCorrelation() ? GrayF32.class : GrayU8.class;
 					return FactoryStereoDisparity.blockMatch(config,inputType,GrayF32.class);
 				}
-				case 1: {
+				case BLOCK5: {
 					ConfigDisparityBMBest5 config = new ConfigDisparityBMBest5();
 					config.disparityMin = disparityMin;
 					config.disparityRange = disparityRange;
@@ -415,7 +414,7 @@ public class DisparityActivity extends DemoCamera2Activity
 					Class inputType = errorBM.isCorrelation() ? GrayF32.class : GrayU8.class;
 					return FactoryStereoDisparity.blockMatchBest5(config,inputType,GrayF32.class);
 				}
-				case 2: {
+				case SGM: {
 					ConfigDisparitySGM config = new ConfigDisparitySGM();
 					config.disparityMin = disparityMin;
 					config.disparityRange = disparityRange;
@@ -432,25 +431,33 @@ public class DisparityActivity extends DemoCamera2Activity
 
 		@Override
 		public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
+//            Log.i(TAG,"ENTER DisparityProcessing.initialize() hash = "+hashCode());
 			if( !isCameraCalibrated() )
 				return;
 
 			intrinsic = lookupIntrinsics();
 
 			DetectDescribePoint<GrayU8, BrightFeature> detDesc =
-					FactoryDetectDescribe.surfFast(null,null,null,GrayU8.class);
+					FactoryDetectDescribe.surfStable(null,null,null,GrayU8.class);
 
 			ScoreAssociation<BrightFeature> score = FactoryAssociation.defaultScore(BrightFeature.class);
 			AssociateDescription<BrightFeature> associate =
 					FactoryAssociation.greedy(score,Double.MAX_VALUE,true);
 
 			disparity = new DisparityCalculation<>(detDesc, associate, intrinsic);
-			visualize.initializeImages( imageWidth, imageHeight , ImageType.SB_U8);
-			disparity.init(imageWidth,imageHeight);
+            disparity.init(imageWidth,imageHeight);
+
+            visualize = new AssociationVisualize<>(DisparityActivity.this);
+            visualize.initializeImages( imageWidth, imageHeight , ImageType.SB_U8);
+
+			// make sure it has a disparity algorithm to use
+            changeDisparityAlg = selectedDisparityAlg;
 		}
 
 		@Override
 		public void onDraw(Canvas canvas, Matrix imageToView) {
+//		    Log.i(TAG, "onDraw() view = "+activeView);
+
 			// TODO show a 3D view of the disparity too. Tap to toggle to it?
 			if( intrinsic == null ) {
 				Paint paint = new Paint();
@@ -464,7 +471,8 @@ public class DisparityActivity extends DemoCamera2Activity
 				visualize.bitmapSrc = ConvertBitmap.checkDeclare(disparity.rectifiedLeft,visualize.bitmapSrc);
 				ConvertBitmap.grayToBitmap(disparity.rectifiedLeft, visualize.bitmapSrc, visualize.storage);
 
-				if( disparity.isDisparityAvailable() ) {
+				GrayF32 disparityImage = this.disparityImage;
+				if( disparity.isDisparityAvailable() && disparityImage != null ) {
 					visualize.bitmapDst = ConvertBitmap.checkDeclare(disparityImage,visualize.bitmapDst);
 					VisualizeImageData.disparity(disparityImage,disparityRange,0,
 							visualize.bitmapDst,visualize.storage);
@@ -474,22 +482,22 @@ public class DisparityActivity extends DemoCamera2Activity
 			} else if( activeView == DView.RECTIFICATION ) {
 				canvas.save();
 
-				visualize.bitmapSrc = ConvertBitmap.checkDeclare(disparity.rectifiedLeft,visualize.bitmapSrc);
-				visualize.bitmapDst = ConvertBitmap.checkDeclare(disparity.rectifiedRight,visualize.bitmapDst);
-				ConvertBitmap.grayToBitmap(disparity.rectifiedLeft,visualize.bitmapSrc,visualize.storage);
-				ConvertBitmap.grayToBitmap(disparity.rectifiedRight,visualize.bitmapDst,visualize.storage);
+				visualize.bitmapSrc = ConvertBitmap.checkDeclare(disparity.rectifiedLeft, visualize.bitmapSrc);
+				visualize.bitmapDst = ConvertBitmap.checkDeclare(disparity.rectifiedRight, visualize.bitmapDst);
+				ConvertBitmap.grayToBitmap(disparity.rectifiedLeft, visualize.bitmapSrc, visualize.storage);
+				ConvertBitmap.grayToBitmap(disparity.rectifiedRight, visualize.bitmapDst, visualize.storage);
 
-				visualize.render(displayView,canvas,true,true);
+				visualize.render(displayView, canvas, true, true);
 
-				if( touchY >= 0 ) {
+				if (touchY >= 0) {
 					canvas.restore();
 					Paint paint = new Paint();
 					paint.setColor(Color.RED);
 					paint.setStyle(Paint.Style.STROKE);
-					paint.setStrokeWidth(4*displayMetrics.density);
-					canvas.drawLine(0,touchY,canvas.getWidth(),touchY,paint);
+					paint.setStrokeWidth(4 * displayMetrics.density);
+					canvas.drawLine(0, touchY, canvas.getWidth(), touchY, paint);
 				}
-			} else {
+			} else if( activeView == DView.ASSOCIATION ) {
 				visualize.bitmapSrc = ConvertBitmap.checkDeclare(visualize.graySrc,visualize.bitmapSrc);
 				visualize.bitmapDst = ConvertBitmap.checkDeclare(visualize.grayDst,visualize.bitmapDst);
 				ConvertBitmap.grayToBitmap(visualize.graySrc,visualize.bitmapSrc,visualize.storage);
@@ -501,7 +509,7 @@ public class DisparityActivity extends DemoCamera2Activity
 
 		@Override
 		public void process(InterleavedU8 color) {
-
+//            Log.i(TAG,"ENTER process(color)");
 			if( intrinsic == null )
 				return;
 
@@ -527,10 +535,9 @@ public class DisparityActivity extends DemoCamera2Activity
 						runOnUiThread(() -> cloudView.getRenderer().setCameraToHome());
 					} else {
 						// clear results and start over
-						disparityImage = null;
 						visualize.setSource(null);
 						visualize.setDestination(null);
-						runOnUiThread(() -> {buttonSave.setEnabled(false);spinnerView.setSelection(0);});
+						changeView(DView.ASSOCIATION,false);
 					}
 				}
 				if( touchEventType == 1 ) {
@@ -540,12 +547,6 @@ public class DisparityActivity extends DemoCamera2Activity
 						target = touchX < viewWidth/2 ? 1 : 2;
 					}
 				} else if( touchEventType == 2 ) {
-					visualize.setSource(null);
-					visualize.forgetSelection();
-				} else if( touchEventType == 3 ) {
-					visualize.setDestination(null);
-					visualize.forgetSelection();
-				} else if( touchEventType == 4 ) {
 					visualize.forgetSelection();
 				}
 			}
@@ -569,7 +570,8 @@ public class DisparityActivity extends DemoCamera2Activity
 
 			// Show the selected image or a preview of what the camera is showing
 			synchronized ( lockGui ) {
-				if( target == 1 ) {
+//                Log.i(TAG,"target = "+target+" left "+visualize.hasLeft+" right "+visualize.hasRight+" hash "+hashCode());
+                if( target == 1 ) {
 					visualize.setSource(gray);
 				} else if( target == 2 ) {
 					visualize.setDestination(gray);
@@ -580,11 +582,11 @@ public class DisparityActivity extends DemoCamera2Activity
 			}
 
 			// Handle a request to update the disparity algorithm and recompute disparity
-			int changeDisparityAlg = DisparityActivity.this.changeDisparityAlg;
-			if( changeDisparityAlg != -1 ) {
-				DisparityActivity.this.changeDisparityAlg = -1;
+			AlgType changeDisparityAlg = DisparityActivity.this.changeDisparityAlg;
+			if( changeDisparityAlg != AlgType.NONE ) {
+//                Log.i(TAG,"disparity changed! hash "+hashCode());
+                DisparityActivity.this.changeDisparityAlg = AlgType.NONE;
 				selectedDisparityAlg = changeDisparityAlg;
-				disparityImage = null;
 				disparity.setDisparityAlg(createDisparity(changeDisparityAlg));
 			}
 
@@ -593,16 +595,17 @@ public class DisparityActivity extends DemoCamera2Activity
 				// If computedFeatures is true here that means the user just selected the last image
 				// and we can now compute the disparity
 				if( computedFeatures ) {
-					// rectify the images and compute the disparity
+//                    Log.i(TAG,"recomputing disparity starting at rectification");
+
+                    // rectify the images and compute the disparity
 					setProgressMessage("Rectifying", false);
 					boolean success = disparity.rectifyImage();
 					if( success ) {
 						setProgressMessage("Disparity", false);
 						disparityImage = disparity.computeDisparity();
 						synchronized (lockGui) {
-							updateVisualizedDisparity(disparityImage);
+							updateVisualizedDisparity(false);
 						}
-						runOnUiThread(() -> buttonSave.setEnabled(true));
 					} else {
 						synchronized ( lockGui ) {
 							ImageMiscOps.fill(disparityImage,0);
@@ -613,30 +616,32 @@ public class DisparityActivity extends DemoCamera2Activity
 									"Disparity computation failed!", Toast.LENGTH_SHORT).show();
 						});
 					}
-				} else if( changeDisparityAlg != -1 ) {
-					// The user has requested that a new disparity algorithm be used to recompute
-					// the disprarity
+				} else if( changeDisparityAlg != AlgType.NONE ) {
+//                    Log.i(TAG,"recomputing disparity");
+
+                    // The user has requested that a new disparity algorithm be used to recompute
+					// the disparity
 					setProgressMessage("Disparity", false);
 					disparityImage = disparity.computeDisparity();
 					synchronized (lockGui) {
-						updateVisualizedDisparity(disparityImage);
+						updateVisualizedDisparity(true);
 					}
 					runOnUiThread(() -> buttonSave.setEnabled(true));
 				}
 			}
-			if( changeDisparityAlg != -1 ) {
-				Log.i("DISPARITY","process(gray) exit");
-			}
 
 			hideProgressDialog();
-		}
+//            Log.i(TAG,"EXIT process(color)");
+        }
 
-		private void updateVisualizedDisparity(GrayF32 computedDisparity) {
+		private void updateVisualizedDisparity( boolean changedDisparity ) {
 			disparityMin = disparity.getDisparityAlg().getDisparityMin();
 			disparityRange = disparity.getDisparityAlg().getDisparityRange();
-			disparityImage.setTo(computedDisparity);
 			visualize.setMatches(disparity.getInliersPixel());
 			visualize.forgetSelection();
+
+			InterleavedU8 colorLeft = this.colorLeft;
+			GrayF32 disparityImage = this.disparityImage;
 
 			runOnUiThread(() -> {
 				DMatrixRMaj rectified1 = disparity.getRectifyAlg().getRect1();
@@ -646,10 +651,11 @@ public class DisparityActivity extends DemoCamera2Activity
 						RectifyImageOps.transformRectToPixel(intrinsic,rectified1);
 
 				cloudView.getRenderer().getCloud().disparityToCloud(
-						colorLeft, computedDisparity,
+						colorLeft, disparityImage,
 						disparityMin,disparityRange,
 						rectifiedToColor,rectifiedK,rectifiedR);
-				spinnerView.setSelection(2); // switch to disparity view
+				if( !changedDisparity )
+					changeView(DView.DISPARITY,true);
 			});
 		}
 
@@ -657,6 +663,7 @@ public class DisparityActivity extends DemoCamera2Activity
 			try {
 				// Save configuration. More should be added here
 				PrintStream out = new PrintStream(new File(savePath, "settings.txt"));
+				out.println("Algorithm "+selectedDisparityAlg);
 				out.println("disparityMin "+disparityMin);
 				out.println("disparityRange "+disparityRange);
 				out.close();
@@ -677,7 +684,7 @@ public class DisparityActivity extends DemoCamera2Activity
 				bitmap.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(new File(savePath,"rectified_right.png")));
 				runOnUiThread(() -> saveDialog.setProgress(3));
 
-				ConvertBitmap.boofToBitmap(disparity.rectMask,bitmap,storage);
+				VisualizeImageData.binaryToBitmap(disparity.rectMask,false,bitmap,storage);
 				bitmap.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(new File(savePath,"rectified_mask.png")));
 				runOnUiThread(() -> saveDialog.setProgress(4));
 
@@ -722,6 +729,13 @@ public class DisparityActivity extends DemoCamera2Activity
 				closeSaveDialog(saveDialog);
 			}
 		}
+	}
+
+	enum AlgType {
+		BLOCK,
+		BLOCK5,
+		SGM,
+		NONE
 	}
 
 	enum DView {
