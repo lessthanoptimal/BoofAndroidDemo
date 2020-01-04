@@ -50,8 +50,8 @@ public class PointCloud3D {
             "}";
 
     // TODO turn into local variable to reduce memory?
-    private GrowQueue_F32 points = new GrowQueue_F32();
-    private GrowQueue_F32 colors = new GrowQueue_F32();
+    public GrowQueue_F32 points = new GrowQueue_F32();
+    public GrowQueue_F32 colors = new GrowQueue_F32();
     private FloatBuffer vertexBuffer;
     private FloatBuffer colorBuffer;
 

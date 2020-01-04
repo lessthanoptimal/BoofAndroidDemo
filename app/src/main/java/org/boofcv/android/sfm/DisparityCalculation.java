@@ -75,6 +75,9 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 	DMatrixRMaj rectifiedK = new DMatrixRMaj(3,3);
 	DMatrixRMaj rectifiedR = new DMatrixRMaj(3,3);
 
+	// estimated camera motion
+	Se3_F64 leftToRight;
+
 
 	// has the disparity been computed
 	boolean computedDisparity = false;
@@ -137,7 +140,7 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 		associate.associate();
 		List<AssociatedPair> pairs = convertToNormalizedCoordinates();
 
-		Se3_F64 leftToRight = estimateCameraMotion(pairs);
+		leftToRight = estimateCameraMotion(pairs);
 
 		if( leftToRight == null ) {
 			Log.e("disparity","estimate motion failed");
@@ -145,7 +148,6 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 			Log.e("disparity","  right.size = "+locationDst.size());
 			Log.e("disparity", "  associated size = " + associate.getMatches().size());
 			Log.e("disparity","  pairs.size = "+pairs.size());
-
 			return false;
 		}
 
@@ -158,9 +160,6 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 	 * Computes the disparity between the two rectified images
 	 */
 	public GrayF32 computeDisparity() {
-		if( disparityAlg == null )
-			return null;
-
 		if( !rectifiedLeft.getImageType().isSameType(disparityAlg.getInputType())) {
 			// Need to copy the rectified image if it's not U8
 			ImageGray tmpLeft = (ImageGray)disparityAlg.getInputType().createImage(rectifiedLeft.width,rectifiedRight.height);

@@ -2,9 +2,6 @@ Change Log for BoofCV Demonstration App
 
 (year)-(month)-(day)
 
-TODO improve performance by removing locks from visualization
-TODO Fix https://github.com/lessthanoptimal/BoofAndroidDemo/issues/11
-
 -------------------------------------------------
 Version 2.6.0
 Date:
@@ -17,7 +14,7 @@ Date:
   * Shows a 3D image
   * Dynamically reshapes rectified images
   * New stereo capabilities
-  * TODO Save disparity, mask, intrinsics, and point cloud to disk
+  * Saves disparity, mask, intrinsics, and point cloud to disk
 
 -------------------------------------------------
 Version 2.5.0
