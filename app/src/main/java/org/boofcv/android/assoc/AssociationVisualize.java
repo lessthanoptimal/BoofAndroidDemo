@@ -39,6 +39,7 @@ public class AssociationVisualize<T extends ImageGray<T>> {
 	public Paint paintWideLine = new Paint();
 	public Paint textPaint = new Paint();
 	public Paint paintLine = new Paint();
+	public Paint paintBlack = new Paint();
 
 	public boolean hasLeft = false;
 	public boolean hasRight = false;
@@ -81,6 +82,9 @@ public class AssociationVisualize<T extends ImageGray<T>> {
 		textPaint.setColor(Color.CYAN);
 		textPaint.setTextSize(16*metrics.density);
 		paintLine.setStrokeWidth(3);
+
+		paintBlack.setColor(Color.BLACK);
+		paintBlack.setStyle(Paint.Style.FILL);
 	}
 
 	/**
@@ -253,10 +257,14 @@ public class AssociationVisualize<T extends ImageGray<T>> {
 		// draw captured images
 		if( showLeft ) {
 			canvas.drawBitmap(bitmapSrc,0,0,null);
+		} else {
+			canvas.drawRect(0,0,renderWidth,renderHeight,paintBlack);
 		}
 
 		if( showRight ) {
 			canvas.drawBitmap(bitmapDst,startX,0,null);
+		} else {
+			canvas.drawRect(startX,0,renderWidth,renderHeight,paintBlack);
 		}
 	}
 

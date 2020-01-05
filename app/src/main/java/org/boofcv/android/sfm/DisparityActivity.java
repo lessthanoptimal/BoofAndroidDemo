@@ -456,7 +456,7 @@ public class DisparityActivity extends DemoCamera2Activity
 
 		@Override
 		public void onDraw(Canvas canvas, Matrix imageToView) {
-//		    Log.i(TAG, "onDraw() view = "+activeView);
+//		    Log.i(TAG, "onDraw() view = "+activeView+" hash "+hashCode());
 
 			// TODO show a 3D view of the disparity too. Tap to toggle to it?
 			if( intrinsic == null ) {
@@ -498,18 +498,15 @@ public class DisparityActivity extends DemoCamera2Activity
 					canvas.drawLine(0, touchY, canvas.getWidth(), touchY, paint);
 				}
 			} else if( activeView == DView.ASSOCIATION ) {
-				visualize.bitmapSrc = ConvertBitmap.checkDeclare(visualize.graySrc,visualize.bitmapSrc);
-				visualize.bitmapDst = ConvertBitmap.checkDeclare(visualize.grayDst,visualize.bitmapDst);
-				ConvertBitmap.grayToBitmap(visualize.graySrc,visualize.bitmapSrc,visualize.storage);
-				ConvertBitmap.grayToBitmap(visualize.grayDst,visualize.bitmapDst,visualize.storage);
-
-				visualize.render(displayView,canvas);
+				synchronized (lockGui) {
+					visualize.render(displayView, canvas);
+				}
 			}
 		}
 
 		@Override
 		public void process(InterleavedU8 color) {
-//            Log.i(TAG,"ENTER process(color)");
+//            Log.i(TAG,"ENTER process(color) hash "+hashCode());
 			if( intrinsic == null )
 				return;
 
@@ -549,10 +546,10 @@ public class DisparityActivity extends DemoCamera2Activity
 				} else if( touchEventType == 2 ) {
 					visualize.forgetSelection();
 				}
+				touchEventType = 0;
 			}
 
 			// Handle the user selecting an image and compute features
-			touchEventType = 0;
 
 			boolean computedFeatures = false;
 			// compute image features for left or right depending on user selection
@@ -569,15 +566,17 @@ public class DisparityActivity extends DemoCamera2Activity
 			}
 
 			// Show the selected image or a preview of what the camera is showing
-			synchronized ( lockGui ) {
+			if( activeView == DView.ASSOCIATION ) {
+				synchronized (lockGui) {
 //                Log.i(TAG,"target = "+target+" left "+visualize.hasLeft+" right "+visualize.hasRight+" hash "+hashCode());
-                if( target == 1 ) {
-					visualize.setSource(gray);
-				} else if( target == 2 ) {
-					visualize.setDestination(gray);
-				} else if( !(visualize.hasLeft && visualize.hasRight) ){
-					// only show a preview if it has not selected the two images
-					visualize.setPreview(gray);
+					if (target == 1) {
+						visualize.setSource(gray);
+					} else if (target == 2) {
+						visualize.setDestination(gray);
+					} else if (!(visualize.hasLeft && visualize.hasRight)) {
+						// only show a preview if it has not selected the two images
+						visualize.setPreview(gray);
+					}
 				}
 			}
 
