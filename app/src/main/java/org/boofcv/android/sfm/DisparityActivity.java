@@ -458,7 +458,6 @@ public class DisparityActivity extends DemoCamera2Activity
 		public void onDraw(Canvas canvas, Matrix imageToView) {
 //		    Log.i(TAG, "onDraw() view = "+activeView+" hash "+hashCode());
 
-			// TODO show a 3D view of the disparity too. Tap to toggle to it?
 			if( intrinsic == null ) {
 				Paint paint = new Paint();
 				paint.setColor(Color.RED);
@@ -466,39 +465,28 @@ public class DisparityActivity extends DemoCamera2Activity
 				int textLength = (int)paint.measureText("Calibrate Camera First");
 
 				canvas.drawText("Calibrate Camera First", (canvas.getWidth() - textLength) / 2, canvas.getHeight() / 2, paint);
-			} else if( activeView == DView.DISPARITY ) {
-				// draw rectified image
-				visualize.bitmapSrc = ConvertBitmap.checkDeclare(disparity.rectifiedLeft,visualize.bitmapSrc);
-				ConvertBitmap.grayToBitmap(disparity.rectifiedLeft, visualize.bitmapSrc, visualize.storage);
+				return;
+			}
 
-				GrayF32 disparityImage = this.disparityImage;
-				if( disparity.isDisparityAvailable() && disparityImage != null ) {
-					visualize.bitmapDst = ConvertBitmap.checkDeclare(disparityImage,visualize.bitmapDst);
-					VisualizeImageData.disparity(disparityImage,disparityRange,0,
-							visualize.bitmapDst,visualize.storage);
+			synchronized (lockGui) {
+				if (activeView == DView.DISPARITY) {
 
-					visualize.render(displayView,canvas,true,true);
-				}
-			} else if( activeView == DView.RECTIFICATION ) {
-				canvas.save();
+					if (disparity.isDisparityAvailable()) {
+						visualize.render(displayView, canvas, true, true);
+					}
+				} else if (activeView == DView.RECTIFICATION) {
+					canvas.save();
+					visualize.render(displayView, canvas, true, true);
 
-				visualize.bitmapSrc = ConvertBitmap.checkDeclare(disparity.rectifiedLeft, visualize.bitmapSrc);
-				visualize.bitmapDst = ConvertBitmap.checkDeclare(disparity.rectifiedRight, visualize.bitmapDst);
-				ConvertBitmap.grayToBitmap(disparity.rectifiedLeft, visualize.bitmapSrc, visualize.storage);
-				ConvertBitmap.grayToBitmap(disparity.rectifiedRight, visualize.bitmapDst, visualize.storage);
-
-				visualize.render(displayView, canvas, true, true);
-
-				if (touchY >= 0) {
-					canvas.restore();
-					Paint paint = new Paint();
-					paint.setColor(Color.RED);
-					paint.setStyle(Paint.Style.STROKE);
-					paint.setStrokeWidth(4 * displayMetrics.density);
-					canvas.drawLine(0, touchY, canvas.getWidth(), touchY, paint);
-				}
-			} else if( activeView == DView.ASSOCIATION ) {
-				synchronized (lockGui) {
+					if (touchY >= 0) {
+						canvas.restore();
+						Paint paint = new Paint();
+						paint.setColor(Color.RED);
+						paint.setStyle(Paint.Style.STROKE);
+						paint.setStrokeWidth(4 * displayMetrics.density);
+						canvas.drawLine(0, touchY, canvas.getWidth(), touchY, paint);
+					}
+				} else if (activeView == DView.ASSOCIATION) {
 					visualize.render(displayView, canvas);
 				}
 			}
@@ -630,8 +618,45 @@ public class DisparityActivity extends DemoCamera2Activity
 			}
 
 			hideProgressDialog();
+
+			synchronized (lockGui) {
+				updateVisualizationImages();
+			}
+
 //            Log.i(TAG,"EXIT process(color)");
         }
+
+		/**
+		 * Updates the bitmap images that are rendered as a pair in several viewing modes
+		 */
+		void updateVisualizationImages() {
+			switch( activeView ) {
+				case DISPARITY:
+					visualize.bitmapSrc = ConvertBitmap.checkDeclare(disparity.rectifiedLeft,visualize.bitmapSrc);
+					ConvertBitmap.grayToBitmap(disparity.rectifiedLeft, visualize.bitmapSrc, visualize.storage);
+
+					if( disparity.isDisparityAvailable() && disparityImage != null ) {
+						visualize.bitmapDst = ConvertBitmap.checkDeclare(disparityImage,visualize.bitmapDst);
+						VisualizeImageData.disparity(disparityImage,disparityRange,0,
+								visualize.bitmapDst,visualize.storage);
+					}
+					break;
+
+				case RECTIFICATION:
+					visualize.bitmapSrc = ConvertBitmap.checkDeclare(disparity.rectifiedLeft, visualize.bitmapSrc);
+					visualize.bitmapDst = ConvertBitmap.checkDeclare(disparity.rectifiedRight, visualize.bitmapDst);
+					ConvertBitmap.grayToBitmap(disparity.rectifiedLeft, visualize.bitmapSrc, visualize.storage);
+					ConvertBitmap.grayToBitmap(disparity.rectifiedRight, visualize.bitmapDst, visualize.storage);
+					break;
+
+				case ASSOCIATION:
+					visualize.bitmapSrc = ConvertBitmap.checkDeclare(visualize.graySrc, visualize.bitmapSrc);
+					visualize.bitmapDst = ConvertBitmap.checkDeclare(visualize.grayDst, visualize.bitmapDst);
+					ConvertBitmap.grayToBitmap(visualize.graySrc, visualize.bitmapSrc, visualize.storage);
+					ConvertBitmap.grayToBitmap(visualize.grayDst, visualize.bitmapDst, visualize.storage);
+					break;
+			}
+		}
 
 		private void updateVisualizedDisparity( boolean changedDisparity ) {
 			disparityMin = disparity.getDisparityAlg().getDisparityMin();

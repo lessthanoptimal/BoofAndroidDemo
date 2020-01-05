@@ -3,6 +3,13 @@ Change Log for BoofCV Demonstration App
 (year)-(month)-(day)
 
 -------------------------------------------------
+Version 2.6.1
+Date: 2020-01-04
+
+- Stereo Disparity
+  * Fixed the wrong image being shown for association
+
+-------------------------------------------------
 Version 2.6.0
 Date: 2020-01-04
 

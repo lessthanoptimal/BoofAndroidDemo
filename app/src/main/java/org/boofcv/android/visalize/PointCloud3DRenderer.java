@@ -70,6 +70,8 @@ public class PointCloud3DRenderer implements GLSurfaceView.Renderer {
             this.rotX = this.rotY = this.rotZ = 0.0f;
         }
 
+        // TODO apply rotation in local coordinate system
+
         // Apply the rotation
         Matrix.setRotateEulerM(rotateMatrix, 0, rotX, rotY, rotZ);
         Matrix.multiplyMM(scratch, 0, poseMatrix, 0, rotateMatrix, 0);
@@ -83,6 +85,7 @@ public class PointCloud3DRenderer implements GLSurfaceView.Renderer {
 
         cloud.draw(scratch);
     }
+
 
     @Override
     public void onSurfaceChanged(GL10 unused, int width, int height) {

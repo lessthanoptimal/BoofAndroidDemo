@@ -55,6 +55,8 @@ public class PointCloudSurfaceView extends GLSurfaceView {
                 if( x < getWidth()/8f )
                     motion = Motion.ROTATE_X;
                 else if( y < getHeight()/8f )
+                    motion = Motion.ROTATE_Z;
+                else if( x >= getWidth()*(7f/8f) )
                     motion = Motion.ROTATE_Y;
                 else
                     motion = Motion.TRANSLATE;
@@ -73,10 +75,15 @@ public class PointCloudSurfaceView extends GLSurfaceView {
                     synchronized (renderer.lock) {
                         renderer.rotX += dy;
                     }
-                } else if( motion == Motion.ROTATE_Y ){
+                } else if( motion == Motion.ROTATE_Z ){
                     float dx = 200.0f * (x - previousX) / getWidth();
                     synchronized (renderer.lock) {
-                        renderer.rotZ += dx;
+                        renderer.rotY += dx;
+                    }
+                } else if( motion == Motion.ROTATE_Y ){
+                    float dy = 200.0f * (previousY - y) / getHeight();
+                    synchronized (renderer.lock) {
+                        renderer.rotZ -= dy;
                     }
                 }
 
@@ -113,6 +120,7 @@ public class PointCloudSurfaceView extends GLSurfaceView {
      enum Motion {
          TRANSLATE,
          ROTATE_X,
-         ROTATE_Y
+         ROTATE_Y,
+         ROTATE_Z
      }
 }
