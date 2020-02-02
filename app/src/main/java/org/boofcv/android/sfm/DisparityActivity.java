@@ -46,6 +46,7 @@ import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.disparity.StereoDisparity;
+import boofcv.alg.cloud.PointCloudReader;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.android.ConvertBitmap;
@@ -61,7 +62,6 @@ import boofcv.factory.feature.disparity.DisparitySgmError;
 import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.points.PointCloudIO;
-import boofcv.io.points.PointCloudReader;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.Point2Transform2_F64;
@@ -740,8 +740,9 @@ public class DisparityActivity extends DemoCamera2Activity
 				PointCloud3D cloud = cloudView.getRenderer().getCloud();
 				int totalPoints = cloud.points.size/3;
 				FileWriter writer = new FileWriter(new File(savePath, "point_cloud.ply"));
-				PointCloudIO.save3DRgb(PointCloudIO.Format.PLY_ASCII,
-						PointCloudReader.wrap3FRGB(cloud.points.data,cloud.colors.data,0,totalPoints),writer);
+				PointCloudIO.save3D(PointCloudIO.Format.PLY_BINARY,
+						PointCloudReader.wrap3FRGB(cloud.points.data,cloud.colors.data,0,totalPoints),
+						true,writer);
 				writer.close();
 				runOnUiThread(() -> saveDialog.setProgress(8));
 			} catch( Exception e ) {

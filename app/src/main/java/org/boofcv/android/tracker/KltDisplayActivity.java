@@ -9,8 +9,8 @@ import android.widget.SeekBar;
 import org.boofcv.android.R;
 
 import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
-import boofcv.abst.feature.tracker.PointTracker;
-import boofcv.factory.feature.tracker.FactoryPointTracker;
+import boofcv.abst.tracker.PointTracker;
+import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
 

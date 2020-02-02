@@ -12,8 +12,8 @@ import org.ddogleg.struct.FastQueue;
 import java.util.ArrayList;
 import java.util.List;
 
-import boofcv.abst.feature.tracker.PointTrack;
-import boofcv.abst.feature.tracker.PointTracker;
+import boofcv.abst.tracker.PointTrack;
+import boofcv.abst.tracker.PointTracker;
 import boofcv.struct.image.GrayU8;
 import georegression.struct.point.Point2D_F64;
 
