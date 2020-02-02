@@ -3,8 +3,12 @@ Change Log for BoofCV Demonstration App
 (year)-(month)-(day)
 
 -------------------------------------------------
-Version 2.6.1
-Date: 2020-01-04
+Version 2.6.2
+Date: 2020-02-01
+
+- Attempt to fix crash on older Android devices when using chessboard
+- Gracefully handle failure to get intrinsics
+- Stereo saves PLY as binary
 
 -------------------------------------------------
 Version 2.6.1
