@@ -8,8 +8,8 @@ android {
         // min SDK version is determined by when Camera2 API becomes functional
         minSdkVersion 22
         targetSdkVersion 28
-        versionCode 32
-        versionName "2.6.2"
+        versionCode 33
+        versionName "2.6.3"
     }
 
     buildTypes {
@@ -38,6 +38,20 @@ android {
 
     dexOptions {
         javaMaxHeapSize "4g"
+    }
+
+    packagingOptions {
+        exclude 'LICENSE-EPL-1.0.txt'
+        exclude 'LICENSE-EDL-1.0.txt'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/ASL2.0'
+        exclude("META-INF/*.kotlin_module")
     }
 }
 

@@ -380,9 +380,12 @@ public class DisparityActivity extends DemoCamera2Activity
 
 		InterleavedU8 colorLeft = new InterleavedU8(1,1,1);
 		GrayU8 gray = new GrayU8(1,1);
-		GrayF32 disparityImage;
+
 		int disparityMin, disparityRange;
 		CameraPinholeBrown intrinsic;
+
+		//------------- Owned by lockGui
+		GrayF32 disparityImage;
 
 		public DisparityProcessing() {
 			super(InterleavedU8.class,3);
@@ -589,8 +592,8 @@ public class DisparityActivity extends DemoCamera2Activity
 					boolean success = disparity.rectifyImage();
 					if( success ) {
 						setProgressMessage("Disparity", false);
-						disparityImage = disparity.computeDisparity();
 						synchronized (lockGui) {
+							disparityImage = disparity.computeDisparity();
 							updateVisualizedDisparity(false);
 						}
 					} else {
@@ -609,8 +612,8 @@ public class DisparityActivity extends DemoCamera2Activity
                     // The user has requested that a new disparity algorithm be used to recompute
 					// the disparity
 					setProgressMessage("Disparity", false);
-					disparityImage = disparity.computeDisparity();
 					synchronized (lockGui) {
+						disparityImage = disparity.computeDisparity();
 						updateVisualizedDisparity(true);
 					}
 					runOnUiThread(() -> buttonSave.setEnabled(true));
@@ -627,7 +630,9 @@ public class DisparityActivity extends DemoCamera2Activity
         }
 
 		/**
-		 * Updates the bitmap images that are rendered as a pair in several viewing modes
+		 * Updates the bitmap images that are rendered as a pair in several viewing modes.
+		 *
+		 * NOTE: This is only called when lockGui is locked
 		 */
 		void updateVisualizationImages() {
 			switch( activeView ) {
@@ -715,7 +720,9 @@ public class DisparityActivity extends DemoCamera2Activity
 				// Save disparity as 8-bit image. This tosses out sub-pixel but there currently
 				// isn't a good way to save those extra bits of resolution. Update this in
 				// the future
-				ConvertBitmap.boofToBitmap(disparityImage,bitmap,storage);
+				synchronized (lockGui) {
+					ConvertBitmap.boofToBitmap(disparityImage, bitmap, storage);
+				}
 				bitmap.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(new File(savePath,"disparityU8.png")));
 				runOnUiThread(() -> saveDialog.setProgress(5));
 
@@ -740,7 +747,7 @@ public class DisparityActivity extends DemoCamera2Activity
 				PointCloud3D cloud = cloudView.getRenderer().getCloud();
 				int totalPoints = cloud.points.size/3;
 				OutputStream output = new FileOutputStream(new File(savePath, "point_cloud.ply"));
-				PointCloudIO.save3D(PointCloudIO.Format.PLY_BINARY,
+				PointCloudIO.save3D(PointCloudIO.Format.PLY,
 						PointCloudReader.wrap3FRGB(cloud.points.data,cloud.colors.data,0,totalPoints),
 						true,output);
 				output.close();

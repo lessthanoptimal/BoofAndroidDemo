@@ -3,6 +3,13 @@ Change Log for BoofCV Demonstration App
 (year)-(month)-(day)
 
 -------------------------------------------------
+Version 2.6.3
+Date: 2020-02-04
+
+- Attempted to fix crash in DisparityActivity through better use of GUI lock
+- Fixed "Unknown class CalibrationDetectorChessboardBinary" Crash Bug
+
+-------------------------------------------------
 Version 2.6.2
 Date: 2020-02-01
 

@@ -27,6 +27,7 @@ import boofcv.abst.fiducial.CalibrationFiducialDetector;
 import boofcv.abst.fiducial.FiducialDetector;
 import boofcv.abst.fiducial.FiducialStability;
 import boofcv.abst.fiducial.SquareBase_to_FiducialDetector;
+import boofcv.abst.fiducial.calib.CalibrationDetectorChessboardBinary;
 import boofcv.abst.fiducial.calib.CalibrationDetectorChessboardX;
 import boofcv.abst.fiducial.calib.CalibrationDetectorCircleHexagonalGrid;
 import boofcv.abst.fiducial.calib.CalibrationDetectorCircleRegularGrid;
@@ -266,6 +267,8 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 					DetectorFiducialCalibration a = ((CalibrationFiducialDetector) detector).getCalibDetector();
 					if (a instanceof CalibrationDetectorChessboardX) {
 						binary = null;
+					} else if (a instanceof CalibrationDetectorChessboardBinary) {
+						binary = ((CalibrationDetectorChessboardBinary) a).getAlgorithm().getBinary();
 					} else if( a instanceof CalibrationDetectorSquareGrid ){
 						binary = ((CalibrationDetectorSquareGrid) a).getAlgorithm().getBinary();
 					} else if( a instanceof CalibrationDetectorCircleHexagonalGrid){
@@ -273,7 +276,7 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 					} else if( a instanceof CalibrationDetectorCircleRegularGrid){
 						binary = ((CalibrationDetectorCircleRegularGrid) a).getDetector().getBinary();
 					} else {
-						throw new RuntimeException("Unknown class "+a.getClass().getSimpleName());
+						throw new RuntimeException("BUG: Unknown calibration detector "+a.getClass().getSimpleName());
 					}
 				} else {
 					binary = ((SquareBase_to_FiducialDetector) detector).getAlgorithm().getBinary();
