@@ -2,6 +2,21 @@ Demonstration of BoofCV for Android devices.  BoofCV is an open source Java comp
 
 Source Code: https://github.com/lessthanoptimal/BoofAndroidDemo
 
+# Examples and Learning BoofCV
+
+The demonstration code contained in this repository is not very good to learn from. The core
+concepts are hidden under a lot of infrastructure and GUI code. The most bare bones example code
+can be found at the following websites:
+
+* [Github Examples](https://github.com/lessthanoptimal/BoofCV/tree/SNAPSHOT/integration/boofcv-android/examples/video/app)
+* [Project Website](https://boofcv.org/index.php?title=Android_support)
+
+# Help Wanted!
+
+Help improve BoofCV on Android! Some of these might even qualify for a small [bounty](https://boofcv.org/index.php?title=Bounties).
+
+* [Code Fragments](https://github.com/lessthanoptimal/BoofCV/issues/154)
+
 # Building
 
 Just load into Android Studio and everything should compile and work just fine. No need to download jars yourself. Gradle will handle that all for you. I recommend ignoring requested by Android Studio to upgrade parts of the script. Historically those "upgrades" have broken things horribly and require additional modifications to fix it.
