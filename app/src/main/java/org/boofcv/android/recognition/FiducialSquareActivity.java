@@ -166,7 +166,7 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 		double maxStability = 0.3;
 		FiducialStability stabilityResults = new FiducialStability();
 
-		final FastQueue<Se3_F64> listPose = new FastQueue<>(Se3_F64.class,true);
+		final FastQueue<Se3_F64> listPose = new FastQueue<>(Se3_F64::new);
 		final GrowQueue_F64 listWidths = new GrowQueue_F64();
 		final GrowQueue_I64 listIDs = new GrowQueue_I64();
 		CameraPinholeBrown intrinsic;

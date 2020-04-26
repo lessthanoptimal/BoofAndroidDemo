@@ -172,7 +172,7 @@ public class PointCloud3D {
                 int cpy = (int)colorPt.y;
 
 
-                if( BoofMiscOps.checkInside(colorImage, cpx, cpy) ) {
+                if( BoofMiscOps.isInside(colorImage, cpx, cpy) ) {
                     int rgb = colorImage.get24(cpx, cpy);
                     colors.data[j++] = ((rgb>>16)&0xFF)/255.0f;
                     colors.data[j++] = ((rgb>>8)&0xFF)/255.0f;

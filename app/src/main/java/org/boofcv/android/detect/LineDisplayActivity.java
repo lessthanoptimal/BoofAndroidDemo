@@ -201,7 +201,7 @@ public class LineDisplayActivity extends DemoCamera2Activity
 		DetectLine<GrayU8> detector;
 		DetectLineSegment<GrayU8> detectorSegment = null;
 
-		FastQueue<LineSegment2D_F32> lines = new FastQueue<LineSegment2D_F32>(LineSegment2D_F32.class,true);
+		FastQueue<LineSegment2D_F32> lines = new FastQueue<>(LineSegment2D_F32::new);
 
 		GrayF32 transformLog = new GrayF32(1, 1);
 		Bitmap transformBitmap = null;

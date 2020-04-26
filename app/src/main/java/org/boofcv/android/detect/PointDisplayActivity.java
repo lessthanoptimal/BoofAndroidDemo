@@ -27,6 +27,8 @@ import boofcv.abst.feature.detect.interest.PointDetector;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.alg.feature.detect.interest.EasyGeneralFeatureDetector;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
+import boofcv.alg.feature.detect.selector.FeatureSelectLimit;
+import boofcv.alg.feature.detect.selector.FeatureSelectNBest;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
 import boofcv.struct.QueueCorner;
@@ -151,7 +153,7 @@ public class PointDisplayActivity extends DemoCamera2Activity
 				break;
 
 			case 3:
-				intensity = (GeneralFeatureIntensity)FactoryIntensityPoint.laplacian();
+				intensity = (GeneralFeatureIntensity)FactoryIntensityPoint.laplacian(GrayU8.class);
 				nonmax = nonmaxMinMax;
 				break;
 
@@ -203,8 +205,9 @@ public class PointDisplayActivity extends DemoCamera2Activity
 		public PointProcessing(GeneralFeatureIntensity<GrayU8, GrayS16> intensity,
 							   NonMaxSuppression nonmax) {
 			super(ImageType.single(GrayU8.class));
+			FeatureSelectLimit selectLimit = new FeatureSelectNBest();
 			GeneralFeatureDetector<GrayU8, GrayS16> general =
-					new GeneralFeatureDetector<GrayU8, GrayS16>(intensity, nonmax);
+					new GeneralFeatureDetector<GrayU8, GrayS16>(intensity, nonmax, selectLimit);
 
 			detector = new GeneralToPointDetector<>(general, GrayU8.class, GrayS16.class);
 			this.nonmax = nonmax;
@@ -255,10 +258,10 @@ public class PointDisplayActivity extends DemoCamera2Activity
 				minimumsGUI.reset();
 
 				if( detector.totalSets() == 1 ) {
-					maximumsGUI.addAll(detector.getPointSet(0));
+					maximumsGUI.appendAll(detector.getPointSet(0));
 				} else {
-					minimumsGUI.addAll(detector.getPointSet(0));
-					maximumsGUI.addAll(detector.getPointSet(1));
+					minimumsGUI.appendAll(detector.getPointSet(0));
+					maximumsGUI.appendAll(detector.getPointSet(1));
 				}
 			}
 		}

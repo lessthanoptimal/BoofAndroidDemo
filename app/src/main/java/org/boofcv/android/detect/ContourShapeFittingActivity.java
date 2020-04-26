@@ -182,8 +182,8 @@ public class ContourShapeFittingActivity extends DemoBitmapCamera2Activity
 	protected class EllipseProcessing extends BaseProcessing {
 
 		final FitData<EllipseRotated_F64> ellipseStorage = new FitData<>(new EllipseRotated_F64());
-		final FastQueue<EllipseRotated_F64> ellipsesVis = new FastQueue<>(EllipseRotated_F64.class,true);
-		final FastQueue<EllipseRotated_F64> ellipsesWork = new FastQueue<>(EllipseRotated_F64.class,true);
+		final FastQueue<EllipseRotated_F64> ellipsesVis = new FastQueue<>(EllipseRotated_F64::new);
+		final FastQueue<EllipseRotated_F64> ellipsesWork = new FastQueue<>(EllipseRotated_F64::new);
 
 		@Override
 		protected void fitShape(List<Point2D_I32> contour) {
@@ -237,8 +237,8 @@ public class ContourShapeFittingActivity extends DemoBitmapCamera2Activity
 
 		PolylineSplitMerge alg = new PolylineSplitMerge();
 
-		final FastQueue<Polygon2D_I32> workPoly = new FastQueue<>(Polygon2D_I32.class,true);
-		final FastQueue<Polygon2D_I32> visPoly = new FastQueue<>(Polygon2D_I32.class,true);
+		final FastQueue<Polygon2D_I32> workPoly = new FastQueue<>(Polygon2D_I32::new);
+		final FastQueue<Polygon2D_I32> visPoly = new FastQueue<>(Polygon2D_I32::new);
 		Path path = new Path();
 
 		public PolygonProcessing() {

@@ -32,6 +32,7 @@ import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageDimension;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.InterleavedF32;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import boofcv.struct.pyramid.ImagePyramid;
 import boofcv.struct.wavelet.WaveletDescription;
 import boofcv.struct.wavelet.WlCoef;
@@ -132,7 +133,10 @@ public class ImageTransformActivity extends DemoBitmapCamera2Activity
 
 	protected class PyramidProcessing extends DemoProcessingAbstract<GrayU8>
 	{
-		ImagePyramid<GrayU8> pyramid = FactoryPyramid.discreteGaussian(new int[]{2,4,8,16},-1,2,false,
+		// NOTE: original settings new int[]{2,4,8,16}, this means it skipped full resolution
+		ConfigDiscreteLevels configPyr = ConfigDiscreteLevels.levels(4);
+
+		ImagePyramid<GrayU8> pyramid = FactoryPyramid.discreteGaussian(configPyr,-1,2,false,
 				ImageType.single(GrayU8.class));
 
 		GrayU8 output;

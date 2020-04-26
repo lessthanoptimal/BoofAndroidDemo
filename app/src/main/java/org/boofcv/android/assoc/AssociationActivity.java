@@ -17,6 +17,7 @@ import org.boofcv.android.CreateDetectorDescriptor;
 import org.boofcv.android.DemoCamera2Activity;
 import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
+import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.alg.descriptor.UtilFeature;
+import boofcv.factory.feature.associate.ConfigAssociateGreedy;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.struct.feature.AssociatedIndex;
 import boofcv.struct.feature.TupleDesc;
@@ -117,10 +119,14 @@ public class AssociationActivity extends DemoCamera2Activity
 
 	@Override
 	public void createNewProcessor() {
-		DetectDescribePoint detDesc = CreateDetectorDescriptor.create(selectedDet, selectedDesc, GrayF32.class);
 
+		ConfigAssociateGreedy configAssoc = new ConfigAssociateGreedy();
+		configAssoc.forwardsBackwards = true;
+		configAssoc.scoreRatioThreshold = 0.8;
+
+		DetectDescribePoint detDesc = CreateDetectorDescriptor.create(selectedDet, selectedDesc, GrayF32.class);
 		ScoreAssociation score = FactoryAssociation.defaultScore(detDesc.getDescriptionType());
-		AssociateDescription assoc = FactoryAssociation.greedy(score,Double.MAX_VALUE,true);
+		AssociateDescription assoc = FactoryAssociation.greedy(configAssoc,score);
 
 		setProcessing(new AssociationProcessing(detDesc, assoc));
 	}
@@ -171,8 +177,8 @@ public class AssociationActivity extends DemoCamera2Activity
 
 		FastQueue<Desc> listSrc;
 		FastQueue<Desc> listDst;
-		FastQueue<Point2D_F64> locationSrc = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
-		FastQueue<Point2D_F64> locationDst = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
+		FastQueue<Point2D_F64> locationSrc = new FastQueue<>(Point2D_F64::new);
+		FastQueue<Point2D_F64> locationDst = new FastQueue<>(Point2D_F64::new);
 
 		public AssociationProcessing( DetectDescribePoint<GrayF32,Desc> detDesc ,
 									  AssociateDescription<Desc> associate  ) {
@@ -279,10 +285,10 @@ public class AssociationActivity extends DemoCamera2Activity
 				associate.associate();
 
 				synchronized ( lockGui ) {
-					List<Point2D_F64> pointsSrc = new ArrayList<Point2D_F64>();
-					List<Point2D_F64> pointsDst = new ArrayList<Point2D_F64>();
+					List<Point2D_F64> pointsSrc = new ArrayList<>();
+					List<Point2D_F64> pointsDst = new ArrayList<>();
 
-					FastQueue<AssociatedIndex> matches = associate.getMatches();
+					FastAccess<AssociatedIndex> matches = associate.getMatches();
 					for( int i = 0; i < matches.size; i++ ) {
 						AssociatedIndex m = matches.get(i);
 						pointsSrc.add(locationSrc.get(m.src));

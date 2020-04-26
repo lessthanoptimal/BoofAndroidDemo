@@ -52,6 +52,7 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
 import boofcv.core.image.ConvertImage;
+import boofcv.factory.feature.associate.ConfigAssociateGreedy;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.feature.disparity.ConfigDisparityBM;
@@ -443,9 +444,12 @@ public class DisparityActivity extends DemoCamera2Activity
 			DetectDescribePoint<GrayU8, BrightFeature> detDesc =
 					FactoryDetectDescribe.surfStable(null,null,null,GrayU8.class);
 
+			ConfigAssociateGreedy configAssoc = new ConfigAssociateGreedy();
+			configAssoc.scoreRatioThreshold = 0.75;
+			configAssoc.forwardsBackwards = true;
+
 			ScoreAssociation<BrightFeature> score = FactoryAssociation.defaultScore(BrightFeature.class);
-			AssociateDescription<BrightFeature> associate =
-					FactoryAssociation.greedy(score,Double.MAX_VALUE,true);
+			AssociateDescription<BrightFeature> associate = FactoryAssociation.greedy(configAssoc,score);
 
 			disparity = new DisparityCalculation<>(detDesc, associate, intrinsic);
             disparity.init(imageWidth,imageHeight);

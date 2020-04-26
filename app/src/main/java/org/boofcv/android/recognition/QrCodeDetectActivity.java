@@ -149,8 +149,8 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
 
         QrCodeDetectorPnP<GrayU8> detector;
 
-        FastQueue<QrCode> detected = new FastQueue<>(QrCode.class,true);
-        FastQueue<QrCode> failures = new FastQueue<>(QrCode.class,true);
+        FastQueue<QrCode> detected = new FastQueue<>(QrCode::new);
+        FastQueue<QrCode> failures = new FastQueue<>(QrCode::new);
 
         Paint colorDetected = new Paint();
         Paint colorFailed = new Paint();
@@ -159,7 +159,7 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
         int uniqueCount = 0;
         int oldValue = -1;
 
-        final FastQueue<Se3_F64> listPose = new FastQueue<>(Se3_F64.class,true);
+        final FastQueue<Se3_F64> listPose = new FastQueue<>(Se3_F64::new);
         RenderCube3D renderCube = new RenderCube3D();
         CameraPinholeBrown intrinsic;
 

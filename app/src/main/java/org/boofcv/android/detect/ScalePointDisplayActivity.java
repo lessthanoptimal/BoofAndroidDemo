@@ -110,7 +110,7 @@ public class ScalePointDisplayActivity extends DemoCamera2Activity
 
 		float density;
 
-		FastQueue<ScalePoint> foundGUI = new FastQueue<ScalePoint>(ScalePoint.class,true);
+		FastQueue<ScalePoint> foundGUI = new FastQueue<>(ScalePoint::new);
 
 		public PointProcessing(InterestPointDetector<GrayU8> detector) {
 			super(ImageType.single(GrayU8.class));

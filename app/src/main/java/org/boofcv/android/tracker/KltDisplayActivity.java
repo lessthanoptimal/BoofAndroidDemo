@@ -8,11 +8,14 @@ import android.widget.SeekBar;
 
 import org.boofcv.android.R;
 
-import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
+import boofcv.abst.feature.detect.interest.ConfigPointDetector;
+import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.tracker.PointTracker;
+import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 
 /**
  * Displays KLT tracks.
@@ -58,13 +61,19 @@ public class KltDisplayActivity extends PointTrackerDisplayActivity {
 
 	@Override
 	public void createNewProcessor() {
-		ConfigGeneralDetector config = new ConfigGeneralDetector();
-		config.maxFeatures = maxFeatures;
-		config.threshold = Math.max(20,45-(maxFeatures/20));
-		config.radius = 3;
+		ConfigPointDetector configDet = new ConfigPointDetector();
+		configDet.type = PointDetectorTypes.SHI_TOMASI;
+		configDet.shiTomasi.radius = 3;
+		configDet.general.maxFeatures = maxFeatures;
+		configDet.general.threshold = Math.max(20,45-(maxFeatures/20));
+		configDet.general.radius = 4;
+
+		ConfigPKlt configKlt = new ConfigPKlt();
+		configKlt.pyramidLevels = ConfigDiscreteLevels.levels(3);
+		configKlt.templateRadius = 3;
 
 		PointTracker<GrayU8> tracker =
-				FactoryPointTracker.klt(new int[]{1,2,4},config,3,GrayU8.class, GrayS16.class);
+				FactoryPointTracker.klt(configKlt,configDet,GrayU8.class, GrayS16.class);
 
 		Log.i("KLT","maxFeatures = "+maxFeatures);
 		setProcessing(new PointProcessing(tracker));

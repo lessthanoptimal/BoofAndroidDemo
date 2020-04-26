@@ -95,7 +95,7 @@ public class CreateDetectorDescriptor {
 				break;
 
 			case DETECT_FAST:
-				general = FactoryDetectPoint.createFast(new ConfigFastCorner(20,9),new ConfigGeneralDetector(150,3,20), imageType);
+				general = FactoryDetectPoint.createFast(new ConfigGeneralDetector(150,3,20),new ConfigFastCorner(20,9), imageType);
 				break;
 
 			default:
@@ -137,8 +137,8 @@ public class CreateDetectorDescriptor {
 
 	private static  ConfigFastHessian confDetectFH() {
 		ConfigFastHessian conf = new ConfigFastHessian();
-		conf.initialSampleSize = 2;
-		conf.extractRadius = 2;
+		conf.extract.radius = 2;
+		conf.initialSampleStep = 2;
 		conf.maxFeaturesPerScale = 120;
 		return conf;
 	}

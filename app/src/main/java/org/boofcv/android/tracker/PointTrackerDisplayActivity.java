@@ -51,9 +51,9 @@ public abstract class PointTrackerDisplayActivity extends DemoCamera2Activity {
 		List<PointTrack> inactive = new ArrayList<>();
 
 		// storage for data structures that are displayed in the GUI
-		FastQueue<Point2D_F64> trackSrc = new FastQueue<>(Point2D_F64.class,true);
-		FastQueue<Point2D_F64> trackDst = new FastQueue<>(Point2D_F64.class,true);
-		FastQueue<Point2D_F64> trackSpawn = new FastQueue<>(Point2D_F64.class,true);
+		FastQueue<Point2D_F64> trackSrc = new FastQueue<>(Point2D_F64::new);
+		FastQueue<Point2D_F64> trackDst = new FastQueue<>(Point2D_F64::new);
+		FastQueue<Point2D_F64> trackSpawn = new FastQueue<>(Point2D_F64::new);
 
 		float circleRadius;
 
@@ -121,7 +121,7 @@ public abstract class PointTrackerDisplayActivity extends DemoCamera2Activity {
 				for( int i = 0; i < active.size(); i++ ) {
 					PointTrack t = active.get(i);
 					TrackInfo info = t.getCookie();
-					info.spawn.set(t);
+					info.spawn.set(t.pixel);
 				}
 
 				tracker.getNewTracks(spawned);
@@ -132,7 +132,7 @@ public abstract class PointTrackerDisplayActivity extends DemoCamera2Activity {
 					}
 					TrackInfo info = t.getCookie();
 					info.lastActive = tick;
-					info.spawn.set(t);
+					info.spawn.set(t.pixel);
 				}
 			}
 
@@ -145,14 +145,14 @@ public abstract class PointTrackerDisplayActivity extends DemoCamera2Activity {
 					PointTrack t = active.get(i);
 					TrackInfo info = t.getCookie();
 					Point2D_F64 s = info.spawn;
-					Point2D_F64 p = active.get(i);
+					Point2D_F64 p = active.get(i).pixel;
 
 					trackSrc.grow().set(s);
 					trackDst.grow().set(p);
 				}
 
 				for( int i = 0; i < spawned.size(); i++ ) {
-					Point2D_F64 p = spawned.get(i);
+					Point2D_F64 p = spawned.get(i).pixel;
 					trackSpawn.grow().set(p);
 				}
 			}

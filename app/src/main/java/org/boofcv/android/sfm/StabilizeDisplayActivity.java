@@ -19,18 +19,19 @@ import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
 import org.ddogleg.struct.FastQueue;
 
-import java.util.List;
-
-import boofcv.abst.feature.detect.interest.ConfigGeneralDetector;
+import boofcv.abst.feature.detect.interest.ConfigPointDetector;
+import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.sfm.AccessPointTracks;
 import boofcv.abst.sfm.d2.ImageMotion2D;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.sfm.d2.StitchingFromMotion2D;
+import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.factory.sfm.FactoryMotion2D;
 import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
@@ -112,13 +113,18 @@ implements CompoundButton.OnCheckedChangeListener
 		PointTracker<GrayU8> tracker;
 
 		if( which == 0 ) {
-			ConfigGeneralDetector config = new ConfigGeneralDetector();
-			config.maxFeatures = 200;
-			config.threshold = 40;
-			config.radius = 3;
+			ConfigPointDetector configDet = new ConfigPointDetector();
+			configDet.type = PointDetectorTypes.SHI_TOMASI;
+			configDet.shiTomasi.radius = 3;
+			configDet.general.maxFeatures = 200;
+			configDet.general.threshold = 40;
+			configDet.general.radius = 4;
 
-			tracker = FactoryPointTracker.
-					klt(new int[]{1, 2, 4}, config, 3, GrayU8.class, GrayS16.class);
+			ConfigPKlt configKlt = new ConfigPKlt();
+			configKlt.pyramidLevels = ConfigDiscreteLevels.levels(3);
+			configKlt.templateRadius = 3;
+
+			tracker = FactoryPointTracker.klt(configKlt, configDet, GrayU8.class, GrayS16.class);
 		} else {
 			tracker = FactoryPointTracker.dda_FH_SURF_Fast(null,null,null,GrayU8.class);
 		}
@@ -143,8 +149,8 @@ implements CompoundButton.OnCheckedChangeListener
 		StitchingFromMotion2D.Corners corners = new StitchingFromMotion2D.Corners();
 		Point2D_F64 distPt = new Point2D_F64();
 
-		FastQueue<Point2D_F64> inliersGui = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
-		FastQueue<Point2D_F64> outliersGui = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
+		FastQueue<Point2D_F64> inliersGui = new FastQueue<>(Point2D_F64::new);
+		FastQueue<Point2D_F64> outliersGui = new FastQueue<>(Point2D_F64::new);
 
 		float radius;
 
@@ -206,11 +212,13 @@ implements CompoundButton.OnCheckedChangeListener
 						alg.getWorldToCurr(imageToDistorted);
 						imageToDistorted.invert(distortedToImage);
 						inliersGui.reset();outliersGui.reset();
-						List<Point2D_F64> points = access.getAllTracks();
-						for( int i = 0; i < points.size(); i++ ) {
-							HomographyPointOps_F64.transform(distortedToImage,points.get(i),distPt);
+						int N = access.getTotalTracks();
+						Point2D_F64 pixel = new Point2D_F64();
+						for( int i = 0; i < N; i++ ) {
+							access.getTrackPixel(i,pixel);
+							HomographyPointOps_F64.transform(distortedToImage,pixel,distPt);
 
-							if( access.isInlier(i) ) {
+							if( access.isTrackInlier(i) ) {
 								inliersGui.grow().set(distPt.x,distPt.y);
 							} else {
 								outliersGui.grow().set(distPt.x,distPt.y);

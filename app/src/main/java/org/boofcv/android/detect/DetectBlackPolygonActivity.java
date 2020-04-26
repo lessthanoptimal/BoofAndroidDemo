@@ -243,7 +243,7 @@ public class DetectBlackPolygonActivity extends DemoBitmapCamera2Activity
 	protected class PolygonProcessing extends DemoProcessingAbstract<GrayU8> {
 
 		final List<Polygon2D_F64> found = new ArrayList<>();
-		final FastQueue<Polygon2D_F64> copy = new FastQueue<>(Polygon2D_F64.class,true);
+		final FastQueue<Polygon2D_F64> copy = new FastQueue<>(Polygon2D_F64::new);
 
 		Path path = new Path();
 

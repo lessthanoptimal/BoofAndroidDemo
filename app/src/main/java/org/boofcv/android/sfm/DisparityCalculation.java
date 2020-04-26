@@ -3,6 +3,7 @@ package org.boofcv.android.sfm;
 import android.util.Log;
 
 import org.ddogleg.fitting.modelset.ModelMatcher;
+import org.ddogleg.struct.FastAccess;
 import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.FMatrixRMaj;
@@ -56,8 +57,8 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 
 	FastQueue<Desc> listSrc;
 	FastQueue<Desc> listDst;
-	FastQueue<Point2D_F64> locationSrc = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
-	FastQueue<Point2D_F64> locationDst = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
+	FastQueue<Point2D_F64> locationSrc = new FastQueue<>(Point2D_F64::new);
+	FastQueue<Point2D_F64> locationDst = new FastQueue<>(Point2D_F64::new);
 
 	List<AssociatedPair> inliersPixel;
 
@@ -190,7 +191,7 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 
 		List<AssociatedPair> calibratedFeatures = new ArrayList<>();
 
-		FastQueue<AssociatedIndex> matches = associate.getMatches();
+		FastAccess<AssociatedIndex> matches = associate.getMatches();
 		for( AssociatedIndex a : matches.toList() ) {
 			Point2D_F64 p1 = locationSrc.get( a.src );
 			Point2D_F64 p2 = locationDst.get( a.dst );
@@ -243,7 +244,7 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 	private void createInliersList( ModelMatcher<Se3_F64, AssociatedPair> epipolarMotion ) {
 		inliersPixel = new ArrayList<>();
 
-		FastQueue<AssociatedIndex> matches = associate.getMatches();
+		FastAccess<AssociatedIndex> matches = associate.getMatches();
 
 		int N = epipolarMotion.getMatchSet().size();
 		for( int i = 0; i < N; i++ ) {

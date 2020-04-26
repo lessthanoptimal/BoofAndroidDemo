@@ -201,7 +201,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 
 		DetectorFiducialCalibration detector;
 
-		FastQueue<Point2D_F64> pointsGui = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
+		FastQueue<Point2D_F64> pointsGui = new FastQueue<>(Point2D_F64::new);
 
 		final Object lockGUI = new Object();
 		List<Point2D_F64> debugPoints = new ArrayList<>();

@@ -21,8 +21,6 @@ import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
 import org.ddogleg.struct.FastQueue;
 
-import java.util.List;
-
 import boofcv.abst.sfm.AccessPointTracks;
 import boofcv.abst.sfm.d2.ImageMotion2D;
 import boofcv.alg.sfm.d2.StitchingFromMotion2D;
@@ -130,8 +128,8 @@ implements CompoundButton.OnCheckedChangeListener
 		StitchingFromMotion2D.Corners corners = new StitchingFromMotion2D.Corners();
 		Point2D_F64 distPt = new Point2D_F64();
 
-		FastQueue<Point2D_F64> inliersGui = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
-		FastQueue<Point2D_F64> outliersGui = new FastQueue<Point2D_F64>(Point2D_F64.class,true);
+		FastQueue<Point2D_F64> inliersGui = new FastQueue<>(Point2D_F64::new);
+		FastQueue<Point2D_F64> outliersGui = new FastQueue<>(Point2D_F64::new);
 
 		float radius;
 
@@ -214,11 +212,13 @@ implements CompoundButton.OnCheckedChangeListener
 						alg.getWorldToCurr(imageToDistorted);
 						imageToDistorted.invert(distortedToImage);
 						inliersGui.reset();outliersGui.reset();
-						List<Point2D_F64> points = access.getAllTracks();
-						for( int i = 0; i < points.size(); i++ ) {
-							HomographyPointOps_F64.transform(distortedToImage,points.get(i),distPt);
+						int N = access.getTotalTracks();
+						Point2D_F64 pixel = new Point2D_F64();
+						for( int i = 0; i < N; i++ ) {
+							access.getTrackPixel(i, pixel);
+							HomographyPointOps_F64.transform(distortedToImage,pixel,distPt);
 
-							if( access.isInlier(i) ) {
+							if( access.isTrackInlier(i) ) {
 								inliersGui.grow().set(distPt.x,distPt.y);
 							} else {
 								outliersGui.grow().set(distPt.x,distPt.y);
@@ -230,10 +230,10 @@ implements CompoundButton.OnCheckedChangeListener
 				}
 
 				boolean inside = true;
-				inside &= BoofMiscOps.checkInside(stitched,corners.p0.x,corners.p0.y,5);
-				inside &= BoofMiscOps.checkInside(stitched,corners.p1.x,corners.p1.y,5);
-				inside &= BoofMiscOps.checkInside(stitched,corners.p2.x,corners.p2.y,5);
-				inside &= BoofMiscOps.checkInside(stitched,corners.p3.x,corners.p3.y,5);
+				inside &= BoofMiscOps.isInside(stitched,corners.p0.x,corners.p0.y,5);
+				inside &= BoofMiscOps.isInside(stitched,corners.p1.x,corners.p1.y,5);
+				inside &= BoofMiscOps.isInside(stitched,corners.p2.x,corners.p2.y,5);
+				inside &= BoofMiscOps.isInside(stitched,corners.p3.x,corners.p3.y,5);
 				if( !inside ) {
 					alg.setOriginToCurrent();
 				}

@@ -91,7 +91,7 @@ public class CannyEdgeActivity extends DemoCamera2Activity
 	protected class CannyProcessing extends DemoProcessingAbstract<GrayU8> {
 		CannyEdge<GrayU8,GrayS16> canny;
 
-		private final FastQueue<Point2D_I32> contours = new FastQueue<>(Point2D_I32.class,true);
+		private final FastQueue<Point2D_I32> contours = new FastQueue<>(Point2D_I32::new);
 		private final GrowQueue_I32 edgeLengths = new GrowQueue_I32();
 		private final GrowQueue_I32 colorEdges = new GrowQueue_I32();
 

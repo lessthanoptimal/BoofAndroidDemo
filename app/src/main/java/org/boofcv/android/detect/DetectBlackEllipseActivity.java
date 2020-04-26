@@ -151,7 +151,7 @@ public class DetectBlackEllipseActivity extends DemoBitmapCamera2Activity
 
 		RectF r = new RectF();
 
-		FastQueue<EllipseRotated_F64> ellipses = new FastQueue<>(EllipseRotated_F64.class,true);
+		FastQueue<EllipseRotated_F64> ellipses = new FastQueue<>(EllipseRotated_F64::new);
 
 		protected EllipseProcessing() {
 			super(ImageType.single(GrayU8.class));

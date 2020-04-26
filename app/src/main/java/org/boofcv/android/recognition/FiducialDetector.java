@@ -39,12 +39,7 @@ public class FiducialDetector extends BaseDetectFiducialSquare<GrayU8> {
 				FactoryShapeDetector.polygon(new ConfigPolygonDetector(false, 4, 4), GrayU8.class),
 				false,0.25, 0.5, squareLength + squareLength, GrayU8.class);
 
-		foundBinary = new FastQueue<GrayU8>(GrayU8.class,true) {
-			@Override
-			protected GrayU8 createInstance() {
-				return new GrayU8(squareLength,squareLength);
-			}
-		};
+		foundBinary = new FastQueue<>(()->new GrayU8(squareLength,squareLength));
 	}
 
 	@Override
