@@ -3,6 +3,13 @@ Change Log for BoofCV Demonstration App
 (year)-(month)-(day)
 
 -------------------------------------------------
+Version 2.6.4
+Date: 2020-04-26
+
+- Updated for changes in BoofCV and other libraries
+- Contains a new attempt mitigate Crashed in YUV
+
+-------------------------------------------------
 Version 2.6.3
 Date: 2020-02-04
 

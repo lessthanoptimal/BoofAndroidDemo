@@ -133,8 +133,7 @@ public class ImageTransformActivity extends DemoBitmapCamera2Activity
 
 	protected class PyramidProcessing extends DemoProcessingAbstract<GrayU8>
 	{
-		// NOTE: original settings new int[]{2,4,8,16}, this means it skipped full resolution
-		ConfigDiscreteLevels configPyr = ConfigDiscreteLevels.levels(4);
+		ConfigDiscreteLevels configPyr = ConfigDiscreteLevels.levels(5);
 
 		ImagePyramid<GrayU8> pyramid = FactoryPyramid.discreteGaussian(configPyr,-1,2,false,
 				ImageType.single(GrayU8.class));
@@ -165,10 +164,10 @@ public class ImageTransformActivity extends DemoBitmapCamera2Activity
 		public void process(GrayU8 input) {
 			pyramid.process(input);
 
-			draw(0, 0, pyramid.getLayer(0));
+			draw(0, 0, pyramid.getLayer(1));
 			int height = 0;
-			int width = pyramid.getLayer(0).getWidth();
-			for( int i = 1; i < pyramid.getNumLayers(); i++ ) {
+			int width = pyramid.getLayer(1).getWidth();
+			for( int i = 2; i < pyramid.getNumLayers(); i++ ) {
 				GrayU8 l = pyramid.getLayer(i);
 				draw(width, height, l);
 				height += l.getHeight();
