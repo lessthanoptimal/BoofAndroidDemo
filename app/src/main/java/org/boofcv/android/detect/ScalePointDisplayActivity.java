@@ -82,7 +82,7 @@ public class ScalePointDisplayActivity extends DemoCamera2Activity
 
 		switch( which ) {
 			case 0:
-				detector = FactoryInterestPoint.fastHessian(new ConfigFastHessian(10,3,100,2,9,4,4));
+				detector = FactoryInterestPoint.fastHessian(new ConfigFastHessian(10,3,100,2,9,4,4),GrayU8.class);
 				break;
 
 			case 1:

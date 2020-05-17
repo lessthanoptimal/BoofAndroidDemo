@@ -313,10 +313,10 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 		ConfigAllCalibration copy = new ConfigAllCalibration();
 
 		copy.targetType = cc.targetType;
-		copy.chessboard.set(cc.chessboard);
-		copy.squareGrid.set(cc.squareGrid);
-		copy.circleGrid.set(cc.circleGrid);
-		copy.hexagonal.set(cc.hexagonal);
+		copy.chessboard.setTo(cc.chessboard);
+		copy.squareGrid.setTo(cc.squareGrid);
+		copy.circleGrid.setTo(cc.circleGrid);
+		copy.hexagonal.setTo(cc.hexagonal);
 
 		return copy;
 	}

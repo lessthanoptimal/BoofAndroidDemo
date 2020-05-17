@@ -19,7 +19,7 @@ import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
 
 import boofcv.abst.tracker.ConfigComaniciu2003;
-import boofcv.abst.tracker.ConfigTld;
+import boofcv.abst.tracker.ConfigTrackerTld;
 import boofcv.abst.tracker.MeanShiftLikelihoodType;
 import boofcv.abst.tracker.TrackerObjectQuad;
 import boofcv.alg.tracker.sfot.SfotConfig;
@@ -113,7 +113,7 @@ public class ObjectTrackerActivity extends DemoCamera2Activity
 			}break;
 
 			case 5:
-				tracker = FactoryTrackerObjectQuad.tld(new ConfigTld(false),GrayU8.class);
+				tracker = FactoryTrackerObjectQuad.tld(new ConfigTrackerTld(false),GrayU8.class);
 				break;
 
 			default:

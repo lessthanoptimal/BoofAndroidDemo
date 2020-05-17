@@ -220,7 +220,7 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 		configEssential.numResolve = 5;
 
 		ConfigRansac configRansac = new ConfigRansac();
-		configRansac.maxIterations = 400;
+		configRansac.iterations = 400;
 		configRansac.inlierThreshold = 0.15;
 		ModelMatcherMultiview<Se3_F64, AssociatedPair> epipolarMotion =
 				FactoryMultiViewRobust.baselineRansac(configEssential,configRansac);

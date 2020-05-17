@@ -48,7 +48,7 @@ public class CreateDetectorDescriptor {
 		if( detect == DETECT_FH && describe == DESC_SURF ) {
 			return FactoryDetectDescribe.surfFast(confDetectFH(), null, null, imageType);
 		} else if( detect == DETECT_SIFT && describe == DESC_SIFT ) {
-			return FactoryDetectDescribe.sift( confSift() );
+			return FactoryDetectDescribe.sift( confSift(),imageType );
 		} else {
 			boolean ss = isScaleSpace(detect);
 
@@ -81,7 +81,7 @@ public class CreateDetectorDescriptor {
 
 		switch( detect ) {
 			case DETECT_FH:
-				return FactoryInterestPoint.fastHessian(confDetectFH());
+				return FactoryInterestPoint.fastHessian(confDetectFH(),imageType);
 
 			case DETECT_SIFT:
 				return FactoryInterestPoint.sift(null,confDetectSift(),imageType);

@@ -8,8 +8,19 @@ The demonstration code contained in this repository is not very good to learn fr
 concepts are hidden under a lot of infrastructure and GUI code. The most bare bones example code
 can be found at the following websites:
 
-* [Github Examples](https://github.com/lessthanoptimal/BoofCV/tree/SNAPSHOT/integration/boofcv-android/examples/video/app)
+* [Github Examples](https://github.com/lessthanoptimal/BoofCV/tree/v0.36/integration/boofcv-android/examples/video/app)
 * [Project Website](https://boofcv.org/index.php?title=Android_support)
+
+# Maven Central
+
+Too add BoofCV to your Android project put the following inside of `app/build.gradle`.
+
+```groovy
+dependencies {
+    ['boofcv-android', 'boofcv-core'].each {
+        String a -> api group: 'org.boofcv', name: a, version: '0.36' }
+}
+```
 
 # Help Wanted!
 
