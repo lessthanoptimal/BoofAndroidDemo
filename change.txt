@@ -10,6 +10,8 @@ Date:
 - Fixed crash issues for DemoBitmapCamera2Activity
   * I'm a bit surprised this only caused a problem now and only on some phones
 - TODO Point Tracker - New colorized lines
+- TODO Uncalibrated 3-View
+- TODO Uncalibrated N-View
 - TODO Fix stereo rotation
 
 -------------------------------------------------

@@ -157,6 +157,11 @@
         <item>SGM</item>
     </string-array>
 
+    <string-array name="disparity_filter_algs">
+        <item>Speckle</item>
+        <item>None</item>
+    </string-array>
+
     <string-array name="disparity_bm_errors">
         <item>SAD</item>
         <item>Census</item>

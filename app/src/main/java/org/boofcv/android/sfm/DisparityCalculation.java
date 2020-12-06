@@ -12,6 +12,7 @@ import org.ejml.ops.ConvertMatrixData;
 import java.util.ArrayList;
 import java.util.List;
 
+import boofcv.abst.disparity.DisparitySmoother;
 import boofcv.abst.disparity.StereoDisparity;
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
@@ -23,6 +24,7 @@ import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.alg.geo.robust.ModelMatcherMultiview;
 import boofcv.core.image.GConvertImage;
+import boofcv.factory.disparity.FactoryStereoDisparity;
 import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.factory.geo.ConfigEssential;
 import boofcv.factory.geo.ConfigRansac;
@@ -49,6 +51,8 @@ import georegression.struct.se.Se3_F64;
  * @author Peter Abeles
  */
 public class DisparityCalculation<Desc extends TupleDesc> {
+
+	private static final String TAG = "Disparity";
 
 	DetectDescribePoint<GrayU8,Desc> detDesc;
 	AssociateDescription<Desc> associate;
@@ -80,6 +84,10 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 	// estimated camera motion
 	Se3_F64 leftToRight;
 
+	// Used to turn on and off filtering disparity images
+	boolean filterDisparity = true;
+	// Speckle removal filter
+	DisparitySmoother<GrayU8,GrayF32> removeSpeckle = FactoryStereoDisparity.removeSpeckle(null,GrayF32.class);
 
 	// has the disparity been computed
 	boolean computedDisparity = false;
@@ -179,6 +187,10 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 		// Remove pixels in the rectified image which are not mapped to a pixel in the source image
         GrayF32 disparity = disparityAlg.getDisparity();
 		RectifyImageOps.applyMask(disparity,rectMask,0);
+		if (filterDisparity) {
+			Log.i(TAG,"Removing Speckle");
+			removeSpeckle.process(rectifiedLeft, disparity, disparityAlg.getDisparityRange());
+		}
 		computedDisparity = true;
 		return disparity;
 	}

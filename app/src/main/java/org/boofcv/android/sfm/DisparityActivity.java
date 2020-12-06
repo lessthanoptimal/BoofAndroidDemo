@@ -88,6 +88,7 @@ public class DisparityActivity extends DemoCamera2Activity
 	Spinner spinnerView;
 	Spinner spinnerAlgs;
 	Spinner spinnerError;
+	Spinner spinnerFilter;
 	Button buttonSave;
 
 	// indicate where the user touched the screen
@@ -105,6 +106,8 @@ public class DisparityActivity extends DemoCamera2Activity
 	// used to notify processor that the disparity algorithms need to be changed
 	volatile AlgType changeDisparityAlg = AlgType.NONE;
 	volatile AlgType selectedDisparityAlg = AlgType.BLOCK;
+
+	FilterType filterType = FilterType.SPECKLE;
 
 	DView activeView = DView.ASSOCIATION;
 
@@ -157,6 +160,13 @@ public class DisparityActivity extends DemoCamera2Activity
 		spinnerError = controls.findViewById(R.id.spinner_error);
 		setupErrorSpinner(selectedDisparityAlg);
 		spinnerError.setOnItemSelectedListener(this);
+
+		spinnerFilter = controls.findViewById(R.id.spinner_filter);
+		adapter = ArrayAdapter.createFromResource(this,
+				R.array.disparity_filter_algs, android.R.layout.simple_spinner_item);
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		spinnerFilter.setAdapter(adapter);
+		spinnerFilter.setOnItemSelectedListener(this);
 
 		setControls(controls);
 
@@ -242,6 +252,9 @@ public class DisparityActivity extends DemoCamera2Activity
 					return;
 				this.errorSGM = selected;
 			}
+			changeDisparityAlg = selectedDisparityAlg;
+		} else if( adapterView == spinnerFilter ) {
+			filterType = FilterType.values()[pos];
 			changeDisparityAlg = selectedDisparityAlg;
 		}
 	}
@@ -477,7 +490,6 @@ public class DisparityActivity extends DemoCamera2Activity
 
 			synchronized (lockGui) {
 				if (activeView == DView.DISPARITY) {
-
 					if (disparity.isDisparityAvailable()) {
 						visualize.render(displayView, canvas, true, true);
 					}
@@ -582,6 +594,7 @@ public class DisparityActivity extends DemoCamera2Activity
                 DisparityActivity.this.changeDisparityAlg = AlgType.NONE;
 				selectedDisparityAlg = changeDisparityAlg;
 				disparity.setDisparityAlg(createDisparity(changeDisparityAlg));
+				disparity.filterDisparity = filterType==FilterType.SPECKLE;
 			}
 
 			// If the two images are selected and it has a disparity algorithm compute the disparity
@@ -779,5 +792,10 @@ public class DisparityActivity extends DemoCamera2Activity
 		RECTIFICATION,
 		DISPARITY,
 		CLOUD3D
+	}
+
+	enum FilterType {
+		SPECKLE,
+		NONE
 	}
 }
