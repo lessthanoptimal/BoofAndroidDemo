@@ -9,7 +9,11 @@ Date:
 - Updated to BoofCV 0.37
 - Fixed crash issues for DemoBitmapCamera2Activity
   * I'm a bit surprised this only caused a problem now and only on some phones
-- TODO Point Tracker - New colorized lines
+- Stereo Disparity
+  * Added speckle filter
+- KLT Tracker
+  * Added two rendering modes: dots and lines
+  * HSV colorization for direction and magnitude
 - TODO Uncalibrated 3-View
 - TODO Uncalibrated N-View
 - TODO Fix stereo rotation

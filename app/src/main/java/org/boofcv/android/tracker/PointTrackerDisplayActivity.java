@@ -15,6 +15,7 @@ import java.util.List;
 import boofcv.abst.tracker.PointTrack;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.struct.image.GrayU8;
+import georegression.metric.UtilAngle;
 import georegression.struct.point.Point2D_F64;
 
 /**
@@ -25,14 +26,22 @@ import georegression.struct.point.Point2D_F64;
 public abstract class PointTrackerDisplayActivity extends DemoCamera2Activity {
 
 	Paint paintLine = new Paint();
+	Paint paintDot = new Paint();
 	Paint paintRed = new Paint();
 	Paint paintBlue = new Paint();
+
+	// if number of tracks drops below this value it will attempt to spawn more
+	int respawnThreshold = 50;
+
+	// If it should render as a dot or a line
+	protected boolean renderDots = false;
 
 	public PointTrackerDisplayActivity(Resolution resolution) {
 		super(resolution);
 
 		paintLine.setColor(Color.RED);
 		paintLine.setStyle(Paint.Style.STROKE);
+		paintDot.setStyle(Paint.Style.FILL);
 		paintRed.setColor(Color.MAGENTA);
 		paintRed.setStyle(Paint.Style.FILL);
 		paintBlue.setColor(Color.BLUE);
@@ -57,6 +66,8 @@ public abstract class PointTrackerDisplayActivity extends DemoCamera2Activity {
 
 		float circleRadius;
 
+		float[] hsv = new float[3];
+
 		public PointProcessing( PointTracker<GrayU8> tracker ) {
 			super(GrayU8.class);
 			this.tracker = tracker;
@@ -70,14 +81,24 @@ public abstract class PointTrackerDisplayActivity extends DemoCamera2Activity {
 
 		@Override
 		public void onDraw(Canvas canvas, Matrix imageToView) {
-
 			canvas.concat(imageToView);
 			synchronized (lockTracks) {
+				double maxRange = canvas.getWidth()/8.0;
+				hsv[1] = 1.0f;
+				hsv[2] = 0.8f;
 				for (int i = 0; i < trackSrc.size(); i++) {
 					Point2D_F64 s = trackSrc.get(i);
 					Point2D_F64 p = trackDst.get(i);
-					canvas.drawLine((float) s.x, (float) s.y, (float) p.x, (float) p.y, paintLine);
-					canvas.drawCircle((float) p.x, (float) p.y, circleRadius, paintRed);
+
+					hsv[0] = (float)UtilAngle.degree(Math.atan2(p.x-s.x, p.y-s.y))+180.0f;
+					hsv[2] = (float)(0.40+Math.min(1.0,s.distance(p)/maxRange)*0.60);
+					if (renderDots) {
+						paintDot.setColor(Color.HSVToColor(hsv));
+						canvas.drawCircle((int) p.x, (int) p.y, circleRadius*3.5f, paintDot);
+					} else {
+						paintLine.setColor(Color.HSVToColor(hsv));
+						canvas.drawLine((float) s.x, (float) s.y, (float) p.x, (float) p.y, paintLine);
+					}
 				}
 
 				for (int i = 0; i < trackSpawn.size(); i++) {
@@ -114,7 +135,7 @@ public abstract class PointTrackerDisplayActivity extends DemoCamera2Activity {
 			}
 
 			spawned.clear();
-			if( active.size() < 50 )  {
+			if( active.size() < respawnThreshold )  {
 				tracker.spawnTracks();
 
 				// update the track's initial position
