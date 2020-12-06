@@ -110,8 +110,7 @@
         <item>FAST</item>
         <item>Laplacian</item>
         <item>KitRos</item>
-        <item>Hessian Det</item>
-        <item>Hessian Trace</item>
+        <item>Hessian</item>
     </string-array>
 
     <string-array name="scale_features">

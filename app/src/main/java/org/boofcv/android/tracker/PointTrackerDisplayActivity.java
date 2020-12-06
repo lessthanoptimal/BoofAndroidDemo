@@ -7,7 +7,7 @@ import android.graphics.Paint;
 
 import org.boofcv.android.DemoCamera2Activity;
 import org.boofcv.android.DemoProcessingAbstract;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,9 +51,9 @@ public abstract class PointTrackerDisplayActivity extends DemoCamera2Activity {
 		List<PointTrack> inactive = new ArrayList<>();
 
 		// storage for data structures that are displayed in the GUI
-		FastQueue<Point2D_F64> trackSrc = new FastQueue<>(Point2D_F64::new);
-		FastQueue<Point2D_F64> trackDst = new FastQueue<>(Point2D_F64::new);
-		FastQueue<Point2D_F64> trackSpawn = new FastQueue<>(Point2D_F64::new);
+		DogArray<Point2D_F64> trackSrc = new DogArray<>(Point2D_F64::new);
+		DogArray<Point2D_F64> trackDst = new DogArray<>(Point2D_F64::new);
+		DogArray<Point2D_F64> trackSpawn = new DogArray<>(Point2D_F64::new);
 
 		float circleRadius;
 
@@ -121,7 +121,7 @@ public abstract class PointTrackerDisplayActivity extends DemoCamera2Activity {
 				for( int i = 0; i < active.size(); i++ ) {
 					PointTrack t = active.get(i);
 					TrackInfo info = t.getCookie();
-					info.spawn.set(t.pixel);
+					info.spawn.setTo(t.pixel);
 				}
 
 				tracker.getNewTracks(spawned);
@@ -132,7 +132,7 @@ public abstract class PointTrackerDisplayActivity extends DemoCamera2Activity {
 					}
 					TrackInfo info = t.getCookie();
 					info.lastActive = tick;
-					info.spawn.set(t.pixel);
+					info.spawn.setTo(t.pixel);
 				}
 			}
 
@@ -147,13 +147,13 @@ public abstract class PointTrackerDisplayActivity extends DemoCamera2Activity {
 					Point2D_F64 s = info.spawn;
 					Point2D_F64 p = active.get(i).pixel;
 
-					trackSrc.grow().set(s);
-					trackDst.grow().set(p);
+					trackSrc.grow().setTo(s);
+					trackDst.grow().setTo(p);
 				}
 
 				for( int i = 0; i < spawned.size(); i++ ) {
 					Point2D_F64 p = spawned.get(i).pixel;
-					trackSpawn.grow().set(p);
+					trackSpawn.grow().setTo(p);
 				}
 			}
 

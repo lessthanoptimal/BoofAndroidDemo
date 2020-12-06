@@ -22,7 +22,7 @@ import org.boofcv.android.R;
 import org.boofcv.android.recognition.ConfigAllCalibration;
 import org.boofcv.android.recognition.SelectCalibrationFiducial;
 import org.boofcv.android.tracker.PointTrackerDisplayActivity;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -201,7 +201,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 
 		DetectorFiducialCalibration detector;
 
-		FastQueue<Point2D_F64> pointsGui = new FastQueue<>(Point2D_F64::new);
+		DogArray<Point2D_F64> pointsGui = new DogArray<>(Point2D_F64::new);
 
 		final Object lockGUI = new Object();
 		List<Point2D_F64> debugPoints = new ArrayList<>();
@@ -309,11 +309,11 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 				if( detected ) {
 					CalibrationObservation found = detector.getDetectedPoints();
 					for( PointIndex2D_F64 p : found.points )
-						pointsGui.grow().set(p);
+						pointsGui.grow().setTo(p.p);
 				} else if( showDetectDebug ) {
 					// show binary image to aid in debugging and detected rectangles
 					if( detector instanceof CalibrationDetectorChessboardX) {
-						FastQueue<ChessboardCorner> corners = ((CalibrationDetectorChessboardX) detector).getDetector().getCorners();
+						DogArray<ChessboardCorner> corners = ((CalibrationDetectorChessboardX) detector).getDetector().getCorners();
 						for (int i = 0; i < corners.size(); i++) {
 							debugPoints.add(corners.get(i));
 						}

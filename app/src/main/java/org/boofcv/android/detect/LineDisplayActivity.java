@@ -21,7 +21,7 @@ import android.widget.Spinner;
 import org.boofcv.android.DemoCamera2Activity;
 import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.List;
 
@@ -140,7 +140,7 @@ public class LineDisplayActivity extends DemoCamera2Activity
 
 		ConfigHoughGradient configGrad = new ConfigHoughGradient(numLines);
 
-		configGrad.thresholdEdge = 40;
+		configGrad.edgeThreshold.threshold = 40;
 		configGrad.localMaxRadius = 5;
 		configGrad.minCounts = 10;
 
@@ -201,7 +201,7 @@ public class LineDisplayActivity extends DemoCamera2Activity
 		DetectLine<GrayU8> detector;
 		DetectLineSegment<GrayU8> detectorSegment = null;
 
-		FastQueue<LineSegment2D_F32> lines = new FastQueue<>(LineSegment2D_F32::new);
+		DogArray<LineSegment2D_F32> lines = new DogArray<>(LineSegment2D_F32::new);
 
 		GrayF32 transformLog = new GrayF32(1, 1);
 		Bitmap transformBitmap = null;
@@ -266,7 +266,7 @@ public class LineDisplayActivity extends DemoCamera2Activity
 					lines.reset();
 					for( LineParametric2D_F32 p : found ) {
 						LineSegment2D_F32 ls = LineImageOps.convert(p, gray.width,gray.height);
-						lines.grow().set(ls.a,ls.b);
+						lines.grow().setTo(ls.a,ls.b);
 					}
 
 					if( showTransform ) {
@@ -288,7 +288,7 @@ public class LineDisplayActivity extends DemoCamera2Activity
 				synchronized ( lockGui ) {
 					lines.reset();
 					for( LineSegment2D_F32 p : found ) {
-						lines.grow().set(p.a,p.b);
+						lines.grow().setTo(p.a,p.b);
 					}
 				}
 			}

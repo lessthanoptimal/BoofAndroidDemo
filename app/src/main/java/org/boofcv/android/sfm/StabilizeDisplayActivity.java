@@ -17,7 +17,7 @@ import android.widget.Spinner;
 import org.boofcv.android.DemoBitmapCamera2Activity;
 import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import boofcv.abst.feature.detect.interest.ConfigPointDetector;
 import boofcv.abst.feature.detect.interest.PointDetectorTypes;
@@ -149,8 +149,8 @@ implements CompoundButton.OnCheckedChangeListener
 		StitchingFromMotion2D.Corners corners = new StitchingFromMotion2D.Corners();
 		Point2D_F64 distPt = new Point2D_F64();
 
-		FastQueue<Point2D_F64> inliersGui = new FastQueue<>(Point2D_F64::new);
-		FastQueue<Point2D_F64> outliersGui = new FastQueue<>(Point2D_F64::new);
+		DogArray<Point2D_F64> inliersGui = new DogArray<>(Point2D_F64::new);
+		DogArray<Point2D_F64> outliersGui = new DogArray<>(Point2D_F64::new);
 
 		float radius;
 
@@ -219,9 +219,9 @@ implements CompoundButton.OnCheckedChangeListener
 							HomographyPointOps_F64.transform(distortedToImage,pixel,distPt);
 
 							if( access.isTrackInlier(i) ) {
-								inliersGui.grow().set(distPt.x,distPt.y);
+								inliersGui.grow().setTo(distPt.x,distPt.y);
 							} else {
-								outliersGui.grow().set(distPt.x,distPt.y);
+								outliersGui.grow().setTo(distPt.x,distPt.y);
 							}
 						}
 					}

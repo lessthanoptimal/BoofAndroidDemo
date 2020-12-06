@@ -28,8 +28,8 @@
 		android:layout_height="wrap_content"
 		android:gravity="center"
 		android:layout_gravity="center"
-		android:max="20"
-		android:progress="2"
+		android:max="40"
+		android:progress="5"
 		android:secondaryProgress="0"
 		android:id="@+id/slider_radius"/>
 

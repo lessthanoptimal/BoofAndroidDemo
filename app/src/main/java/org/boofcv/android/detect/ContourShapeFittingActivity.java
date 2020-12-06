@@ -19,7 +19,7 @@ import android.widget.ToggleButton;
 import org.boofcv.android.DemoBitmapCamera2Activity;
 import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.List;
 
@@ -182,13 +182,13 @@ public class ContourShapeFittingActivity extends DemoBitmapCamera2Activity
 	protected class EllipseProcessing extends BaseProcessing {
 
 		final FitData<EllipseRotated_F64> ellipseStorage = new FitData<>(new EllipseRotated_F64());
-		final FastQueue<EllipseRotated_F64> ellipsesVis = new FastQueue<>(EllipseRotated_F64::new);
-		final FastQueue<EllipseRotated_F64> ellipsesWork = new FastQueue<>(EllipseRotated_F64::new);
+		final DogArray<EllipseRotated_F64> ellipsesVis = new DogArray<>(EllipseRotated_F64::new);
+		final DogArray<EllipseRotated_F64> ellipsesWork = new DogArray<>(EllipseRotated_F64::new);
 
 		@Override
 		protected void fitShape(List<Point2D_I32> contour) {
 			ShapeFittingOps.fitEllipse_I32(contour, 0, false, ellipseStorage);
-			ellipsesWork.grow().set(ellipseStorage.shape);
+			ellipsesWork.grow().setTo(ellipseStorage.shape);
 		}
 
 		@Override
@@ -201,7 +201,7 @@ public class ContourShapeFittingActivity extends DemoBitmapCamera2Activity
 			synchronized (lockGui) {
 				ellipsesVis.reset();
 				for (int i = 0; i < ellipsesWork.size; i++) {
-					ellipsesVis.grow().set(ellipsesWork.get(i));
+					ellipsesVis.grow().setTo(ellipsesWork.get(i));
 				}
 			}
 		}
@@ -237,8 +237,8 @@ public class ContourShapeFittingActivity extends DemoBitmapCamera2Activity
 
 		PolylineSplitMerge alg = new PolylineSplitMerge();
 
-		final FastQueue<Polygon2D_I32> workPoly = new FastQueue<>(Polygon2D_I32::new);
-		final FastQueue<Polygon2D_I32> visPoly = new FastQueue<>(Polygon2D_I32::new);
+		final DogArray<Polygon2D_I32> workPoly = new DogArray<>(Polygon2D_I32::new);
+		final DogArray<Polygon2D_I32> visPoly = new DogArray<>(Polygon2D_I32::new);
 		Path path = new Path();
 
 		public PolygonProcessing() {
@@ -257,7 +257,7 @@ public class ContourShapeFittingActivity extends DemoBitmapCamera2Activity
 			poly.vertexes.resize(best.splits.size);
 			for (int i = 0; i < best.splits.size; i++) {
 				Point2D_I32 p = contour.get(best.splits.get(i));
-				poly.get(i).set(p);
+				poly.get(i).setTo(p);
 			}
 		}
 
@@ -271,7 +271,7 @@ public class ContourShapeFittingActivity extends DemoBitmapCamera2Activity
 			synchronized (lockGui) {
 				visPoly.reset();
 				for (int i = 0; i < workPoly.size; i++) {
-					visPoly.grow().set(workPoly.get(i));
+					visPoly.grow().setTo(workPoly.get(i));
 				}
 			}
 		}

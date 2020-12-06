@@ -15,16 +15,17 @@ import android.widget.Spinner;
 import org.boofcv.android.DemoBitmapCamera2Activity;
 import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
+import org.ddogleg.struct.DogArray_I32;
 
 import boofcv.alg.enhance.EnhanceImageOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.android.ConvertBitmap;
-import boofcv.concurrency.IWorkArrays;
 import boofcv.core.image.ConvertImage;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
+import pabeles.concurrency.GrowArray;
 
 /**
  * Blurs the input video image using different algorithms.
@@ -35,7 +36,7 @@ public class EnhanceDisplayActivity extends DemoBitmapCamera2Activity
 		implements AdapterView.OnItemSelectedListener, CompoundButton.OnCheckedChangeListener
 {
 
-	IWorkArrays work = new IWorkArrays();
+	GrowArray<DogArray_I32> work = new GrowArray<>(DogArray_I32::new);
 	Spinner spinnerView;
 	CheckBox checkColor;
 
@@ -120,8 +121,8 @@ public class EnhanceDisplayActivity extends DemoBitmapCamera2Activity
 	}
 
 	protected abstract class EnhanceProcessing extends DemoProcessingAbstract<GrayU8> {
-		int histogram[] = new int[256];
-		int transform[] = new int[256];
+		int[] histogram = new int[256];
+		int[] transform = new int[256];
 		GrayU8 enhanced = new GrayU8(1,1);
 
 		protected EnhanceProcessing() {
@@ -140,8 +141,8 @@ public class EnhanceDisplayActivity extends DemoBitmapCamera2Activity
 	}
 
 	protected abstract class EnhanceProcessingColor extends DemoProcessingAbstract<Planar<GrayU8>> {
-		int histogram[] = new int[256];
-		int transform[] = new int[256];
+		int[] histogram = new int[256];
+		int[] transform = new int[256];
 
 		Planar<GrayU8> enhanced = new Planar<>(GrayU8.class, 1, 1, 3);
 		GrayU8 gray = new GrayU8(1,1);

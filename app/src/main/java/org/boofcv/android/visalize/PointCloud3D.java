@@ -2,7 +2,7 @@ package org.boofcv.android.visalize;
 
 import android.opengl.GLES20;
 
-import org.ddogleg.struct.GrowQueue_F32;
+import org.ddogleg.struct.DogArray_F32;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.FMatrixRMaj;
 import org.ejml.ops.ConvertMatrixData;
@@ -50,8 +50,8 @@ public class PointCloud3D {
             "}";
 
     // TODO turn into local variable to reduce memory?
-    public GrowQueue_F32 points = new GrowQueue_F32();
-    public GrowQueue_F32 colors = new GrowQueue_F32();
+    public DogArray_F32 points = new DogArray_F32();
+    public DogArray_F32 colors = new DogArray_F32();
     private FloatBuffer vertexBuffer;
     private FloatBuffer colorBuffer;
 

@@ -1,6 +1,6 @@
 package org.boofcv.android.recognition;
 
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,14 +32,14 @@ public class FiducialDetector extends BaseDetectFiducialSquare<GrayU8> {
 	private GrayF32 grayNoBorder = new GrayF32();
 
 	// All the images inside which it found
-	private FastQueue<GrayU8> foundBinary;
+	private DogArray<GrayU8> foundBinary;
 
 	public FiducialDetector() {
 		super(FactoryThresholdBinary.globalOtsu(0, 255, 1.0,true, GrayU8.class),
 				FactoryShapeDetector.polygon(new ConfigPolygonDetector(false, 4, 4), GrayU8.class),
 				false,0.25, 0.5, squareLength + squareLength, GrayU8.class);
 
-		foundBinary = new FastQueue<>(()->new GrayU8(squareLength,squareLength));
+		foundBinary = new DogArray<>(()->new GrayU8(squareLength,squareLength));
 	}
 
 	@Override
@@ -52,7 +52,7 @@ public class FiducialDetector extends BaseDetectFiducialSquare<GrayU8> {
 	 * Returns a list of all detected fiducials
 	 */
 	public List<Detected> getDetected() {
-		FastQueue<FoundFiducial> found = getFound();
+		DogArray<FoundFiducial> found = getFound();
 		if( found.size() <= 0 )
 			return new ArrayList<>();
 

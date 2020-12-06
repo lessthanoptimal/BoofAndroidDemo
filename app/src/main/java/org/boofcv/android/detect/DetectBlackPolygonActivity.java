@@ -22,7 +22,7 @@ import org.boofcv.android.DemoBitmapCamera2Activity;
 import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
 import org.boofcv.android.misc.MiscUtil;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -243,7 +243,7 @@ public class DetectBlackPolygonActivity extends DemoBitmapCamera2Activity
 	protected class PolygonProcessing extends DemoProcessingAbstract<GrayU8> {
 
 		final List<Polygon2D_F64> found = new ArrayList<>();
-		final FastQueue<Polygon2D_F64> copy = new FastQueue<>(Polygon2D_F64::new);
+		final DogArray<Polygon2D_F64> copy = new DogArray<>(Polygon2D_F64::new);
 
 		Path path = new Path();
 
@@ -289,7 +289,7 @@ public class DetectBlackPolygonActivity extends DemoBitmapCamera2Activity
 				copy.reset();
 				detector.getPolygons(found, null);
 				for (int i = 0; i < found.size(); i++) {
-					copy.grow().set(found.get(i));
+					copy.grow().setTo(found.get(i));
 				}
 			}
 

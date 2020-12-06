@@ -3,8 +3,8 @@ package org.boofcv.android.sfm;
 import android.util.Log;
 
 import org.ddogleg.fitting.modelset.ModelMatcher;
+import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.FastQueue;
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.data.FMatrixRMaj;
 import org.ejml.ops.ConvertMatrixData;
@@ -12,12 +12,13 @@ import org.ejml.ops.ConvertMatrixData;
 import java.util.ArrayList;
 import java.util.List;
 
+import boofcv.abst.disparity.StereoDisparity;
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
-import boofcv.abst.feature.disparity.StereoDisparity;
 import boofcv.alg.descriptor.UtilFeature;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.geo.PerspectiveOps;
+import boofcv.alg.geo.RectifyDistortImageOps;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.geo.rectify.RectifyCalibrated;
 import boofcv.alg.geo.robust.ModelMatcherMultiview;
@@ -55,10 +56,10 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 
 	StereoDisparity<?, GrayF32> disparityAlg;
 
-	FastQueue<Desc> listSrc;
-	FastQueue<Desc> listDst;
-	FastQueue<Point2D_F64> locationSrc = new FastQueue<>(Point2D_F64::new);
-	FastQueue<Point2D_F64> locationDst = new FastQueue<>(Point2D_F64::new);
+	DogArray<Desc> listSrc;
+	DogArray<Desc> listDst;
+	DogArray<Point2D_F64> locationSrc = new DogArray<>(Point2D_F64::new);
+	DogArray<Point2D_F64> locationDst = new DogArray<>(Point2D_F64::new);
 
 	List<AssociatedPair> inliersPixel;
 
@@ -120,12 +121,12 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 
 	}
 
-	private void describeImage(FastQueue<Desc> listDesc, FastQueue<Point2D_F64> listLoc) {
+	private void describeImage(DogArray<Desc> listDesc, DogArray<Point2D_F64> listLoc) {
 		listDesc.reset();
 		listLoc.reset();
 		int N = detDesc.getNumberOfFeatures();
 		for( int i = 0; i < N; i++ ) {
-			listLoc.grow().set(detDesc.getLocation(i));
+			listLoc.grow().setTo(detDesc.getLocation(i));
 			listDesc.grow().setTo(detDesc.getDescription(i));
 		}
 	}
@@ -271,8 +272,8 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 		rectifyAlg.process(K, new Se3_F64(), K, leftToRight);
 
 		// rectification matrix for each image
-		DMatrixRMaj rect1 = rectifyAlg.getRect1();
-		DMatrixRMaj rect2 = rectifyAlg.getRect2();
+		DMatrixRMaj rect1 = rectifyAlg.getUndistToRectPixels1();
+		DMatrixRMaj rect2 = rectifyAlg.getUndistToRectPixels2();
 
 		// save calibration matrices
 		rectifiedK.set(rectifyAlg.getCalibrationMatrix());
@@ -293,10 +294,10 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 		ConvertMatrixData.convert(rect1,rect1_f);
 		ConvertMatrixData.convert(rect2,rect2_f);
 
-		ImageDistort<GrayU8,GrayU8> distortLeft =
-				RectifyImageOps.rectifyImage(intrinsic, rect1_f, BorderType.EXTENDED, ImageType.single(GrayU8.class));
-		ImageDistort<GrayU8,GrayU8> distortRight =
-				RectifyImageOps.rectifyImage(intrinsic, rect2_f, BorderType.EXTENDED, ImageType.single(GrayU8.class));
+		ImageDistort<GrayU8,GrayU8> distortLeft = RectifyDistortImageOps.rectifyImage(
+						intrinsic, rect1_f, BorderType.EXTENDED, ImageType.single(GrayU8.class));
+		ImageDistort<GrayU8,GrayU8> distortRight = RectifyDistortImageOps.rectifyImage(
+						intrinsic, rect2_f, BorderType.EXTENDED, ImageType.single(GrayU8.class));
 
 		distortLeft.apply(distortedLeft, rectifiedLeft, rectMask);
 		distortRight.apply(distortedRight, rectifiedRight);

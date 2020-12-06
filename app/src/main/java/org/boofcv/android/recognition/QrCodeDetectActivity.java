@@ -22,7 +22,7 @@ import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
 import org.boofcv.android.misc.MiscUtil;
 import org.boofcv.android.misc.RenderCube3D;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -149,8 +149,8 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
 
         QrCodeDetectorPnP<GrayU8> detector;
 
-        FastQueue<QrCode> detected = new FastQueue<>(QrCode::new);
-        FastQueue<QrCode> failures = new FastQueue<>(QrCode::new);
+        DogArray<QrCode> detected = new DogArray<>(QrCode::new);
+        DogArray<QrCode> failures = new DogArray<>(QrCode::new);
 
         Paint colorDetected = new Paint();
         Paint colorFailed = new Paint();
@@ -159,7 +159,7 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
         int uniqueCount = 0;
         int oldValue = -1;
 
-        final FastQueue<Se3_F64> listPose = new FastQueue<>(Se3_F64::new);
+        final DogArray<Se3_F64> listPose = new DogArray<>(Se3_F64::new);
         RenderCube3D renderCube = new RenderCube3D();
         CameraPinholeBrown intrinsic;
 
@@ -215,7 +215,7 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
                             QrCode qr = detected.get(i);
                             MiscUtil.renderPolygon(qr.bounds,path,canvas,colorDetected);
 
-                            if(touching && Intersection2D_F64.containConvex(qr.bounds,touched)) {
+                            if(touching && Intersection2D_F64.containsConvex(qr.bounds,touched)) {
                                 selectedQR = qr.message;
                             }
                         }

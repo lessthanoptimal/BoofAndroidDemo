@@ -21,7 +21,6 @@ import org.boofcv.android.R;
 import boofcv.alg.distort.AdjustmentType;
 import boofcv.alg.distort.ImageDistort;
 import boofcv.alg.distort.LensDistortionOps_F32;
-import boofcv.alg.distort.PointToPixelTransform_F32;
 import boofcv.alg.interpolate.InterpolatePixelS;
 import boofcv.android.ConvertBitmap;
 import boofcv.factory.distort.FactoryDistort;
@@ -30,6 +29,7 @@ import boofcv.struct.border.BorderType;
 import boofcv.struct.calib.CameraPinhole;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.distort.Point2Transform2_F32;
+import boofcv.struct.distort.PointToPixelTransform_F32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
@@ -123,7 +123,7 @@ public class UndistortDisplayActivity extends DemoBitmapCamera2Activity
 			if( intrinsic != null ) {
 				// define the transform.  Cache the results for quick rendering later on
 				CameraPinhole desired = new CameraPinhole();
-				desired.set(intrinsic);
+				desired.setTo(intrinsic);
 
 				Point2Transform2_F32 fullView = LensDistortionOps_F32.transformChangeModel(AdjustmentType.FULL_VIEW,
 						intrinsic,desired,false,null);
