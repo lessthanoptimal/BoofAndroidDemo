@@ -6,8 +6,10 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.TextureView;
@@ -18,6 +20,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import org.boofcv.android.DemoCamera2Activity;
 import org.boofcv.android.DemoProcessingAbstract;
@@ -26,15 +30,33 @@ import org.boofcv.android.visalize.PointCloudSurfaceView;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I8;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
+import boofcv.abst.geo.bundle.SceneStructureMetric;
+import boofcv.abst.tracker.PointTrack;
+import boofcv.alg.mvs.DisparityParameters;
+import boofcv.alg.mvs.MultiViewStereoFromKnownSceneStructure;
+import boofcv.alg.mvs.StereoPairGraph;
 import boofcv.alg.mvs.video.SelectFramesForReconstruction3D;
+import boofcv.alg.sfm.structure.GeneratePairwiseImageGraph;
+import boofcv.alg.sfm.structure.LookUpSimilarGivenTracks;
+import boofcv.alg.sfm.structure.MetricFromUncalibratedPairwiseGraph;
+import boofcv.alg.sfm.structure.PairwiseImageGraph;
+import boofcv.alg.sfm.structure.RefineMetricWorkingGraph;
+import boofcv.alg.sfm.structure.SceneWorkingGraph;
 import boofcv.android.ConvertBitmap;
 import boofcv.core.image.ConvertImage;
+import boofcv.factory.disparity.ConfigDisparityBMBest5;
+import boofcv.factory.disparity.FactoryStereoDisparity;
 import boofcv.factory.mvs.ConfigSelectFrames3D;
 import boofcv.factory.mvs.FactoryMultiViewStereo;
+import boofcv.io.image.LookUpImageFilesByIndex;
+import boofcv.misc.BoofMiscOps;
+import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.InterleavedU8;
@@ -47,7 +69,7 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
         implements AdapterView.OnItemSelectedListener
 {
     private static String TAG = "MVS";
-    private static final int MAX_SELECT = 10;
+    private static final int MAX_SELECT = 15;
 
     Spinner spinnerView;
     Spinner spinnerAlgs;
@@ -56,9 +78,29 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
     // If image collection should reset and start over
     boolean reset = false;
 
+    Mode mode = Mode.COLLECT_IMAGES;
+
+    // Used to print debug info to text view
+    ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
+    PrintStream debugStream = new PrintStream(byteOutputStream);
+    RedirectPrintToView repeatedRedirectTask = new RedirectPrintToView();
+    private Handler mHandler;
+
     // Used to display the found disparity as a 3D point cloud
     PointCloudSurfaceView cloudView;
+    // Displays debugging output from MVS
+    TextView stdoutView;
     ViewGroup layoutViews;
+
+    SparseReconstructionThread threadSparse;
+
+    final LookUpSimilarGivenTracks<PointTrack> similar =
+            new LookUpSimilarGivenTracks<>(t->t.featureId,(t,p)->p.setTo(t.pixel));
+    final DogArray<InterleavedU8> selectedImages = new DogArray<>(InterleavedU8::new);
+    SceneWorkingGraph working = null;
+    PairwiseImageGraph pairwise = null;
+    SceneStructureMetric scene = null;
+
 
     public MultiViewStereoActivity() {
         super(Resolution.R640x480);
@@ -97,6 +139,11 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerAlgs.setAdapter(adapter);
         spinnerAlgs.setOnItemSelectedListener(this);
+
+        stdoutView = new TextView(this);
+        stdoutView.setBackgroundColor(0xA0000000);
+        stdoutView.setMovementMethod(new ScrollingMovementMethod());
+        mHandler = new Handler();
 
         setControls(controls);
     }
@@ -137,11 +184,34 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
         reset = true;
     }
 
+    private void changeMode(Mode mode) {
+        if (this.mode == mode)
+            return;
+
+        Mode previousMode = this.mode;
+        this.mode = mode;
+
+        runOnUiThread(()->{
+            if (previousMode==Mode.SPARSE_RECONSTRUCTION) {
+                layoutViews.removeView(stdoutView);
+            }
+
+            if (mode==Mode.SPARSE_RECONSTRUCTION) {
+                stdoutView.setText("");
+                layoutViews.addView(stdoutView,layoutViews.getChildCount(),
+                        new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                // Start the process of redirecting output to this view
+                repeatedRedirectTask.run();
+
+                threadSparse = new SparseReconstructionThread();
+                threadSparse.start();
+            }
+        });
+    }
+
     protected class MvsProcessing extends DemoProcessingAbstract<InterleavedU8> {
         final SelectFramesForReconstruction3D<GrayU8> selector;
         final ConfigSelectFrames3D config = new ConfigSelectFrames3D();
-
-        final DogArray<GrayU8> frames = new DogArray<>(GrayU8::new);
 
         final GrayU8 gray = new GrayU8(1,1);
         Bitmap bitmap;
@@ -212,17 +282,34 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
 
         @Override
         public void process(InterleavedU8 color) {
+            if (mode != Mode.COLLECT_IMAGES)
+                return;
+
             ConvertImage.average(color, gray);
 
-            selector.next(gray);
+            boolean selectedFrame = selector.next(gray);
 
             lockTrack.lock();
             try {
                 // Handle when the user requests that it start over
                 if (reset) {
                     reset = false;
+                    selectedFrame = true;
                     selector.initialize(gray.width, gray.height);
+                    similar.reset();
+                    selectedImages.reset();
                 }
+
+                // This frame was selected as a key frame. Save results
+                if (selectedFrame) {
+                    similar.addFrame(gray.width, gray.height, selector.getActiveTracks());
+                    selectedImages.grow().setTo(color);
+                    if (selectedImages.size>=MAX_SELECT) {
+                        changeMode(Mode.SPARSE_RECONSTRUCTION);
+                    }
+                }
+
+                // Copy into bitmap for visualization
                 ConvertBitmap.interleavedToBitmap(color,bitmap,bitmapStorage);
                 selector.lookupKeyFrameTracksInCurrentFrame(trackPixels);
 
@@ -247,5 +334,161 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
                 lockTrack.unlock();
             }
         }
+    }
+
+    /**
+     * Redirects text to the text view
+     */
+    class RedirectPrintToView implements Runnable {
+        @Override
+        public void run() {
+            if (mode != Mode.SPARSE_RECONSTRUCTION)
+                return;
+
+            if (byteOutputStream.size()>0){
+                String text = byteOutputStream.toString();
+                byteOutputStream.reset();
+                runOnUiThread(()-> {
+                    stdoutView.append(text);
+                    // Automatically scroll to bottom as more text is added
+                    final int scrollAmount = stdoutView.getLayout().getLineTop(stdoutView.getLineCount()) - stdoutView.getHeight();
+                    stdoutView.scrollTo(0, Math.max(scrollAmount, 0));
+                });
+            }
+            mHandler.postDelayed(this,50);
+        }
+    }
+
+    class SparseReconstructionThread extends Thread {
+        boolean stop = false;
+        @Override
+        public void run() {
+            GeneratePairwiseImageGraph generatePairwise = new GeneratePairwiseImageGraph();
+            MetricFromUncalibratedPairwiseGraph metric = new MetricFromUncalibratedPairwiseGraph();
+
+            debugStream.println("Finding similar images");
+            similar.computeSimilarRelationships(true,200);
+
+            debugStream.println("Computing Pairwise Graph");
+            generatePairwise.setVerbose(debugStream, null);
+            generatePairwise.process(similar);
+
+            debugStream.println("Projective to Metric");
+            metric.setVerbose(debugStream, null);
+            metric.getInitProjective().setVerbose(debugStream, null);
+            metric.getExpandMetric().setVerbose(debugStream, null);
+            if (!metric.process(similar, generatePairwise.graph)) {
+                Toast.makeText(MultiViewStereoActivity.this,"Metric Failed", Toast.LENGTH_LONG).show();
+                changeMode(Mode.COLLECT_IMAGES);
+            }
+
+            debugStream.println("Bundle Adjustment");
+            RefineMetricWorkingGraph refine = new RefineMetricWorkingGraph();
+            refine.bundleAdjustment.keepFraction = 0.95;
+            refine.bundleAdjustment.getSba().setVerbose(debugStream, null);
+            if (!refine.process(similar, metric.workGraph)) {
+                Toast.makeText(MultiViewStereoActivity.this,"Bundle Adjustment Failed", Toast.LENGTH_LONG).show();
+                changeMode(Mode.COLLECT_IMAGES);
+            }
+
+            debugStream.println("----------------------------------------------------------------------------");
+            working = metric.workGraph;
+            pairwise = generatePairwise.graph;
+            scene = refine.bundleAdjustment.getStructure();
+            for (PairwiseImageGraph.View pv : pairwise.nodes.toList()) {
+                SceneWorkingGraph.View wv = working.lookupView(pv.id);
+                if (wv == null)
+                    continue;
+                int order = working.viewList.indexOf(wv);
+
+                debugStream.printf("view[%2d]='%2s' f=%6.1f k1=%6.3f k2=%6.3f t={%5.1f, %5.1f, %5.1f}\n", order, wv.pview.id,
+                        wv.intrinsic.f, wv.intrinsic.k1, wv.intrinsic.k2,
+                        wv.world_to_view.T.x, wv.world_to_view.T.y, wv.world_to_view.T.z);
+            }
+            debugStream.println("Printing view info. Used " + scene.views.size + " / " + pairwise.nodes.size);
+
+            changeMode(Mode.DENSE_STEREO);
+        }
+    }
+
+    class DenseCloudThread extends Thread {
+        @Override
+        public void run() {
+            ConfigDisparityBMBest5 configDisparity = new ConfigDisparityBMBest5();
+            configDisparity.validateRtoL = 1;
+            configDisparity.texture = 0.5;
+            configDisparity.regionRadiusX = configDisparity.regionRadiusY = 4;
+            configDisparity.disparityRange = 120;
+
+            // Looks up images based on their index in the file list
+            LookUpImageFilesByIndex imageLookup = null;//new LookUpImageFilesByIndex(example.imageFiles);
+
+            // Create and configure MVS
+            //
+            // Note that the stereo disparity algorithm used must output a GrayF32 disparity image as much of the code
+            // is hard coded to use it. MVS would not work without sub-pixel enabled.
+            MultiViewStereoFromKnownSceneStructure mvs = new MultiViewStereoFromKnownSceneStructure<>(imageLookup, ImageType.SB_U8);
+            mvs.setStereoDisparity(FactoryStereoDisparity.blockMatchBest5(configDisparity, GrayU8.class, GrayF32.class));
+            // Improve stereo by removing small regions, which tends to be noise. Consider adjusting the region size.
+            mvs.getComputeFused().setDisparitySmoother(FactoryStereoDisparity.removeSpeckle(null, GrayF32.class));
+            // Print out profiling info from multi baseline stereo
+            mvs.getComputeFused().setVerboseProfiling(debugStream);
+
+            // Grab intermediate results as they are computed
+//            mvs.setListener(new MultiViewStereoFromKnownSceneStructure.Listener<>() {
+//                @Override
+//                public void handlePairDisparity( String left, String right, GrayU8 rect0, GrayU8 rect1,
+//                                                 GrayF32 disparity, GrayU8 mask, DisparityParameters parameters ) {
+//                    // Displaying individual stereo pair results can be very useful for debugging, but this isn't done
+//                    // because of the amount of information it would show
+//                }
+//
+//                @Override
+//                public void handleFusedDisparity( String name,
+//                                                  GrayF32 disparity, GrayU8 mask, DisparityParameters parameters ) {
+//                    // Display the disparity for each center view
+//                    BufferedImage colorized = VisualizeImageData.disparity(disparity, null, parameters.disparityRange, 0);
+//                    ShowImages.showWindow(colorized, "Center " + name);
+//                }
+//            });
+
+            // MVS stereo needs to know which view pairs have enough 3D information to act as a stereo pair and
+            // the quality of that 3D information. This is used to guide which views act as "centers" for accumulating
+            // 3D information which is then converted into the point cloud.
+            //
+            // StereoPairGraph contains this information and we will create it from Pairwise and Working graphs.
+
+            StereoPairGraph mvsGraph = new StereoPairGraph();
+//            SceneStructureMetric _structure = example.scene;
+            // Add a vertex for each view
+            BoofMiscOps.forIdx(working.viewList, (i, wv ) -> mvsGraph.addVertex(wv.pview.id, i));
+            // Compute the 3D score for each connected view
+            BoofMiscOps.forIdx(working.viewList, ( workIdxI, wv ) -> {
+                PairwiseImageGraph.View pv = pairwise.mapNodes.get(wv.pview.id);
+                pv.connections.forIdx(( j, e ) -> {
+                    // Look at the ratio of inliers for a homography and fundamental matrix model
+                    PairwiseImageGraph.View po = e.other(pv);
+                    double ratio = 1.0 - Math.min(1.0, e.countH/(1.0 + e.countF));
+                    if (ratio <= 0.25)
+                        return;
+                    // There is sufficient 3D information between these two views
+                    SceneWorkingGraph.View wvo = working.views.get(po.id);
+                    int workIdxO = working.viewList.indexOf(wvo);
+                    if (workIdxO <= workIdxI)
+                        return;
+                    mvsGraph.connect(pv.id, po.id, ratio);
+                });
+            });
+
+            // Compute the dense 3D point cloud
+            mvs.process(scene, mvsGraph);
+        }
+    }
+
+    enum Mode {
+        COLLECT_IMAGES,
+        SPARSE_RECONSTRUCTION,
+        DENSE_STEREO,
+        VIEW_CLOUD
     }
 }
