@@ -1,6 +1,9 @@
 package org.boofcv.android;
 
+import android.app.ActivityManager;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.pm.ConfigurationInfo;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
@@ -542,7 +545,7 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
         }
     }
 
-    final float pts[] = new float[2];
+    final float[] pts = new float[2];
 
     /**
      * Applies the matrix to the specified point. Make sure only ONE thread uses this at any
@@ -556,7 +559,7 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
         out.y = pts[1];
     }
 
-    public static void applyToPoint(Matrix matrix , double x , double y , Point2D_F64 out, float pts[] ) {
+    public static void applyToPoint(Matrix matrix , double x , double y , Point2D_F64 out, float[] pts) {
         pts[0] = (float)x;
         pts[1] = (float)y;
         matrix.mapPoints(pts);
@@ -579,6 +582,13 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
             }
         }
         return intrinsic;
+    }
+
+    protected boolean hasGLES20() {
+        ActivityManager am = (ActivityManager)
+                getSystemService(Context.ACTIVITY_SERVICE);
+        ConfigurationInfo info = am.getDeviceConfigurationInfo();
+        return info.reqGlEsVersion >= 0x20000;
     }
 
     public boolean isCameraCalibrated() {

@@ -1,9 +1,6 @@
 package org.boofcv.android.sfm;
 
-import android.app.ActivityManager;
 import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.pm.ConfigurationInfo;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -194,17 +191,9 @@ public class DisparityActivity extends DemoCamera2Activity
 		}
 	}
 
-	private boolean hasGLES20() {
-		ActivityManager am = (ActivityManager)
-				getSystemService(Context.ACTIVITY_SERVICE);
-		ConfigurationInfo info = am.getDeviceConfigurationInfo();
-		return info.reqGlEsVersion >= 0x20000;
-	}
-
 	@Override
 	protected void onResume() {
 		super.onResume();
-
 		changeView(DView.ASSOCIATION,false);
 	}
 

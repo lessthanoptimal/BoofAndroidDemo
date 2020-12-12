@@ -66,7 +66,7 @@ public class KltDisplayActivity extends PointTrackerDisplayActivity {
 
 	@Override
 	public void createNewProcessor() {
-		Log.i("KLT","MaxFeatuers="+maxFeatures);
+		Log.i("KLT","MaxFeatures="+maxFeatures);
 		ConfigPointDetector configDet = new ConfigPointDetector();
 		configDet.type = PointDetectorTypes.SHI_TOMASI;
 		configDet.shiTomasi.radius = 3;
@@ -78,10 +78,10 @@ public class KltDisplayActivity extends PointTrackerDisplayActivity {
 		ConfigPKlt configKlt = new ConfigPKlt();
 		configKlt.pyramidLevels = ConfigDiscreteLevels.minSize(40);
 		configKlt.templateRadius = 3;
-		configKlt.maximumTracks = configDet.general.maxFeatures;
+		configKlt.maximumTracks.setFixed(configDet.general.maxFeatures);
 		configKlt.toleranceFB = 2;
 
-		respawnThreshold = Math.max(1,configKlt.maximumTracks/4);
+		respawnThreshold = Math.max(1,(int)(configKlt.maximumTracks.length/4));
 
 		PointTracker<GrayU8> tracker =
 				FactoryPointTracker.klt(configKlt,configDet,GrayU8.class, GrayS16.class);

@@ -63,6 +63,9 @@
         <activity
             android:name=".sfm.DisparityActivity"
             android:screenOrientation="landscape" />
+        <activity
+            android:name=".sfm.MultiViewStereoActivity"
+            android:screenOrientation="landscape" />
         <activity android:name=".AboutActivity" />
         <activity android:name=".tracker.ObjectTrackerActivity"/>
         <activity android:name=".tracker.KltDisplayActivity"/>

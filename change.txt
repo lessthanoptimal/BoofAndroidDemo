@@ -3,7 +3,7 @@ Change Log for BoofCV Demonstration App
 (year)-(month)-(day)
 
 -------------------------------------------------
-Version 2.6.6
+Version 2.7.0
 Date:
 
 - Updated to BoofCV 0.37
@@ -11,12 +11,12 @@ Date:
   * I'm a bit surprised this only caused a problem now and only on some phones
 - Stereo Disparity
   * Added speckle filter
+  * TODO pop up menu which contains existing spinners
 - KLT Tracker
   * Added two rendering modes: dots and lines
   * HSV colorization for direction and magnitude
-- TODO Uncalibrated 3-View
+- TODO Add Uchiya Markers
 - TODO Uncalibrated N-View
-- TODO Fix stereo rotation
 
 -------------------------------------------------
 Version 2.6.5

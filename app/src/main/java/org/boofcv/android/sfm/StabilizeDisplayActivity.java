@@ -43,7 +43,7 @@ import georegression.transform.homography.HomographyPointOps_F64;
  * @author Peter Abeles
  */
 public class StabilizeDisplayActivity extends DemoBitmapCamera2Activity
-implements CompoundButton.OnCheckedChangeListener
+		implements CompoundButton.OnCheckedChangeListener
 {
 
 	Paint paintBorder=new Paint();

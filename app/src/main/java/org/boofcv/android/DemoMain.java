@@ -52,6 +52,7 @@ import org.boofcv.android.segmentation.ColorHistogramSegmentationActivity;
 import org.boofcv.android.segmentation.SuperpixelDisplayActivity;
 import org.boofcv.android.sfm.DisparityActivity;
 import org.boofcv.android.sfm.MosaicDisplayActivity;
+import org.boofcv.android.sfm.MultiViewStereoActivity;
 import org.boofcv.android.sfm.StabilizeDisplayActivity;
 import org.boofcv.android.tracker.KltDisplayActivity;
 import org.boofcv.android.tracker.ObjectTrackerActivity;
@@ -183,7 +184,8 @@ public class DemoMain extends AppCompatActivity implements ExpandableListView.On
 		calib.addChild("Calibrate",CalibrationActivity.class);
 		calib.addChild("Undistort",UndistortDisplayActivity.class);
 
-		sfm.addChild("Stereo",DisparityActivity.class);
+		sfm.addChild("Calibrated Stereo",DisparityActivity.class);
+		sfm.addChild("Uncalibrated MVS", MultiViewStereoActivity.class);
 		sfm.addChild("Stabilization",StabilizeDisplayActivity.class);
 		sfm.addChild("Mosaic",MosaicDisplayActivity.class);
 

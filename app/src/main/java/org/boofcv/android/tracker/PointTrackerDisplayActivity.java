@@ -94,7 +94,7 @@ public abstract class PointTrackerDisplayActivity extends DemoCamera2Activity {
 					hsv[2] = (float)(0.40+Math.min(1.0,s.distance(p)/maxRange)*0.60);
 					if (renderDots) {
 						paintDot.setColor(Color.HSVToColor(hsv));
-						canvas.drawCircle((int) p.x, (int) p.y, circleRadius*3.5f, paintDot);
+						canvas.drawCircle((float) p.x, (float) p.y, circleRadius*3.5f, paintDot);
 					} else {
 						paintLine.setColor(Color.HSVToColor(hsv));
 						canvas.drawLine((float) s.x, (float) s.y, (float) p.x, (float) p.y, paintLine);
