@@ -13,9 +13,11 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +29,7 @@ import android.widget.PopupMenu;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import org.apache.commons.io.FilenameUtils;
 import org.boofcv.android.DemoCamera2Activity;
 import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
@@ -90,7 +93,7 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
         implements AdapterView.OnItemSelectedListener, PopupMenu.OnMenuItemClickListener
 {
     private static final String TAG = "MVS";
-    private static final int MAX_SELECT = 10;
+    private static final int MAX_SELECT = 25;
 
     Spinner spinnerDisplay;
     Button buttonConfigure;
@@ -98,6 +101,9 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
 
     // If image collection should reset and start over
     boolean reset = false;
+
+    // React to user gestures, e.g. change images being viewed
+    private GestureDetector mDetector;
 
     // What step is MVS on
     Mode mode = Mode.COLLECT_IMAGES;
@@ -125,24 +131,28 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
         ConvertBitmap.bitmapToBoof(BitmapFactory.decodeFile(path),image,null);
     });
 
-    // BEGIN LOCK OWNERSHIP
+    //----------------- BEGIN LOCK OWNERSHIP
     final ReentrantLock lockDisplayImage = new ReentrantLock();
+    // Color or disparity images
+    boolean displayImageRgb;
     // Which image is being displayed
     int displayImageIdx;
-    // Which disparity is being displayed
-    int displayDisparityIdx;
+    final List<String> displayImagePaths = new ArrayList<>();
     boolean displayImageChanged=false;
-    // END LOCK OWNERSHIP
+    //----------------- END LOCK OWNERSHIP
 
     SceneWorkingGraph working = null;
     PairwiseImageGraph pairwise = null;
     SceneStructureMetric scene = null;
 
+    //----------------- BEGIN LOCK
     final ReentrantLock lockCloud = new ReentrantLock();
+    final List<String> disparityPaths = new ArrayList<>();
     Bitmap bitmapDisparity;
     String textDisparity="";
     DogArray_I8 workspaceDisparity = new DogArray_I8();
     DenseCloudThread threadCloud = null;
+    //----------------- END LOCK
 
     // Workspace where the current reconstruction has files saved to
     File workingDir = new File(".");
@@ -188,6 +198,12 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
         mHandler = new Handler();
 
         setControls(controls);
+
+        mDetector = new GestureDetector(this, new MyGestureDetector(displayView));
+        displayView.setOnTouchListener((v, event) -> {
+            mDetector.onTouchEvent(event);
+            return true;
+        });
 
         cloudView = new PointCloudSurfaceView(this);
         workingDir = createMvsWorkDirectory();
@@ -282,6 +298,7 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
                 threadSparse = new SparseReconstructionThread();
                 threadSparse.start();
             } else if (mode==Mode.DENSE_STEREO) {
+                disparityPaths.clear();
                 bitmapDisparity = null;
                 textDisparity = "Multi-Baseline Stereo";
                 changeDisplay(Display.DISPARITY);
@@ -324,18 +341,87 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
                     new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         } else if (display==Display.IMAGES) {
             lockDisplayImage.lock();
-            displayImageIdx = 0;
-            displayImageChanged = true;
-            lockDisplayImage.unlock();
+            try {
+                displayImageRgb = true;
+                displayImageIdx = 0;
+                displayImageChanged = true;
+                displayImagePaths.clear();
+                displayImagePaths.addAll(imageFiles);
+            } finally {
+                lockDisplayImage.unlock();
+            }
         } else if (display==Display.DISPARITY) {
             lockDisplayImage.lock();
-            displayDisparityIdx = 0;
-            displayImageChanged = true;
-            lockDisplayImage.unlock();
+            try {
+                displayImageRgb = false;
+                displayImageIdx = 0;
+                displayImageChanged = true;
+                displayImagePaths.clear();
+                displayImagePaths.addAll(disparityPaths);
+            } finally {
+                lockDisplayImage.unlock();
+            }
         }
 
         // Update the spinner so that it correctly indicates which display is being shown
         spinnerDisplay.setSelection(display.ordinal());
+    }
+
+    /**
+     * Use guestures to interact with the GUI
+     */
+    protected class MyGestureDetector extends GestureDetector.SimpleOnGestureListener
+    {
+        View v;
+
+        public MyGestureDetector(View v) {
+            this.v = v;
+        }
+
+        @Override
+        public boolean onFling( MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            // Change the image being viewed
+            if (display==Display.IMAGES || display==Display.DISPARITY) {
+                if (Math.abs(velocityX) < Math.abs(velocityY)*3)
+                    return false;
+
+                lockDisplayImage.lock();
+                try {
+                    if (velocityX > 0)
+                        displayImageIdx--;
+                    else
+                        displayImageIdx++;
+                    final int N = displayImagePaths.size();
+                    if (displayImageIdx<0)
+                        displayImageIdx = N-1;
+                    else if (displayImageIdx>=N)
+                        displayImageIdx=0;
+                    displayImageChanged = true;
+                } finally {
+                    lockDisplayImage.unlock();
+                }
+
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public boolean onSingleTapConfirmed(MotionEvent e){
+            if (display==Display.IMAGES || display==Display.DISPARITY) {
+                lockDisplayImage.lock();
+                try {
+                    displayImageIdx++;
+                    if (displayImageIdx>=displayImagePaths.size())
+                        displayImageIdx=0;
+                    displayImageChanged = true;
+                } finally {
+                    lockDisplayImage.unlock();
+                }
+                return true;
+            }
+            return false;
+        }
     }
 
     protected class MvsProcessing extends DemoProcessingAbstract<InterleavedU8> {
@@ -386,23 +472,17 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
             paintText.setTextAlign(Paint.Align.LEFT);
             paintText.setARGB(0xFF,0xFF,0xB0,0);
             paintText.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD));
+
         }
 
         @Override
         public void onDraw(Canvas canvas, Matrix imageToView) {
-            if (display == Display.DISPARITY) {
-                // Draw status on the bottom of the screen. This avoid conflict with FPS text
-                canvas.drawText(textDisparity,10,canvas.getHeight()-40*displayMetrics.density,paintText);
-                lockCloud.lock();
-                try {
-                    if (bitmapDisparity != null)
-                        canvas.drawBitmap(bitmapDisparity, 0, 0, null);
-                } finally {
-                    lockCloud.unlock();
-                }
-            } else if(display == Display.IMAGES) {
+            if (display == Display.IMAGES || display == Display.DISPARITY) {
+                canvas.drawText(statusText,10,canvas.getHeight()-40*displayMetrics.density,paintText);
                 canvas.concat(imageToView);
-                canvas.drawBitmap(bitmap,0,0,null);
+                if (bitmap!=null) {
+                    canvas.drawBitmap(bitmap,0,0,null);
+                }
             } else if(display == Display.COLLECT){
                 // Draw status on the bottom of the screen. This avoid conflict with FPS text
                 canvas.drawText(statusText,10,canvas.getHeight()-40*displayMetrics.density,paintText);
@@ -428,14 +508,31 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
             // Load display images here since this won't lock the UI thread
             {
                 boolean changed;
-                int index;
+                String path=null;
                 lockDisplayImage.lock();
-                changed = displayImageChanged;
-                index = displayImageIdx;
-                lockDisplayImage.unlock();
-                if (display == Display.IMAGES && changed) {
+                try {
+                    changed = displayImageChanged;
+                    if (displayImagePaths.size() > displayImageIdx) {
+                        path = displayImagePaths.get(displayImageIdx);
+                    }
+                } finally {
+                    lockDisplayImage.unlock();
+                }
+
+                if ((display == Display.IMAGES||display==Display.DISPARITY) && changed && path != null) {
                     displayImageChanged = false;
-                    bitmap = BitmapFactory.decodeFile(imageFiles.get(index));
+                    bitmap = BitmapFactory.decodeFile(path);
+                    if (displayImageRgb)
+                        statusText = "Image "+displayImageIdx;
+                    else {
+                        statusText = "Disparity "+FilenameUtils.getBaseName(path).split("_")[1];
+                    }
+                } else if(display==Display.DISPARITY && path == null) {
+                    statusText = textDisparity;
+                    bitmap = null;
+                } else if(display == Display.IMAGES && path == null) {
+                    statusText = "No Images";
+                    bitmap = null;
                 }
             }
 
@@ -469,7 +566,7 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
                                 similar.getImageIDs().size()));
                         try {
                             FileOutputStream fos = new FileOutputStream(dest);
-                            bitmap.compress(Bitmap.CompressFormat.PNG,90,fos);
+                            bitmap.compress(Bitmap.CompressFormat.PNG,100,fos);
                             fos.close();
                             imageFiles.add(dest.getPath());
                         } catch (IOException e) {
@@ -497,10 +594,10 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
 
                     statusText = "Images: " + selector.getSelectedFrames().size;
 
-                    Log.i(TAG, String.format("consider=%s motion=%5.1f 3d=%.1f h=%.1f pairs=%4d keyFrames=%d",
-                            selector.isConsidered3D(), selector.getFrameMotion(),
-                            error3D, errorH, selector.getPairs().size,
-                            selector.getSelectedFrames().size));
+//                    Log.i(TAG, String.format("consider=%s motion=%5.1f 3d=%.1f h=%.1f pairs=%4d keyFrames=%d",
+//                            selector.isConsidered3D(), selector.getFrameMotion(),
+//                            error3D, errorH, selector.getPairs().size,
+//                            selector.getSelectedFrames().size));
                 }
             } finally {
                 lockTrack.unlock();
@@ -650,7 +747,6 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
                                                   GrayF32 disparity, GrayU8 mask, DisparityParameters parameters ) {
                     lockCloud.lock();
                     try {
-                        textDisparity = "Image "+name;
                         bitmapDisparity = ConvertBitmap.checkDeclare(disparity, bitmapDisparity);
                         VisualizeImageData.disparity(disparity,parameters.disparityRange,0,
                                 bitmapDisparity, workspaceDisparity);
@@ -658,6 +754,26 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
                         // TODO save to disk and create a list for later display
                     } finally {
                         lockCloud.unlock();
+                    }
+                    // at this point disparity is read only so this is safe and won't block the UI
+                    File file = new File(workingDir,String.format("disparity/visualized_%s.png",name));
+                    Log.i(TAG,"Saving "+file.getPath());
+                    disparityPaths.add(file.getPath());
+                    try {
+                        bitmapDisparity.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(file));
+                    } catch (IOException e ) {
+                        e.printStackTrace();
+                    }
+
+                    // Tell it that the image to display has changed
+                    lockDisplayImage.lock();
+                    try {
+                        displayImagePaths.clear();
+                        displayImagePaths.addAll(disparityPaths);
+                        displayImageIdx = disparityPaths.size()-1;
+                        displayImageChanged = true;
+                    } finally {
+                        lockDisplayImage.unlock();
                     }
                 }
             });
@@ -753,8 +869,8 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
     }
 
     enum Display {
-        IMAGES,
         DEBUG,
+        IMAGES,
         DISPARITY,
         SPARSE_CLOUD,
         DENSE_CLOUD,

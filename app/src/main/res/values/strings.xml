@@ -152,8 +152,8 @@
     </string-array>
 
     <string-array name="mvs_views">
-        <item>Images</item>
         <item>Debug</item>
+        <item>Images</item>
         <item>Disparity</item>
         <item>Sparse 3D</item>
         <item>Dense 3D</item>
