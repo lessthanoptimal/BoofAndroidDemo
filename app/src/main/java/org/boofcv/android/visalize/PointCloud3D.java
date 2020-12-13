@@ -27,7 +27,7 @@ import static org.boofcv.android.visalize.PointCloud3DRenderer.checkError;
 
 public class PointCloud3D {
 
-    final int NUM_POINTS = 100;
+    final int NUM_POINTS = 1000;
 
     private int COORDS_PER_VERTEX = 3; // (x,y,z)
 
@@ -96,12 +96,13 @@ public class PointCloud3D {
 
     public void createRandomCloud() {
         declarePoints(NUM_POINTS);
+        float scale = 2.0f;
 
         Random rand = new Random(2345);
         for (int i = 0,idx=0; i < NUM_POINTS; i++) {
-            points.data[idx++] = rand.nextFloat()-0.5f;
-            points.data[idx++] = rand.nextFloat()-0.5f;
-            points.data[idx++] = rand.nextFloat()-0.5f;
+            points.data[idx++] = scale*(rand.nextFloat()-0.5f);
+            points.data[idx++] = scale*(rand.nextFloat()-0.5f);
+            points.data[idx++] = scale*(rand.nextFloat()-0.5f);
         }
 
         for (int i = 0,idx=0; i < NUM_POINTS; i++) {
@@ -171,7 +172,6 @@ public class PointCloud3D {
                 int cpx = (int)colorPt.x;
                 int cpy = (int)colorPt.y;
 
-
                 if( BoofMiscOps.isInside(colorImage, cpx, cpy) ) {
                     int rgb = colorImage.get24(cpx, cpy);
                     colors.data[j++] = ((rgb>>16)&0xFF)/255.0f;
@@ -186,13 +186,30 @@ public class PointCloud3D {
             }
         }
 
+        points.size = i;
+        colors.size = j;
+        finalizePoints();
+    }
+
+    public void setPoint(int idx, double x, double y, double z, int rgb ) {
+        int i = idx*3;
+        points.data[i  ] = (float)x;
+        points.data[i+1] = (float)y;
+        points.data[i+2] = (float)z;
+
+        colors.data[i  ] = ((rgb>>16)&0xFF)/255.0f;
+        colors.data[i+1] = ((rgb>>8)&0xFF)/255.0f;
+        colors.data[i+2] = (rgb&0xFF)/255.0f;
+    }
+
+    public void finalizePoints() {
         vertexBuffer.put(points.data,0,points.size);
         vertexBuffer.position(0);
         colorBuffer.put(colors.data,0,colors.size);
         colorBuffer.position(0);
     }
 
-    private void declarePoints(int totalPoints ) {
+    public void declarePoints(int totalPoints ) {
         points.resize(totalPoints*3);
         colors.resize(totalPoints*3);
         {

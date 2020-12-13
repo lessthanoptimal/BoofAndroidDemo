@@ -65,7 +65,8 @@
             android:screenOrientation="landscape" />
         <activity
             android:name=".sfm.MultiViewStereoActivity"
-            android:screenOrientation="landscape" />
+            android:screenOrientation="landscape"
+            android:keepScreenOn="true" />
         <activity android:name=".AboutActivity" />
         <activity android:name=".tracker.ObjectTrackerActivity"/>
         <activity android:name=".tracker.KltDisplayActivity"/>
