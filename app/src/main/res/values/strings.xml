@@ -159,11 +159,6 @@
         <item>Dense 3D</item>
     </string-array>
 
-    <string-array name="mvs_configure">
-        <item>Scene</item>
-        <item>Disparity</item>
-    </string-array>
-
     <string-array name="disparity_algs">
         <item>BlockMatch</item>
         <item>BlockMatch5</item>
