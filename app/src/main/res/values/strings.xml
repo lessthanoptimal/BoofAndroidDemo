@@ -151,6 +151,19 @@
         <item>Cloud 3D</item>
     </string-array>
 
+    <string-array name="mvs_views">
+        <item>Images</item>
+        <item>Debug</item>
+        <item>Disparity</item>
+        <item>Sparse 3D</item>
+        <item>Dense 3D</item>
+    </string-array>
+
+    <string-array name="mvs_configure">
+        <item>Scene</item>
+        <item>Disparity</item>
+    </string-array>
+
     <string-array name="disparity_algs">
         <item>BlockMatch</item>
         <item>BlockMatch5</item>

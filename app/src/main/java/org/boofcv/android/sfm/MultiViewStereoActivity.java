@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.method.ScrollingMovementMethod;
@@ -21,7 +22,6 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.boofcv.android.DemoCamera2Activity;
 import org.boofcv.android.DemoProcessingAbstract;
@@ -75,16 +75,19 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
         implements AdapterView.OnItemSelectedListener
 {
     private static final String TAG = "MVS";
-    private static final int MAX_SELECT = 15;
+    private static final int MAX_SELECT = 10;
 
     Spinner spinnerView;
-    Spinner spinnerAlgs;
+    Spinner spinnerConfigure;
     Button buttonSave;
 
     // If image collection should reset and start over
     boolean reset = false;
 
+    // What step is MVS on
     Mode mode = Mode.COLLECT_IMAGES;
+    // What should be displayed to the user
+    Display display = Display.COLLECT;
 
     // Used to print debug info to text view
     ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
@@ -95,7 +98,7 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
     // Used to display the found disparity as a 3D point cloud
     PointCloudSurfaceView cloudView;
     // Displays debugging output from MVS
-    TextView stdoutView;
+    TextView debugView;
     ViewGroup layoutViews;
 
     SparseReconstructionThread threadSparse;
@@ -130,16 +133,13 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
         buttonSave = controls.findViewById(R.id.button_save);
         buttonSave.setEnabled(false);
 
-        if (!hasGLES20()) {
-            toast("No GLES20. Point cloud rendering will fail");
-        }
-
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.disparity_views, android.R.layout.simple_spinner_item);
+                R.array.mvs_views, android.R.layout.simple_spinner_item);
         // if it doesn't support 3D rendering remove the cloud option
         if( !hasGLES20() ) {
+            toast("No GLES20. Can't display point cloud");
             List<CharSequence> list = new ArrayList<>();
-            for( int i = 0; i < adapter.getCount()-1; i++ ) {
+            for( int i = 0; i < adapter.getCount()-2; i++ ) {
                 list.add(adapter.getItem(i));
             }
             adapter = new ArrayAdapter<>(this,android.R.layout.simple_spinner_item,list);
@@ -147,17 +147,18 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerView.setAdapter(adapter);
         spinnerView.setOnItemSelectedListener(this);
+        spinnerView.setEnabled(false);
 
-        spinnerAlgs = controls.findViewById(R.id.spinner_algs);
+        spinnerConfigure = controls.findViewById(R.id.spinner_configure);
         adapter = ArrayAdapter.createFromResource(this,
-                R.array.disparity_algs, android.R.layout.simple_spinner_item);
+                R.array.mvs_configure, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerAlgs.setAdapter(adapter);
-        spinnerAlgs.setOnItemSelectedListener(this);
+        spinnerConfigure.setAdapter(adapter);
+        spinnerConfigure.setOnItemSelectedListener(this);
 
-        stdoutView = new TextView(this);
-        stdoutView.setBackgroundColor(0xA0000000);
-        stdoutView.setMovementMethod(new ScrollingMovementMethod());
+        debugView = new TextView(this);
+        debugView.setBackgroundColor(0xA0000000);
+        debugView.setMovementMethod(new ScrollingMovementMethod());
         mHandler = new Handler();
 
         setControls(controls);
@@ -184,7 +185,12 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
+        if (parent==spinnerView) {
+            // You should only be able to select an item in the view spinner while viewing results
+            if (mode!=Mode.VIEW_RESULTS)
+                return;
+            changeDisplay(Display.values()[position]);
+        }
     }
 
     @Override
@@ -193,6 +199,10 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
     }
 
     public void resetPressed( View view ) {
+        reset = true;
+    }
+
+    public void savePressed( View view ) {
         reset = true;
     }
 
@@ -206,32 +216,62 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
         Log.i(TAG,"Mode: "+previousMode+" -> "+mode);
 
         runOnUiThread(()->{
-            if (previousMode==Mode.SPARSE_RECONSTRUCTION) {
-                layoutViews.removeView(stdoutView);
-            } else if(previousMode==Mode.VIEW_CLOUD) {
-                layoutViews.removeView(cloudView);
-            }
-
-            if (mode==Mode.SPARSE_RECONSTRUCTION) {
-                stdoutView.setText("");
-                layoutViews.addView(stdoutView,layoutViews.getChildCount(),
-                        new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            if (mode==Mode.COLLECT_IMAGES) {
+                // disable since there is a sequence of events that need to be followed now
+                spinnerView.setEnabled(false);
+                buttonSave.setEnabled(false);
+                changeDisplay(Display.COLLECT);
+            } else if (mode==Mode.SPARSE_RECONSTRUCTION) {
                 // Start the process of redirecting output to this view
+                debugView.setText("");
+                changeDisplay(Display.DEBUG);
                 repeatedRedirectTask.run();
-
                 threadSparse = new SparseReconstructionThread();
                 threadSparse.start();
             } else if (mode==Mode.DENSE_STEREO) {
                 bitmapDisparity = null;
                 textDisparity = "Multi-Baseline Stereo";
+                changeDisplay(Display.DISPARITY);
                 threadCloud = new DenseCloudThread();
                 threadCloud.start();
-            } else if (mode==Mode.VIEW_CLOUD) {
+            } else if (mode==Mode.VIEW_RESULTS) {
                 Log.i(TAG,"Added cloudView");
-                layoutViews.addView(cloudView,layoutViews.getChildCount(),
-                        new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                // Enable the view spinner so the user can select what should be viewed
+                spinnerView.setEnabled(true);
+                buttonSave.setEnabled(true);
+                changeDisplay(Display.DENSE_CLOUD);
             }
         });
+    }
+
+    private void changeDisplay(Display display) {
+        if (this.display == display)
+            return;
+
+        if (Looper.getMainLooper().getThread() != Thread.currentThread()) {
+            throw new RuntimeException("Must be in UI thread");
+        }
+
+        Display previous = this.display;
+        this.display = display;
+
+        Log.i(TAG,"Display: "+previous+" -> "+display);
+
+        if (previous==Display.DEBUG) {
+            layoutViews.removeView(debugView);
+        } else if(previous==Display.DENSE_CLOUD) {
+            layoutViews.removeView(cloudView);
+        }
+
+        if (display==Display.DEBUG) {
+            Log.i(TAG,"Added debugView");
+            layoutViews.addView(debugView,layoutViews.getChildCount(),
+                    new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        } else if (display==Display.DENSE_CLOUD) {
+            Log.i(TAG,"Added cloudView");
+            layoutViews.addView(cloudView,layoutViews.getChildCount(),
+                    new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        }
     }
 
     protected class MvsProcessing extends DemoProcessingAbstract<InterleavedU8> {
@@ -286,7 +326,7 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
 
         @Override
         public void onDraw(Canvas canvas, Matrix imageToView) {
-            if (mode == Mode.DENSE_STEREO) {
+            if (display == Display.DISPARITY) {
                 // Draw status on the bottom of the screen. This avoid conflict with FPS text
                 canvas.drawText(textDisparity,10,canvas.getHeight()-40*displayMetrics.density,paintText);
                 lockCloud.lock();
@@ -296,7 +336,7 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
                 } finally {
                     lockCloud.unlock();
                 }
-            } else if(mode == Mode.COLLECT_IMAGES){
+            } else if(display == Display.COLLECT){
                 // Draw status on the bottom of the screen. This avoid conflict with FPS text
                 canvas.drawText(statusText,10,canvas.getHeight()-40*displayMetrics.density,paintText);
 
@@ -318,6 +358,7 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
 
         @Override
         public void process(InterleavedU8 color) {
+            // TODO should it shut off the camera when not in use?
             if (mode != Mode.COLLECT_IMAGES)
                 return;
 
@@ -371,27 +412,23 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
         }
     }
 
-    private void toast(String message) {
-        runOnUiThread(() -> Toast.makeText(this,message,Toast.LENGTH_LONG).show());
-    }
-
     /**
      * Redirects text to the text view
      */
     class RedirectPrintToView implements Runnable {
         @Override
         public void run() {
-            if (mode != Mode.SPARSE_RECONSTRUCTION)
+            if (mode != Mode.SPARSE_RECONSTRUCTION && mode != Mode.DENSE_STEREO)
                 return;
 
             if (byteOutputStream.size()>0){
                 String text = byteOutputStream.toString();
                 byteOutputStream.reset();
                 runOnUiThread(()-> {
-                    stdoutView.append(text);
+                    debugView.append(text);
                     // Automatically scroll to bottom as more text is added
-                    final int scrollAmount = stdoutView.getLayout().getLineTop(stdoutView.getLineCount()) - stdoutView.getHeight();
-                    stdoutView.scrollTo(0, Math.max(scrollAmount, 0));
+                    final int scrollAmount = debugView.getLayout().getLineTop(debugView.getLineCount()) - debugView.getHeight();
+                    debugView.scrollTo(0, Math.max(scrollAmount, 0));
                 });
             }
             mHandler.postDelayed(this,50);
@@ -564,7 +601,7 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
                 cloudShow.finalizePoints();
 //                cloudShow.clearCloud();
 //                cloudShow.createRandomCloud();
-                changeMode(Mode.VIEW_CLOUD);
+                changeMode(Mode.VIEW_RESULTS);
             });
         }
     }
@@ -573,6 +610,15 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
         COLLECT_IMAGES,
         SPARSE_RECONSTRUCTION,
         DENSE_STEREO,
-        VIEW_CLOUD
+        VIEW_RESULTS
+    }
+
+    enum Display {
+        IMAGES,
+        DEBUG,
+        DISPARITY,
+        SPARSE_CLOUD,
+        DENSE_CLOUD,
+        COLLECT
     }
 }

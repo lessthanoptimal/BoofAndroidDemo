@@ -591,6 +591,13 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
         return info.reqGlEsVersion >= 0x20000;
     }
 
+    /**
+     * Display a message using Toast
+     */
+    protected void toast(String message) {
+        runOnUiThread(() -> Toast.makeText(this,message,Toast.LENGTH_LONG).show());
+    }
+
     public boolean isCameraCalibrated() {
         return app.preference.lookup(cameraWidth,cameraHeight) != null;
     }
