@@ -4,7 +4,7 @@ Change Log for BoofCV Demonstration App
 
 -------------------------------------------------
 Version 2.7.0
-Date:
+Date: 2020-12-14
 
 - Updated to BoofCV 0.37-SNAPSHOT
 - Fixed crash issues for DemoBitmapCamera2Activity
@@ -15,6 +15,7 @@ Date:
   * Added two rendering modes: dots and lines
   * HSV colorization for direction and magnitude
 - Add Uncalibrated Multi View Stereo
+
 -------------------------------------------------
 Version 2.6.5
 Date: 2020-05-17
