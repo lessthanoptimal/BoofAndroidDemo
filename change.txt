@@ -6,18 +6,15 @@ Change Log for BoofCV Demonstration App
 Version 2.7.0
 Date:
 
-- Updated to BoofCV 0.37
+- Updated to BoofCV 0.37-SNAPSHOT
 - Fixed crash issues for DemoBitmapCamera2Activity
   * I'm a bit surprised this only caused a problem now and only on some phones
 - Stereo Disparity
   * Added speckle filter
-  * TODO pop up menu which contains existing spinners
 - KLT Tracker
   * Added two rendering modes: dots and lines
   * HSV colorization for direction and magnitude
-- TODO Add Uchiya Markers
-- TODO Uncalibrated N-View
-
+- Add Uncalibrated Multi View Stereo
 -------------------------------------------------
 Version 2.6.5
 Date: 2020-05-17

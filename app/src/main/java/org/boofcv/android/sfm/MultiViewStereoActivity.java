@@ -101,6 +101,7 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
     // TODO Add help button that takes you to a website/youtube video
     // TODO configure disparity calculation. alg + max range
     // TODO Clean up this class
+    // TODO Save similar image info so that tracks are known
 
     private static final String TAG = "MVS";
     private static final int MAX_SELECT = 30;
@@ -421,13 +422,11 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
                 // disable since there is a sequence of events that need to be followed now
                 spinnerDisplay.setEnabled(false);
                 buttonSave.setEnabled(false);
-                buttonReset.setEnabled(true);
                 buttonOpen.setEnabled(true);
                 changeDisplay(Display.COLLECT);
                 reset = true;
             } else if (mode==Mode.SPARSE_RECONSTRUCTION) {
                 // Start the process of redirecting output to this view
-                buttonReset.setEnabled(false);
                 buttonSave.setEnabled(false);
                 buttonOpen.setEnabled(false);
                 debugView.setText("");
@@ -436,7 +435,6 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
                 threadSparse = new SparseReconstructionThread();
                 threadSparse.start();
             } else if (mode==Mode.DENSE_STEREO) {
-                buttonReset.setEnabled(false);
                 buttonSave.setEnabled(false);
                 buttonOpen.setEnabled(false);
                 disparityPaths.clear();
@@ -446,7 +444,6 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
                 threadCloud = new DenseCloudThread();
                 threadCloud.start();
             } else if (mode==Mode.VIEW_RESULTS) {
-                buttonReset.setEnabled(true);
                 buttonSave.setEnabled(true);
                 buttonOpen.setEnabled(true);
                 Log.i(TAG,"Added cloudView");
@@ -516,10 +513,13 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
             } finally {
                 lockDisplayImage.unlock();
             }
+        } else if (display == Display.COLLECT) {
+            buttonReset.setEnabled(true);
         }
 
         // Update the spinner so that it correctly indicates which display is being shown
-        spinnerDisplay.setSelection(display.ordinal());
+        if (display != Display.COLLECT)
+            spinnerDisplay.setSelection(display.ordinal());
     }
 
     /**
@@ -836,6 +836,7 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
                 metric.getInitProjective().setVerbose(debugStream, null);
                 metric.getExpandMetric().setVerbose(debugStream, null);
                 if (!metric.process(similar, generatePairwise.graph)) {
+                    Log.d(TAG,"Metric reconstruction failed");
                     toast("Metric Failed");
                     changeMode(Mode.COLLECT_IMAGES);
                     return;
@@ -848,6 +849,7 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
                 refine.bundleAdjustment.keepFraction = 0.95;
                 refine.bundleAdjustment.getSba().setVerbose(debugStream, null);
                 if (!refine.process(similar, metric.workGraph)) {
+                    Log.d(TAG,"Bundle Adjustment Failed");
                     toast("Bundle Adjustment Failed");
                     changeMode(Mode.COLLECT_IMAGES);
                     return;
@@ -916,8 +918,6 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
                         bitmapDisparity = ConvertBitmap.checkDeclare(disparity, bitmapDisparity);
                         VisualizeImageData.disparity(disparity,parameters.disparityRange,0,
                                 bitmapDisparity, workspaceDisparity);
-
-                        // TODO save to disk and create a list for later display
                     } finally {
                         lockCloud.unlock();
                     }
