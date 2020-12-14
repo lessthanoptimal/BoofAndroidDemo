@@ -1,5 +1,7 @@
 package org.boofcv.android.sfm;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -41,11 +43,13 @@ import org.ddogleg.struct.DogArray_I8;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.locks.ReentrantLock;
@@ -78,6 +82,7 @@ import boofcv.io.geo.MultiViewIO;
 import boofcv.io.image.LookUpImageFilesByIndex;
 import boofcv.io.points.PointCloudIO;
 import boofcv.misc.BoofMiscOps;
+import boofcv.struct.Point3dRgbI_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
@@ -93,8 +98,6 @@ import static org.boofcv.android.DemoMain.getExternalDirectory;
 public class MultiViewStereoActivity extends DemoCamera2Activity
         implements AdapterView.OnItemSelectedListener, PopupMenu.OnMenuItemClickListener
 {
-    // TODO Save image stuff
-    // TODO Load saved results
     // TODO Add help button that takes you to a website/youtube video
     // TODO configure disparity calculation. alg + max range
     // TODO Clean up this class
@@ -105,6 +108,7 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
     Spinner spinnerDisplay;
     Button buttonConfigure;
     Button buttonSave;
+    Button buttonOpen;
     Button buttonReset;
 
     // If image collection should reset and start over
@@ -133,6 +137,9 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
     TextView debugView;
     ViewGroup layoutViews;
 
+    // Selected file in open diloag
+    String selected;
+
     SparseReconstructionThread threadSparse;
 
     final LookUpSimilarGivenTracks<PointTrack> similar =
@@ -151,10 +158,6 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
     final List<String> displayImagePaths = new ArrayList<>();
     boolean displayImageChanged=false;
     //----------------- END LOCK OWNERSHIP
-
-    SceneWorkingGraph working = null;
-    PairwiseImageGraph pairwise = null;
-    SceneStructureMetric scene = null;
 
     //----------------- BEGIN LOCK
     final ReentrantLock lockCloud = new ReentrantLock();
@@ -203,6 +206,7 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
 
         buttonConfigure = controls.findViewById(R.id.button_configure);
         buttonReset = controls.findViewById(R.id.button_reset);
+        buttonOpen = controls.findViewById(R.id.button_load);
 
         debugView = new TextView(this);
         debugView.setBackgroundColor(0xA0000000);
@@ -237,7 +241,6 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
     @Override
     protected void onResume() {
         super.onResume();
-//        changeView(DisparityActivity.DView.ASSOCIATION,false);
     }
 
     @Override
@@ -293,6 +296,100 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
         runOnUiThread(()->buttonSave.setEnabled(false));
     }
 
+    public void loadPressed( View view ) {
+        AlertDialog.Builder builderSingle = new AlertDialog.Builder(this);
+        builderSingle.setIcon(R.drawable.ic_launcher);
+        builderSingle.setTitle("Select Saved");
+
+        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this, android.R.layout.select_dialog_singlechoice);
+
+        File directory = new File(getExternalDirectory(this),"mvs");
+        File[] files = directory.listFiles();
+        if (files==null) {
+            toast("No saved files");
+            return;
+        }
+        Log.i(TAG,"Files in mvs "+files.length);
+        for( File f : files ) {
+            if (!f.isDirectory())
+                continue;
+            Log.i(TAG,"  "+f.getName());
+            arrayAdapter.add(f.getName());
+        }
+        selected = null;
+        if (!arrayAdapter.isEmpty())
+            selected = arrayAdapter.getItem(0);
+        builderSingle.setNegativeButton("Cancel", (dialog, which) -> {selected=null;dialog.dismiss();});
+        builderSingle.setSingleChoiceItems(arrayAdapter,0,
+                (dialog, which) -> selected=arrayAdapter.getItem(which));
+        builderSingle.setPositiveButton("OK", (dialog, which) ->
+        {System.out.println("Select "+selected);if (selected!=null) load(new File(directory,selected));});
+        AlertDialog dialog = builderSingle.create();
+        dialog.show();
+    }
+
+    protected void load( File directory ) {
+        Log.i(TAG,"Loading "+directory.getPath());
+
+        UtilIO.deleteRecursive(workingDir);
+        UtilIO.copyRecursive(directory,workingDir);
+
+        loadWorkDirectory(true);
+    }
+
+    protected void loadWorkDirectory( boolean alertOnError ) {
+        Log.i(TAG,"Loading Work Directory. alert="+alertOnError);
+        loadFileNames(new File(workingDir,"images"),imageFiles);
+        if (imageFiles.isEmpty())
+            return;
+        loadFileNames(new File(workingDir,"disparity"),disparityPaths);
+        if (disparityPaths.isEmpty())
+            return;
+        if (!loadPointCloud(denseCloudView, "dense_cloud.ply",alertOnError))
+            return;
+        if (!loadPointCloud(sparseCloudView, "sparse_cloud.ply",alertOnError))
+            return;
+        changeMode(Mode.VIEW_RESULTS);
+        // Disable save since it's already saved
+        runOnUiThread(()->buttonSave.setEnabled(false));
+    }
+
+    private boolean loadPointCloud(PointCloudSurfaceView view, String fileName, boolean alertOnError) {
+        try {
+            DogArray<Point3dRgbI_F64> cloud = new DogArray<>(Point3dRgbI_F64::new);
+            FileInputStream inputStream = new FileInputStream(new File(workingDir, fileName));
+            PointCloudIO.load3DRgb64F(PointCloudIO.Format.PLY,inputStream,cloud);
+            PointCloud3D cloudShow = view.getRenderer().getCloud();
+            cloudShow.clearCloud();
+            cloudShow.declarePoints(cloud.size());
+            for (int i = 0; i < cloud.size; i++) {
+                Point3dRgbI_F64 p = cloud.get(i);
+                cloudShow.setPoint(i, p.x,p.y,p.z,p.rgb);
+            }
+            runOnUiThread(cloudShow::finalizePoints);
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            toast("Failed to load "+fileName);
+        }
+        return false;
+    }
+
+    private void loadFileNames(File directory, List<String> paths) {
+        paths.clear();
+        List<String> files = UtilIO.listAll(directory.getPath());
+        if (files.isEmpty())
+            return;
+
+        Collections.sort(files);
+        for (int i = 0; i < files.size(); i++) {
+            File f = new File(files.get(i));
+            if (!f.isFile())
+                continue;
+            paths.add(f.getPath());
+        }
+    }
+
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
@@ -325,12 +422,14 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
                 spinnerDisplay.setEnabled(false);
                 buttonSave.setEnabled(false);
                 buttonReset.setEnabled(true);
+                buttonOpen.setEnabled(true);
                 changeDisplay(Display.COLLECT);
                 reset = true;
             } else if (mode==Mode.SPARSE_RECONSTRUCTION) {
                 // Start the process of redirecting output to this view
                 buttonReset.setEnabled(false);
                 buttonSave.setEnabled(false);
+                buttonOpen.setEnabled(false);
                 debugView.setText("");
                 changeDisplay(Display.DEBUG);
                 repeatedRedirectTask.run();
@@ -339,6 +438,7 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
             } else if (mode==Mode.DENSE_STEREO) {
                 buttonReset.setEnabled(false);
                 buttonSave.setEnabled(false);
+                buttonOpen.setEnabled(false);
                 disparityPaths.clear();
                 bitmapDisparity = null;
                 textDisparity = "Multi-Baseline Stereo";
@@ -348,6 +448,7 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
             } else if (mode==Mode.VIEW_RESULTS) {
                 buttonReset.setEnabled(true);
                 buttonSave.setEnabled(true);
+                buttonOpen.setEnabled(true);
                 Log.i(TAG,"Added cloudView");
                 // Enable the view spinner so the user can select what should be viewed
                 spinnerDisplay.setEnabled(true);
@@ -751,12 +852,12 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
                     changeMode(Mode.COLLECT_IMAGES);
                     return;
                 }
-                scene = refine.bundleAdjustment.getStructure();
+                SceneStructureMetric scene = refine.bundleAdjustment.getStructure();
                 MultiViewIO.save(scene, new File(workingDir, "scene.yaml").getPath());
 
                 debugStream.println("----------------------------------------------------------------------------");
-                working = metric.workGraph;
-                pairwise = generatePairwise.graph;
+                SceneWorkingGraph working = metric.workGraph;
+                PairwiseImageGraph pairwise = generatePairwise.graph;
 
                 for (PairwiseImageGraph.View pv : pairwise.nodes.toList()) {
                     SceneWorkingGraph.View wv = working.lookupView(pv.id);
@@ -849,6 +950,14 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
             //
             // StereoPairGraph contains this information and we will create it from Pairwise and Working graphs.
 
+            Log.i(TAG,"Loading Graphs");
+            final PairwiseImageGraph pairwise = MultiViewIO.load(
+                    new File(workingDir, "pairwise.yaml").getPath(), (PairwiseImageGraph)null);
+            final SceneWorkingGraph working = MultiViewIO.load(
+                    new File(workingDir, "working.yaml").getPath(), pairwise, null);
+            final SceneStructureMetric scene = MultiViewIO.load(
+                    new File(workingDir, "scene.yaml").getPath(), (SceneStructureMetric)null);
+
             Log.i(TAG,"Creating MVS Graph");
             StereoPairGraph mvsGraph = new StereoPairGraph();
             // Add a vertex for each view
@@ -881,14 +990,10 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
                 changeMode(Mode.COLLECT_IMAGES);
                 return;
             }
-            // Free up some memory
-            working = null;
-            pairwise = null;
-
             Log.i(TAG,"Creating Cloud for Display. Size="+mvs.getCloud().size());
             textDisparity = "Cloud Size "+mvs.getCloud().size();
 
-            updateDenseCloud(mvs);
+            updateDenseCloud(mvs, scene);
             updateSparseCloud(scene);
 
             // Let the user view everything
@@ -896,7 +1001,8 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
         }
     }
 
-    private void updateDenseCloud(MultiViewStereoFromKnownSceneStructure<GrayU8> mvs) {
+    private void updateDenseCloud(MultiViewStereoFromKnownSceneStructure<GrayU8> mvs,
+                                  SceneStructureMetric scene) {
         // Colorize the cloud to make it easier to view. This is done by projecting points back into the
         // first view they were seen in and reading the color
         PointCloud3D cloudShow = denseCloudView.getRenderer().getCloud();
