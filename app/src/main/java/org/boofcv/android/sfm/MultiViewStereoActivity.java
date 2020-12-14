@@ -1,7 +1,6 @@
 package org.boofcv.android.sfm;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -180,6 +179,7 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.i(TAG,"ENTER onCreate()");
 
         LayoutInflater inflater = getLayoutInflater();
         LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.multi_view_stereo_controls,null);
@@ -240,8 +240,22 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onStop() {
+        super.onStop();
+        Log.i(TAG,"ENTER onStop()");
+
+        // If there are threads running request that they stop. Otherwise they will keep
+        // on running and there will be undefined behavior.
+        try {
+            Thread sparse = this.threadSparse;
+            Thread cloud = this.threadCloud;
+            if (sparse != null) sparse.interrupt();
+            if (cloud != null) cloud.interrupt();
+        } catch (RuntimeException e){
+            Log.d(TAG,"Failed to interrupt threads. "+e.getMessage());
+        }
+        // onCreate() Should see if these threads are running and wait to be safe otherwise
+        //            two processes could modify the work directory
     }
 
     @Override
@@ -255,9 +269,7 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
     }
 
     @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-
-    }
+    public void onNothingSelected(AdapterView<?> parent) {}
 
     public void configurePressed( View view ) {
         PopupMenu popup = new PopupMenu(this, view);
@@ -813,6 +825,7 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
     }
 
     class SparseReconstructionThread extends Thread {
+
         @Override
         public void run() {
             try {
@@ -824,11 +837,15 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
                 similar.computeSimilarRelationships(true, 200, 6);
                 // TODO Save these to disk
 
+                if (Thread.interrupted()) return;
+
                 debugStream.println("Computing Pairwise Graph");
                 Log.i(TAG, "Pairwise Graph");
                 generatePairwise.setVerbose(debugStream, null);
                 generatePairwise.process(similar);
                 MultiViewIO.save(generatePairwise.graph, new File(workingDir, "pairwise.yaml").getPath());
+
+                if (Thread.interrupted()) return;
 
                 debugStream.println("Projective to Metric");
                 Log.i(TAG, "Projective to Metric");
@@ -843,6 +860,8 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
                 }
                 MultiViewIO.save(metric.workGraph, new File(workingDir, "working.yaml").getPath());
 
+                if (Thread.interrupted()) return;
+
                 debugStream.println("Bundle Adjustment");
                 Log.i(TAG, "Bundle Adjustment");
                 RefineMetricWorkingGraph refine = new RefineMetricWorkingGraph();
@@ -854,6 +873,8 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
                     changeMode(Mode.COLLECT_IMAGES);
                     return;
                 }
+                if (Thread.interrupted()) return;
+
                 SceneStructureMetric scene = refine.bundleAdjustment.getStructure();
                 MultiViewIO.save(scene, new File(workingDir, "scene.yaml").getPath());
 
@@ -874,6 +895,7 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
                 debugStream.println("Printing view info. Used " + scene.views.size + " / " + pairwise.nodes.size);
                 Log.i(TAG, "Finished sparse reconstruction");
 
+                if (Thread.interrupted()) return;
                 changeMode(Mode.DENSE_STEREO);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -949,6 +971,7 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
             // 3D information which is then converted into the point cloud.
             //
             // StereoPairGraph contains this information and we will create it from Pairwise and Working graphs.
+            if (Thread.interrupted()) return;
 
             Log.i(TAG,"Loading Graphs");
             final PairwiseImageGraph pairwise = MultiViewIO.load(
@@ -957,6 +980,7 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
                     new File(workingDir, "working.yaml").getPath(), pairwise, null);
             final SceneStructureMetric scene = MultiViewIO.load(
                     new File(workingDir, "scene.yaml").getPath(), (SceneStructureMetric)null);
+            if (Thread.interrupted()) return;
 
             Log.i(TAG,"Creating MVS Graph");
             StereoPairGraph mvsGraph = new StereoPairGraph();
@@ -985,6 +1009,7 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
             try {
                 mvs.process(scene, mvsGraph);
             } catch( RuntimeException e ) {
+                if (Thread.interrupted()) return;
                 e.printStackTrace();
                 toast("Dense reconstruction failed");
                 changeMode(Mode.COLLECT_IMAGES);
@@ -993,9 +1018,10 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
             Log.i(TAG,"Creating Cloud for Display. Size="+mvs.getCloud().size());
             textDisparity = "Cloud Size "+mvs.getCloud().size();
 
+            if (Thread.interrupted()) return;
             updateDenseCloud(mvs, scene);
             updateSparseCloud(scene);
-
+            if (Thread.interrupted()) return;
             // Let the user view everything
             changeMode(Mode.VIEW_RESULTS);
         }
