@@ -7,10 +7,10 @@ Version 2.7.1
 Date:
 
 - Migrated to AndroidX
-- TODO MVS Detects pure rotation and warns you to stop
+- MVS Detects pure rotation and warns you to stop
 - TODO New Disparity Configure Dialog
   * Add to Calibrated Stereo and MVS
-- TODO Calibrated Stereo and open option
+- TODO Calibrated Stereo: Add open saved results option
 
 -------------------------------------------------
 Version 2.7.0

@@ -605,10 +605,14 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
         float circleRadius;
 
         private final Paint paintText = new Paint();
+        private final Paint paintWarning = new Paint();
 
         // Displays current status
         String statusText = "";
-
+        // Warning text to tell the user they are doing something wrong
+        String warningText = "";
+        // At what time will the wanring text be zeroed
+        long warningTimeOut;
         //------------------ OWNED BY LOCK
         final ReentrantLock lockTrack = new ReentrantLock();
         final DogArray<Point2D_F64> trackPixels = new DogArray<>(Point2D_F64::new);
@@ -641,10 +645,16 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
             paintText.setTextAlign(Paint.Align.LEFT);
             paintText.setARGB(0xFF,0xFF,0xB0,0);
             paintText.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD));
+
+            paintWarning.setStrokeWidth(3*displayMetrics.density);
+            paintWarning.setTextSize(24*displayMetrics.density);
+            paintWarning.setARGB(0xFF,0xFF,0,0);
+            paintWarning.setTextAlign(Paint.Align.CENTER);
         }
 
         @Override
         public void onDraw(Canvas canvas, Matrix imageToView) {
+            canvas.save();
             if (display == Display.IMAGES || display == Display.DISPARITY) {
                 canvas.drawText(statusText,10,canvas.getHeight()-40*displayMetrics.density,paintText);
                 canvas.concat(imageToView);
@@ -668,6 +678,15 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
                 } finally {
                     lockTrack.unlock();
                 }
+            }
+
+            // Draw the warning text on top of the image or anything else that's rendered
+            canvas.restore();
+            if (!warningText.isEmpty()) {
+                canvas.drawText(warningText,canvas.getWidth()/2.0f,canvas.getHeight()/2.0f,paintWarning);
+                // See if the text has been displayed for too long
+                if (warningTimeOut<System.currentTimeMillis())
+                    warningText="";
             }
         }
 
@@ -712,10 +731,19 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
 
             boolean selectedFrame = selector.next(gray);
 
+            // If it was force to select a frame and didn't even consider that it could be 3D
+            // The user is most likely rotating the camera. The first frame is never 3D
+            if (selectedFrame && !selector.isConsidered3D() &&
+                    selector.getSelectedFrames().size>1) {
+                warningText = "Translate! Do Not Rotate!";
+                warningTimeOut = System.currentTimeMillis() + 2_000;
+            }
+
             lockTrack.lock();
             try {
                 // Handle when the user requests that it start over
                 if (reset) {
+                    warningText = "";
                     reset = false;
                     selector.initialize(gray.width, gray.height);
                     similar.reset();
