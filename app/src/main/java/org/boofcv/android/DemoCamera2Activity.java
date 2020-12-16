@@ -13,8 +13,6 @@ import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.os.Bundle;
 import android.os.Looper;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 import android.util.Size;
 import android.view.MotionEvent;
@@ -22,6 +20,8 @@ import android.view.SurfaceView;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+
+import androidx.annotation.Nullable;
 
 import org.acra.ACRA;
 
@@ -320,7 +320,7 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
     }
 
     @Override
-    protected void onCameraOpened( @NonNull CameraDevice cameraDevice ) {
+    protected void onCameraOpened( CameraDevice cameraDevice ) {
         // Adding a delay before starting the process seems to allow things to run better
         // An image can be displayed
         new java.util.Timer().schedule(
@@ -345,7 +345,7 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
     /**
      * Changes the processor used to process the video frames
      */
-    public void setProcessing(DemoProcessing processor ) {
+    public void setProcessing( DemoProcessing processor ) {
         synchronized (lockProcessor) {
             // shut down the previous processor
             if( this.processor != null ) {

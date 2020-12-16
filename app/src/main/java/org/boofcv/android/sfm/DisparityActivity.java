@@ -7,8 +7,6 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
@@ -177,7 +175,7 @@ public class DisparityActivity extends DemoCamera2Activity
 	}
 
 	@Override
-	protected void startCamera(@NonNull ViewGroup layout, @Nullable TextureView view ) {
+	protected void startCamera( ViewGroup layout, TextureView view ) {
 		super.startCamera(layout,view);
 		this.layoutViews = layout;
 	}

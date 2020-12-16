@@ -20,7 +20,7 @@
 			android:scaleType="fitCenter"
 			android:src="@drawable/boofcv_logo" />
 
-		<android.support.v7.widget.Toolbar
+		<androidx.appcompat.widget.Toolbar
 			android:id="@+id/my_toolbar"
 			android:layout_width="wrap_content"
 			android:layout_height="?attr/actionBarSize"
