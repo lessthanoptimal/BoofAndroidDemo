@@ -11,6 +11,7 @@
 		android:layout_weight="1"
 		android:gravity="center|start"
 		android:orientation="horizontal" >
+
 		<Spinner
 			android:id="@+id/spinner_view"
 			android:layout_width="wrap_content"

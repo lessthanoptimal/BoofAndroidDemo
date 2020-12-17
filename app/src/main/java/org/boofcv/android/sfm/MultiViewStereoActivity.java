@@ -102,7 +102,6 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
         implements AdapterView.OnItemSelectedListener, PopupMenu.OnMenuItemClickListener
 {
     // TODO Add help button that takes you to a website/youtube video
-    // TODO configure disparity calculation. alg + max range
     // TODO Clean up this class
     // TODO Save similar image info so that tracks are known
 

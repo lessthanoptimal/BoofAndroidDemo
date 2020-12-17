@@ -37,7 +37,6 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import boofcv.abst.disparity.StereoDisparity;
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
@@ -47,12 +46,6 @@ import boofcv.alg.misc.ImageMiscOps;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
 import boofcv.core.image.ConvertImage;
-import boofcv.factory.disparity.ConfigDisparityBM;
-import boofcv.factory.disparity.ConfigDisparityBMBest5;
-import boofcv.factory.disparity.ConfigDisparitySGM;
-import boofcv.factory.disparity.DisparityError;
-import boofcv.factory.disparity.DisparitySgmError;
-import boofcv.factory.disparity.FactoryStereoDisparity;
 import boofcv.factory.feature.associate.ConfigAssociateGreedy;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
@@ -81,28 +74,18 @@ public class DisparityActivity extends DemoCamera2Activity
 	public final static String TAG = "DisparityActivity";
 
 	Spinner spinnerView;
-	Spinner spinnerAlgs;
-	Spinner spinnerError;
-	Spinner spinnerFilter;
 	Button buttonSave;
+	Button buttonConfigure;
+	StereoDisparityDialog dialogDisparity = new StereoDisparityDialog();
 
 	// indicate where the user touched the screen
 	volatile int touchEventType = 0;
 	volatile int touchX;
 	volatile int touchY;
 	volatile boolean reset = false;
+	volatile boolean disparityChanged = false;
 
 	private GestureDetector mDetector;
-
-	// Which error models are selected for each disparity algorithm family
-	private DisparityError errorBM = DisparityError.CENSUS;
-	private DisparitySgmError errorSGM = DisparitySgmError.CENSUS;
-
-	// used to notify processor that the disparity algorithms need to be changed
-	volatile AlgType changeDisparityAlg = AlgType.NONE;
-	volatile AlgType selectedDisparityAlg = AlgType.BLOCK;
-
-	FilterType filterType = FilterType.SPECKLE;
 
 	DView activeView = DView.ASSOCIATION;
 
@@ -117,6 +100,10 @@ public class DisparityActivity extends DemoCamera2Activity
 	public DisparityActivity() {
 		super(Resolution.R640x480);
 		super.bitmapMode = BitmapMode.NONE;
+
+		// Select a reasonable default and when the user reconfigures disparity, recompute it
+		dialogDisparity.selectedType = StereoDisparityDialog.DisparityType.BLOCK5;
+		dialogDisparity.listenerOK = ()->disparityChanged=true;
 	}
 
 	@Override
@@ -131,6 +118,8 @@ public class DisparityActivity extends DemoCamera2Activity
 		buttonSave = controls.findViewById(R.id.button_save);
 		buttonSave.setEnabled(false);
 
+		buttonConfigure = controls.findViewById(R.id.button_configure);
+
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
 				R.array.disparity_views, android.R.layout.simple_spinner_item);
 		// if it doesn't support 3D rendering remove the cloud option
@@ -144,24 +133,6 @@ public class DisparityActivity extends DemoCamera2Activity
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinnerView.setAdapter(adapter);
 		spinnerView.setOnItemSelectedListener(this);
-
-		spinnerAlgs = controls.findViewById(R.id.spinner_algs);
-		adapter = ArrayAdapter.createFromResource(this,
-				R.array.disparity_algs, android.R.layout.simple_spinner_item);
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		spinnerAlgs.setAdapter(adapter);
-		spinnerAlgs.setOnItemSelectedListener(this);
-
-		spinnerError = controls.findViewById(R.id.spinner_error);
-		setupErrorSpinner(selectedDisparityAlg);
-		spinnerError.setOnItemSelectedListener(this);
-
-		spinnerFilter = controls.findViewById(R.id.spinner_filter);
-		adapter = ArrayAdapter.createFromResource(this,
-				R.array.disparity_filter_algs, android.R.layout.simple_spinner_item);
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		spinnerFilter.setAdapter(adapter);
-		spinnerFilter.setOnItemSelectedListener(this);
 
 		setControls(controls);
 
@@ -203,65 +174,18 @@ public class DisparityActivity extends DemoCamera2Activity
 	@Override
 	public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id ) {
 		if( adapterView == spinnerView ) {
-			if( pos == 0 ) {
+			if (pos == 0) {
 				activeView = DView.ASSOCIATION;
-			} else if( pos == 1 ) {
+			} else if (pos == 1) {
 				touchY = -1;
 				activeView = DView.RECTIFICATION;
-			} else if( pos == 2 ) {
+			} else if (pos == 2) {
 				activeView = DView.DISPARITY;
 			} else {
 				activeView = DView.CLOUD3D;
 			}
 			showCloud3D(activeView == DView.CLOUD3D);
-		} else if( adapterView == spinnerAlgs ) {
-			changeDisparityAlg = AlgType.values()[pos];
-
-			// update the list of possible error models
-			if( changeDisparityAlg != selectedDisparityAlg ) {
-				setupErrorSpinner(changeDisparityAlg);
-			}
-
-		} else if( adapterView == spinnerError ) {
-			// this was called because the algorithm type changed. It can be ignored
-			if( changeDisparityAlg != AlgType.NONE )
-				return;
-			// Changing disparity can trigger this event to happen. If there is no actual change in
-			// error abort
-			if( isBlockMatch(selectedDisparityAlg)) {
-				DisparityError selected = DisparityError.values()[pos];
-				if( selected == errorBM )
-					return;
-				this.errorBM = selected;
-			} else {
-				DisparitySgmError selected = DisparitySgmError.values()[pos];
-				if( selected == errorSGM )
-					return;
-				this.errorSGM = selected;
-			}
-			changeDisparityAlg = selectedDisparityAlg;
-		} else if( adapterView == spinnerFilter ) {
-			filterType = FilterType.values()[pos];
-			changeDisparityAlg = selectedDisparityAlg;
 		}
-	}
-
-	private void setupErrorSpinner( AlgType type ) {
-		int res = isBlockMatch(type) ?
-				R.array.disparity_bm_errors : R.array.disparity_sgm_errors;
-		int ordinal = isBlockMatch(type) ?
-				errorBM.ordinal() : errorSGM.ordinal();
-
-		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-				res, android.R.layout.simple_spinner_item);
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		spinnerError.setAdapter(adapter);
-		spinnerError.setSelection(ordinal,false);
-		adapter.notifyDataSetChanged();
-	}
-
-	private boolean isBlockMatch( AlgType type ) {
-		return type.ordinal() < 2;
 	}
 
 	@Override
@@ -269,6 +193,11 @@ public class DisparityActivity extends DemoCamera2Activity
 
 	public void resetPressed( View view ) {
 		reset = true;
+	}
+
+	public void configurePressed( View view ) {
+		// TODO After the BoofCV Activity has been updated switch this over to AndroidX API
+		dialogDisparity.show(getFragmentManager(), "Disparity Dialog");
 	}
 
 	/**
@@ -393,46 +322,6 @@ public class DisparityActivity extends DemoCamera2Activity
 //			Log.i(TAG,"NEW DisparityProcessing() hash "+hashCode());
 		}
 
-		private StereoDisparity<?, GrayF32> createDisparity(AlgType whichAlg ) {
-
-			// Don't set to zero to avoid points at infinity when rending 3D
-			int disparityMin = 5;
-			int disparityRange = 120;
-
-			switch( whichAlg ) {
-				case BLOCK: {
-					ConfigDisparityBM config = new ConfigDisparityBM();
-					config.disparityMin = disparityMin;
-					config.disparityRange = disparityRange;
-					config.errorType = errorBM;
-					config.subpixel = true;
-					Class inputType = errorBM.isCorrelation() ? GrayF32.class : GrayU8.class;
-					return FactoryStereoDisparity.blockMatch(config,inputType,GrayF32.class);
-				}
-				case BLOCK5: {
-					ConfigDisparityBMBest5 config = new ConfigDisparityBMBest5();
-					config.disparityMin = disparityMin;
-					config.disparityRange = disparityRange;
-					config.errorType = errorBM;
-					config.subpixel = true;
-					Class inputType = errorBM.isCorrelation() ? GrayF32.class : GrayU8.class;
-					return FactoryStereoDisparity.blockMatchBest5(config,inputType,GrayF32.class);
-				}
-				case SGM: {
-					ConfigDisparitySGM config = new ConfigDisparitySGM();
-					config.disparityMin = disparityMin;
-					config.disparityRange = disparityRange;
-					config.errorType = errorSGM;
-					config.useBlocks = true;
-					config.subpixel = true;
-					return FactoryStereoDisparity.sgm(config,GrayU8.class,GrayF32.class);
-				}
-
-				default:
-					throw new RuntimeException("Unknown algorithm "+changeDisparityAlg);
-			}
-		}
-
 		@Override
 		public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
 //            Log.i(TAG,"ENTER DisparityProcessing.initialize() hash = "+hashCode());
@@ -451,14 +340,12 @@ public class DisparityActivity extends DemoCamera2Activity
 			ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.defaultScore(TupleDesc_F64.class);
 			AssociateDescription<TupleDesc_F64> associate = FactoryAssociation.greedy(configAssoc,score);
 
+			disparityChanged = true;
 			disparity = new DisparityCalculation<>(detDesc, associate, intrinsic);
             disparity.init(imageWidth,imageHeight);
 
             visualize = new AssociationVisualize<>(DisparityActivity.this);
             visualize.initializeImages( imageWidth, imageHeight , ImageType.SB_U8);
-
-			// make sure it has a disparity algorithm to use
-            changeDisparityAlg = selectedDisparityAlg;
 		}
 
 		@Override
@@ -575,13 +462,12 @@ public class DisparityActivity extends DemoCamera2Activity
 			}
 
 			// Handle a request to update the disparity algorithm and recompute disparity
-			AlgType changeDisparityAlg = DisparityActivity.this.changeDisparityAlg;
-			if( changeDisparityAlg != AlgType.NONE ) {
-//                Log.i(TAG,"disparity changed! hash "+hashCode());
-                DisparityActivity.this.changeDisparityAlg = AlgType.NONE;
-				selectedDisparityAlg = changeDisparityAlg;
-				disparity.setDisparityAlg(createDisparity(changeDisparityAlg));
-				disparity.filterDisparity = filterType==FilterType.SPECKLE;
+			boolean disparityChangedThisFrame = disparityChanged;
+			if (disparityChanged) {
+				disparityChanged = false;
+				disparity.setDisparityAlg(dialogDisparity.createDisparity());
+				disparity.filterDisparity =
+						dialogDisparity.filterType==StereoDisparityDialog.FilterType.SPECKLE;
 			}
 
 			// If the two images are selected and it has a disparity algorithm compute the disparity
@@ -610,7 +496,7 @@ public class DisparityActivity extends DemoCamera2Activity
 									"Disparity computation failed!", Toast.LENGTH_SHORT).show();
 						});
 					}
-				} else if( changeDisparityAlg != AlgType.NONE ) {
+				} else if (disparityChangedThisFrame) {
 //                    Log.i(TAG,"recomputing disparity");
 
                     // The user has requested that a new disparity algorithm be used to recompute
@@ -696,7 +582,7 @@ public class DisparityActivity extends DemoCamera2Activity
 			try {
 				// Save configuration. More should be added here
 				PrintStream out = new PrintStream(new File(savePath, "settings.txt"));
-				out.println("Algorithm "+selectedDisparityAlg);
+				out.println("Algorithm "+dialogDisparity.selectedType.name());
 				out.println("disparityMin "+disparityMin);
 				out.println("disparityRange "+disparityRange);
 				out.close();
@@ -767,22 +653,10 @@ public class DisparityActivity extends DemoCamera2Activity
 		}
 	}
 
-	enum AlgType {
-		BLOCK,
-		BLOCK5,
-		SGM,
-		NONE
-	}
-
 	enum DView {
 		ASSOCIATION,
 		RECTIFICATION,
 		DISPARITY,
 		CLOUD3D
-	}
-
-	enum FilterType {
-		SPECKLE,
-		NONE
 	}
 }
