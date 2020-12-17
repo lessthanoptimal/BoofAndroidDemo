@@ -15,7 +15,6 @@ import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.TextureView;
@@ -55,6 +54,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.locks.ReentrantLock;
 
+import boofcv.abst.disparity.StereoDisparity;
 import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.abst.tracker.PointTrack;
@@ -74,7 +74,6 @@ import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
 import boofcv.core.image.ConvertImage;
 import boofcv.core.image.LookUpColorRgbFormats;
-import boofcv.factory.disparity.ConfigDisparityBMBest5;
 import boofcv.factory.disparity.FactoryStereoDisparity;
 import boofcv.factory.mvs.ConfigSelectFrames3D;
 import boofcv.factory.mvs.FactoryMultiViewStereo;
@@ -86,6 +85,7 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.struct.Point3dRgbI_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.InterleavedU8;
 import georegression.geometry.ConvertRotation3D_F64;
@@ -114,6 +114,7 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
     Button buttonSave;
     Button buttonOpen;
     Button buttonReset;
+    StereoDisparityDialog dialogDisparity = new StereoDisparityDialog();
 
     // If image collection should reset and start over
     boolean reset = false;
@@ -186,6 +187,16 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
     public MultiViewStereoActivity() {
         super(Resolution.R640x480);
         super.bitmapMode = BitmapMode.NONE;
+
+        // Default to this since it's faster
+        dialogDisparity.selectedType = StereoDisparityDialog.DisparityType.BLOCK5;
+        dialogDisparity.listenerOK = ()->{
+            // If it already has results, recompute with the new disparity
+            if (mode!=Mode.VIEW_RESULTS)
+                return;
+            Log.i(TAG,"Recomputing disparity after user settings change");
+            changeMode(Mode.DENSE_STEREO);
+        };
     }
 
     @Override
@@ -289,11 +300,13 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
     public void onNothingSelected(AdapterView<?> parent) {}
 
     public void configurePressed( View view ) {
-        PopupMenu popup = new PopupMenu(this, view);
-        MenuInflater inflater = popup.getMenuInflater();
-        inflater.inflate(R.menu.mvs_configure, popup.getMenu());
-        popup.setOnMenuItemClickListener(this);
-        popup.show();
+        // TODO After the BoofCV Activity has been updated switch this over to AndroidX API
+        dialogDisparity.show(getFragmentManager(), "Disparity Dialog");
+//        PopupMenu popup = new PopupMenu(this, view);
+//        MenuInflater inflater = popup.getMenuInflater();
+//        inflater.inflate(R.menu.mvs_configure, popup.getMenu());
+//        popup.setOnMenuItemClickListener(this);
+//        popup.show();
     }
 
     public void resetPressed( View view ) {
@@ -452,12 +465,14 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
                 spinnerDisplay.setEnabled(false);
                 buttonSave.setEnabled(false);
                 buttonOpen.setEnabled(true);
+                buttonConfigure.setEnabled(true);
                 changeDisplay(Display.COLLECT);
                 reset = true;
             } else if (mode==Mode.SPARSE_RECONSTRUCTION) {
                 // Start the process of redirecting output to this view
                 buttonSave.setEnabled(false);
                 buttonOpen.setEnabled(false);
+                buttonConfigure.setEnabled(false);
                 debugView.setText("");
                 changeDisplay(Display.DEBUG);
                 repeatedRedirectTask.run();
@@ -466,6 +481,7 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
             } else if (mode==Mode.DENSE_STEREO) {
                 buttonSave.setEnabled(false);
                 buttonOpen.setEnabled(false);
+                buttonConfigure.setEnabled(false);
                 disparityPaths.clear();
                 bitmapDisparity = null;
                 textDisparity = "Multi-Baseline Stereo";
@@ -475,6 +491,7 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
             } else if (mode==Mode.VIEW_RESULTS) {
                 buttonSave.setEnabled(true);
                 buttonOpen.setEnabled(true);
+                buttonConfigure.setEnabled(true);
                 Log.i(TAG,"Added cloudView");
                 // Enable the view spinner so the user can select what should be viewed
                 spinnerDisplay.setEnabled(true);
@@ -972,31 +989,28 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
         }
     }
 
-    class DenseCloudThread extends Thread {
+    class DenseCloudThread<T extends ImageGray<T>> extends Thread {
         @Override
         public void run() {
-            ConfigDisparityBMBest5 configDisparity = new ConfigDisparityBMBest5();
-            configDisparity.validateRtoL = 1;
-            configDisparity.texture = 0.15;
-            configDisparity.regionRadiusX = configDisparity.regionRadiusY = 4;
-            configDisparity.disparityRange = 120;
-            configDisparity.disparityMin = 5;
+            //noinspection unchecked,rawtypes,rawtypes
+            StereoDisparity<T,GrayF32> disparity = (StereoDisparity) dialogDisparity.createDisparity();
+            ImageType<T> inputType = disparity.getInputType();
 
             // Create and configure MVS
             //
             // Note that the stereo disparity algorithm used must output a GrayF32 disparity image as much of the code
             // is hard coded to use it. MVS would not work without sub-pixel enabled.
-            MultiViewStereoFromKnownSceneStructure<GrayU8> mvs = new MultiViewStereoFromKnownSceneStructure<>(imageLookup, ImageType.SB_U8);
-            mvs.setStereoDisparity(FactoryStereoDisparity.blockMatchBest5(configDisparity, GrayU8.class, GrayF32.class));
+            MultiViewStereoFromKnownSceneStructure<T> mvs = new MultiViewStereoFromKnownSceneStructure<>(imageLookup, inputType);
+            mvs.setStereoDisparity(disparity);
             // Improve stereo by removing small regions, which tends to be noise. Consider adjusting the region size.
             mvs.getComputeFused().setDisparitySmoother(FactoryStereoDisparity.removeSpeckle(null, GrayF32.class));
             // Print out profiling info from multi baseline stereo
             mvs.getComputeFused().setVerboseProfiling(debugStream);
 
             // This allows us to display intermediate results to the user while they wait for all of this to finish
-            mvs.setListener(new MultiViewStereoFromKnownSceneStructure.Listener<GrayU8>() {
+            mvs.setListener(new MultiViewStereoFromKnownSceneStructure.Listener<T>() {
                 @Override
-                public void handlePairDisparity( String left, String right, GrayU8 rect0, GrayU8 rect1,
+                public void handlePairDisparity( String left, String right, T rect0, T rect1,
                                                  GrayF32 disparity, GrayU8 mask, DisparityParameters parameters ) {}
 
                 @Override
@@ -1094,7 +1108,7 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
         }
     }
 
-    private void updateDenseCloud(MultiViewStereoFromKnownSceneStructure<GrayU8> mvs,
+    private void updateDenseCloud(MultiViewStereoFromKnownSceneStructure<?> mvs,
                                   SceneStructureMetric scene) {
         // Colorize the cloud to make it easier to view. This is done by projecting points back into the
         // first view they were seen in and reading the color
