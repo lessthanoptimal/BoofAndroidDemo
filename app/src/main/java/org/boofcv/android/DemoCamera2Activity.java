@@ -1,6 +1,8 @@
 package org.boofcv.android;
 
+import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.pm.ConfigurationInfo;
@@ -17,6 +19,7 @@ import android.util.Log;
 import android.util.Size;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
+import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -25,6 +28,7 @@ import androidx.annotation.Nullable;
 
 import org.acra.ACRA;
 
+import java.io.File;
 import java.util.Locale;
 
 import boofcv.android.ConvertBitmap;
@@ -34,6 +38,8 @@ import boofcv.misc.MovingAverage;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.ImageBase;
 import georegression.struct.point.Point2D_F64;
+
+import static org.boofcv.android.DemoMain.getExternalDirectory;
 
 /**
  * Camera activity specifically designed for this demonstration. Image processing algorithms
@@ -602,6 +608,54 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
         return app.preference.lookup(cameraWidth,cameraHeight) != null;
     }
 
+    // Used to keep track of which director the user selected
+    private String selectedByDialog;
+
+    /**
+     * Opens a dialog and lets you select a child directory inside of the specified directory.
+     */
+    public void selectDirectoryDialog( String directoryName, HandleSelected handleSelected ) {
+        Activity activity = this;
+        AlertDialog.Builder builderSingle = new AlertDialog.Builder(activity);
+        builderSingle.setIcon(R.drawable.ic_launcher);
+        builderSingle.setTitle("Select Saved");
+
+        // Full path to the parent directory containing saved results
+        File fullPath = new File(getExternalDirectory(this),directoryName);
+
+        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(activity, android.R.layout.select_dialog_singlechoice);
+
+        File directory = new File(getExternalDirectory(activity),directoryName);
+        File[] files = directory.listFiles();
+        if (files==null) {
+            toast("No saved files");
+            return;
+        }
+        Log.i(TAG,"Files in "+directoryName+" "+files.length);
+        for( File f : files ) {
+            if (!f.isDirectory())
+                continue;
+            Log.i(TAG,"  "+f.getName());
+            arrayAdapter.add(f.getName());
+        }
+        selectedByDialog = null;
+        if (!arrayAdapter.isEmpty())
+            selectedByDialog = arrayAdapter.getItem(0);
+        builderSingle.setNegativeButton("Cancel", (dialog, which) -> {selectedByDialog=null;dialog.dismiss();});
+        builderSingle.setSingleChoiceItems(arrayAdapter,0,
+                (dialog, which) -> selectedByDialog=arrayAdapter.getItem(which));
+        builderSingle.setPositiveButton("OK", (dialog, which) ->{
+            if (selectedByDialog!=null)
+                handleSelected.selectedDirectory(new File(fullPath,selectedByDialog));
+        });
+        AlertDialog dialog = builderSingle.create();
+        dialog.show();
+    }
+
+    @FunctionalInterface
+    public interface HandleSelected {
+        void selectedDirectory(File directory);
+    }
 
     /**
      * Algorithm which require an exact resolution should request

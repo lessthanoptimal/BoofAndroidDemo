@@ -1,6 +1,5 @@
 package org.boofcv.android.sfm;
 
-import android.app.AlertDialog;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -149,9 +148,8 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
     final LookUpSimilarGivenTracks<PointTrack> similar =
             new LookUpSimilarGivenTracks<>(t->t.featureId,(t,p)->p.setTo(t.pixel));
     final List<String> imageFiles = new ArrayList<>();
-    final LookUpImageFilesByIndex imageLookup = new LookUpImageFilesByIndex(imageFiles, (path,image)->{
-        ConvertBitmap.bitmapToBoof(BitmapFactory.decodeFile(path),image,null);
-    });
+    final LookUpImageFilesByIndex imageLookup = new LookUpImageFilesByIndex(imageFiles,
+            (path,image)-> ConvertBitmap.bitmapToBoof(BitmapFactory.decodeFile(path),image,null));
 
     //----------------- Text in processing window
     // Displays current status
@@ -339,35 +337,7 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
     }
 
     public void loadPressed( View view ) {
-        AlertDialog.Builder builderSingle = new AlertDialog.Builder(this);
-        builderSingle.setIcon(R.drawable.ic_launcher);
-        builderSingle.setTitle("Select Saved");
-
-        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this, android.R.layout.select_dialog_singlechoice);
-
-        File directory = new File(getExternalDirectory(this),"mvs");
-        File[] files = directory.listFiles();
-        if (files==null) {
-            toast("No saved files");
-            return;
-        }
-        Log.i(TAG,"Files in mvs "+files.length);
-        for( File f : files ) {
-            if (!f.isDirectory())
-                continue;
-            Log.i(TAG,"  "+f.getName());
-            arrayAdapter.add(f.getName());
-        }
-        selected = null;
-        if (!arrayAdapter.isEmpty())
-            selected = arrayAdapter.getItem(0);
-        builderSingle.setNegativeButton("Cancel", (dialog, which) -> {selected=null;dialog.dismiss();});
-        builderSingle.setSingleChoiceItems(arrayAdapter,0,
-                (dialog, which) -> selected=arrayAdapter.getItem(which));
-        builderSingle.setPositiveButton("OK", (dialog, which) ->
-        {System.out.println("Select "+selected);if (selected!=null) load(new File(directory,selected));});
-        AlertDialog dialog = builderSingle.create();
-        dialog.show();
+        selectDirectoryDialog("mvs", this::load);
     }
 
     protected void load( File directory ) {

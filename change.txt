@@ -3,17 +3,18 @@ Change Log for BoofCV Demonstration App
 (year)-(month)-(day)
 
 -------------------------------------------------
-Version 2.7.1
+Version 2.8.0
 Date:
 
 - Migrated to AndroidX
 - MVS provides more informative info
   * Detects pure rotation and warns you to stop
   * Detects that tracks have been lost
-  * Tells you to tap to finish
-- TODO New Disparity Configure Dialog
+  * Tells you to tap to finish when started
+- New Disparity Configure Dialog
   * Add to Calibrated Stereo and MVS
-- TODO Calibrated Stereo: Add open saved results option
+- Calibrated Stereo
+  * Add ability to open previously saved results
 
 -------------------------------------------------
 Version 2.7.0

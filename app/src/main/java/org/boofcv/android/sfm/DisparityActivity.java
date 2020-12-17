@@ -2,6 +2,7 @@ package org.boofcv.android.sfm;
 
 import android.app.ProgressDialog;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -31,7 +32,9 @@ import org.ddogleg.struct.DogArray_I8;
 import org.ejml.data.DMatrixRMaj;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -41,8 +44,11 @@ import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.alg.cloud.PointCloudReader;
+import boofcv.alg.cloud.PointCloudWriter;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.misc.ImageMiscOps;
+import boofcv.alg.misc.ImageStatistics;
+import boofcv.alg.misc.PixelMath;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
 import boofcv.core.image.ConvertImage;
@@ -72,9 +78,11 @@ public class DisparityActivity extends DemoCamera2Activity
 		implements AdapterView.OnItemSelectedListener
 {
 	public final static String TAG = "DisparityActivity";
+	public final static String STEREO_DIRECTORY = "stereo";
 
 	Spinner spinnerView;
 	Button buttonSave;
+	Button buttonLoad;
 	Button buttonConfigure;
 	StereoDisparityDialog dialogDisparity = new StereoDisparityDialog();
 
@@ -93,9 +101,12 @@ public class DisparityActivity extends DemoCamera2Activity
 	PointCloudSurfaceView cloudView;
 	ViewGroup layoutViews;
 
-	// Shows status of saving to disk
+	// Shows status of saving to disk. If dialog is not null then that is also a request to save
 	ProgressDialog saveDialog;
 	File savePath;
+	// Path where of saved data that should be loaded. If not null then it will be loaded
+	// in the next cycle
+	File loadPath=null;
 
 	public DisparityActivity() {
 		super(Resolution.R640x480);
@@ -114,11 +125,12 @@ public class DisparityActivity extends DemoCamera2Activity
 		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.disparity_controls,null);
 
 		spinnerView = controls.findViewById(R.id.spinner_view);
-		// disable save button until disparity has been computed
-		buttonSave = controls.findViewById(R.id.button_save);
-		buttonSave.setEnabled(false);
-
 		buttonConfigure = controls.findViewById(R.id.button_configure);
+		buttonSave = controls.findViewById(R.id.button_save);
+		buttonLoad = controls.findViewById(R.id.button_load);
+
+		// disable save button until disparity has been computed
+		buttonSave.setEnabled(false);
 
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
 				R.array.disparity_views, android.R.layout.simple_spinner_item);
@@ -202,17 +214,16 @@ public class DisparityActivity extends DemoCamera2Activity
 
 	/**
 	 * Opens a dialog showing the status of saving to disk and creates a request to save to disk.
-	 * @param view
 	 */
 	public void savePressed( View view ) {
 		buttonSave.setEnabled(false);
 
 		if( saveDialog != null ) {
-			Log.e(TAG,"Save proessed while save is in progress!");
+			Log.e(TAG,"Save pressed while save was already in progress!");
 			return;
 		}
 
-		savePath = new File(getExternalDirectory(this),"stereo/"+System.currentTimeMillis());
+		savePath = new File(getExternalDirectory(this),STEREO_DIRECTORY+"/"+System.currentTimeMillis());
 		if( !savePath.exists() ) {
 			if( !savePath.mkdirs() ) {
 				Log.d(TAG,"Failed to create output directory");
@@ -232,9 +243,6 @@ public class DisparityActivity extends DemoCamera2Activity
 		// Make it so the user can't dismiss the dialog and has to wait for it complete
 		// otherwise it might be in an unstable state
 		saveDialog.setCancelable(false);
-		saveDialog.setOnCancelListener(dialog -> {
-			buttonSave.setEnabled(true);
-		});
 		saveDialog.show();
 		this.saveDialog = saveDialog;
 	}
@@ -246,6 +254,10 @@ public class DisparityActivity extends DemoCamera2Activity
 		}
 		this.saveDialog = null;
 		savePath = null;
+	}
+
+	public void loadPressed( View view ) {
+		selectDirectoryDialog(STEREO_DIRECTORY,(selected)->this.loadPath=selected);
 	}
 
 	protected class MyGestureDetector extends GestureDetector.SimpleOnGestureListener
@@ -311,11 +323,10 @@ public class DisparityActivity extends DemoCamera2Activity
 		InterleavedU8 colorLeft = new InterleavedU8(1,1,1);
 		GrayU8 gray = new GrayU8(1,1);
 
-		int disparityMin, disparityRange;
 		CameraPinholeBrown intrinsic;
 
 		//------------- Owned by lockGui
-		GrayF32 disparityImage;
+		final GrayF32 disparityImage = new GrayF32(1,1);
 
 		public DisparityProcessing() {
 			super(InterleavedU8.class,3);
@@ -393,11 +404,8 @@ public class DisparityActivity extends DemoCamera2Activity
 
 			// Handle save request here since the processing thread controls all the relevant
 			// data structure and can block for as long as it needs without issue
-			ProgressDialog saveDialog = DisparityActivity.this.saveDialog;
-			if( saveDialog != null ) {
-				saveStereoToDisk(saveDialog);
-				return;
-			}
+			if (checkIfThenSave()) return;
+			if (checkIfThenLoad()) return;
 
 			ConvertImage.average(color,gray);
 
@@ -482,8 +490,9 @@ public class DisparityActivity extends DemoCamera2Activity
 					boolean success = disparity.rectifyImage();
 					if( success ) {
 						setProgressMessage("Disparity", false);
+						disparity.computeDisparity();
 						synchronized (lockGui) {
-							disparityImage = disparity.computeDisparity();
+							disparityImage.setTo(disparity.getDisparity());
 							updateVisualizedDisparity(false);
 						}
 					} else {
@@ -502,8 +511,9 @@ public class DisparityActivity extends DemoCamera2Activity
                     // The user has requested that a new disparity algorithm be used to recompute
 					// the disparity
 					setProgressMessage("Disparity", false);
+					disparity.computeDisparity();
 					synchronized (lockGui) {
-						disparityImage = disparity.computeDisparity();
+						disparityImage.setTo(disparity.getDisparity());
 						updateVisualizedDisparity(true);
 					}
 					runOnUiThread(() -> buttonSave.setEnabled(true));
@@ -519,18 +529,54 @@ public class DisparityActivity extends DemoCamera2Activity
 //            Log.i(TAG,"EXIT process(color)");
         }
 
+		private boolean checkIfThenSave() {
+			ProgressDialog saveDialog = DisparityActivity.this.saveDialog;
+			if (saveDialog==null)
+				return false;
+
+			try {
+				saveStereoToDisk(saveDialog);
+			} catch( Exception e ) {
+				e.printStackTrace(System.err);
+				Log.e(TAG,e.getMessage());
+				runOnUiThread(()-> Toast.makeText(DisparityActivity.this,
+						"Save failed! "+e.getMessage(),Toast.LENGTH_LONG).show());
+			} finally {
+				closeSaveDialog(saveDialog);
+			}
+			return true;
+		}
+
+		private boolean checkIfThenLoad() {
+			if (loadPath==null)
+				return false;
+
+			try {
+				loadStereoData(loadPath);
+			} catch( Exception e ) {
+				e.printStackTrace(System.err);
+				Log.e(TAG,e.getMessage());
+				runOnUiThread(()-> Toast.makeText(DisparityActivity.this,
+						"Load failed! "+e.getMessage(),Toast.LENGTH_LONG).show());
+			} finally {
+				loadPath = null;
+			}
+			return true;
+		}
+
 		/**
 		 * Updates the bitmap images that are rendered as a pair in several viewing modes.
 		 *
 		 * NOTE: This is only called when lockGui is locked
 		 */
 		void updateVisualizationImages() {
+			int disparityRange = dialogDisparity.disparityRange;
 			switch( activeView ) {
 				case DISPARITY:
 					visualize.bitmapSrc = ConvertBitmap.checkDeclare(disparity.rectifiedLeft,visualize.bitmapSrc);
 					ConvertBitmap.grayToBitmap(disparity.rectifiedLeft, visualize.bitmapSrc, visualize.storage);
 
-					if( disparity.isDisparityAvailable() && disparityImage != null ) {
+					if( disparityImage != null ) {
 						visualize.bitmapDst = ConvertBitmap.checkDeclare(disparityImage,visualize.bitmapDst);
 						VisualizeImageData.disparity(disparityImage,disparityRange,0,
 								visualize.bitmapDst,visualize.storage);
@@ -554,8 +600,8 @@ public class DisparityActivity extends DemoCamera2Activity
 		}
 
 		private void updateVisualizedDisparity( boolean changedDisparity ) {
-			disparityMin = disparity.getDisparityAlg().getDisparityMin();
-			disparityRange = disparity.getDisparityAlg().getDisparityRange();
+			int disparityMin = disparity.getDisparityAlg().getDisparityMin();
+			int disparityRange = disparity.getDisparityAlg().getDisparityRange();
 			visualize.setMatches(disparity.getInliersPixel());
 			visualize.forgetSelection();
 
@@ -578,78 +624,128 @@ public class DisparityActivity extends DemoCamera2Activity
 			});
 		}
 
-		private void saveStereoToDisk(ProgressDialog saveDialog) {
-			try {
-				// Save configuration. More should be added here
-				PrintStream out = new PrintStream(new File(savePath, "settings.txt"));
-				out.println("Algorithm "+dialogDisparity.selectedType.name());
-				out.println("disparityMin "+disparityMin);
-				out.println("disparityRange "+disparityRange);
-				out.close();
+		private void saveStereoToDisk( ProgressDialog saveDialog ) throws IOException {
+			// Save configuration. More should be added here
+			PrintStream out = new PrintStream(new File(savePath, "settings.txt"));
+			out.println("Algorithm "+dialogDisparity.selectedType.name());
+			out.println("disparityMin "+dialogDisparity.disparityMin);
+			out.println("disparityRange "+dialogDisparity.disparityRange);
+			out.close();
 
-				runOnUiThread(() -> saveDialog.setProgress(1));
+			runOnUiThread(() -> saveDialog.setProgress(1));
 
-				Bitmap bitmap = Bitmap.createBitmap(
-						disparity.rectifiedLeft.width,
-						disparity.rectifiedLeft.height,
-						Bitmap.Config.ARGB_8888);
-				DogArray_I8 storage = new DogArray_I8();
+			Bitmap bitmap = Bitmap.createBitmap(
+					disparity.rectifiedLeft.width,
+					disparity.rectifiedLeft.height,
+					Bitmap.Config.ARGB_8888);
+			DogArray_I8 storage = new DogArray_I8();
 
-				ConvertBitmap.boofToBitmap(disparity.rectifiedLeft,bitmap,storage);
-				bitmap.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(new File(savePath,"rectified_left.png")));
-				runOnUiThread(() -> saveDialog.setProgress(2));
+			ConvertBitmap.boofToBitmap(disparity.rectifiedLeft,bitmap,storage);
+			bitmap.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(new File(savePath,"rectified_left.png")));
+			runOnUiThread(() -> saveDialog.setProgress(2));
 
-				ConvertBitmap.boofToBitmap(disparity.rectifiedRight,bitmap,storage);
-				bitmap.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(new File(savePath,"rectified_right.png")));
-				runOnUiThread(() -> saveDialog.setProgress(3));
+			ConvertBitmap.boofToBitmap(disparity.rectifiedRight,bitmap,storage);
+			bitmap.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(new File(savePath,"rectified_right.png")));
+			runOnUiThread(() -> saveDialog.setProgress(3));
 
-				VisualizeImageData.binaryToBitmap(disparity.rectMask,false,bitmap,storage);
-				bitmap.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(new File(savePath,"rectified_mask.png")));
-				runOnUiThread(() -> saveDialog.setProgress(4));
+			VisualizeImageData.binaryToBitmap(disparity.rectMask,false,bitmap,storage);
+			bitmap.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(new File(savePath,"rectified_mask.png")));
+			runOnUiThread(() -> saveDialog.setProgress(4));
 
-				// Save disparity as 8-bit image. This tosses out sub-pixel but there currently
-				// isn't a good way to save those extra bits of resolution. Update this in
-				// the future
-				synchronized (lockGui) {
-					ConvertBitmap.boofToBitmap(disparityImage, bitmap, storage);
-				}
-				bitmap.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(new File(savePath,"disparityU8.png")));
-				runOnUiThread(() -> saveDialog.setProgress(5));
-
-				bitmap = Bitmap.createBitmap( colorLeft.width, colorLeft.height,Bitmap.Config.ARGB_8888);
-				ConvertBitmap.boofToBitmap(colorLeft,bitmap,storage);
-				bitmap.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(new File(savePath,"color_left.png")));
-				runOnUiThread(() -> saveDialog.setProgress(6));
-
-				// free memory. Is this necessary?
-				bitmap = null;
-				storage = null;
-
-				// Save stereo intrinsic and extrinsic parameters
-				StereoParameters calib = new StereoParameters();
-				calib.left = intrinsic;
-				calib.right = intrinsic;
-				calib.right_to_left = disparity.leftToRight.invert(null);
-				CalibrationIO.save(calib,new File(savePath,"stereo_calibration.yaml"));
-				runOnUiThread(() -> saveDialog.setProgress(7));
-
-				// Save the point cloud
-				PointCloud3D cloud = cloudView.getRenderer().getCloud();
-				int totalPoints = cloud.points.size/3;
-				OutputStream output = new FileOutputStream(new File(savePath, "point_cloud.ply"));
-				PointCloudIO.save3D(PointCloudIO.Format.PLY,
-						PointCloudReader.wrap3FRGB(cloud.points.data,cloud.colors.data,0,totalPoints),
-						true,output);
-				output.close();
-				runOnUiThread(() -> saveDialog.setProgress(8));
-			} catch( Exception e ) {
-				e.printStackTrace(System.err);
-				Log.e(TAG,e.getMessage());
-				runOnUiThread(()->Toast.makeText(DisparityActivity.this,
-						"Save failed! "+e.getMessage(),Toast.LENGTH_LONG).show());
-			} finally {
-				closeSaveDialog(saveDialog);
+			// Save disparity as 8-bit image. This tosses out sub-pixel but there currently
+			// isn't a good way to save those extra bits of resolution. Update this in
+			// the future
+			synchronized (lockGui) {
+				ConvertBitmap.boofToBitmap(disparityImage, bitmap, storage);
 			}
+			bitmap.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(new File(savePath,"disparityU8.png")));
+			runOnUiThread(() -> saveDialog.setProgress(5));
+
+			bitmap = Bitmap.createBitmap( colorLeft.width, colorLeft.height,Bitmap.Config.ARGB_8888);
+			ConvertBitmap.boofToBitmap(colorLeft,bitmap,storage);
+			bitmap.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(new File(savePath,"color_left.png")));
+			runOnUiThread(() -> saveDialog.setProgress(6));
+
+			// free memory. Is this necessary?
+			bitmap = null;
+			storage = null;
+
+			// Save stereo intrinsic and extrinsic parameters
+			StereoParameters calib = new StereoParameters();
+			calib.left = intrinsic;
+			calib.right = intrinsic;
+			calib.right_to_left = disparity.leftToRight.invert(null);
+			CalibrationIO.save(calib,new File(savePath,"stereo_calibration.yaml"));
+			runOnUiThread(() -> saveDialog.setProgress(7));
+
+			// Save the point cloud
+			PointCloud3D cloud = cloudView.getRenderer().getCloud();
+			int totalPoints = cloud.points.size/3;
+			OutputStream output = new FileOutputStream(new File(savePath, "point_cloud.ply"));
+			PointCloudIO.save3D(PointCloudIO.Format.PLY,
+					PointCloudReader.wrap3FRGB(cloud.points.data,cloud.colors.data,0,totalPoints),
+					true,output);
+			output.close();
+			runOnUiThread(() -> saveDialog.setProgress(8));
+		}
+
+		void loadStereoData( File directory ) throws IOException {
+			Log.i(TAG,"Loading "+directory.getPath());
+			DogArray_I8 storage = new DogArray_I8();
+			ConvertBitmap.bitmapToBoof(BitmapFactory.decodeFile(
+					new File(directory,"rectified_left.png").getPath()),disparity.rectifiedLeft,storage);
+			ConvertBitmap.bitmapToBoof(BitmapFactory.decodeFile(
+					new File(directory,"rectified_right.png").getPath()),disparity.rectifiedRight,storage);
+			ConvertBitmap.bitmapToBoof(BitmapFactory.decodeFile(
+					new File(directory,"rectified_mask.png").getPath()),disparity.rectMask,storage);
+			// convert it into a binary image with values 0 and 1
+			PixelMath.lambda1(disparity.rectMask,v-> (v==0)?(byte)0:(byte)1,disparity.rectMask);
+			Log.i(TAG,"  Loading color_left");
+			ConvertBitmap.bitmapToBoof(BitmapFactory.decodeFile(
+					new File(directory,"color_left.png").getPath()),colorLeft,storage);
+			synchronized (lockGui) {
+				// precision has been lost but it should look the same
+				ConvertBitmap.bitmapToBoof(BitmapFactory.decodeFile(
+						new File(directory, "disparityU8.png").getPath()), disparityImage, storage);
+			}
+
+			Log.i(TAG,"  ma vlaue "+ ImageStatistics.max(disparityImage)+" width "+disparityImage.width);
+
+			Log.i(TAG,"  Loading stereo_calibration");
+			StereoParameters calib = CalibrationIO.load(new File(directory,"stereo_calibration.yaml"));
+			intrinsic.setTo(calib.left);
+			calib.right_to_left.invert(disparity.leftToRight);
+
+			// load the cloud
+			Log.i(TAG,"  Loading point cloud");
+			PointCloud3D cloud = cloudView.getRenderer().getCloud();
+			PointCloudIO.load(PointCloudIO.Format.PLY,
+					new FileInputStream(new File(directory, "point_cloud.ply")),
+					new PointCloudWriter() {
+						int total = 0;
+						@Override
+						public void init(int estimatedSize) {
+							cloud.declarePoints(estimatedSize);
+						}
+
+						@Override
+						public void add(double x, double y, double z) {
+							cloud.setPoint(total++,x,y,z,0xFFFF0000);
+						}
+
+						@Override
+						public void add(double x, double y, double z, int rgb) {
+							cloud.setPoint(total++,x,y,z,rgb);
+						}
+					}
+			);
+			// Finish rendering the cloud and switch to the 3D view
+			runOnUiThread(()->{
+				// tell the point cloud that it can be displayed
+				cloud.finalizePoints();
+				// change the view to 3D cloud and disable the save button
+				changeView(DView.CLOUD3D,false);
+			});
 		}
 	}
 

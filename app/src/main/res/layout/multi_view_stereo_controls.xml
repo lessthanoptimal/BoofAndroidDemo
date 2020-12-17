@@ -33,19 +33,21 @@
 			android:text="Reset"
 			android:onClick="resetPressed"
 			android:id="@+id/button_reset" android:layout_gravity="center"/>
-
-		<Button
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="Save"
-			android:onClick="savePressed"
-			android:id="@+id/button_save" android:layout_gravity="center"/>
-
-		<Button
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
-			android:text="Load"
-			android:onClick="loadPressed"
-			android:id="@+id/button_load" android:layout_gravity="center"/>
 	</LinearLayout>
+
+	<Button
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_weight="0"
+		android:text="Save"
+		android:onClick="savePressed"
+		android:id="@+id/button_save" android:layout_gravity="center"/>
+
+	<Button
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_weight="0"
+		android:text="Load"
+		android:onClick="loadPressed"
+		android:id="@+id/button_load" android:layout_gravity="center"/>
 </LinearLayout>
