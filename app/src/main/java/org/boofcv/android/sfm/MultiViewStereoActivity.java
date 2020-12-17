@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
@@ -87,8 +88,10 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.InterleavedU8;
+import georegression.geometry.ConvertRotation3D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point3D_F64;
+import georegression.struct.so.Rodrigues_F64;
 
 import static org.boofcv.android.DemoMain.getExternalDirectory;
 
@@ -149,6 +152,14 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
     final LookUpImageFilesByIndex imageLookup = new LookUpImageFilesByIndex(imageFiles, (path,image)->{
         ConvertBitmap.bitmapToBoof(BitmapFactory.decodeFile(path),image,null);
     });
+
+    //----------------- Text in processing window
+    // Displays current status
+    String statusText = "";
+    // Warning text to tell the user they are doing something wrong
+    String warningText = "";
+    // At what time will the wanring text be zeroed
+    long warningTimeOut;
 
     //----------------- BEGIN LOCK OWNERSHIP
     final ReentrantLock lockDisplayImage = new ReentrantLock();
@@ -227,6 +238,11 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
         denseCloudView = new PointCloudSurfaceView(this);
         sparseCloudView = new PointCloudSurfaceView(this);
         workingDir = createMvsWorkDirectory();
+
+        // Display a helpful message the first time the collection window is shown
+        // This really isn't a warning, but it's in the correct location.
+        warningText = "Touch to Finish";
+        warningTimeOut = System.currentTimeMillis() + 2_000;
     }
 
     @Override
@@ -606,13 +622,8 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
 
         private final Paint paintText = new Paint();
         private final Paint paintWarning = new Paint();
+        private final Paint paintWarningBG = new Paint();
 
-        // Displays current status
-        String statusText = "";
-        // Warning text to tell the user they are doing something wrong
-        String warningText = "";
-        // At what time will the wanring text be zeroed
-        long warningTimeOut;
         //------------------ OWNED BY LOCK
         final ReentrantLock lockTrack = new ReentrantLock();
         final DogArray<Point2D_F64> trackPixels = new DogArray<>(Point2D_F64::new);
@@ -647,9 +658,13 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
             paintText.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD));
 
             paintWarning.setStrokeWidth(3*displayMetrics.density);
-            paintWarning.setTextSize(24*displayMetrics.density);
+            paintWarning.setTextSize(30*displayMetrics.density);
             paintWarning.setARGB(0xFF,0xFF,0,0);
             paintWarning.setTextAlign(Paint.Align.CENTER);
+
+            paintWarningBG.setStyle(Paint.Style.FILL);
+            paintWarningBG.setARGB(0xAA,0,0,0);
+            paintWarningBG.setStrokeWidth(3*displayMetrics.density);
         }
 
         @Override
@@ -683,7 +698,24 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
             // Draw the warning text on top of the image or anything else that's rendered
             canvas.restore();
             if (!warningText.isEmpty()) {
-                canvas.drawText(warningText,canvas.getWidth()/2.0f,canvas.getHeight()/2.0f,paintWarning);
+                // draw a background behind the text to make it easier to see
+                Rect textBounds = new Rect();
+                paintWarning.getTextBounds(warningText,0,warningText.length(),textBounds);
+
+                // Draw area center
+                float cx = canvas.getWidth()/2.0f;
+                float cy = canvas.getHeight()/2.0f;
+
+                // Figure out the starting point for the background box
+                float bgWidth = textBounds.width()*1.2f; // make it a bit bigger
+                float bgHeight = textBounds.height()*1.6f; // hmm scaling isn't linear. Is this device dependent?
+                float bgX0 = cx+textBounds.left-bgWidth/2.0f;
+                float bgY0 = cy+(textBounds.top+textBounds.bottom)/2.0f-bgHeight/2.0f;
+
+                // Draw the box and text
+                canvas.drawRect(bgX0, bgY0, bgX0+bgWidth, bgY0+bgHeight, paintWarningBG);
+                canvas.drawText(warningText,cx,cy,paintWarning);
+
                 // See if the text has been displayed for too long
                 if (warningTimeOut<System.currentTimeMillis())
                     warningText="";
@@ -780,6 +812,9 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
                             changeMode(Mode.SPARSE_RECONSTRUCTION);
                             return;
                         }
+                    } else if (!selector.isSufficientFeaturePairs()) {
+                        warningText = "Lost Track";
+                        warningTimeOut = System.currentTimeMillis() + 2_000;
                     }
 
                     // For visually the 3D quality, use a function which will smoothly increase in
@@ -869,14 +904,14 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
                 if (Thread.interrupted()) return;
 
                 debugStream.println("Computing Pairwise Graph");
-                Log.i(TAG, "Pairwise Graph");
+                Log.i(TAG, "\nPairwise Graph");
                 generatePairwise.setVerbose(debugStream, null);
                 generatePairwise.process(similar);
                 MultiViewIO.save(generatePairwise.graph, new File(workingDir, "pairwise.yaml").getPath());
 
                 if (Thread.interrupted()) return;
 
-                debugStream.println("Projective to Metric");
+                debugStream.println("\nProjective to Metric");
                 Log.i(TAG, "Projective to Metric");
                 metric.setVerbose(debugStream, null);
                 metric.getInitProjective().setVerbose(debugStream, null);
@@ -891,7 +926,7 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
 
                 if (Thread.interrupted()) return;
 
-                debugStream.println("Bundle Adjustment");
+                debugStream.println("\nBundle Adjustment");
                 Log.i(TAG, "Bundle Adjustment");
                 RefineMetricWorkingGraph refine = new RefineMetricWorkingGraph();
                 refine.bundleAdjustment.keepFraction = 0.95;
@@ -911,17 +946,20 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
                 SceneWorkingGraph working = metric.workGraph;
                 PairwiseImageGraph pairwise = generatePairwise.graph;
 
+                Rodrigues_F64 rod = new Rodrigues_F64();
                 for (PairwiseImageGraph.View pv : pairwise.nodes.toList()) {
                     SceneWorkingGraph.View wv = working.lookupView(pv.id);
                     if (wv == null)
                         continue;
                     int order = working.viewList.indexOf(wv);
+                    ConvertRotation3D_F64.matrixToRodrigues(wv.world_to_view.R,rod);
 
-                    debugStream.printf("view[%2d]='%2s' f=%6.1f k1=%6.3f k2=%6.3f t={%5.1f, %5.1f, %5.1f}\n", order, wv.pview.id,
+                    debugStream.printf("view[%2d]='%2s' f=%6.1f k1=%6.3f k2=%6.3f t={%5.1f, %5.1f, %5.1f} r=%5.2f\n", order, wv.pview.id,
                             wv.intrinsic.f, wv.intrinsic.k1, wv.intrinsic.k2,
-                            wv.world_to_view.T.x, wv.world_to_view.T.y, wv.world_to_view.T.z);
+                            wv.world_to_view.T.x, wv.world_to_view.T.y, wv.world_to_view.T.z, rod.theta);
                 }
-                debugStream.println("Printing view info. Used " + scene.views.size + " / " + pairwise.nodes.size);
+                debugStream.println("    Views Used " + scene.views.size + " / " + pairwise.nodes.size);
+                debugStream.println("----------------------------------------------------------------------------");
                 Log.i(TAG, "Finished sparse reconstruction");
 
                 if (Thread.interrupted()) return;
