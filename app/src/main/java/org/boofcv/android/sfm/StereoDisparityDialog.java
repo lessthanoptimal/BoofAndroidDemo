@@ -17,6 +17,7 @@ import org.boofcv.android.R;
 
 import java.util.Objects;
 
+import boofcv.abst.disparity.DisparitySmoother;
 import boofcv.abst.disparity.StereoDisparity;
 import boofcv.factory.disparity.ConfigDisparityBM;
 import boofcv.factory.disparity.ConfigDisparityBMBest5;
@@ -26,6 +27,7 @@ import boofcv.factory.disparity.DisparitySgmError;
 import boofcv.factory.disparity.FactoryStereoDisparity;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageGray;
 
 /**
  * Opens a dialog and lets you select high level parameters for stereo disparity;
@@ -190,6 +192,10 @@ public class StereoDisparityDialog extends DialogFragment
             default:
                 throw new RuntimeException("Unknown algorithm "+ selectedType);
         }
+    }
+
+    public <T extends ImageGray<T>> DisparitySmoother<T, GrayF32> createSmoother() {
+        return FactoryStereoDisparity.removeSpeckle(null,GrayF32.class);
     }
 
     @Override

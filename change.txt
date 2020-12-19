@@ -4,7 +4,7 @@ Change Log for BoofCV Demonstration App
 
 -------------------------------------------------
 Version 2.8.0
-Date:
+Date: 2020-12-18
 
 - Migrated to AndroidX
 - MVS provides more informative info
@@ -41,7 +41,7 @@ Version 2.6.4
 Date: 2020-04-26
 
 - Updated for changes in BoofCV and other libraries
-- Contains a new attempt mitigate Crashed in YUV
+- Contains a new attempt to mitigate crashes in YUV
 
 -------------------------------------------------
 Version 2.6.3

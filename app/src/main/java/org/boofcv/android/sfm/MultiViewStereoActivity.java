@@ -73,7 +73,6 @@ import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
 import boofcv.core.image.ConvertImage;
 import boofcv.core.image.LookUpColorRgbFormats;
-import boofcv.factory.disparity.FactoryStereoDisparity;
 import boofcv.factory.mvs.ConfigSelectFrames3D;
 import boofcv.factory.mvs.FactoryMultiViewStereo;
 import boofcv.io.UtilIO;
@@ -972,7 +971,8 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
             MultiViewStereoFromKnownSceneStructure<T> mvs = new MultiViewStereoFromKnownSceneStructure<>(imageLookup, inputType);
             mvs.setStereoDisparity(disparity);
             // Improve stereo by removing small regions, which tends to be noise. Consider adjusting the region size.
-            mvs.getComputeFused().setDisparitySmoother(FactoryStereoDisparity.removeSpeckle(null, GrayF32.class));
+            if (dialogDisparity.filterType != StereoDisparityDialog.FilterType.NONE)
+                mvs.getComputeFused().setDisparitySmoother(dialogDisparity.createSmoother());
             // Print out profiling info from multi baseline stereo
             mvs.getComputeFused().setVerboseProfiling(debugStream);
 
