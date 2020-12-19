@@ -139,9 +139,6 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
     TextView debugView;
     ViewGroup layoutViews;
 
-    // Selected file in open diloag
-    String selected;
-
     SparseReconstructionThread threadSparse;
 
     final LookUpSimilarGivenTracks<PointTrack> similar =
@@ -155,7 +152,7 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
     String statusText = "";
     // Warning text to tell the user they are doing something wrong
     String warningText = "";
-    // At what time will the wanring text be zeroed
+    // At what time will the warning text be zeroed
     long warningTimeOut;
 
     //----------------- BEGIN LOCK OWNERSHIP
@@ -361,8 +358,13 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
         if (!loadPointCloud(sparseCloudView, "sparse_cloud.ply",alertOnError))
             return;
         changeMode(Mode.VIEW_RESULTS);
+
         // Disable save since it's already saved
-        runOnUiThread(()->buttonSave.setEnabled(false));
+        runOnUiThread(()->{
+            denseCloudView.getRenderer().setCameraToHome();
+            sparseCloudView.getRenderer().setCameraToHome();
+            buttonSave.setEnabled(false);
+        });
     }
 
     private boolean loadPointCloud(PointCloudSurfaceView view, String fileName, boolean alertOnError) {

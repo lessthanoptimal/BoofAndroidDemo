@@ -129,12 +129,15 @@ public class PointCloud3D {
         final float centerX = (float)camera.cx;
         final float centerY = (float)camera.cy;
 
+        // only filter on zero disparity if the min is zero
+        final float filterOnZero = disparityMin == 0.0f ? 0.0f : Float.MAX_VALUE;
+
         int count = 0;
         for (int y = 0; y < disparity.height; y++) {
             int idx = disparity.startIndex + y*disparity.stride;
             for (int x = 0; x < disparity.width; x++) {
                 float v = disparity.data[idx++];
-                if( v < disparityRange && v != 0.0f )
+                if( v < disparityRange && v != filterOnZero )
                     count++;
             }
         }
@@ -149,7 +152,7 @@ public class PointCloud3D {
             int idx = disparity.startIndex + py*disparity.stride;
             for (int px = 0; px < disparity.width; px++) {
                 float v = disparity.data[idx++];
-                if( v >= disparityRange || v == 0.0f )
+                if( v >= disparityRange || v == filterOnZero )
                     continue;
 
                 v += disparityMin;

@@ -4,9 +4,13 @@ Change Log for BoofCV Demonstration App
 
 -------------------------------------------------
 Version 2.9.0
-Date: 2020-12-XX
+Date: 2020-12-19
 
-- TODO update 3D viewer so that it's more sane
+- 3D point cloud viewer is better
+  * Translation and rotation is better but not perfect
+  * The cloud is viewed closer and better fills the screen
+  * Near clipping plane is overly aggressive still
+  * When loading saved data in MVS it will be set to home position
 
 -------------------------------------------------
 Version 2.8.0
