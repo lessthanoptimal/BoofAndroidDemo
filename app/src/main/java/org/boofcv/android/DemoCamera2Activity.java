@@ -171,7 +171,7 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
         Size target = s.sizes.get( app.preference.resolution-1);
         for( int i = 0; i < resolutions.length; i++  ) {
             Size r = resolutions[i];
-            if( r.getWidth() == target.getWidth() && r.getHeight() == r.getHeight() ) {
+            if( r.getWidth() == target.getWidth() && r.getHeight() == target.getHeight() ) {
                 return i;
             }
         }

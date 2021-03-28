@@ -3,6 +3,12 @@ Change Log for BoofCV Demonstration App
 (year)-(month)-(day)
 
 -------------------------------------------------
+Version
+Date:
+
+- Fixed bug when selecting camera resolution. Thanks esteimle!
+
+-------------------------------------------------
 Version 2.9.0
 Date: 2020-12-19
 
