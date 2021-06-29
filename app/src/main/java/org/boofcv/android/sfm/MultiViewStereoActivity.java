@@ -634,14 +634,15 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
         public MvsProcessing() {
             super(InterleavedU8.class, 3);
 
-            config.minTranslation.setRelative(0.05, 0);
-            config.maxTranslation.setRelative(0.15, 20);
+            config.minTranslation.setRelative(0.07, 0);
+            config.maxTranslation.setRelative(0.20, 20);
             config.scorer3D.ransacF.iterations = 20; // make everything run faster
             config.skipEvidenceRatio = 0.0; // turn off this check to speed things up
             config.motionInlierPx = 5.0;
             config.thresholdQuick = 0.1;
             config.historyLength = 0; // turn off so that it must select the current frame
             selector = FactorySceneReconstruction.frameSelector3D(config, ImageType.SB_U8);
+//            selector.setVerbose(System.out, BoofMiscOps.hashSet(BoofVerbose.RECURSIVE));
 
             paintDot.setStyle(Paint.Style.FILL);
         }
@@ -769,8 +770,15 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
             // The user is most likely rotating the camera. The first frame is never 3D
             if (selectedFrame && !selector.isConsidered3D() &&
                     selector.getSelectedFrames().size > 1) {
-                warningText = "Translate! Do Not Rotate!";
-                warningTimeOut = System.currentTimeMillis() + 2_000;
+                warningText = "";
+                switch (selector.getCause()) {
+                    case EXCESSIVE_MOTION: warningText = "Translate! Do Not Rotate!"; break;
+                    case TRACKING_FAILURE: warningText = "Tracking Problems"; break;
+                }
+                if (!warningText.isEmpty()) {
+                    warningTimeOut = System.currentTimeMillis() + 2_000;
+//                    System.out.println(warningText);
+                }
             }
 
             lockTrack.lock();
