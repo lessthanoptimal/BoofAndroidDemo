@@ -35,6 +35,8 @@ import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.shapes.Polygon2D_F64;
+import georegression.struct.shapes.Quadrilateral_F64;
 import georegression.transform.homography.HomographyPointOps_F64;
 
 /**
@@ -146,7 +148,7 @@ public class StabilizeDisplayActivity extends DemoBitmapCamera2Activity
 		Homography2D_F64 distortedToImage = new Homography2D_F64();
 
 
-		StitchingFromMotion2D.Corners corners = new StitchingFromMotion2D.Corners();
+		Quadrilateral_F64 corners = new Quadrilateral_F64();
 		Point2D_F64 distPt = new Point2D_F64();
 
 		DogArray<Point2D_F64> inliersGui = new DogArray<>(Point2D_F64::new);
@@ -177,10 +179,10 @@ public class StabilizeDisplayActivity extends DemoBitmapCamera2Activity
 
 			canvas.concat(imageToView);
 			synchronized (lockGui) {
-				Point2D_F64 p0 = corners.p0;
-				Point2D_F64 p1 = corners.p1;
-				Point2D_F64 p2 = corners.p2;
-				Point2D_F64 p3 = corners.p3;
+				Point2D_F64 p0 = corners.a;
+				Point2D_F64 p1 = corners.b;
+				Point2D_F64 p2 = corners.c;
+				Point2D_F64 p3 = corners.d;
 
 				canvas.drawLine((int) p0.x, (int) p0.y, (int) p1.x, (int) p1.y, paintBorder);
 				canvas.drawLine((int) p1.x, (int) p1.y, (int) p2.x, (int) p2.y, paintBorder);

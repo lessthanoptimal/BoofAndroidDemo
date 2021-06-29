@@ -171,7 +171,7 @@ public class AssociationActivity extends DemoCamera2Activity
 	}
 
 
-	protected class AssociationProcessing<Desc extends TupleDesc> extends DemoProcessingAbstract<GrayF32> {
+	protected class AssociationProcessing<Desc extends TupleDesc<Desc>> extends DemoProcessingAbstract<GrayF32> {
 		DetectDescribePoint<GrayF32,Desc> detDesc;
 		AssociateDescription<Desc> associate;
 
@@ -187,8 +187,8 @@ public class AssociationActivity extends DemoCamera2Activity
 			this.associate = associate;
 
 
-			listSrc = UtilFeature.createQueue(detDesc,10);
-			listDst = UtilFeature.createQueue(detDesc,10);
+			listSrc = new DogArray<>(detDesc::createDescription);
+			listDst = new DogArray<>(detDesc::createDescription);
 		}
 
 		@Override

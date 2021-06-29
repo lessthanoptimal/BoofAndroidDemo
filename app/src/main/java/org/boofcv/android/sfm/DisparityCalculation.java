@@ -50,7 +50,7 @@ import georegression.struct.se.Se3_F64;
  *
  * @author Peter Abeles
  */
-public class DisparityCalculation<Desc extends TupleDesc> {
+public class DisparityCalculation<Desc extends TupleDesc<Desc>> {
 
 	private static final String TAG = "Disparity";
 
@@ -99,8 +99,8 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 		this.associate = associate;
 		this.intrinsic = intrinsic;
 
-		listSrc = UtilFeature.createQueue(detDesc, 10);
-		listDst = UtilFeature.createQueue(detDesc, 10);
+		listSrc = new DogArray<>(detDesc::createDescription);
+		listDst = new DogArray<>(detDesc::createDescription);
 	}
 
 	public void setDisparityAlg(StereoDisparity<?, GrayF32> disparityAlg) {
@@ -288,8 +288,8 @@ public class DisparityCalculation<Desc extends TupleDesc> {
 		DMatrixRMaj rect2 = rectifyAlg.getUndistToRectPixels2();
 
 		// save calibration matrices
-		rectifiedK.set(rectifyAlg.getCalibrationMatrix());
-		rectifiedR.set(rectifyAlg.getRectifiedRotation());
+		rectifiedK.setTo(rectifyAlg.getCalibrationMatrix());
+		rectifiedR.setTo(rectifyAlg.getRectifiedRotation());
 
 		// Adjust the rectification to make the view area more useful
 		ImageDimension rectShape = new ImageDimension();

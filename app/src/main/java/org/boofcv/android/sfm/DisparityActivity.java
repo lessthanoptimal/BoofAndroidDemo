@@ -52,6 +52,7 @@ import boofcv.alg.misc.PixelMath;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
 import boofcv.core.image.ConvertImage;
+import boofcv.factory.disparity.ConfigDisparity;
 import boofcv.factory.feature.associate.ConfigAssociateGreedy;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
@@ -113,7 +114,7 @@ public class DisparityActivity extends DemoCamera2Activity
 		super.bitmapMode = BitmapMode.NONE;
 
 		// Select a reasonable default and when the user reconfigures disparity, recompute it
-		dialogDisparity.selectedType = StereoDisparityDialog.DisparityType.BLOCK5;
+		dialogDisparity.selectedType = ConfigDisparity.Approach.BLOCK_MATCH;
 		dialogDisparity.listenerOK = ()->disparityChanged=true;
 	}
 
@@ -699,7 +700,7 @@ public class DisparityActivity extends DemoCamera2Activity
 			ConvertBitmap.bitmapToBoof(BitmapFactory.decodeFile(
 					new File(directory,"rectified_mask.png").getPath()),disparity.rectMask,storage);
 			// convert it into a binary image with values 0 and 1
-			PixelMath.lambda1(disparity.rectMask,v-> (v==0)?(byte)0:(byte)1,disparity.rectMask);
+			PixelMath.operator1(disparity.rectMask,v-> (v==0)?(byte)0:(byte)1,disparity.rectMask);
 			Log.i(TAG,"  Loading color_left");
 			ConvertBitmap.bitmapToBoof(BitmapFactory.decodeFile(
 					new File(directory,"color_left.png").getPath()),colorLeft,storage);
@@ -724,13 +725,8 @@ public class DisparityActivity extends DemoCamera2Activity
 					new PointCloudWriter() {
 						int total = 0;
 						@Override
-						public void init(int estimatedSize) {
-							cloud.declarePoints(estimatedSize);
-						}
-
-						@Override
-						public void add(double x, double y, double z) {
-							cloud.setPoint(total++,x,y,z,0xFFFF0000);
+						public void initialize(int size, boolean hasColor) {
+							cloud.declarePoints(size);
 						}
 
 						@Override

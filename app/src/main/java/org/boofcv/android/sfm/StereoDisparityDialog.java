@@ -19,6 +19,7 @@ import java.util.Objects;
 
 import boofcv.abst.disparity.DisparitySmoother;
 import boofcv.abst.disparity.StereoDisparity;
+import boofcv.factory.disparity.ConfigDisparity;
 import boofcv.factory.disparity.ConfigDisparityBM;
 import boofcv.factory.disparity.ConfigDisparityBMBest5;
 import boofcv.factory.disparity.ConfigDisparitySGM;
@@ -52,7 +53,7 @@ public class StereoDisparityDialog extends DialogFragment
     // Region radius for block matching
     public int regionRadiusBM = 4;
 
-    public DisparityType selectedType = DisparityType.BLOCK;
+    public ConfigDisparity.Approach selectedType = ConfigDisparity.Approach.BLOCK_MATCH;
     public FilterType filterType = FilterType.SPECKLE;
 
     Spinner spinnerTypes;
@@ -107,7 +108,7 @@ public class StereoDisparityDialog extends DialogFragment
         return builder.create();
     }
 
-    private void setupErrorSpinner( DisparityType type ) {
+    private void setupErrorSpinner( ConfigDisparity.Approach type ) {
         int res = isBlockMatch(type) ?
                 R.array.disparity_bm_errors : R.array.disparity_sgm_errors;
         int ordinal = isBlockMatch(type) ?
@@ -121,14 +122,14 @@ public class StereoDisparityDialog extends DialogFragment
         adapter.notifyDataSetChanged();
     }
 
-    private boolean isBlockMatch( DisparityType type ) {
+    private boolean isBlockMatch( ConfigDisparity.Approach type ) {
         return type.ordinal() < 2;
     }
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id ) {
         if( adapterView == spinnerTypes) {
-            DisparityType changeType = DisparityType.values()[pos];
+            ConfigDisparity.Approach changeType = ConfigDisparity.Approach.values()[pos];
 
             // update the list of possible error models
             if( changeType != selectedType) {
@@ -154,12 +155,55 @@ public class StereoDisparityDialog extends DialogFragment
 
     @Override public void onNothingSelected(AdapterView<?> adapterView) {}
 
+    public ConfigDisparity createDisparityConfig() {
+        ConfigDisparity configDisparity = new ConfigDisparity();
+        // ensure disparity has a valid range
+        int disparityRange = Math.max(1,this.disparityRange);
+
+        switch(selectedType) {
+            case BLOCK_MATCH: {
+                ConfigDisparityBM config = configDisparity.approachBM;
+                config.disparityMin = disparityMin;
+                config.disparityRange = disparityRange;
+                config.regionRadiusX = config.regionRadiusY = regionRadiusBM;
+                config.errorType = errorBM;
+                config.subpixel = true;
+                break;
+            }
+
+            case BLOCK_MATCH_5: {
+                ConfigDisparityBMBest5 config = configDisparity.approachBM5;
+                config.disparityMin = disparityMin;
+                config.disparityRange = disparityRange;
+                config.regionRadiusX = config.regionRadiusY = regionRadiusBM;
+                config.errorType = errorBM;
+                config.subpixel = true;
+                break;
+            }
+
+            case SGM: {
+                ConfigDisparitySGM config = configDisparity.approachSGM;
+                config.disparityMin = disparityMin;
+                config.disparityRange = disparityRange;
+                config.errorType = errorSGM;
+                config.useBlocks = true;
+                config.subpixel = true;
+                break;
+            }
+
+            default:
+                throw new RuntimeException("Unknown algorithm "+ selectedType);
+        }
+
+        return configDisparity;
+    }
+
     public StereoDisparity<?, GrayF32> createDisparity() {
         // ensure disparity has a valid range
         int disparityRange = Math.max(1,this.disparityRange);
 
         switch(selectedType) {
-            case BLOCK: {
+            case BLOCK_MATCH: {
                 ConfigDisparityBM config = new ConfigDisparityBM();
                 config.disparityMin = disparityMin;
                 config.disparityRange = disparityRange;
@@ -169,7 +213,7 @@ public class StereoDisparityDialog extends DialogFragment
                 Class inputType = errorBM.isCorrelation() ? GrayF32.class : GrayU8.class;
                 return FactoryStereoDisparity.blockMatch(config,inputType,GrayF32.class);
             }
-            case BLOCK5: {
+            case BLOCK_MATCH_5: {
                 ConfigDisparityBMBest5 config = new ConfigDisparityBMBest5();
                 config.disparityMin = disparityMin;
                 config.disparityRange = disparityRange;
@@ -210,13 +254,6 @@ public class StereoDisparityDialog extends DialogFragment
     @FunctionalInterface
     interface ListenerOK {
         void handleOK();
-    }
-
-    enum DisparityType {
-        BLOCK,
-        BLOCK5,
-        SGM,
-        NONE
     }
 
     enum FilterType {

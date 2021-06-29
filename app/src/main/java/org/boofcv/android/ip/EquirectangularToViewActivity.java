@@ -253,7 +253,7 @@ public class EquirectangularToViewActivity extends Activity {
         public void run() {
             while( true ) {
                 synchronized (controlLock) {
-                    controlR.set(workR);
+                    controlR.setTo(workR);
                     CommonOps_FDRM.setIdentity(workR);
                 }
 

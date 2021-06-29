@@ -66,8 +66,10 @@ def acraVersion = '5.7.0'
 
 dependencies {
     ['boofcv-android', 'boofcv-core'].each {
-        String a -> implementation group: 'org.boofcv', name: a, version: '0.37-SNAPSHOT'
+        String a -> implementation group: 'org.boofcv', name: a, version: '0.38-SNAPSHOT'
     }
+
+    implementation 'net.lingala.zip4j:zip4j:2.8.0'
 
     annotationProcessor 'org.projectlombok:lombok:1.18.16'
 

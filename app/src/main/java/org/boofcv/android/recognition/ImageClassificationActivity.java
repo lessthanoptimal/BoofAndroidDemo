@@ -21,7 +21,7 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 
 import org.boofcv.android.DemoBitmapCamera2Activity;
@@ -475,7 +475,7 @@ public class ImageClassificationActivity extends DemoBitmapCamera2Activity
                     setStatus(ImageClassificationActivity.Status.LOADING);
                     classifier.loadModel(decompressedPath);
                     setStatus(ImageClassificationActivity.Status.IDLE);
-                } catch (ZipException | IOException e) {
+                } catch (IOException e) {
                     Log.w(TAG, "Failed to load model on second attempt.");
                     e.printStackTrace();
                     setStatus(ImageClassificationActivity.Status.ERROR);
