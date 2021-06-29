@@ -37,6 +37,7 @@ import org.boofcv.android.R;
 import org.boofcv.android.visalize.PointCloud3D;
 import org.boofcv.android.visalize.PointCloud3DRenderer;
 import org.boofcv.android.visalize.PointCloudSurfaceView;
+import org.ddogleg.DDoglegConcurrency;
 import org.ddogleg.struct.DogArray;
 import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.DogArray_I8;
@@ -76,6 +77,7 @@ import boofcv.alg.structure.SparseSceneToDenseCloud;
 import boofcv.alg.video.SelectFramesForReconstruction3D;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.core.image.ConvertImage;
 import boofcv.core.image.LookUpColorRgbFormats;
 import boofcv.factory.disparity.ConfigDisparity;
@@ -258,6 +260,9 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
         // This really isn't a warning, but it's in the correct location.
         warningText = "Touch to Finish";
         warningTimeOut = System.currentTimeMillis() + 2_000;
+
+        // This will make SBA concurrent
+        DDoglegConcurrency.USE_CONCURRENT = BoofConcurrency.USE_CONCURRENT;
     }
 
     @Override
