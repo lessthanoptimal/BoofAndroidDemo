@@ -8,6 +8,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -33,6 +34,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Locale;
 
 import boofcv.abst.scene.SceneRecognition;
 import boofcv.abst.scene.WrapFeatureToSceneRecognition;
@@ -221,6 +223,11 @@ public class SceneRecognitionActivity extends DemoCamera2Activity
 
         // Recent query results. inteded to reduce number of times an image is loaded
         DogArray<QueryCache> cache = new DogArray<>(QueryCache::new);
+        // Score of the best fit image in DB
+        double bestFitError;
+
+        Paint paint = new Paint();
+        Rect bounds = new Rect();
 
         DogArray<SceneRecognition.Match> matches = new DogArray<>(SceneRecognition.Match::new);
 
@@ -234,14 +241,14 @@ public class SceneRecognitionActivity extends DemoCamera2Activity
         @Override
         public void initialize(int width, int height, int sensorOrientation) {
             bitmapPreview = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+
+            paint.setColor(Color.RED);
+            paint.setTextSize(40 * displayMetrics.density);
         }
 
         @Override
         public void onDraw(Canvas canvas, Matrix imageToView) {
             if (status != Status.RUNNING) {
-                Paint paint = new Paint();
-                paint.setColor(Color.RED);
-                paint.setTextSize(40 * displayMetrics.density);
                 String text = "Status = " + status;
                 int textLength = (int) paint.measureText(text);
                 canvas.drawText(text, (canvas.getWidth() - textLength) / 2, canvas.getHeight() / 2, paint);
@@ -275,8 +282,13 @@ public class SceneRecognitionActivity extends DemoCamera2Activity
             renderToScreen.reset();
             renderToScreen.postScale((float) scale, (float) scale);
 
+            // Render the error so you can see how good it thinks the fit is
             synchronized (lockGUI) {
-                canvas.drawBitmap(bitmapMatch, (int) (bitmapPreview.getWidth() * 1.03), 0, null);
+                int offsetX = (int) (bitmapPreview.getWidth() * 1.03);
+                canvas.drawBitmap(bitmapMatch, offsetX, 0, null);
+                String text = String.format(Locale.getDefault(),"%4.2f", bestFitError);
+                paint.getTextBounds(text, 0, text.length(), bounds);
+                canvas.drawText(text, offsetX, 10+bounds.height(), paint);
             }
         }
 
@@ -314,6 +326,10 @@ public class SceneRecognitionActivity extends DemoCamera2Activity
             }
 
             // Find the best match
+            findBestMatch();
+        }
+
+        private void findBestMatch() {
             synchronized (lockRecognizer) {
                 try {
                     recognizer.query(query, (m) -> true, 1, matches);
@@ -354,6 +370,7 @@ public class SceneRecognitionActivity extends DemoCamera2Activity
                 }
             }
 
+            bestFitError = matches.get(0).error;
             bitmapMatch = cached.bitmap;
         }
     }

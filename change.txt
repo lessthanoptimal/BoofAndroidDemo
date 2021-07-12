@@ -7,10 +7,10 @@ Version
 Date:
 
 - Fixed bug when selecting camera resolution. Thanks esteimle!
+- Added Recognition demo
 - TODO 3D viewer
   * rotate around a point as one navigation option
   * Fix the flipped 3D cloud issue
-- TODO Recognition demo
 
 -------------------------------------------------
 Version 2.9.0
