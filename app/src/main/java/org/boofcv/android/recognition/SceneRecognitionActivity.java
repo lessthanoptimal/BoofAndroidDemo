@@ -2,6 +2,7 @@ package org.boofcv.android.recognition;
 
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -75,6 +76,7 @@ public class SceneRecognitionActivity extends DemoCamera2Activity
     Button buttonAdd;
     Button buttonSave;
     Button buttonClearDB;
+    Button buttonHelp;
 
     // the user has requested that a new image be added
     boolean requestAddImage;
@@ -94,6 +96,7 @@ public class SceneRecognitionActivity extends DemoCamera2Activity
         buttonAdd = controls.findViewById(R.id.button_add);
         buttonSave = controls.findViewById(R.id.button_save);
         buttonClearDB = controls.findViewById(R.id.button_clear_db);
+        buttonHelp = controls.findViewById(R.id.button_help);
 
         setControls(controls);
 
@@ -134,6 +137,11 @@ public class SceneRecognitionActivity extends DemoCamera2Activity
 
     public void addPressed(View view) {
         requestAddImage = true;
+    }
+
+    public void helpPressed( View view ) {
+        Intent intent = new Intent(this, SceneRecognitionHelpActivity.class);
+        startActivity(intent);
     }
 
     /**
@@ -188,6 +196,7 @@ public class SceneRecognitionActivity extends DemoCamera2Activity
         runOnUiThread(() -> {
             buttonAdd.setEnabled(enabled);
             buttonSave.setEnabled(enabled);
+            buttonHelp.setEnabled(enabled);
             buttonClearDB.setEnabled(enabled);
         });
     }

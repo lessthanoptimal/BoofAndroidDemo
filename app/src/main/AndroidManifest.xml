@@ -90,6 +90,7 @@
         <activity
             android:name=".recognition.SceneRecognitionActivity"
             android:screenOrientation="landscape" />
+        <activity android:name=".recognition.SceneRecognitionHelpActivity" />
         <activity android:name=".visalize.PointCloudActivity"/>
     </application>
 
