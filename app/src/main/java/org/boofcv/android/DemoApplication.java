@@ -69,6 +69,7 @@ public class DemoApplication extends Application
         builder.getPluginConfigurationBuilder(HttpSenderConfigurationBuilder.class).setEnabled(true);
 
         // Only post bugs if in release mode
+        Log.i(TAG, "ACRA Initialized");
         ACRA.init(this,builder);
 
         ACRA.getErrorReporter().putCustomData("BOOFCV-VERSION", BoofVersion.VERSION);

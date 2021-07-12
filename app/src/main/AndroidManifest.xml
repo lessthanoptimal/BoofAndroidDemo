@@ -87,6 +87,9 @@
         <activity android:name=".recognition.QrCodeDetectActivity"/>
         <activity android:name=".recognition.QrCodeListActivity"/>
         <activity android:name=".recognition.ImageClassificationActivity"/>
+        <activity
+            android:name=".recognition.SceneRecognitionActivity"
+            android:screenOrientation="landscape" />
         <activity android:name=".visalize.PointCloudActivity"/>
     </application>
 
