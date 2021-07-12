@@ -35,6 +35,7 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import boofcv.abst.scene.SceneRecognition;
+import boofcv.abst.scene.WrapFeatureToSceneRecognition;
 import boofcv.android.ConvertBitmap;
 import boofcv.core.image.ConvertImage;
 import boofcv.io.UtilIO;
@@ -70,6 +71,7 @@ public class SceneRecognitionActivity extends DemoCamera2Activity
     private DownloadRecognitionModel download;
 
     Button buttonAdd;
+    Button buttonSave;
     Button buttonClearDB;
 
     // the user has requested that a new image be added
@@ -88,13 +90,12 @@ public class SceneRecognitionActivity extends DemoCamera2Activity
         LinearLayout controls = (LinearLayout) inflater.inflate(R.layout.scene_recognition_controls, null);
 
         buttonAdd = controls.findViewById(R.id.button_add);
+        buttonSave = controls.findViewById(R.id.button_save);
         buttonClearDB = controls.findViewById(R.id.button_clear_db);
 
-        // Disabled all buttons until the model has been loaded
-        buttonAdd.setEnabled(false);
-        buttonClearDB.setEnabled(false);
-
         setControls(controls);
+
+        activateControls(false);
 
         // Load/Download the model
         runOnUiThread(() -> {
@@ -140,17 +141,52 @@ public class SceneRecognitionActivity extends DemoCamera2Activity
      */
     public void clearDbPressed(View view) {
         setStatus(Status.CLEARING);
-        synchronized (lockRecognizer) {
-            recognizer.clearDatabase();
-            // TODO save it again
-        }
-        deleteImages();
-        finish();
+
+        // TODO do this the proper android way
+        new Thread() {
+            @Override
+            public void run() {
+                synchronized (lockRecognizer) {
+                    // save the model without the image DB
+                    recognizer.clearDatabase();
+                }
+                saveRecognizer();
+                deleteImages();
+                setStatus(Status.RUNNING);
+            }
+        }.start();
     }
 
-    protected void activateControls() {
+    /**
+     * Stop processing, delete
+     *
+     * @param view
+     */
+    public void saveDataBase(View view) {
+        setStatus(Status.SAVING);
+
+        // TODO do this the proper android way
+        new Thread() {
+            @Override
+            public void run() {
+                saveRecognizer();
+                setStatus(Status.RUNNING);
+            }
+        }.start();
+    }
+
+    public void saveRecognizer() {
+        synchronized (lockRecognizer) {
+            File baseDir = new File(getExternalDirectory(SceneRecognitionActivity.this), DATA_DIRECTORY);
+            RecognitionIO.saveFeatureToScene((WrapFeatureToSceneRecognition)recognizer, new File(baseDir, MODEL));
+        }
+    }
+
+    protected void activateControls( boolean enabled ) {
         runOnUiThread(() -> {
-            buttonAdd.setEnabled(true);
+            buttonAdd.setEnabled(enabled);
+            buttonSave.setEnabled(enabled);
+            buttonClearDB.setEnabled(enabled);
         });
     }
 
@@ -279,7 +315,13 @@ public class SceneRecognitionActivity extends DemoCamera2Activity
 
             // Find the best match
             synchronized (lockRecognizer) {
-                recognizer.query(query, (m) -> true, 1, matches);
+                try {
+                    recognizer.query(query, (m) -> true, 1, matches);
+                } catch (RuntimeException e ) {
+                    e.printStackTrace();
+                    Log.e(TAG, "Query failed!");
+                    setStatus(Status.ERROR);
+                }
             }
             if (matches.isEmpty())
                 return;
@@ -382,7 +424,9 @@ public class SceneRecognitionActivity extends DemoCamera2Activity
                     runOnUiThread(() -> pDialog.setMessage("Decompressing Model"));
 
                     // Make sure the initial destination isn't full of crap
-                    UtilIO.deleteRecursive(new File(destinationHome, "scene_recognition"));
+                    File tmpModelDir = new File(destinationHome, "scene_recognition");
+                    if (tmpModelDir.exists())
+                        UtilIO.deleteRecursive(tmpModelDir);
 
                     Log.i(TAG, "Decompressing " + fileZip.getPath());
                     Log.i(TAG, "  destination " + destinationHome.getPath());
@@ -413,9 +457,13 @@ public class SceneRecognitionActivity extends DemoCamera2Activity
                     recognizer = RecognitionIO.loadFeatureToScene(modelPath, ImageType.SB_U8);
                 }
                 Log.d(TAG, "loaded model");
-                deleteImages();
+
+                // Create images if it doesn't exist yet
+                File baseDir = new File(getExternalDirectory(SceneRecognitionActivity.this), DATA_DIRECTORY);
+                File imageDir = new File(baseDir, IMAGES);
+                if (!imageDir.exists())
+                    imageDir.mkdirs();
                 setStatus(SceneRecognitionActivity.Status.RUNNING);
-                activateControls();
                 return true;
             } catch (RuntimeException e) {
                 Log.w(TAG, "Failed to load model on first attempt.  Downloading");
@@ -523,9 +571,7 @@ public class SceneRecognitionActivity extends DemoCamera2Activity
     }
 
     private void setStatus(Status status) {
-//        if (status == Status.RUNNING) {
-//            runOnUiThread(() -> activateControls());
-//        }
+        runOnUiThread(() -> activateControls(status == Status.RUNNING));
         this.status = status;
     }
 
