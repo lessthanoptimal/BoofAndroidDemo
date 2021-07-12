@@ -1,3 +1,7 @@
+TODO 3D viewer
+  * rotate around a point as one navigation option
+  * Fix the flipped 3D cloud issue
+
 TODO Stereo Disparity - Load previously saved images
 
 TODO improve performance by removing locks from visualization
