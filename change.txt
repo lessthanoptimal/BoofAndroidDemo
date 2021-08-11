@@ -3,6 +3,12 @@ Change Log for BoofCV Demonstration App
 (year)-(month)-(day)
 
 -------------------------------------------------
+Version 2.11.0
+Date:
+
+- TODO added support for ECoCheck markers
+
+-------------------------------------------------
 Version 2.10.0
 Date: 2021-Jul-12
 

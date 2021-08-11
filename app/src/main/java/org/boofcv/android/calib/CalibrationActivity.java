@@ -32,7 +32,7 @@ import boofcv.abst.fiducial.calib.CalibrationDetectorCircleHexagonalGrid;
 import boofcv.abst.fiducial.calib.CalibrationDetectorCircleRegularGrid;
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
 import boofcv.abst.fiducial.calib.CalibrationPatterns;
-import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
+import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
 import boofcv.alg.feature.detect.chess.ChessboardCorner;
 import boofcv.alg.fiducial.calib.circle.DetectCircleHexagonalGrid;
 import boofcv.alg.fiducial.calib.circle.DetectCircleRegularGrid;
@@ -56,335 +56,331 @@ import georegression.struct.shapes.Polygon2D_F64;
  *
  * @author Peter Abeles
  */
-public class CalibrationActivity extends PointTrackerDisplayActivity
-{
-	public static final String TAG = "CalibrationActivity";
+public class CalibrationActivity extends PointTrackerDisplayActivity {
+    public static final String TAG = "CalibrationActivity";
 
-	public static ConfigAllCalibration cc = new ConfigAllCalibration();
-	Paint paintPoint = new Paint();
-	Paint paintFailed = new Paint();
+    public static ConfigAllCalibration cc = new ConfigAllCalibration();
+    Paint paintPoint = new Paint();
+    Paint paintFailed = new Paint();
 
-	// Storage for calibration info
-	List<CalibrationObservation> shots;
+    // Storage for calibration info
+    List<CalibrationObservation> shots;
 
-	// user has requested that the next image be processed for the target
-	boolean captureRequested = false;
+    // user has requested that the next image be processed for the target
+    boolean captureRequested = false;
 
-	// user has requested that the most recent image be removed from data list
-	boolean removeRequested = false;
+    // user has requested that the most recent image be removed from data list
+    boolean removeRequested = false;
 
-	// displays the number of calibration images captured
-	TextView textCount;
+    // displays the number of calibration images captured
+    TextView textCount;
 
-	// true if detect failed
-	boolean showDetectDebug;
+    // true if detect failed
+    boolean showDetectDebug;
 
-	// the user requests that the images be processed
-	boolean processRequested = false;
+    // the user requests that the images be processed
+    boolean processRequested = false;
 
-	// pause the display so that it doesn't change until after this time
-	long timeResume;
+    // pause the display so that it doesn't change until after this time
+    long timeResume;
 
-	// handles gestures
-	GestureDetector mDetector;
+    // handles gestures
+    GestureDetector mDetector;
 
-	public CalibrationActivity() {
-		super(Resolution.R640x480);
+    public CalibrationActivity() {
+        super(Resolution.R640x480);
 
-		// this activity wants control over what is shown
-		super.bitmapMode = BitmapMode.NONE;
+        // this activity wants control over what is shown
+        super.bitmapMode = BitmapMode.NONE;
 
-		paintPoint.setColor(Color.RED);
-		paintPoint.setStyle(Paint.Style.FILL);
+        paintPoint.setColor(Color.RED);
+        paintPoint.setStyle(Paint.Style.FILL);
 
-		paintFailed.setColor(Color.CYAN);
-		paintFailed.setStyle(Paint.Style.STROKE);
-	}
+        paintFailed.setColor(Color.CYAN);
+        paintFailed.setStyle(Paint.Style.STROKE);
+    }
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-		LayoutInflater inflater = getLayoutInflater();
-		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.calibration_view,null);
+        LayoutInflater inflater = getLayoutInflater();
+        LinearLayout controls = (LinearLayout) inflater.inflate(R.layout.calibration_view, null);
 
-		textCount = controls.findViewById(R.id.text_total);
+        textCount = controls.findViewById(R.id.text_total);
 
-		shots = new ArrayList<>();
+        shots = new ArrayList<>();
 
-		setControls(controls);
-		mDetector = new GestureDetector(this, new MyGestureDetector());
-		displayView.setOnTouchListener((v, event) -> {
+        setControls(controls);
+        mDetector = new GestureDetector(this, new MyGestureDetector());
+        displayView.setOnTouchListener((v, event) -> {
             mDetector.onTouchEvent(event);
             return true;
         });
 
-		SelectCalibrationFiducial dialog = new SelectCalibrationFiducial(cc);
-		dialog.show(this, this::createNewProcessor);
-	}
+        SelectCalibrationFiducial dialog = new SelectCalibrationFiducial(cc);
+        dialog.show(this, this::createNewProcessor);
+    }
 
-	@Override
-	protected void onResume() {
-		super.onResume();
+    @Override
+    protected void onResume() {
+        super.onResume();
 
-	}
+    }
 
-	@Override
-	protected void onCameraResolutionChange(int width, int height, int sensorOrientation) {
-		super.onCameraResolutionChange(width, height,sensorOrientation);
-		if (bitmap.getWidth() != width || bitmap.getHeight() != height)
-			bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-		if( isCameraCalibrated() ) {
-			runOnUiThread(()-> Toast.makeText(this, "Camera already calibrated", Toast.LENGTH_SHORT).show());
-		}
-	}
+    @Override
+    protected void onCameraResolutionChange(int width, int height, int sensorOrientation) {
+        super.onCameraResolutionChange(width, height, sensorOrientation);
+        if (bitmap.getWidth() != width || bitmap.getHeight() != height)
+            bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        if (isCameraCalibrated()) {
+            runOnUiThread(() -> Toast.makeText(this, "Camera already calibrated", Toast.LENGTH_SHORT).show());
+        }
+    }
 
-	/**
-	 * Configures the detector, configures target description for calibration and starts the detector thread.
-	 */
-	@Override
-	public void createNewProcessor() {
-		DetectorFiducialCalibration detector;
+    /**
+     * Configures the detector, configures target description for calibration and starts the detector thread.
+     */
+    @Override
+    public void createNewProcessor() {
+        DetectSingleFiducialCalibration detector;
 
-		if( cc.targetType == CalibrationPatterns.CHESSBOARD ) {
-			detector = FactoryFiducialCalibration.chessboardX(null,cc.chessboard);
-		} else if( cc.targetType == CalibrationPatterns.SQUARE_GRID ) {
-			detector = FactoryFiducialCalibration.squareGrid(null,cc.squareGrid);
-		} else if( cc.targetType == CalibrationPatterns.CIRCLE_HEXAGONAL ){
-			detector = FactoryFiducialCalibration.circleHexagonalGrid(null,cc.hexagonal);
-		} else if( cc.targetType == CalibrationPatterns.CIRCLE_GRID ){
-			detector = FactoryFiducialCalibration.circleRegularGrid(null,cc.circleGrid);
-		} else {
-			throw new RuntimeException("Unknown targetType "+cc.targetType);
-		}
-		CalibrationComputeActivity.targetLayout = detector.getLayout();
-		setProcessing(new DetectTarget(detector));
-	}
+        if (cc.targetType == CalibrationPatterns.CHESSBOARD) {
+            detector = FactoryFiducialCalibration.chessboardX(null, cc.chessboard);
+        } else if (cc.targetType == CalibrationPatterns.SQUARE_GRID) {
+            detector = FactoryFiducialCalibration.squareGrid(null, cc.squareGrid);
+        } else if (cc.targetType == CalibrationPatterns.CIRCLE_HEXAGONAL) {
+            detector = FactoryFiducialCalibration.circleHexagonalGrid(null, cc.hexagonal);
+        } else if (cc.targetType == CalibrationPatterns.CIRCLE_GRID) {
+            detector = FactoryFiducialCalibration.circleRegularGrid(null, cc.circleGrid);
+        } else {
+            throw new RuntimeException("Unknown targetType " + cc.targetType);
+        }
+        CalibrationComputeActivity.targetLayout = detector.getLayout();
+        setProcessing(new DetectTarget(detector));
+    }
 
-	public void pressedOK( View view ) {
-		processRequested = true;
-	}
+    public void pressedOK(View view) {
+        processRequested = true;
+    }
 
-	public void pressedRemove( View view ) {
-		removeRequested = true;
-	}
+    public void pressedRemove(View view) {
+        removeRequested = true;
+    }
 
-	public void pressedHelp( View view ) {
-		Intent intent = new Intent(this, CalibrationHelpActivity.class);
-		startActivity(intent);
-	}
+    public void pressedHelp(View view) {
+        Intent intent = new Intent(this, CalibrationHelpActivity.class);
+        startActivity(intent);
+    }
 
-	/**
-	 * Checks to see if there are enough images and launches the activity for computing intrinsic parameters.
-	 * Only call from a thread where 'shots' is not going to be modified
-	 */
-	private void handleProcessRequest() {
-		if( shots.size() < 3 ) {
-			Toast.makeText(this, "Need at least three images.", Toast.LENGTH_SHORT).show();
-		} else {
-			CalibrationComputeActivity.images = shots;
-			Intent intent = new Intent(this, CalibrationComputeActivity.class);
-			startActivity(intent);
-		}
-	}
+    /**
+     * Checks to see if there are enough images and launches the activity for computing intrinsic parameters.
+     * Only call from a thread where 'shots' is not going to be modified
+     */
+    private void handleProcessRequest() {
+        if (shots.size() < 3) {
+            Toast.makeText(this, "Need at least three images.", Toast.LENGTH_SHORT).show();
+        } else {
+            CalibrationComputeActivity.images = shots;
+            Intent intent = new Intent(this, CalibrationComputeActivity.class);
+            startActivity(intent);
+        }
+    }
 
-	protected class MyGestureDetector extends GestureDetector.SimpleOnGestureListener
-	{
-		@Override
-		public boolean onDown(MotionEvent e) {
-			captureRequested = true;
-			return true;
-		}
-	}
+    protected class MyGestureDetector extends GestureDetector.SimpleOnGestureListener {
+        @Override
+        public boolean onDown(MotionEvent e) {
+            captureRequested = true;
+            return true;
+        }
+    }
 
-	private class DetectTarget extends DemoProcessingAbstract<GrayF32> {
+    private class DetectTarget extends DemoProcessingAbstract<GrayF32> {
 
-		DetectorFiducialCalibration detector;
+        DetectSingleFiducialCalibration detector;
 
-		DogArray<Point2D_F64> pointsGui = new DogArray<>(Point2D_F64::new);
+        DogArray<Point2D_F64> pointsGui = new DogArray<>(Point2D_F64::new);
 
-		final Object lockGUI = new Object();
-		List<Point2D_F64> debugPoints = new ArrayList<>();
-		List<List<Point2D_I32>> debugQuads = new ArrayList<>();
-		List<EllipseRotated_F64> debugEllipses = new ArrayList<>();
-		float radius;
+        final Object lockGUI = new Object();
+        List<Point2D_F64> debugPoints = new ArrayList<>();
+        List<List<Point2D_I32>> debugQuads = new ArrayList<>();
+        List<EllipseRotated_F64> debugEllipses = new ArrayList<>();
+        float radius;
 
-		protected DetectTarget( DetectorFiducialCalibration detector ) {
-			super(GrayF32.class);
-			this.detector = detector;
-		}
+        protected DetectTarget(DetectSingleFiducialCalibration detector) {
+            super(GrayF32.class);
+            this.detector = detector;
+        }
 
-		@Override
-		public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
-			float density = cameraToDisplayDensity;
-			paintFailed.setStrokeWidth(7f*density);
-			radius = 6*density;
-		}
+        @Override
+        public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
+            float density = cameraToDisplayDensity;
+            paintFailed.setStrokeWidth(7f * density);
+            radius = 6 * density;
+        }
 
-		@Override
-		public void onDraw(Canvas canvas, Matrix imageToView) {
-			canvas.drawBitmap(bitmap, imageToView, null);
+        @Override
+        public void onDraw(Canvas canvas, Matrix imageToView) {
+            canvas.drawBitmap(bitmap, imageToView, null);
 
-			if( processRequested ) {
-				processRequested = false;
-				handleProcessRequest();
-				return;
-			}
+            if (processRequested) {
+                processRequested = false;
+                handleProcessRequest();
+                return;
+            }
 
-			synchronized (lockGUI) {
-				canvas.concat(imageToView);
+            synchronized (lockGUI) {
+                canvas.concat(imageToView);
 
-				// draw shapes for debugging purposes
-				for ( Point2D_F64 p : debugPoints ) {
-					canvas.drawCircle((float) p.x, (float) p.y, radius, paintFailed);
-				}
+                // draw shapes for debugging purposes
+                for (Point2D_F64 p : debugPoints) {
+                    canvas.drawCircle((float) p.x, (float) p.y, radius, paintFailed);
+                }
 
-				for (List<Point2D_I32> l : debugQuads) {
-					for (int i = 1; i < l.size(); i++) {
-						Point2D_I32 c0 = l.get(i - 1);
-						Point2D_I32 c1 = l.get(i);
-						canvas.drawLine(c0.x, c0.y, c1.x, c1.y, paintFailed);
-					}
-					Point2D_I32 c0 = l.get(0);
-					Point2D_I32 c1 = l.get(l.size() - 1);
-					canvas.drawLine(c0.x, c0.y, c1.x, c1.y, paintFailed);
-				}
+                for (List<Point2D_I32> l : debugQuads) {
+                    for (int i = 1; i < l.size(); i++) {
+                        Point2D_I32 c0 = l.get(i - 1);
+                        Point2D_I32 c1 = l.get(i);
+                        canvas.drawLine(c0.x, c0.y, c1.x, c1.y, paintFailed);
+                    }
+                    Point2D_I32 c0 = l.get(0);
+                    Point2D_I32 c1 = l.get(l.size() - 1);
+                    canvas.drawLine(c0.x, c0.y, c1.x, c1.y, paintFailed);
+                }
 
-				for (EllipseRotated_F64 e : debugEllipses) {
+                for (EllipseRotated_F64 e : debugEllipses) {
 
-					float phi = (float) UtilAngle.radianToDegree(e.phi);
+                    float phi = (float) UtilAngle.radianToDegree(e.phi);
 
-					float x0 = (float) (e.center.x - e.a);
-					float y0 = (float) (e.center.y - e.b);
-					float x1 = (float) (e.center.x + e.a);
-					float y1 = (float) (e.center.y + e.b);
+                    float x0 = (float) (e.center.x - e.a);
+                    float y0 = (float) (e.center.y - e.b);
+                    float x1 = (float) (e.center.x + e.a);
+                    float y1 = (float) (e.center.y + e.b);
 
-					canvas.save();
-					canvas.rotate(phi, (float) e.center.x, (float) e.center.y);
+                    canvas.save();
+                    canvas.rotate(phi, (float) e.center.x, (float) e.center.y);
 //					r.set(cx-w,cy-h,cx+w+1,cy+h+1);
-					canvas.drawOval(new RectF(x0, y0, x1, y1), paintFailed);
-					canvas.restore();
-				}
+                    canvas.drawOval(new RectF(x0, y0, x1, y1), paintFailed);
+                    canvas.restore();
+                }
 
-				// draw detected calibration points
-				for (int i = 0; i < pointsGui.size(); i++) {
-					Point2D_F64 p = pointsGui.get(i);
-					canvas.drawCircle((float) p.x, (float) p.y, radius, paintPoint);
-				}
-			}
-		}
+                // draw detected calibration points
+                for (int i = 0; i < pointsGui.size(); i++) {
+                    Point2D_F64 p = pointsGui.get(i);
+                    canvas.drawCircle((float) p.x, (float) p.y, radius, paintPoint);
+                }
+            }
+        }
 
-		@Override
-		public void process(GrayF32 input) {
-			// User requested that the most recently processed image be removed
-			if( removeRequested ) {
-				removeRequested = false;
-				if( shots.size() > 0 )  {
-					shots.remove( shots.size()-1 );
-					updateShotCountInUiThread();
-				}
-			}
+        @Override
+        public void process(GrayF32 input) {
+            // User requested that the most recently processed image be removed
+            if (removeRequested) {
+                removeRequested = false;
+                if (shots.size() > 0) {
+                    shots.remove(shots.size() - 1);
+                    updateShotCountInUiThread();
+                }
+            }
 
-			if( timeResume > System.currentTimeMillis() )
-				return;
+            if (timeResume > System.currentTimeMillis())
+                return;
 
 
-			GrayU8 binary = null;
-			boolean detected = false;
-			showDetectDebug = false;
-			if( captureRequested ) {
-				captureRequested = false;
-				long before = System.currentTimeMillis();
-				detected = collectMeasurement(input);
-				long after = System.currentTimeMillis();
-				Log.i(TAG,"detection time "+(after-before)+" (ms)");
-			}
+            GrayU8 binary = null;
+            boolean detected = false;
+            showDetectDebug = false;
+            if (captureRequested) {
+                captureRequested = false;
+                long before = System.currentTimeMillis();
+                detected = collectMeasurement(input);
+                long after = System.currentTimeMillis();
+                Log.i(TAG, "detection time " + (after - before) + " (ms)");
+            }
 
-			// safely copy data into data structures used by GUI thread
-			synchronized ( lockGUI ) {
-				pointsGui.reset();
-				debugPoints.clear();
-				debugQuads.clear();
-				debugEllipses.clear();
-				if( detected ) {
-					CalibrationObservation found = detector.getDetectedPoints();
-					for( PointIndex2D_F64 p : found.points )
-						pointsGui.grow().setTo(p.p);
-				} else if( showDetectDebug ) {
-					// show binary image to aid in debugging and detected rectangles
-					if( detector instanceof CalibrationDetectorChessboardX) {
-						DogArray<ChessboardCorner> corners = ((CalibrationDetectorChessboardX) detector).getDetector().getCorners();
-						for (int i = 0; i < corners.size(); i++) {
-							debugPoints.add(corners.get(i));
-						}
-						binary = null;
-					} else if( detector instanceof CalibrationDetectorSquareGrid) {
-						DetectSquareGridFiducial<GrayF32> alg = ((CalibrationDetectorSquareGrid) detector).getAlgorithm();
-						extractQuads(alg.getDetectorSquare().getPolygons(null,null));
-						binary = alg.getBinary();
-					} else if( detector instanceof CalibrationDetectorCircleHexagonalGrid) {
-						DetectCircleHexagonalGrid<GrayF32> alg = ((CalibrationDetectorCircleHexagonalGrid) detector).getDetector();
-						debugEllipses.clear();
-						debugEllipses.addAll(alg.getEllipseDetector().getFoundEllipses(null));
-						binary = alg.getBinary();
-					} else if( detector instanceof CalibrationDetectorCircleRegularGrid) {
-						DetectCircleRegularGrid<GrayF32> alg = ((CalibrationDetectorCircleRegularGrid) detector).getDetector();
-						debugEllipses.clear();
-						debugEllipses.addAll(alg.getEllipseDetector().getFoundEllipses(null));
-						binary = alg.getBinary();
-					}
-				}
-			}
+            // safely copy data into data structures used by GUI thread
+            synchronized (lockGUI) {
+                pointsGui.reset();
+                debugPoints.clear();
+                debugQuads.clear();
+                debugEllipses.clear();
+                if (detected) {
+                    CalibrationObservation found = detector.getDetectedPoints();
+                    for (PointIndex2D_F64 p : found.points)
+                        pointsGui.grow().setTo(p.p);
+                } else if (showDetectDebug) {
+                    // show binary image to aid in debugging and detected rectangles
+                    if (detector instanceof CalibrationDetectorChessboardX) {
+                        DogArray<ChessboardCorner> corners = ((CalibrationDetectorChessboardX) detector).getDetector().getCorners();
+                        for (int i = 0; i < corners.size(); i++) {
+                            debugPoints.add(corners.get(i));
+                        }
+                        binary = null;
+                    } else if (detector instanceof CalibrationDetectorSquareGrid) {
+                        DetectSquareGridFiducial<GrayF32> alg = ((CalibrationDetectorSquareGrid) detector).getAlgorithm();
+                        extractQuads(alg.getDetectorSquare().getPolygons(null, null));
+                        binary = alg.getBinary();
+                    } else if (detector instanceof CalibrationDetectorCircleHexagonalGrid) {
+                        DetectCircleHexagonalGrid<GrayF32> alg = ((CalibrationDetectorCircleHexagonalGrid) detector).getDetector();
+                        debugEllipses.clear();
+                        debugEllipses.addAll(alg.getEllipseDetector().getFoundEllipses(null));
+                        binary = alg.getBinary();
+                    } else if (detector instanceof CalibrationDetectorCircleRegularGrid) {
+                        DetectCircleRegularGrid<GrayF32> alg = ((CalibrationDetectorCircleRegularGrid) detector).getDetector();
+                        debugEllipses.clear();
+                        debugEllipses.addAll(alg.getEllipseDetector().getFoundEllipses(null));
+                        binary = alg.getBinary();
+                    }
+                }
+            }
 
-			if( binary != null )
-				VisualizeImageData.binaryToBitmap(binary,false,bitmap,bitmapTmp);
-			else
-				ConvertBitmap.grayToBitmap(input, bitmap, bitmapTmp);
-		}
+            if (binary != null)
+                VisualizeImageData.binaryToBitmap(binary, false, bitmap, bitmapTmp);
+            else
+                ConvertBitmap.grayToBitmap(input, bitmap, bitmapTmp);
+        }
 
-		protected void extractQuads( List<Polygon2D_F64> squares ) {
-			debugQuads.clear();
+        protected void extractQuads(List<Polygon2D_F64> squares) {
+            debugQuads.clear();
 
-			if( squares != null ) {
-				for( Polygon2D_F64 b : squares ) {
+            if (squares != null) {
+                for (Polygon2D_F64 b : squares) {
+                    List<Point2D_I32> l = new ArrayList<>();
+                    for (int i = 0; i < b.size(); i++) {
+                        Point2D_F64 c = b.get(i);
+                        l.add(new Point2D_I32((int) c.x, (int) c.y));
+                    }
+                    debugQuads.add(l);
+                }
+            }
+        }
 
-					List<Point2D_I32> l = new ArrayList<Point2D_I32>();
-					for( int i = 0; i < b.size(); i++ ) {
-						Point2D_F64 c = b.get(i);
-						l.add( new Point2D_I32((int)c.x,(int)c.y) );
-					}
-					debugQuads.add(l);
-				}
-			}
-		}
+        /**
+         * Detect calibration targets in the image and save the results.  Pause the display so the
+         * user can see the results]
+         */
+        private boolean collectMeasurement(GrayF32 gray) {
+            boolean success = detector.process(gray);
 
-		/**
-		 * Detect calibration targets in the image and save the results.  Pause the display so the
-		 * user can see the results]
-		 */
-		private boolean collectMeasurement(GrayF32 gray)
-		{
-			boolean success = detector.process(gray);
+            // pause the display to provide feed back to the user
+            timeResume = System.currentTimeMillis() + 1500;
 
-			// pause the display to provide feed back to the user
-			timeResume = System.currentTimeMillis()+1500;
+            if (success) {
+                shots.add(detector.getDetectedPoints());
+                updateShotCountInUiThread();
+                return true;
+            } else {
+                showDetectDebug = true;
+                return false;
+            }
+        }
 
-			if( success ) {
-				shots.add(detector.getDetectedPoints());
-				updateShotCountInUiThread();
-				return true;
-			}  else {
-				showDetectDebug = true;
-				return false;
-			}
-		}
-
-		/**
-		 * Call when the number of shots needs to be updated from outside an UI thread
-		 */
-		private void updateShotCountInUiThread() {
-			final int size = shots.size();
-			runOnUiThread(() -> textCount.setText(""+size));
-		}
-	}
+        /**
+         * Call when the number of shots needs to be updated from outside an UI thread
+         */
+        private void updateShotCountInUiThread() {
+            final int size = shots.size();
+            runOnUiThread(() -> textCount.setText("" + size));
+        }
+    }
 }
