@@ -30,9 +30,11 @@ import java.util.List;
 import boofcv.abst.fiducial.calib.CalibrationDetectorChessboardX;
 import boofcv.abst.fiducial.calib.CalibrationDetectorCircleHexagonalGrid;
 import boofcv.abst.fiducial.calib.CalibrationDetectorCircleRegularGrid;
+import boofcv.abst.fiducial.calib.CalibrationDetectorMultiECoCheck;
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
 import boofcv.abst.fiducial.calib.CalibrationPatterns;
 import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
+import boofcv.abst.geo.calibration.MultiToSingleFiducialCalibration;
 import boofcv.alg.feature.detect.chess.ChessboardCorner;
 import boofcv.alg.fiducial.calib.circle.DetectCircleHexagonalGrid;
 import boofcv.alg.fiducial.calib.circle.DetectCircleRegularGrid;
@@ -153,6 +155,10 @@ public class CalibrationActivity extends PointTrackerDisplayActivity {
             detector = FactoryFiducialCalibration.circleHexagonalGrid(null, cc.hexagonal);
         } else if (cc.targetType == CalibrationPatterns.CIRCLE_GRID) {
             detector = FactoryFiducialCalibration.circleRegularGrid(null, cc.circleGrid);
+        } else if (cc.targetType == CalibrationPatterns.ECOCHECK) {
+            CalibrationDetectorMultiECoCheck multi;
+            multi = FactoryFiducialCalibration.ecocheck(null, cc.ecocheck);
+            detector = new MultiToSingleFiducialCalibration(multi);
         } else {
             throw new RuntimeException("Unknown targetType " + cc.targetType);
         }
@@ -330,6 +336,14 @@ public class CalibrationActivity extends PointTrackerDisplayActivity {
                         debugEllipses.clear();
                         debugEllipses.addAll(alg.getEllipseDetector().getFoundEllipses(null));
                         binary = alg.getBinary();
+                    } else if (detector instanceof MultiToSingleFiducialCalibration) {
+                        MultiToSingleFiducialCalibration multiToSingle = (MultiToSingleFiducialCalibration)detector;
+                        CalibrationDetectorMultiECoCheck ecocheck = (CalibrationDetectorMultiECoCheck)multiToSingle.getMulti();
+                        DogArray<ChessboardCorner> corners = ecocheck.getDetector().getDetector().getCorners();
+                        for (int i = 0; i < corners.size(); i++) {
+                            debugPoints.add(corners.get(i));
+                        }
+                        binary = null;
                     }
                 }
             }

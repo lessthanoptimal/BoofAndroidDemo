@@ -87,7 +87,7 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 					updateControlValues();
 					vis.invalidate();
 
-					boolean enabled = position != 0;
+					boolean enabled = position != 0 && position != 4;
 					textWidth.setEnabled(enabled);
 					textSpace.setEnabled(enabled);
 				} catch( NumberFormatException ignore ){}
@@ -192,6 +192,11 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 				cc.chessboard.numRows = numRows;
 			} break;
 
+			case ECOCHECK:{
+				cc.ecocheck.markerShapes.get(0).numCols = numCols;
+				cc.ecocheck.markerShapes.get(0).numRows = numRows;
+			} break;
+
 			case SQUARE_GRID:{
 				cc.squareGrid.numCols = numCols;
 				cc.squareGrid.numRows = numRows;
@@ -238,6 +243,11 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 			case CHESSBOARD:{
 				numCols = cc.chessboard.numCols;
 				numRows = cc.chessboard.numRows;
+			} break;
+
+			case ECOCHECK:{
+				numCols = cc.ecocheck.markerShapes.get(0).numCols;
+				numRows = cc.ecocheck.markerShapes.get(0).numRows;
 			} break;
 
 			case SQUARE_GRID:{
@@ -292,6 +302,7 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 		adapter.add("Square Grid");
 		adapter.add("Circle Hex");
 		adapter.add("Circle Grid");
+		adapter.add("ECoCheck");
 
 		spinnerTarget.setAdapter(adapter);
 	}
@@ -302,6 +313,7 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 			case 1: return CalibrationPatterns.SQUARE_GRID;
 			case 2: return CalibrationPatterns.CIRCLE_HEXAGONAL;
 			case 3: return CalibrationPatterns.CIRCLE_GRID;
+			case 4: return CalibrationPatterns.ECOCHECK;
 		}
 		throw new RuntimeException("Egads");
 	}
@@ -317,6 +329,7 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 		copy.squareGrid.setTo(cc.squareGrid);
 		copy.circleGrid.setTo(cc.circleGrid);
 		copy.hexagonal.setTo(cc.hexagonal);
+		copy.ecocheck.setTo(cc.ecocheck);
 
 		return copy;
 	}

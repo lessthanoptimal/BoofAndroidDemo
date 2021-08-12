@@ -7,7 +7,12 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.view.SurfaceView;
 
+import org.boofcv.android.visalize.CanvasFiducialRenderEngine;
+
+import boofcv.abst.fiducial.calib.ConfigECoCheckMarkers;
 import boofcv.abst.fiducial.calib.ConfigGridDimen;
+import boofcv.alg.fiducial.calib.ecocheck.ECoCheckGenerator;
+import boofcv.alg.fiducial.calib.ecocheck.ECoCheckUtils;
 import georegression.metric.UtilAngle;
 
 
@@ -71,6 +76,17 @@ public class DrawCalibrationFiducial extends SurfaceView {
 				renderSquareGrid(canvas, config.numCols-cols0, config.numRows-rows0, squareWidth,squareWidth, 1, 1);
 			} break;
 
+			case ECOCHECK: {
+				ConfigECoCheckMarkers config = cc.ecocheck;
+				ConfigECoCheckMarkers.MarkerShape shape = config.markerShapes.get(0);
+				int squareWidth = (int)Math.min(surfaceWidth/shape.numCols,surfaceHeight/shape.numRows);
+
+				int gridWidth = squareWidth*(shape.numCols-1);
+				int gridHeight = squareWidth*(shape.numRows-1);
+				canvas.translate((surfaceWidth-gridWidth)/2,(surfaceHeight-gridHeight)/2);
+				renderECoCheck(canvas, config, squareWidth);
+			} break;
+
 			// TODO update
 			case SQUARE_GRID: {
 				// how wide a black square is
@@ -131,6 +147,18 @@ public class DrawCalibrationFiducial extends SurfaceView {
 			} break;
 
 		}
+	}
+
+	private void renderECoCheck(Canvas canvas,
+								ConfigECoCheckMarkers config,
+								int squareWidth) {
+		ECoCheckUtils utils = new ECoCheckUtils();
+		config.convertToGridList(utils.markers);
+		utils.fixate();
+		ECoCheckGenerator generator = new ECoCheckGenerator(utils);
+		generator.squareWidth = 1.0;
+		generator.setRender(new CanvasFiducialRenderEngine(canvas, squareWidth));
+		generator.render(0);
 	}
 
 	private void renderSquareGrid(Canvas canvas,

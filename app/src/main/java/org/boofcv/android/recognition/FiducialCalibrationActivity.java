@@ -52,11 +52,7 @@ public class FiducialCalibrationActivity extends FiducialSquareActivity {
 		toggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
 			synchronized (lock) {
 				robust = isChecked;
-				if (robust) {
-					seek.setEnabled(false);
-				} else {
-					seek.setEnabled(true);
-				}
+				seek.setEnabled(!robust);
 				createNewProcessor();
 			}
 		});
@@ -66,11 +62,13 @@ public class FiducialCalibrationActivity extends FiducialSquareActivity {
 	protected FiducialDetector<GrayU8> createDetector() {
 
 		if( cc.targetType == CalibrationPatterns.CHESSBOARD ) {
-			if( robust ) {
+			if (robust) {
 				return FactoryFiducial.calibChessboardX(null, cc.chessboard, GrayU8.class);
 			} else {
 				return FactoryFiducial.calibChessboardB(null, cc.chessboard, GrayU8.class);
 			}
+		} else if (cc.targetType == CalibrationPatterns.ECOCHECK) {
+			return FactoryFiducial.ecocheck(null,cc.ecocheck, GrayU8.class);
 		} else if( cc.targetType == CalibrationPatterns.SQUARE_GRID ) {
 			return FactoryFiducial.calibSquareGrid(null,cc.squareGrid, GrayU8.class);
 		} else if( cc.targetType == CalibrationPatterns.CIRCLE_HEXAGONAL ) {
