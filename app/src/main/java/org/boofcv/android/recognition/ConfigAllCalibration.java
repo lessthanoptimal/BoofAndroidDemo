@@ -13,9 +13,5 @@ public class ConfigAllCalibration {
     public ConfigGridDimen squareGrid = new ConfigGridDimen(4, 3, 1, 0.5);
     public ConfigGridDimen hexagonal = new ConfigGridDimen(20, 24, 1, 1.5);
     public ConfigGridDimen circleGrid = new ConfigGridDimen(17, 12, 1, 1.5);
-    public ConfigECoCheckMarkers ecocheck = new ConfigECoCheckMarkers();
-
-    {
-        ecocheck.markerShapes.add(new ConfigECoCheckMarkers.MarkerShape(9, 7, 1));
-    }
+    public ConfigECoCheckMarkers ecocheck = ConfigECoCheckMarkers.singleShape(9,7,1, 1);
 }

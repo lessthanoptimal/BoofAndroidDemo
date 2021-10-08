@@ -337,8 +337,8 @@ public class CalibrationActivity extends PointTrackerDisplayActivity {
                         debugEllipses.addAll(alg.getEllipseDetector().getFoundEllipses(null));
                         binary = alg.getBinary();
                     } else if (detector instanceof MultiToSingleFiducialCalibration) {
-                        MultiToSingleFiducialCalibration multiToSingle = (MultiToSingleFiducialCalibration)detector;
-                        CalibrationDetectorMultiECoCheck ecocheck = (CalibrationDetectorMultiECoCheck)multiToSingle.getMulti();
+                        var multiToSingle = (MultiToSingleFiducialCalibration)detector;
+                        var ecocheck = (CalibrationDetectorMultiECoCheck)multiToSingle.getMulti();
                         DogArray<ChessboardCorner> corners = ecocheck.getDetector().getDetector().getCorners();
                         for (int i = 0; i < corners.size(); i++) {
                             debugPoints.add(corners.get(i));

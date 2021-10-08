@@ -6,8 +6,9 @@ Change Log for BoofCV Demonstration App
 Version 2.11.0
 Date:
 
+- Updated BoofCV version to 0.39
 - Added support for ECoCheck markers in calibration.
-- TODO ECoCheck configure: ECC level, # markers, target marker
+- Turned on Java 11 language support
 
 -------------------------------------------------
 Version 2.10.0
