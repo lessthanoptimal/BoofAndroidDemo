@@ -10,7 +10,7 @@ import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.View;
 
-import org.ddogleg.struct.GrowQueue_I8;
+import org.ddogleg.struct.DogArray_I8;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +50,7 @@ public class AssociationVisualize<T extends ImageGray<T>> {
 	public T grayDst;
 	public Bitmap bitmapSrc;
 	public Bitmap bitmapDst;
-	public GrowQueue_I8 storage = new GrowQueue_I8();
+	public DogArray_I8 storage = new DogArray_I8();
 
 	// transform between image and output
 	public Matrix renderToScreen = new Matrix();
@@ -344,8 +344,8 @@ public class AssociationVisualize<T extends ImageGray<T>> {
 			Point2D_F64 s = locationSrc.get(best);
 			Point2D_F64 d = locationDst.get(best);
 
-			matchedPair.p1.set(s);
-			matchedPair.p2.set(d);
+			matchedPair.p1.setTo(s);
+			matchedPair.p2.setTo(d);
 			return true;
 		}
 		return false;

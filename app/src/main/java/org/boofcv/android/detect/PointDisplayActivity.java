@@ -17,13 +17,17 @@ import android.widget.Spinner;
 import org.boofcv.android.DemoCamera2Activity;
 import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
+import org.ddogleg.struct.DogArray;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.intensity.GeneralFeatureIntensity;
 import boofcv.abst.feature.detect.interest.ConfigFastCorner;
-import boofcv.abst.feature.detect.interest.GeneralToPointDetector;
-import boofcv.abst.feature.detect.interest.PointDetector;
+import boofcv.abst.feature.detect.interest.GeneralToInterestPoint;
+import boofcv.abst.feature.detect.interest.InterestPointDetector;
 import boofcv.alg.feature.detect.intensity.HessianBlobIntensity;
 import boofcv.alg.feature.detect.interest.EasyGeneralFeatureDetector;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
@@ -31,10 +35,12 @@ import boofcv.alg.feature.detect.selector.FeatureSelectLimit;
 import boofcv.alg.feature.detect.selector.FeatureSelectNBest;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.intensity.FactoryIntensityPoint;
+import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
+import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I16;
 
 /**
@@ -116,7 +122,7 @@ public class PointDisplayActivity extends DemoCamera2Activity
 	}
 
 	private void setSelection( int which ) {
-		PointDetector<GrayU8> detector=null;
+		InterestPointDetector<GrayU8> detector=null;
 		GeneralFeatureIntensity<GrayU8, GrayS16> intensity=null;
 		NonMaxSuppression nonmax = nonmaxMax;
 
@@ -126,7 +132,7 @@ public class PointDisplayActivity extends DemoCamera2Activity
 
 		int pixelTol = 10 + (int)(200*(featureRadius/(double)seekRadius.getMax()));
 		ConfigFastCorner configFast = new ConfigFastCorner(pixelTol,9);
-		configFast.maxFeatures = 0.02;
+		// configFast.maxFeatures = 0.02; TODO
 
 		boolean enableRadius=false;
 		boolean enabledWeighted=false;
@@ -178,7 +184,7 @@ public class PointDisplayActivity extends DemoCamera2Activity
 		seekRadius.setEnabled(enableRadius);
 
 		if( intensity != null )
-			setProcessing(new PointProcessing(intensity,nonmax));
+			setProcessing(new PointProcessing(intensity, nonmaxMinMax, nonmax));
 		else
 			setProcessing(new PointProcessing(detector));
 	}
@@ -192,28 +198,31 @@ public class PointDisplayActivity extends DemoCamera2Activity
 	public void onNothingSelected(AdapterView<?> adapterView) {}
 
 	protected class PointProcessing extends DemoProcessingAbstract<GrayU8> {
-		PointDetector<GrayU8> detector;
+		InterestPointDetector<GrayU8> detector;
 
 		NonMaxSuppression nonmax;
 
 		// location of point features displayed inside of GUI
-		QueueCorner maximumsGUI = new QueueCorner();
-		QueueCorner minimumsGUI = new QueueCorner();
+		List<Point2D_F64> maximumsGUI = new  ArrayList<>();
+		List<Point2D_F64> minimumsGUI = new ArrayList<>();
 
 		float radius;
 
 		public PointProcessing(GeneralFeatureIntensity<GrayU8, GrayS16> intensity,
-							   NonMaxSuppression nonmax) {
+							   NonMaxSuppression nonmin, NonMaxSuppression nonmax) {
 			super(ImageType.single(GrayU8.class));
-			FeatureSelectLimit selectLimit = new FeatureSelectNBest();
-			GeneralFeatureDetector<GrayU8, GrayS16> general =
-					new GeneralFeatureDetector<GrayU8, GrayS16>(intensity, nonmax, selectLimit);
 
-			detector = new GeneralToPointDetector<>(general, GrayU8.class, GrayS16.class);
+			FeatureSelectNBest selectLimit = new FeatureSelectNBest();
+			GeneralFeatureDetector<GrayU8, GrayS16> general =
+					new GeneralFeatureDetector<GrayU8, GrayS16>(intensity, nonmin, nonmax, selectLimit);
+
+			detector = FactoryInterestPoint.wrapPoint(general, 1, GrayU8.class, GrayS16.class);
+
+			// detector = new GeneralToPointDetector<>(general, GrayU8.class, GrayS16.class);
 			this.nonmax = nonmax;
 		}
 
-		public PointProcessing(PointDetector<GrayU8> detector ) {
+		public PointProcessing(InterestPointDetector<GrayU8> detector ) {
 			super(ImageType.single(GrayU8.class));
 			this.detector = detector;
 		}
@@ -228,7 +237,7 @@ public class PointDisplayActivity extends DemoCamera2Activity
 				EasyGeneralFeatureDetector easy = (EasyGeneralFeatureDetector)detector;
 				int totalSets = easy.getDetector().isDetectMaximums() ? 1 : 0;
 				totalSets += easy.getDetector().isDetectMinimums() ? 1 : 0;
-				easy.getDetector().setMaxFeatures(200 * imageWidth / (320*totalSets) );
+				easy.getDetector().setFeatureLimit(200 * imageWidth / (320*totalSets) );
 			}
 		}
 
@@ -237,31 +246,33 @@ public class PointDisplayActivity extends DemoCamera2Activity
 
 			canvas.concat(imageToView);
 			synchronized (lockGui) {
-				for (int i = 0; i < maximumsGUI.size; i++) {
-					Point2D_I16 p = maximumsGUI.get(i);
-					canvas.drawCircle(p.x, p.y, radius, paintMax);
+				for (int i = 0; i < maximumsGUI.size(); i++) {
+					Point2D_F64 p = maximumsGUI.get(i);
+					canvas.drawCircle((float)p.x, (float)p.y, radius, paintMax);
 				}
 
-				for (int i = 0; i < minimumsGUI.size; i++) {
-					Point2D_I16 p = minimumsGUI.get(i);
-					canvas.drawCircle(p.x, p.y, radius, paintMin);
+				for (int i = 0; i < minimumsGUI.size(); i++) {
+					Point2D_F64 p = minimumsGUI.get(i);
+					canvas.drawCircle((float)p.x, (float)p.y, radius, paintMin);
 				}
 			}
 		}
 
 		@Override
 		public void process(GrayU8 gray) {
-			detector.process(gray);
+			detector.detect(gray);
 
 			synchronized (lockGui) {
-				maximumsGUI.reset();
-				minimumsGUI.reset();
+				maximumsGUI.clear();
+				minimumsGUI.clear();
 
-				if( detector.totalSets() == 1 ) {
-					maximumsGUI.appendAll(detector.getPointSet(0));
+				if( detector.getNumberOfSets() == 1 ) {
+					int set = detector.getSet(0); // TODO
+
+					maximumsGUI.add(detector.getLocation(0));
 				} else {
-					minimumsGUI.appendAll(detector.getPointSet(0));
-					maximumsGUI.appendAll(detector.getPointSet(1));
+					minimumsGUI.add(detector.getLocation(0));
+					maximumsGUI.add(detector.getLocation(1));
 				}
 			}
 		}

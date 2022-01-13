@@ -15,8 +15,8 @@ import android.widget.SeekBar;
 import org.boofcv.android.DemoCamera2Activity;
 import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 
 import java.util.List;
 import java.util.Random;
@@ -91,9 +91,9 @@ public class CannyEdgeActivity extends DemoCamera2Activity
 	protected class CannyProcessing extends DemoProcessingAbstract<GrayU8> {
 		CannyEdge<GrayU8,GrayS16> canny;
 
-		private final FastQueue<Point2D_I32> contours = new FastQueue<>(Point2D_I32::new);
-		private final GrowQueue_I32 edgeLengths = new GrowQueue_I32();
-		private final GrowQueue_I32 colorEdges = new GrowQueue_I32();
+		private final DogArray<Point2D_I32> contours = new DogArray<>(Point2D_I32::new);
+		private final DogArray_I32 edgeLengths = new DogArray_I32();
+		private final DogArray_I32 colorEdges = new DogArray_I32();
 
 		Paint paintFade = new Paint();
 		TextPaint paintText = new TextPaint();
@@ -119,7 +119,7 @@ public class CannyEdgeActivity extends DemoCamera2Activity
 		public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
 			// predeclare some memory
 			synchronized (contours) {
-				contours.growArray(5000);
+				contours.reserve(5000);
 				edgeLengths.resize(1000);
 				contours.size = 0;
 				edgeLengths.size = 0;
@@ -196,7 +196,7 @@ public class CannyEdgeActivity extends DemoCamera2Activity
 						EdgeSegment s = e.segments.get(j);
 						for (int k = 0; k < s.points.size(); k++) {
 							Point2D_I32 p = s.points.get(k);
-							contours.grow().set(p.x,p.y);
+							contours.grow().setTo(p.x,p.y);
 						}
 						edgeLengths.add(s.points.size());
 						// abort if there are too many points and rendering will get slow

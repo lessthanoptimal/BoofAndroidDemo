@@ -32,7 +32,7 @@ import org.boofcv.android.R;
 import org.boofcv.android.assoc.AssociationVisualize;
 import org.boofcv.android.visalize.PointCloud3D;
 import org.boofcv.android.visalize.PointCloudSurfaceView;
-import org.ddogleg.struct.GrowQueue_I8;
+import org.ddogleg.struct.DogArray_I8;
 import org.ejml.data.DMatrixRMaj;
 
 import java.io.File;
@@ -42,31 +42,31 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import boofcv.abst.disparity.StereoDisparity;
 import boofcv.abst.feature.associate.AssociateDescription;
 import boofcv.abst.feature.associate.ScoreAssociation;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
-import boofcv.abst.feature.disparity.StereoDisparity;
 import boofcv.alg.cloud.PointCloudReader;
 import boofcv.alg.geo.RectifyImageOps;
 import boofcv.alg.misc.ImageMiscOps;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
 import boofcv.core.image.ConvertImage;
+import boofcv.factory.disparity.ConfigDisparityBM;
+import boofcv.factory.disparity.ConfigDisparityBMBest5;
+import boofcv.factory.disparity.ConfigDisparitySGM;
+import boofcv.factory.disparity.DisparityError;
+import boofcv.factory.disparity.DisparitySgmError;
+import boofcv.factory.disparity.FactoryStereoDisparity;
 import boofcv.factory.feature.associate.ConfigAssociateGreedy;
 import boofcv.factory.feature.associate.FactoryAssociation;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
-import boofcv.factory.feature.disparity.ConfigDisparityBM;
-import boofcv.factory.feature.disparity.ConfigDisparityBMBest5;
-import boofcv.factory.feature.disparity.ConfigDisparitySGM;
-import boofcv.factory.feature.disparity.DisparityError;
-import boofcv.factory.feature.disparity.DisparitySgmError;
-import boofcv.factory.feature.disparity.FactoryStereoDisparity;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.io.points.PointCloudIO;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.calib.StereoParameters;
 import boofcv.struct.distort.Point2Transform2_F64;
-import boofcv.struct.feature.BrightFeature;
+import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
@@ -376,7 +376,7 @@ public class DisparityActivity extends DemoCamera2Activity
 
 	protected class DisparityProcessing extends DemoProcessingAbstract<InterleavedU8> {
 
-		DisparityCalculation<BrightFeature> disparity;
+		DisparityCalculation<TupleDesc_F64> disparity;
         AssociationVisualize<GrayU8> visualize;
 
 		InterleavedU8 colorLeft = new InterleavedU8(1,1,1);
@@ -393,7 +393,7 @@ public class DisparityActivity extends DemoCamera2Activity
 //			Log.i(TAG,"NEW DisparityProcessing() hash "+hashCode());
 		}
 
-		private StereoDisparity<?, GrayF32> createDisparity( AlgType whichAlg ) {
+		private StereoDisparity<?, GrayF32> createDisparity(AlgType whichAlg ) {
 
 			// Don't set to zero to avoid points at infinity when rending 3D
 			int disparityMin = 5;
@@ -441,15 +441,15 @@ public class DisparityActivity extends DemoCamera2Activity
 
 			intrinsic = lookupIntrinsics();
 
-			DetectDescribePoint<GrayU8, BrightFeature> detDesc =
+			DetectDescribePoint<GrayU8, TupleDesc_F64> detDesc =
 					FactoryDetectDescribe.surfStable(null,null,null,GrayU8.class);
 
 			ConfigAssociateGreedy configAssoc = new ConfigAssociateGreedy();
 			configAssoc.scoreRatioThreshold = 0.75;
 			configAssoc.forwardsBackwards = true;
 
-			ScoreAssociation<BrightFeature> score = FactoryAssociation.defaultScore(BrightFeature.class);
-			AssociateDescription<BrightFeature> associate = FactoryAssociation.greedy(configAssoc,score);
+			ScoreAssociation<TupleDesc_F64> score = FactoryAssociation.defaultScore(TupleDesc_F64.class);
+			AssociateDescription<TupleDesc_F64> associate = FactoryAssociation.greedy(configAssoc,score);
 
 			disparity = new DisparityCalculation<>(detDesc, associate, intrinsic);
             disparity.init(imageWidth,imageHeight);
@@ -677,7 +677,7 @@ public class DisparityActivity extends DemoCamera2Activity
 			GrayF32 disparityImage = this.disparityImage;
 
 			runOnUiThread(() -> {
-				DMatrixRMaj rectified1 = disparity.getRectifyAlg().getRect1();
+				DMatrixRMaj rectified1 = disparity.getRectifyAlg().getUndistToRectPixels1();
 				DMatrixRMaj rectifiedK = disparity.rectifiedK;
 				DMatrixRMaj rectifiedR = disparity.rectifiedR;
 				Point2Transform2_F64 rectifiedToColor =
@@ -707,7 +707,7 @@ public class DisparityActivity extends DemoCamera2Activity
 						disparity.rectifiedLeft.width,
 						disparity.rectifiedLeft.height,
 						Bitmap.Config.ARGB_8888);
-				GrowQueue_I8 storage = new GrowQueue_I8();
+				DogArray_I8 storage = new DogArray_I8();
 
 				ConvertBitmap.boofToBitmap(disparity.rectifiedLeft,bitmap,storage);
 				bitmap.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(new File(savePath,"rectified_left.png")));
@@ -743,7 +743,7 @@ public class DisparityActivity extends DemoCamera2Activity
 				StereoParameters calib = new StereoParameters();
 				calib.left = intrinsic;
 				calib.right = intrinsic;
-				calib.rightToLeft = disparity.leftToRight.invert(null);
+				calib.right_to_left = disparity.leftToRight.invert(null);
 				CalibrationIO.save(calib,new File(savePath,"stereo_calibration.yaml"));
 				runOnUiThread(() -> saveDialog.setProgress(7));
 

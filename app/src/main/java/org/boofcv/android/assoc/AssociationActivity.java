@@ -18,7 +18,7 @@ import org.boofcv.android.DemoCamera2Activity;
 import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
 import org.ddogleg.struct.FastAccess;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -171,14 +171,14 @@ public class AssociationActivity extends DemoCamera2Activity
 	}
 
 
-	protected class AssociationProcessing<Desc extends TupleDesc> extends DemoProcessingAbstract<GrayF32> {
+	protected class AssociationProcessing<Desc extends TupleDesc<Desc>> extends DemoProcessingAbstract<GrayF32> {
 		DetectDescribePoint<GrayF32,Desc> detDesc;
 		AssociateDescription<Desc> associate;
 
-		FastQueue<Desc> listSrc;
-		FastQueue<Desc> listDst;
-		FastQueue<Point2D_F64> locationSrc = new FastQueue<>(Point2D_F64::new);
-		FastQueue<Point2D_F64> locationDst = new FastQueue<>(Point2D_F64::new);
+		DogArray<Desc> listSrc;
+		DogArray<Desc> listDst;
+		DogArray<Point2D_F64> locationSrc = new DogArray<>(Point2D_F64::new);
+		DogArray<Point2D_F64> locationDst = new DogArray<>(Point2D_F64::new);
 
 		public AssociationProcessing( DetectDescribePoint<GrayF32,Desc> detDesc ,
 									  AssociateDescription<Desc> associate  ) {
@@ -187,8 +187,8 @@ public class AssociationActivity extends DemoCamera2Activity
 			this.associate = associate;
 
 
-			listSrc = UtilFeature.createQueue(detDesc,10);
-			listDst = UtilFeature.createQueue(detDesc,10);
+			listSrc = UtilFeature.createArray(detDesc,10);
+			listDst = UtilFeature.createArray(detDesc,10);
 		}
 
 		@Override
@@ -302,12 +302,12 @@ public class AssociationActivity extends DemoCamera2Activity
 			hideProgressDialog();
 		}
 
-		private void describeImage(FastQueue<Desc> listDesc, FastQueue<Point2D_F64> listLoc) {
+		private void describeImage(DogArray<Desc> listDesc, DogArray<Point2D_F64> listLoc) {
 			listDesc.reset();
 			listLoc.reset();
 			int N = detDesc.getNumberOfFeatures();
 			for( int i = 0; i < N; i++ ) {
-				listLoc.grow().set(detDesc.getLocation(i));
+				listLoc.grow().setTo(detDesc.getLocation(i));
 				listDesc.grow().setTo(detDesc.getDescription(i));
 			}
 		}

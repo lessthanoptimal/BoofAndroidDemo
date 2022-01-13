@@ -17,7 +17,7 @@ import android.widget.Spinner;
 import org.boofcv.android.DemoBitmapCamera2Activity;
 import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.List;
 
@@ -151,7 +151,7 @@ public class DetectBlackEllipseActivity extends DemoBitmapCamera2Activity
 
 		RectF r = new RectF();
 
-		FastQueue<EllipseRotated_F64> ellipses = new FastQueue<>(EllipseRotated_F64::new);
+		DogArray<EllipseRotated_F64> ellipses = new DogArray<>(EllipseRotated_F64::new);
 
 		protected EllipseProcessing() {
 			super(ImageType.single(GrayU8.class));
@@ -209,7 +209,7 @@ public class DetectBlackEllipseActivity extends DemoBitmapCamera2Activity
 			synchronized (lockGui) {
 				ellipses.reset();
 				for (EllipseRotated_F64 ellipse : found) {
-					ellipses.grow().set(ellipse);
+					ellipses.grow().setTo(ellipse);
 				}
 			}
 		}

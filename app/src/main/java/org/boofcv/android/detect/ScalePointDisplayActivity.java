@@ -17,7 +17,7 @@ import android.widget.Spinner;
 import org.boofcv.android.DemoCamera2Activity;
 import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import boofcv.abst.feature.detect.interest.ConfigFastHessian;
 import boofcv.abst.feature.detect.interest.ConfigSiftDetector;
@@ -110,7 +110,7 @@ public class ScalePointDisplayActivity extends DemoCamera2Activity
 
 		float density;
 
-		FastQueue<ScalePoint> foundGUI = new FastQueue<>(ScalePoint::new);
+		DogArray<ScalePoint> foundGUI = new DogArray<>(ScalePoint::new);
 
 		public PointProcessing(InterestPointDetector<GrayU8> detector) {
 			super(ImageType.single(GrayU8.class));
@@ -129,7 +129,7 @@ public class ScalePointDisplayActivity extends DemoCamera2Activity
 				for (int i = 0; i < foundGUI.size(); i++) {
 					ScalePoint p = foundGUI.get(i);
 					float radius = (float)(p.scale*density);
-					canvas.drawCircle((float) p.x, (float) p.y, radius, paintMax);
+					canvas.drawCircle((float) p.pixel.x, (float) p.pixel.y, radius, paintMax);
 				}
 			}
 		}
@@ -143,7 +143,7 @@ public class ScalePointDisplayActivity extends DemoCamera2Activity
 				for( int i = 0; i < N; i++ ) {
 					Point2D_F64 p = detector.getLocation(i);
 					double radius = detector.getRadius(i);
-					foundGUI.grow().set(p.x, p.y, radius);
+					foundGUI.grow().setTo(p.x, p.y, radius);
 				}
 			}
 		}

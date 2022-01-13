@@ -16,8 +16,8 @@ import android.widget.Toast;
 import org.boofcv.android.DemoBitmapCamera2Activity;
 import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_I32;
 import org.ddogleg.struct.Stoppable;
 
 import boofcv.abst.segmentation.ImageSuperpixels;
@@ -134,8 +134,8 @@ public class SuperpixelDisplayActivity extends DemoBitmapCamera2Activity
 		Planar<GrayU8> background;
 
 		ComputeRegionMeanColor colorize;
-		FastQueue<float[]> segmentColor = new ColorQueue_F32(3);
-		GrowQueue_I32 regionMemberCount = new GrowQueue_I32();
+		DogArray<float[]> segmentColor = new ColorQueue_F32(3);
+		DogArray_I32 regionMemberCount = new DogArray_I32();
 
 		public SegmentationProcessing(ImageSuperpixels<Planar<GrayU8>> segmentation) {
 			super(ImageType.pl(3, GrayU8.class));

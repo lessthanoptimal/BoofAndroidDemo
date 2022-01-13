@@ -129,15 +129,15 @@ public class ObjectTrackerActivity extends DemoCamera2Activity
 	public boolean onTouch(View view, MotionEvent motionEvent) {
 		if( mode == 0 ) {
 			if(MotionEvent.ACTION_DOWN == motionEvent.getActionMasked()) {
-				click0.set((int) motionEvent.getX(), (int) motionEvent.getY());
-				click1.set((int) motionEvent.getX(), (int) motionEvent.getY());
+				click0.setTo((int) motionEvent.getX(), (int) motionEvent.getY());
+				click1.setTo((int) motionEvent.getX(), (int) motionEvent.getY());
 				mode = 1;
 			}
 		} else if( mode == 1 ) {
 			if(MotionEvent.ACTION_MOVE == motionEvent.getActionMasked()) {
-				click1.set((int)motionEvent.getX(),(int)motionEvent.getY());
+				click1.setTo((int)motionEvent.getX(),(int)motionEvent.getY());
 			} else if(MotionEvent.ACTION_UP == motionEvent.getActionMasked()) {
-				click1.set((int)motionEvent.getX(),(int)motionEvent.getY());
+				click1.setTo((int)motionEvent.getX(),(int)motionEvent.getY());
 				mode = 2;
 			}
 		}
@@ -248,8 +248,8 @@ public class ObjectTrackerActivity extends DemoCamera2Activity
 
 				if( movedSignificantly(location.a,location.c) ) {
 					// use the selected region and start the tracker
-					location.b.set(location.c.x, location.a.y);
-					location.d.set( location.a.x, location.c.y );
+					location.b.setTo(location.c.x, location.a.y);
+					location.d.setTo( location.a.x, location.c.y );
 
 					visible = true;
 					mode = 3;

@@ -21,7 +21,7 @@ import android.widget.FrameLayout;
 import android.widget.Spinner;
 
 import org.boofcv.android.R;
-import org.ddogleg.struct.GrowQueue_I8;
+import org.ddogleg.struct.DogArray_I8;
 import org.ejml.data.FMatrixRMaj;
 import org.ejml.dense.row.CommonOps_FDRM;
 
@@ -71,7 +71,7 @@ public class EquirectangularToViewActivity extends Activity {
     Bitmap outputBitmap;
     Planar<GrayU8> equiImage = new Planar<>(GrayU8.class,1,1,3);
     Planar<GrayU8> renderImage = new Planar<>(GrayU8.class,1,1,3);
-    final GrowQueue_I8 bitmapTmp = new GrowQueue_I8();
+    final DogArray_I8 bitmapTmp = new DogArray_I8();
     // END
 
     DisplayView view;
@@ -252,7 +252,7 @@ public class EquirectangularToViewActivity extends Activity {
         public void run() {
             while( true ) {
                 synchronized (controlLock) {
-                    controlR.set(workR);
+                    controlR.setTo(workR);
                     CommonOps_FDRM.setIdentity(workR);
                 }
 

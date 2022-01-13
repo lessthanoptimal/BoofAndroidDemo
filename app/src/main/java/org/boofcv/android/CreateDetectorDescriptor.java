@@ -1,7 +1,7 @@
 package org.boofcv.android;
 
 import boofcv.abst.feature.describe.ConfigBrief;
-import boofcv.abst.feature.describe.DescribeRegionPoint;
+import boofcv.abst.feature.describe.DescribePointRadiusAngle;
 import boofcv.abst.feature.detdesc.ConfigCompleteSift;
 import boofcv.abst.feature.detdesc.DetectDescribePoint;
 import boofcv.abst.feature.detect.interest.ConfigFastCorner;
@@ -16,7 +16,7 @@ import boofcv.abst.feature.orientation.OrientationIntegral;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.alg.filter.derivative.GImageDerivativeOps;
 import boofcv.alg.transform.ii.GIntegralImageOps;
-import boofcv.factory.feature.describe.FactoryDescribeRegionPoint;
+import boofcv.factory.feature.describe.FactoryDescribePointRadiusAngle;
 import boofcv.factory.feature.detdesc.FactoryDetectDescribe;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
@@ -53,7 +53,7 @@ public class CreateDetectorDescriptor {
 			boolean ss = isScaleSpace(detect);
 
 			InterestPointDetector detector = createDetector(detect,imageType);
-			DescribeRegionPoint descriptor = createDescriptor(describe,ss,imageType);
+			DescribePointRadiusAngle descriptor = createDescriptor(describe,ss,imageType);
 			OrientationImage ori = createOrientation(detect,imageType);
 
 			return FactoryDetectDescribe.fuseTogether(detector,ori,descriptor);
@@ -106,19 +106,19 @@ public class CreateDetectorDescriptor {
 		return FactoryInterestPoint.wrapPoint(general,1.0,imageType,derivType);
 	}
 
-	public static DescribeRegionPoint createDescriptor( int describe , boolean scaleSpace , Class imageType ) {
+	public static DescribePointRadiusAngle createDescriptor(int describe , boolean scaleSpace , Class imageType ) {
 		switch( describe ) {
 			case DESC_SURF:
-				return FactoryDescribeRegionPoint.surfFast(null, imageType);
+				return FactoryDescribePointRadiusAngle.surfFast(null, imageType);
 
 			case DESC_SIFT:
-				return FactoryDescribeRegionPoint.sift(null,null,imageType);
+				return FactoryDescribePointRadiusAngle.sift(null,null,imageType);
 
 			case DESC_BRIEF:
-				return FactoryDescribeRegionPoint.brief(new ConfigBrief(!scaleSpace),imageType);
+				return FactoryDescribePointRadiusAngle.brief(new ConfigBrief(!scaleSpace),imageType);
 
 			case DESC_NCC:
-				return FactoryDescribeRegionPoint.pixelNCC(9,9,imageType);
+				return FactoryDescribePointRadiusAngle.pixelNCC(9,9,imageType);
 
 			default:
 				throw new RuntimeException("Unknown descriptor");

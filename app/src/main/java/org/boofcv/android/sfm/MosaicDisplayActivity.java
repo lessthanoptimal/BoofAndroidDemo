@@ -19,7 +19,7 @@ import android.widget.ToggleButton;
 import org.boofcv.android.DemoCamera2Activity;
 import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import boofcv.abst.sfm.AccessPointTracks;
 import boofcv.abst.sfm.d2.ImageMotion2D;
@@ -31,6 +31,7 @@ import boofcv.struct.image.ImageType;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
+import georegression.struct.shapes.Quadrilateral_F64;
 import georegression.transform.homography.HomographyPointOps_F64;
 
 import static org.boofcv.android.sfm.StabilizeDisplayActivity.createStabilization;
@@ -125,11 +126,11 @@ implements CompoundButton.OnCheckedChangeListener
 		Homography2D_F64 imageToDistorted = new Homography2D_F64();
 		Homography2D_F64 distortedToImage = new Homography2D_F64();
 
-		StitchingFromMotion2D.Corners corners = new StitchingFromMotion2D.Corners();
+		Quadrilateral_F64 corners = new Quadrilateral_F64();
 		Point2D_F64 distPt = new Point2D_F64();
 
-		FastQueue<Point2D_F64> inliersGui = new FastQueue<>(Point2D_F64::new);
-		FastQueue<Point2D_F64> outliersGui = new FastQueue<>(Point2D_F64::new);
+		DogArray<Point2D_F64> inliersGui = new DogArray<>(Point2D_F64::new);
+		DogArray<Point2D_F64> outliersGui = new DogArray<>(Point2D_F64::new);
 
 		float radius;
 
@@ -172,10 +173,10 @@ implements CompoundButton.OnCheckedChangeListener
 
 			canvas.concat(imageToView);
 			synchronized (lockGui) {
-				Point2D_F64 p0 = corners.p0;
-				Point2D_F64 p1 = corners.p1;
-				Point2D_F64 p2 = corners.p2;
-				Point2D_F64 p3 = corners.p3;
+				Point2D_F64 p0 = corners.a;
+				Point2D_F64 p1 = corners.b;
+				Point2D_F64 p2 = corners.c;
+				Point2D_F64 p3 = corners.d;
 
 				canvas.drawLine((int) p0.x, (int) p0.y, (int) p1.x, (int) p1.y, paintBorder);
 				canvas.drawLine((int) p1.x, (int) p1.y, (int) p2.x, (int) p2.y, paintBorder);
@@ -219,9 +220,9 @@ implements CompoundButton.OnCheckedChangeListener
 							HomographyPointOps_F64.transform(distortedToImage,pixel,distPt);
 
 							if( access.isTrackInlier(i) ) {
-								inliersGui.grow().set(distPt.x,distPt.y);
+								inliersGui.grow().setTo(distPt.x,distPt.y);
 							} else {
-								outliersGui.grow().set(distPt.x,distPt.y);
+								outliersGui.grow().setTo(distPt.x,distPt.y);
 							}
 						}
 					}
@@ -230,10 +231,10 @@ implements CompoundButton.OnCheckedChangeListener
 				}
 
 				boolean inside = true;
-				inside &= BoofMiscOps.isInside(stitched,corners.p0.x,corners.p0.y,5);
-				inside &= BoofMiscOps.isInside(stitched,corners.p1.x,corners.p1.y,5);
-				inside &= BoofMiscOps.isInside(stitched,corners.p2.x,corners.p2.y,5);
-				inside &= BoofMiscOps.isInside(stitched,corners.p3.x,corners.p3.y,5);
+				inside &= BoofMiscOps.isInside(stitched,corners.a.x,corners.a.y,5);
+				inside &= BoofMiscOps.isInside(stitched,corners.b.x,corners.b.y,5);
+				inside &= BoofMiscOps.isInside(stitched,corners.c.x,corners.c.y,5);
+				inside &= BoofMiscOps.isInside(stitched,corners.d.x,corners.d.y,5);
 				if( !inside ) {
 					alg.setOriginToCurrent();
 				}

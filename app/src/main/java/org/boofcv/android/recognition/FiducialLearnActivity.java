@@ -24,8 +24,8 @@ import org.boofcv.android.R;
 import org.boofcv.android.misc.MiscUtil;
 import org.boofcv.android.misc.UnitsDistance;
 import org.ddogleg.sorting.QuickSelect;
-import org.ddogleg.struct.GrowQueue_F64;
-import org.ddogleg.struct.GrowQueue_I32;
+import org.ddogleg.struct.DogArray_F64;
+import org.ddogleg.struct.DogArray_I32;
 
 import java.util.List;
 
@@ -103,8 +103,8 @@ public class FiducialLearnActivity extends DemoCamera2Activity
 		FiducialDetector.Detected detected[];
 		int numDetected = 0;
 
-		GrowQueue_I32 indexes = new GrowQueue_I32();
-		GrowQueue_F64 area = new GrowQueue_F64();
+		DogArray_I32 indexes = new DogArray_I32();
+		DogArray_F64 area = new DogArray_F64();
 
 		Path path = new Path();
 		Polygon2D_F64 polygon = new Polygon2D_F64(4);
@@ -196,7 +196,7 @@ public class FiducialLearnActivity extends DemoCamera2Activity
 					numDetected = found.size();
 					for (int i = 0; i < numDetected; i++) {
 						detected[i].binary.setTo(found.get(i).binary);
-						detected[i].location.set(found.get(i).location);
+						detected[i].location.setTo(found.get(i).location);
 					}
 				} else {
 					indexes.resize( found.size() );
@@ -213,7 +213,7 @@ public class FiducialLearnActivity extends DemoCamera2Activity
 						int index = indexes.data[i];
 
 						detected[i].binary.setTo(found.get(index).binary);
-						detected[i].location.set(found.get(index).location);
+						detected[i].location.setTo(found.get(index).location);
 					}
 				}
 			}

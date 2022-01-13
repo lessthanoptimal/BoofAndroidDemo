@@ -19,9 +19,9 @@ import org.boofcv.android.DemoBitmapCamera2Activity;
 import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
 import org.boofcv.android.misc.RenderCube3D;
-import org.ddogleg.struct.FastQueue;
-import org.ddogleg.struct.GrowQueue_F64;
-import org.ddogleg.struct.GrowQueue_I64;
+import org.ddogleg.struct.DogArray;
+import org.ddogleg.struct.DogArray_F64;
+import org.ddogleg.struct.DogArray_I64;
 
 import boofcv.abst.fiducial.CalibrationFiducialDetector;
 import boofcv.abst.fiducial.FiducialDetector;
@@ -32,7 +32,7 @@ import boofcv.abst.fiducial.calib.CalibrationDetectorChessboardX;
 import boofcv.abst.fiducial.calib.CalibrationDetectorCircleHexagonalGrid;
 import boofcv.abst.fiducial.calib.CalibrationDetectorCircleRegularGrid;
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
-import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
+import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
 import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
 import boofcv.factory.distort.LensDistortionFactory;
@@ -166,9 +166,9 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 		double maxStability = 0.3;
 		FiducialStability stabilityResults = new FiducialStability();
 
-		final FastQueue<Se3_F64> listPose = new FastQueue<>(Se3_F64::new);
-		final GrowQueue_F64 listWidths = new GrowQueue_F64();
-		final GrowQueue_I64 listIDs = new GrowQueue_I64();
+		final DogArray<Se3_F64> listPose = new DogArray<>(Se3_F64::new);
+		final DogArray_F64 listWidths = new DogArray_F64();
+		final DogArray_I64 listIDs = new DogArray_I64();
 		CameraPinholeBrown intrinsic;
 
 		protected FiducialProcessor( FiducialDetector<T> detector ) {
@@ -264,7 +264,7 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 			} else {
 				GrayU8 binary;
 				if (detector instanceof CalibrationFiducialDetector) {
-					DetectorFiducialCalibration a = ((CalibrationFiducialDetector) detector).getCalibDetector();
+					DetectSingleFiducialCalibration a = ((CalibrationFiducialDetector) detector).getCalibDetector();
 					if (a instanceof CalibrationDetectorChessboardX) {
 						binary = null;
 					} else if (a instanceof CalibrationDetectorChessboardBinary) {
@@ -299,7 +299,7 @@ public abstract class FiducialSquareActivity extends DemoBitmapCamera2Activity
 					currentStability = Math.max(stabilityResults.orientation,currentStability);
 
 					detector.getFiducialToCamera(i, targetToCamera);
-					listPose.grow().set(targetToCamera);
+					listPose.grow().setTo(targetToCamera);
 					listWidths.add(detector.getWidth(i));
 					listIDs.add(detector.getId(i));
 				}

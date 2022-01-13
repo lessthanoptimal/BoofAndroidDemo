@@ -22,7 +22,7 @@ import org.boofcv.android.R;
 import org.boofcv.android.recognition.ConfigAllCalibration;
 import org.boofcv.android.recognition.SelectCalibrationFiducial;
 import org.boofcv.android.tracker.PointTrackerDisplayActivity;
-import org.ddogleg.struct.FastQueue;
+import org.ddogleg.struct.DogArray;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +32,7 @@ import boofcv.abst.fiducial.calib.CalibrationDetectorCircleHexagonalGrid;
 import boofcv.abst.fiducial.calib.CalibrationDetectorCircleRegularGrid;
 import boofcv.abst.fiducial.calib.CalibrationDetectorSquareGrid;
 import boofcv.abst.fiducial.calib.CalibrationPatterns;
-import boofcv.abst.geo.calibration.DetectorFiducialCalibration;
+import boofcv.abst.geo.calibration.DetectSingleFiducialCalibration;
 import boofcv.alg.feature.detect.chess.ChessboardCorner;
 import boofcv.alg.fiducial.calib.circle.DetectCircleHexagonalGrid;
 import boofcv.alg.fiducial.calib.circle.DetectCircleRegularGrid;
@@ -144,7 +144,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 	 */
 	@Override
 	public void createNewProcessor() {
-		DetectorFiducialCalibration detector;
+		DetectSingleFiducialCalibration detector;
 
 		if( cc.targetType == CalibrationPatterns.CHESSBOARD ) {
 			detector = FactoryFiducialCalibration.chessboardX(null,cc.chessboard);
@@ -199,9 +199,9 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 
 	private class DetectTarget extends DemoProcessingAbstract<GrayF32> {
 
-		DetectorFiducialCalibration detector;
+		DetectSingleFiducialCalibration detector;
 
-		FastQueue<Point2D_F64> pointsGui = new FastQueue<>(Point2D_F64::new);
+		DogArray<Point2D_F64> pointsGui = new DogArray<>(Point2D_F64::new);
 
 		final Object lockGUI = new Object();
 		List<Point2D_F64> debugPoints = new ArrayList<>();
@@ -209,7 +209,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 		List<EllipseRotated_F64> debugEllipses = new ArrayList<>();
 		float radius;
 
-		protected DetectTarget( DetectorFiducialCalibration detector ) {
+		protected DetectTarget( DetectSingleFiducialCalibration detector ) {
 			super(GrayF32.class);
 			this.detector = detector;
 		}
@@ -309,11 +309,11 @@ public class CalibrationActivity extends PointTrackerDisplayActivity
 				if( detected ) {
 					CalibrationObservation found = detector.getDetectedPoints();
 					for( PointIndex2D_F64 p : found.points )
-						pointsGui.grow().set(p);
+						pointsGui.grow().setTo(p.getP());
 				} else if( showDetectDebug ) {
 					// show binary image to aid in debugging and detected rectangles
 					if( detector instanceof CalibrationDetectorChessboardX) {
-						FastQueue<ChessboardCorner> corners = ((CalibrationDetectorChessboardX) detector).getDetector().getCorners();
+						DogArray<ChessboardCorner> corners = ((CalibrationDetectorChessboardX) detector).getDetector().getCorners();
 						for (int i = 0; i < corners.size(); i++) {
 							debugPoints.add(corners.get(i));
 						}

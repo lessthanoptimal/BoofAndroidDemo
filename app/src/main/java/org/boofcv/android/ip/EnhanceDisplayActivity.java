@@ -15,16 +15,18 @@ import android.widget.Spinner;
 import org.boofcv.android.DemoBitmapCamera2Activity;
 import org.boofcv.android.DemoProcessingAbstract;
 import org.boofcv.android.R;
+import org.ddogleg.struct.DogArray_I32;
 
 import boofcv.alg.enhance.EnhanceImageOps;
 import boofcv.alg.misc.ImageStatistics;
 import boofcv.android.ConvertBitmap;
-import boofcv.concurrency.IWorkArrays;
+import boofcv.concurrency.BoofConcurrency;
 import boofcv.core.image.ConvertImage;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.Planar;
+import pabeles.concurrency.GrowArray;
 
 /**
  * Blurs the input video image using different algorithms.
@@ -35,7 +37,7 @@ public class EnhanceDisplayActivity extends DemoBitmapCamera2Activity
 		implements AdapterView.OnItemSelectedListener, CompoundButton.OnCheckedChangeListener
 {
 
-	IWorkArrays work = new IWorkArrays();
+	GrowArray<DogArray_I32> work = new GrowArray<>(DogArray_I32::new);
 	Spinner spinnerView;
 	CheckBox checkColor;
 

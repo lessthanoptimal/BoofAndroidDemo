@@ -7,7 +7,7 @@ android {
         applicationId "org.boofcv.android"
         // min SDK version is determined by when Camera2 API becomes functional
         minSdkVersion 22
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode 35
         versionName "2.6.5"
     }
@@ -67,13 +67,17 @@ def acraVersion = '5.3.0'
 dependencies {
     ['boofcv-android', 'boofcv-core'].each {
         String a ->
-            implementation group: 'org.boofcv', name: a, version: '0.36'
+            implementation group: 'org.boofcv', name: a, version: '0.39.1'
     }
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.android.support:support-v4:28.0.0'
 
+    implementation 'net.lingala.zip4j:zip4j:2.9.1'
+
     implementation "ch.acra:acra-http:$acraVersion"
     implementation "ch.acra:acra-toast:$acraVersion"
     implementation "ch.acra:acra-limiter:$acraVersion"
+
+    annotationProcessor "org.projectlombok:lombok:1.18.20" // add this
 }
