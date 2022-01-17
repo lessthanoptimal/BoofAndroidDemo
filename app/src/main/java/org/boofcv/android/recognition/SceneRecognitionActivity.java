@@ -1,5 +1,7 @@
 package org.boofcv.android.recognition;
 
+import static org.boofcv.android.DemoMain.getExternalDirectory;
+
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -47,8 +49,6 @@ import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.InterleavedU8;
-
-import static org.boofcv.android.DemoMain.getExternalDirectory;
 
 /**
  * Demonstration for scene recognition. A continuous preview of the camera is shown to the user
@@ -139,7 +139,7 @@ public class SceneRecognitionActivity extends DemoCamera2Activity
         requestAddImage = true;
     }
 
-    public void helpPressed( View view ) {
+    public void helpPressed(View view) {
         Intent intent = new Intent(this, SceneRecognitionHelpActivity.class);
         startActivity(intent);
     }
@@ -188,11 +188,11 @@ public class SceneRecognitionActivity extends DemoCamera2Activity
     public void saveRecognizer() {
         synchronized (lockRecognizer) {
             File baseDir = new File(getExternalDirectory(SceneRecognitionActivity.this), DATA_DIRECTORY);
-            RecognitionIO.saveFeatureToScene((WrapFeatureToSceneRecognition)recognizer, new File(baseDir, MODEL));
+            RecognitionIO.saveFeatureToScene((WrapFeatureToSceneRecognition) recognizer, new File(baseDir, MODEL));
         }
     }
 
-    protected void activateControls( boolean enabled ) {
+    protected void activateControls(boolean enabled) {
         runOnUiThread(() -> {
             buttonAdd.setEnabled(enabled);
             buttonSave.setEnabled(enabled);
@@ -295,9 +295,9 @@ public class SceneRecognitionActivity extends DemoCamera2Activity
             synchronized (lockGUI) {
                 int offsetX = (int) (bitmapPreview.getWidth() * 1.03);
                 canvas.drawBitmap(bitmapMatch, offsetX, 0, null);
-                String text = String.format(Locale.getDefault(),"%4.2f", bestFitError);
+                String text = String.format(Locale.getDefault(), "%4.2f", bestFitError);
                 paint.getTextBounds(text, 0, text.length(), bounds);
-                canvas.drawText(text, offsetX, 10+bounds.height(), paint);
+                canvas.drawText(text, offsetX, 10 + bounds.height(), paint);
             }
         }
 
@@ -342,7 +342,7 @@ public class SceneRecognitionActivity extends DemoCamera2Activity
             synchronized (lockRecognizer) {
                 try {
                     recognizer.query(query, (m) -> true, 1, matches);
-                } catch (RuntimeException e ) {
+                } catch (RuntimeException e) {
                     e.printStackTrace();
                     Log.e(TAG, "Query failed!");
                     setStatus(Status.ERROR);
@@ -429,6 +429,12 @@ public class SceneRecognitionActivity extends DemoCamera2Activity
                 if (attemptToLoadModel(modelPath))
                     return null;
 
+                // Delete the file if it already exists
+                if (modelPath.exists()) {
+                    Log.i(TAG, "  Deleting existing model directory: '" + modelPath + "'");
+                    UtilIO.deleteRecursive(modelPath);
+                }
+
                 // download the file
                 runOnUiThread(() -> pDialog.setMessage("Downloading Model"));
                 downloadModelFile(fileZip, destinationHome, MODEL_ADDRESS);
@@ -460,6 +466,9 @@ public class SceneRecognitionActivity extends DemoCamera2Activity
                     zipFile.extractAll(destinationHome.getAbsolutePath());
                     // Rename the decompressed directory to model
                     if (!new File(destinationHome, "scene_recognition").renameTo(modelPath)) {
+                        Log.e(TAG, "Failed to rename");
+                        Log.e(TAG, "   src='" + new File(destinationHome, "scene_recognition").getPath() + "'");
+                        Log.e(TAG, "   dst='" + modelPath.getPath() + "'");
                         throw new IOException("Failed to rename");
                     }
 
@@ -493,7 +502,7 @@ public class SceneRecognitionActivity extends DemoCamera2Activity
                 return true;
             } catch (RuntimeException e) {
                 Log.w(TAG, "Failed to load model on first attempt.  Downloading");
-                Log.w(TAG, "    message = " + e.getMessage());
+                Log.w(TAG, "    message: '" + e.getMessage() + "'");
             }
             return false;
         }

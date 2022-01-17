@@ -118,12 +118,10 @@ public class PointDisplayActivity extends DemoCamera2Activity
 		int featureRadius = seekRadius.getProgress()+1;
 		boolean weighted = checkWeighted.isChecked();
 
-		boolean enableRadius=false;
 		boolean enabledWeighted=false;
 
 		switch( which ) {
 			case 0:
-				enableRadius = true;
 				enabledWeighted = true;
 				config.shiTomasi.weighted = weighted;
 				config.shiTomasi.radius = featureRadius;
@@ -131,7 +129,6 @@ public class PointDisplayActivity extends DemoCamera2Activity
 				break;
 
 			case 1:
-				enableRadius = true;
 				enabledWeighted = true;
 				config.harris.weighted = weighted;
 				config.harris.radius = featureRadius;
@@ -139,7 +136,6 @@ public class PointDisplayActivity extends DemoCamera2Activity
 				break;
 
 			case 2:
-				enableRadius = true;
 				// less strict requirement since it can prune features with non-max
 				config.fast.minContinuous = 9;
 				config.fast.pixelTol= 10 + (int)(200*(featureRadius/(double)seekRadius.getMax()));
@@ -164,8 +160,8 @@ public class PointDisplayActivity extends DemoCamera2Activity
 				throw new RuntimeException("Unknown selection");
 		}
 
+		config.general.radius = featureRadius;
 		checkWeighted.setEnabled(enabledWeighted);
-		seekRadius.setEnabled(enableRadius);
 
 		GeneralFeatureDetector<GrayU8,GrayS16> general = FactoryDetectPoint.create(config,GrayU8.class, GrayS16.class);
 

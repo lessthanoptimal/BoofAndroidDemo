@@ -4,14 +4,15 @@ Change Log for BoofCV Demonstration App
 
 -------------------------------------------------
 Version 2.12.0
-Date:
+Date: 2022-Jan-17
 
 - Updated BoofCV version to 0.40
 - Added Micro QR Code
+- Corner/Blob detector adjusts detection radius now, reducing excessive features
 
 -------------------------------------------------
 Version 2.11.0
-Date:
+Date: never
 
 - Updated BoofCV version to 0.39
 - Added support for ECoCheck markers in calibration.
