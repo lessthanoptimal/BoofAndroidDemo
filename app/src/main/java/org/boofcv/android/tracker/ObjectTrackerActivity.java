@@ -22,7 +22,7 @@ import boofcv.abst.tracker.ConfigComaniciu2003;
 import boofcv.abst.tracker.ConfigTrackerTld;
 import boofcv.abst.tracker.MeanShiftLikelihoodType;
 import boofcv.abst.tracker.TrackerObjectQuad;
-import boofcv.alg.tracker.sfot.SfotConfig;
+import boofcv.alg.tracker.sfot.ConfigSfot;
 import boofcv.factory.tracker.FactoryTrackerObjectQuad;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
@@ -106,7 +106,7 @@ public class ObjectTrackerActivity extends DemoCamera2Activity
 			}break;
 
 			case 4:{
-				SfotConfig config = new SfotConfig();
+				ConfigSfot config = new ConfigSfot();
 				config.numberOfSamples = 10;
 				config.robustMaxError = 30;
 				tracker = FactoryTrackerObjectQuad.sparseFlow(config,GrayU8.class,null);

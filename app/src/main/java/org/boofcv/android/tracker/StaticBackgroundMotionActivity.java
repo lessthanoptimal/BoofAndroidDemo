@@ -194,7 +194,7 @@ public class StaticBackgroundMotionActivity extends DemoBitmapCamera2Activity
 			work.reshape(imageWidth, imageHeight);
 			scaled.reshape(imageWidth/3,imageHeight/3);
 
-			shrink = new FDistort();
+			shrink = new FDistort(scaled.imageType);
 		}
 
 		@Override

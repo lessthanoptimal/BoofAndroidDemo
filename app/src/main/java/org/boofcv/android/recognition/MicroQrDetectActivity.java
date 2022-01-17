@@ -27,10 +27,11 @@ import org.ddogleg.struct.DogArray;
 import java.util.HashMap;
 import java.util.Map;
 
-import boofcv.abst.fiducial.QrCodeDetectorPnP;
+import boofcv.abst.fiducial.MicroQrCodeDetectorPnP;
+import boofcv.alg.fiducial.microqr.MicroQrCode;
 import boofcv.alg.fiducial.qrcode.QrCode;
 import boofcv.factory.distort.LensDistortionFactory;
-import boofcv.factory.fiducial.ConfigQrCode;
+import boofcv.factory.fiducial.ConfigMicroQrCode;
 import boofcv.factory.fiducial.FactoryFiducial;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.GrayU8;
@@ -41,8 +42,8 @@ import georegression.struct.se.Se3_F64;
 /**
  * Used to detect and read information from QR codes
  */
-public class QrCodeDetectActivity extends DemoCamera2Activity {
-    private static final String TAG = "QrCodeDetect";
+public class MicroQrDetectActivity extends DemoCamera2Activity {
+    private static final String TAG = "MicroQrDetect";
 
     // Switches what information is displayed
     Mode mode = Mode.NORMAL;
@@ -53,7 +54,7 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
     TextView textUnqiueCount;
     // List of unique qr codes
     public static final Object uniqueLock = new Object();
-    public static final Map<String,QrCode> unique = new HashMap<>();
+    public static final Map<String, MicroQrCode> unique = new HashMap<>();
     // qr which has been selected and should be viewed
     public static String selectedQR = null;
     // TODO don't use a static method and forget detection if the activity is exited by the user
@@ -68,7 +69,7 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
     Detector detectorType = Detector.STANDARD;
     Spinner spinnerDetector;
 
-    public QrCodeDetectActivity() {
+    public MicroQrDetectActivity() {
         super(Resolution.HIGH);
         super.changeResolutionOnSlow = true;
     }
@@ -78,7 +79,7 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
         super.onCreate(savedInstanceState);
 
         LayoutInflater inflater = getLayoutInflater();
-        LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.qrcode_detect_controls,null);
+        LinearLayout controls = (LinearLayout) inflater.inflate(R.layout.qrcode_detect_controls, null);
 
         spinnerDetector = controls.findViewById(R.id.spinner_algs);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
@@ -117,18 +118,20 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
 
         @Override
         public boolean onTouch(View view, MotionEvent motionEvent) {
-            switch( motionEvent.getAction() ) {
-                case MotionEvent.ACTION_DOWN:{
+            switch (motionEvent.getAction()) {
+                case MotionEvent.ACTION_DOWN: {
                     touching = true;
-                } break;
+                }
+                break;
 
-                case MotionEvent.ACTION_UP:{
+                case MotionEvent.ACTION_UP: {
                     touching = false;
-                } break;
+                }
+                break;
             }
 
-            if( touching ) {
-                applyToPoint(viewToImage,motionEvent.getX(),motionEvent.getY(),touched);
+            if (touching) {
+                applyToPoint(viewToImage, motionEvent.getX(), motionEvent.getY(), touched);
             }
 
             return true;
@@ -140,17 +143,17 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
         setProcessing(new QrCodeProcessing());
     }
 
-    public void pressedListView( View view ) {
-        Intent intent = new Intent(this, QrCodeListActivity.class );
+    public void pressedListView(View view) {
+        Intent intent = new Intent(this, MicroQrListActivity.class);
         startActivity(intent);
     }
 
     protected class QrCodeProcessing extends DemoProcessingAbstract<GrayU8> {
 
-        QrCodeDetectorPnP<GrayU8> detector;
+        MicroQrCodeDetectorPnP<GrayU8> detector;
 
-        DogArray<QrCode> detected = new DogArray<>(QrCode::new);
-        DogArray<QrCode> failures = new DogArray<>(QrCode::new);
+        DogArray<MicroQrCode> detected = new DogArray<>(MicroQrCode::new);
+        DogArray<MicroQrCode> failures = new DogArray<>(MicroQrCode::new);
 
         Paint colorDetected = new Paint();
         Paint colorFailed = new Paint();
@@ -166,23 +169,24 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
         public QrCodeProcessing() {
             super(GrayU8.class);
 
-            ConfigQrCode config;
+            ConfigMicroQrCode config;
 
-            switch( detectorType ) {
-                case FAST:{
-                    config = ConfigQrCode.fast();
-                }break;
+            switch (detectorType) {
+                case FAST: {
+                    config = ConfigMicroQrCode.fast();
+                }
+                break;
 
                 default: {
-                    config = new ConfigQrCode();
+                    config = new ConfigMicroQrCode();
                 }
             }
 
-            detector = FactoryFiducial.qrcode3D(config,GrayU8.class);
+            detector = FactoryFiducial.microqr3D(config, GrayU8.class);
 
-            colorDetected.setARGB(0xA0,0,0xFF,0);
+            colorDetected.setARGB(0xA0, 0, 0xFF, 0);
             colorDetected.setStyle(Paint.Style.FILL);
-            colorFailed.setARGB(0xA0,0xFF,0x11,0x11);
+            colorFailed.setARGB(0xA0, 0xFF, 0x11, 0x11);
             colorFailed.setStyle(Paint.Style.FILL);
         }
 
@@ -194,7 +198,7 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
 
             renderCube.initialize(cameraToDisplayDensity);
             intrinsic = lookupIntrinsics();
-            detector.setLensDistortion(LensDistortionFactory.narrow(intrinsic),imageWidth,imageHeight);
+            detector.setLensDistortion(LensDistortionFactory.narrow(intrinsic), imageWidth, imageHeight);
 
             synchronized (uniqueLock) {
                 uniqueCount = unique.size();
@@ -205,40 +209,42 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
         public void onDraw(Canvas canvas, Matrix imageToView) {
             canvas.concat(imageToView);
             synchronized (lockGui) {
-                if( oldValue != uniqueCount ) {
+                if (oldValue != uniqueCount) {
                     oldValue = uniqueCount;
                     textUnqiueCount.setText(uniqueCount + "");
                 }
-                switch( mode ) {
-                    case NORMAL:{
-                        for( int i = 0; i < detected.size; i++ ) {
-                            QrCode qr = detected.get(i);
-                            MiscUtil.renderPolygon(qr.bounds,path,canvas,colorDetected);
+                switch (mode) {
+                    case NORMAL: {
+                        for (int i = 0; i < detected.size; i++) {
+                            MicroQrCode qr = detected.get(i);
+                            MiscUtil.renderPolygon(qr.bounds, path, canvas, colorDetected);
 
-                            if(touching && Intersection2D_F64.containsConvex(qr.bounds,touched)) {
+                            if (touching && Intersection2D_F64.containsConvex(qr.bounds, touched)) {
                                 selectedQR = qr.message;
                             }
                         }
-                        for( int i = 0; showFailures && i < failures.size; i++ ) {
-                            QrCode qr = failures.get(i);
-                            MiscUtil.renderPolygon(qr.bounds,path,canvas,colorFailed);
+                        for (int i = 0; showFailures && i < failures.size; i++) {
+                            MicroQrCode qr = failures.get(i);
+                            MiscUtil.renderPolygon(qr.bounds, path, canvas, colorFailed);
                         }
-                    }break;
+                    }
+                    break;
 
-                    case GRAPH:{
+                    case GRAPH: {
                         // TODO implement this in the future
-                    }break;
+                    }
+                    break;
                 }
 
-                for ( int i = 0; i < listPose.size; i++ ) {
+                for (int i = 0; i < listPose.size; i++) {
                     renderCube.drawCube("", listPose.get(i), intrinsic, 1, canvas);
                 }
             }
 
             // touchProcessed is needed to prevent multiple intent from being sent
-            if( selectedQR != null && !touchProcessed ) {
+            if (selectedQR != null && !touchProcessed) {
                 touchProcessed = true;
-                Intent intent = new Intent(QrCodeDetectActivity.this, QrCodeListActivity.class );
+                Intent intent = new Intent(MicroQrDetectActivity.this, QrCodeListActivity.class);
                 startActivity(intent);
             }
         }
@@ -248,12 +254,12 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
             detector.detect(input);
 
             synchronized (uniqueLock) {
-                for (QrCode qr : detector.getDetector().getDetections()) {
+                for (MicroQrCode qr : detector.getDetector().getDetections()) {
                     if (qr.message == null) {
                         Log.e(TAG, "qr with null message?!?");
                     }
                     if (!unique.containsKey(qr.message)) {
-                        Log.i(TAG,"Adding new qr code with message of length="+qr.message.length());
+                        Log.i(TAG, "Adding new qr code with message of length=" + qr.message.length());
                         unique.put(qr.message, qr.clone());
                     }
                 }
@@ -262,13 +268,13 @@ public class QrCodeDetectActivity extends DemoCamera2Activity {
 
             synchronized (lockGui) {
                 detected.reset();
-                for (QrCode qr : detector.getDetector().getDetections()) {
+                for (MicroQrCode qr : detector.getDetector().getDetections()) {
                     detected.grow().setTo(qr);
                 }
 
                 failures.reset();
-                for (QrCode qr : detector.getDetector().getFailures()) {
-                    if( qr.failureCause.ordinal() >= QrCode.Failure.ERROR_CORRECTION.ordinal()) {
+                for (MicroQrCode qr : detector.getDetector().getFailures()) {
+                    if (qr.failureCause.ordinal() >= QrCode.Failure.ERROR_CORRECTION.ordinal()) {
                         failures.grow().setTo(qr);
                     }
                 }

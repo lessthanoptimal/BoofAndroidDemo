@@ -48,6 +48,7 @@ import org.boofcv.android.recognition.FiducialCalibrationActivity;
 import org.boofcv.android.recognition.FiducialSquareBinaryActivity;
 import org.boofcv.android.recognition.FiducialSquareImageActivity;
 import org.boofcv.android.recognition.ImageClassificationActivity;
+import org.boofcv.android.recognition.MicroQrDetectActivity;
 import org.boofcv.android.recognition.QrCodeDetectActivity;
 import org.boofcv.android.recognition.SceneRecognitionActivity;
 import org.boofcv.android.segmentation.ColorHistogramSegmentationActivity;
@@ -178,6 +179,7 @@ public class DemoMain extends AppCompatActivity implements ExpandableListView.On
         tracker.addChild("Motion Detection", StaticBackgroundMotionActivity.class);
 
         recognition.addChild("QR Code", QrCodeDetectActivity.class);
+        recognition.addChild("Micro QR Code", MicroQrDetectActivity.class);
         recognition.addChild("Image Classification", ImageClassificationActivity.class);
         recognition.addChild("Square Binary", FiducialSquareBinaryActivity.class);
         recognition.addChild("Square Image", FiducialSquareImageActivity.class);
