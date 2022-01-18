@@ -8,7 +8,7 @@ The demonstration code contained in this repository is not very good to learn fr
 concepts are hidden under a lot of infrastructure and GUI code. The most bare bones example code
 can be found at the following websites:
 
-* [Github Examples](https://github.com/lessthanoptimal/BoofCV/tree/v0.38/integration/boofcv-android/examples/video/app)
+* [Github Examples](https://github.com/lessthanoptimal/BoofCV/tree/v0.40/integration/boofcv-android/examples/video/app)
 * [Project Website](https://boofcv.org/index.php?title=Android_support)
 
 # Maven Central
