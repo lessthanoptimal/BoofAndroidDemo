@@ -18,7 +18,7 @@ Too add BoofCV to your Android project put the following inside of `app/build.gr
 ```groovy
 dependencies {
     ['boofcv-android', 'boofcv-core'].each {
-        String a -> api group: 'org.boofcv', name: a, version: '0.38' }
+        String a -> api group: 'org.boofcv', name: a, version: '0.40' }
 }
 ```
 
@@ -43,7 +43,7 @@ ACRA is used to report crashes. To prevent me from getting spammed by weird erro
 hack this code the destination address for ACRA isn't checked into the repository. To
 add error reporting create a text file with the address here:
 
-app/src/main/asserts/acra.txt
+app/src/main/assets/acra.txt
 
 # Usage
 
@@ -54,3 +54,4 @@ http://peterabeles.com/blog/?p=204
 * Date: April 22, 2018
 
 P.S. Holy sh** I first released this in 2013??
+P.P.S. Still updating in 2022!
