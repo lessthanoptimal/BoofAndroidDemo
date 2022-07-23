@@ -44,6 +44,7 @@ import org.boofcv.android.ip.EquirectangularToViewActivity;
 import org.boofcv.android.ip.GradientDisplayActivity;
 import org.boofcv.android.ip.ImageTransformActivity;
 import org.boofcv.android.ip.ThresholdDisplayActivity;
+import org.boofcv.android.recognition.AztecCodeDetectActivity;
 import org.boofcv.android.recognition.FiducialCalibrationActivity;
 import org.boofcv.android.recognition.FiducialSquareBinaryActivity;
 import org.boofcv.android.recognition.FiducialSquareImageActivity;
@@ -182,6 +183,7 @@ public class DemoMain extends AppCompatActivity implements ExpandableListView.On
 
         recognition.addChild("QR Code", QrCodeDetectActivity.class);
         recognition.addChild("Micro QR Code", MicroQrDetectActivity.class);
+        recognition.addChild("Aztec Code", AztecCodeDetectActivity.class);
         recognition.addChild("Image Classification", ImageClassificationActivity.class);
         recognition.addChild("Square Binary", FiducialSquareBinaryActivity.class);
         recognition.addChild("Square Image", FiducialSquareImageActivity.class);

@@ -88,6 +88,8 @@
         <activity android:name=".recognition.QrCodeListActivity"/>
         <activity android:name=".recognition.MicroQrDetectActivity"/>
         <activity android:name=".recognition.MicroQrListActivity"/>
+-         <activity android:name=".recognition.AztecCodeDetectActivity"/>
+        <activity android:name=".recognition.AztecCodeListActivity"/>
         <activity android:name=".recognition.ImageClassificationActivity"/>
         <activity
             android:name=".recognition.SceneRecognitionActivity"
