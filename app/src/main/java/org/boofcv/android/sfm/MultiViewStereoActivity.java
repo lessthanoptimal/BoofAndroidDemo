@@ -1,5 +1,7 @@
 package org.boofcv.android.sfm;
 
+import static org.boofcv.android.DemoMain.getExternalDirectory;
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -56,16 +58,13 @@ import java.util.Locale;
 import java.util.concurrent.locks.ReentrantLock;
 
 import boofcv.BoofVerbose;
-import boofcv.abst.disparity.StereoDisparity;
 import boofcv.abst.geo.bundle.SceneStructureCommon;
 import boofcv.abst.geo.bundle.SceneStructureMetric;
 import boofcv.abst.tracker.PointTrack;
 import boofcv.alg.cloud.PointCloudReader;
 import boofcv.alg.geo.bundle.cameras.BundlePinholeSimplified;
-import boofcv.alg.mvs.ColorizeMultiViewStereoResults;
-import boofcv.alg.mvs.DisparityParameters;
+import boofcv.alg.geo.rectify.DisparityParameters;
 import boofcv.alg.mvs.MultiViewStereoFromKnownSceneStructure;
-import boofcv.alg.mvs.StereoPairGraph;
 import boofcv.alg.similar.SimilarImagesFromTracks;
 import boofcv.alg.structure.GeneratePairwiseImageGraph;
 import boofcv.alg.structure.LookUpCameraInfo;
@@ -79,7 +78,6 @@ import boofcv.android.ConvertBitmap;
 import boofcv.android.VisualizeImageData;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.core.image.ConvertImage;
-import boofcv.core.image.LookUpColorRgbFormats;
 import boofcv.factory.disparity.ConfigDisparity;
 import boofcv.factory.structure.ConfigEpipolarScore3D;
 import boofcv.factory.structure.ConfigGeneratePairwiseImageGraph;
@@ -103,8 +101,6 @@ import georegression.struct.point.Point3D_F64;
 import georegression.struct.so.Rodrigues_F64;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
-
-import static org.boofcv.android.DemoMain.getExternalDirectory;
 
 /**
  * Provides a UI for collecting images for use in Multi View Stereo

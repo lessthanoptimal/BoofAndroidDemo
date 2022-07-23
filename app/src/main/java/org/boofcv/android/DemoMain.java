@@ -72,6 +72,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import boofcv.android.camera2.CameraID;
+import boofcv.android.camera2.SimpleCamera2Activity;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.struct.calib.CameraPinholeBrown;
 
@@ -249,13 +251,13 @@ public class DemoMain extends AppCompatActivity implements ExpandableListView.On
             if (manager == null)
                 throw new RuntimeException("No cameras?!");
             try {
-                String[] cameras = manager.getCameraIdList();
+                List<CameraID> cameras = SimpleCamera2Activity.getAllCameras(manager);
 
-                for (String cameraId : cameras) {
+                for (CameraID cameraId : cameras) {
                     CameraSpecs c = new CameraSpecs();
                     app.specs.add(c);
-                    c.deviceId = cameraId;
-                    CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
+                    c.deviceId = cameraId.id;
+                    CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId.id);
                     Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
                     c.facingBack = facing != null && facing == CameraCharacteristics.LENS_FACING_BACK;
                     StreamConfigurationMap map = characteristics.
@@ -279,7 +281,7 @@ public class DemoMain extends AppCompatActivity implements ExpandableListView.On
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
+                                           String[] permissions, int[] grantResults) {
         switch (requestCode) {
             case 0: {
                 // If request is cancelled, the result arrays are empty.
@@ -356,7 +358,7 @@ public class DemoMain extends AppCompatActivity implements ExpandableListView.On
         File directory = new File(getExternalDirectory(activity), "calibration");
         if (!directory.exists())
             return;
-        File files[] = directory.listFiles();
+        File[] files = directory.listFiles();
         if (files == null)
             return;
         String prefix = "camera" + cameraId;

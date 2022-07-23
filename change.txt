@@ -3,6 +3,13 @@ Change Log for BoofCV Demonstration App
 (year)-(month)-(day)
 
 -------------------------------------------------
+Version 2.13.0
+
+- Updated to BoofCV to 0.41
+- It can now find physical cameras inside a logical camera
+- TODO add AztecCode support
+
+-------------------------------------------------
 Version 2.12.0
 Date: 2022-Jan-17
 

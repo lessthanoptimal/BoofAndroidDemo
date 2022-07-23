@@ -17,6 +17,9 @@ import android.widget.Spinner;
 
 import java.util.List;
 
+import boofcv.android.camera2.CameraID;
+import boofcv.android.camera2.SimpleCamera2Activity;
+
 /**
  * Lets the user configure the camera size.
  *
@@ -34,7 +37,7 @@ public class PreferenceActivity extends Activity
 
 	DemoPreference preference;
 	List<CameraSpecs> specs;
-	String[] cameras;
+	List<CameraID> cameras;
 
 	DemoApplication app;
 
@@ -87,13 +90,23 @@ public class PreferenceActivity extends Activity
 		ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_spinner_item);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-		cameras = manager.getCameraIdList();
-		for (int i = 0; i < cameras.length; i++ ) {
-			String cameraId = cameras[i];
-			CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
+		cameras = SimpleCamera2Activity.getAllCameras(manager);
+		for (int i = 0; i < cameras.size(); i++ ) {
+			CameraID camera = cameras.get(i);
+			CameraCharacteristics characteristics = manager.getCameraCharacteristics(camera.id);
 			Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
 
-			adapter.add(CameraInformationActivity.facing(facing)+" "+cameraId);
+			// Name it so you can tell if it's multi-sensor camera
+			String name = camera.isLogical() ? camera.id : camera.logical+":"+camera.id;
+
+			// Also show focal length so you can figure out the type of camera
+			String focal = "";
+			float[] focalLengths = characteristics.get(CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS);
+			if (focalLengths != null && focalLengths.length >= 1) {
+				focal = String.format("%3.1f", focalLengths[0]);
+			}
+
+			adapter.add(name+" "+CameraInformationActivity.facing(facing)+" f:"+focal);
 		}
 
 		spinnerCamera.setAdapter(adapter);
@@ -115,8 +128,8 @@ public class PreferenceActivity extends Activity
 	}
 
 	private int cameraNameToIndex( String name ) {
-		for (int i = 0; i < cameras.length; i++) {
-			if( cameras[i].equals(name))
+		for (int i = 0; i < cameras.size(); i++) {
+			if( cameras.get(i).id.equals(name))
 				return i;
 		}
 		throw new RuntimeException("Unknown camera "+name);
@@ -128,7 +141,7 @@ public class PreferenceActivity extends Activity
 		if( spinnerCamera == adapterView ) {
 			Log.d("PreferenceActivity","onItemSelected camera");
 //			Toast.makeText(this,"spinner camera",2).show();
-			preference.cameraId = cameras[pos];
+			preference.cameraId = cameras.get(pos).id;
 			setupResolutionSpinner(preference.resolution);
 		} else if( spinnerResolution == adapterView ) {
 			preference.resolution = pos;

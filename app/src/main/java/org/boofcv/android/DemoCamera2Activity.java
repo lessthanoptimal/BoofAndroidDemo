@@ -1,5 +1,7 @@
 package org.boofcv.android;
 
+import static org.boofcv.android.DemoMain.getExternalDirectory;
+
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
@@ -32,14 +34,13 @@ import java.io.File;
 import java.util.Locale;
 
 import boofcv.android.ConvertBitmap;
+import boofcv.android.camera2.CameraID;
 import boofcv.android.camera2.VisualizeCamera2Activity;
 import boofcv.concurrency.BoofConcurrency;
 import boofcv.misc.MovingAverage;
 import boofcv.struct.calib.CameraPinholeBrown;
 import boofcv.struct.image.ImageBase;
 import georegression.struct.point.Point2D_F64;
-
-import static org.boofcv.android.DemoMain.getExternalDirectory;
 
 /**
  * Camera activity specifically designed for this demonstration. Image processing algorithms
@@ -156,8 +157,8 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
     }
 
     @Override
-    protected boolean selectCamera( String cameraId , CameraCharacteristics characteristics) {
-        return cameraId.equals(app.preference.cameraId);
+    protected boolean selectCamera(CameraID cameraId , CameraCharacteristics characteristics) {
+        return cameraId.id.equals(app.preference.cameraId);
     }
 
     @Override
@@ -352,6 +353,8 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
      * Changes the processor used to process the video frames
      */
     public void setProcessing( DemoProcessing processor ) {
+        if (verbose)
+            Log.i(TAG, "ENTER setProcessing()");
         synchronized (lockProcessor) {
             // shut down the previous processor
             if( this.processor != null ) {
@@ -360,6 +363,8 @@ public abstract class DemoCamera2Activity extends VisualizeCamera2Activity {
             // switch it over to the new one
             setImageType(processor.getImageType(),processor.getColorFormat());
             this.processor = processor;
+            if (verbose)
+                Log.i(TAG, "assigned processor");
 
             // If the camera is not initialized then all these values are not known. It will be
             // initialized when they are known

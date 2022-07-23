@@ -16,6 +16,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import boofcv.android.camera2.CameraID;
+import boofcv.android.camera2.SimpleCamera2Activity;
 import boofcv.struct.calib.CameraPinholeBrown;
 
 /**
@@ -49,22 +51,23 @@ public class CameraInformationActivity extends Activity {
 			return;
 		}
 
-		String[] cameras = manager.getCameraIdList();
+		List<CameraID> cameras = SimpleCamera2Activity.getAllCameras(manager);
 
-		write("Number of cameras: "+cameras.length);
+		write("Number of cameras: "+cameras.size());
 		write("-------- Intrinsic --------");
-		for( String cameraId : cameras ) {
-			printIntrinsic(cameraId);
+		for( CameraID cameraId : cameras ) {
+			printIntrinsic(cameraId.id);
 		}
 
-		for( String cameraId : cameras ) {
-			CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
+		for( CameraID cameraId : cameras ) {
+			CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId.id);
 			Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
 			float[] focalLengths = characteristics.get(CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS);
 
 			write("------ Camera = "+cameraId);
 			write("orientation  = " +characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION));
 			write("facing       = " +facing(facing));
+			write("logical      = " + cameraId.isLogical());
 
 			StreamConfigurationMap map = characteristics.
 					get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
@@ -73,11 +76,21 @@ public class CameraInformationActivity extends Activity {
 			}
 			Size[] sizes = map.getOutputSizes(ImageFormat.YUV_420_888);
 			write(" * Video Resolutions for YUV 420_888");
-			for( Size size : sizes ) {
-				write("  "+s(size));
+			Size sizeMax = sizes[0];
+			Size sizeMin = sizes[0];
+			for (int i = 1; i < sizes.length; i++) {
+				Size s = sizes[i];
+				int area = s.getWidth()*s.getHeight();
+				if (area < sizeMin.getWidth()*sizeMin.getHeight()) {
+					sizeMin = s;
+				} else if (area > sizeMax.getWidth()*sizeMax.getHeight()) {
+					sizeMax = s;
+				}
 			}
+			write("  "+s(sizeMin)+" -> "+s(sizeMax));
+
 			write(" * Image Formats");
-			int formats[] = map.getOutputFormats();
+			int[] formats = map.getOutputFormats();
 			for( int format : formats ) {
 				write("  "+format(format));
 			}
@@ -153,7 +166,7 @@ public class CameraInformationActivity extends Activity {
 	private void printIntrinsic( String which ) {
 		File directory = new File(getExternalFilesDir(null),"calibration");
 		if( !directory.exists() ) {
-			write("No cameras have ben calibrated. No Directory");
+			write("No cameras have been calibrated. No Directory");
 			return;
 		}
 		List<CameraPinholeBrown> calibration = new ArrayList<>();
