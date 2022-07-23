@@ -10,7 +10,7 @@ Version 2.13.0
  * Only works correctly with Android 11 due to bugs in older systems
 - Added AztecCode support
 - Display color images for
-  * TODO image stabilization, mosaic, tracking
+  * stabilization, mosaic, tracking
 
 -------------------------------------------------
 Version 2.12.0

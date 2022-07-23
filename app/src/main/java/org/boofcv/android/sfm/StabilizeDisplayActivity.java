@@ -23,6 +23,7 @@ import boofcv.abst.feature.detect.interest.ConfigPointDetector;
 import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.sfm.AccessPointTracks;
 import boofcv.abst.sfm.d2.ImageMotion2D;
+import boofcv.abst.sfm.d2.PlToGrayMotion2D;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.sfm.d2.StitchingFromMotion2D;
 import boofcv.alg.tracker.klt.ConfigPKlt;
@@ -31,11 +32,11 @@ import boofcv.factory.tracker.FactoryPointTracker;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.image.Planar;
 import boofcv.struct.pyramid.ConfigDiscreteLevels;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
-import georegression.struct.shapes.Polygon2D_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
 import georegression.transform.homography.HomographyPointOps_F64;
 
@@ -101,7 +102,7 @@ public class StabilizeDisplayActivity extends DemoBitmapCamera2Activity
 
 	@Override
 	public void createNewProcessor() {
-		StitchingFromMotion2D<GrayU8,Affine2D_F64> distortAlg =
+		StitchingFromMotion2D<Planar<GrayU8>,Affine2D_F64> distortAlg =
 				createStabilization(spinnerView.getSelectedItemPosition());
 		setProcessing(new PointProcessing(distortAlg));
 	}
@@ -110,7 +111,7 @@ public class StabilizeDisplayActivity extends DemoBitmapCamera2Activity
 		resetRequested = true;
 	}
 
-	static StitchingFromMotion2D<GrayU8,Affine2D_F64> createStabilization( int which ) {
+	static StitchingFromMotion2D<Planar<GrayU8>,Affine2D_F64> createStabilization(int which ) {
 
 		PointTracker<GrayU8> tracker;
 
@@ -134,7 +135,9 @@ public class StabilizeDisplayActivity extends DemoBitmapCamera2Activity
 		ImageMotion2D<GrayU8,Affine2D_F64> motion = FactoryMotion2D.createMotion2D(100, 1.5, 2, 40,
 				0.5, 0.6, false, tracker, new Affine2D_F64());
 
-		return FactoryMotion2D.createVideoStitch(0.2,motion, ImageType.single(GrayU8.class));
+		ImageMotion2D<Planar<GrayU8>, Affine2D_F64> motionColor = new PlToGrayMotion2D(motion, GrayU8.class);
+
+		return FactoryMotion2D.createVideoStitch(0.2,motionColor, ImageType.PL_U8);
 	}
 
 	@Override
@@ -142,8 +145,8 @@ public class StabilizeDisplayActivity extends DemoBitmapCamera2Activity
 		showFeatures = b;
 	}
 
-	protected class PointProcessing extends DemoProcessingAbstract<GrayU8> {
-		StitchingFromMotion2D<GrayU8,Affine2D_F64> alg;
+	protected class PointProcessing extends DemoProcessingAbstract<Planar<GrayU8>> {
+		StitchingFromMotion2D<Planar<GrayU8>,Affine2D_F64> alg;
 		Homography2D_F64 imageToDistorted = new Homography2D_F64();
 		Homography2D_F64 distortedToImage = new Homography2D_F64();
 
@@ -156,8 +159,8 @@ public class StabilizeDisplayActivity extends DemoBitmapCamera2Activity
 
 		float radius;
 
-		public PointProcessing( StitchingFromMotion2D<GrayU8,Affine2D_F64> alg  ) {
-			super(ImageType.single(GrayU8.class));
+		public PointProcessing( StitchingFromMotion2D<Planar<GrayU8>,Affine2D_F64> alg  ) {
+			super(ImageType.pl(3, GrayU8.class));
 			this.alg = alg;
 		}
 
@@ -201,11 +204,11 @@ public class StabilizeDisplayActivity extends DemoBitmapCamera2Activity
 		}
 
 		@Override
-		public void process(GrayU8 gray) {
-			if( !resetRequested && alg.process(gray) ) {
+		public void process(Planar<GrayU8> color) {
+			if( !resetRequested && alg.process(color) ) {
 				convertToBitmapDisplay(alg.getStitchedImage());
 				synchronized ( lockGui ) {
-					alg.getImageCorners(gray.width,gray.height,corners);
+					alg.getImageCorners(color.width,color.height,corners);
 
 					ImageMotion2D<?,?> motion = alg.getMotion();
 					if( showFeatures && (motion instanceof AccessPointTracks) ) {

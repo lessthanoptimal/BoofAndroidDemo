@@ -1,5 +1,7 @@
 package org.boofcv.android.sfm;
 
+import static org.boofcv.android.sfm.StabilizeDisplayActivity.createStabilization;
+
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -28,13 +30,12 @@ import boofcv.android.ConvertBitmap;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
+import boofcv.struct.image.Planar;
 import georegression.struct.affine.Affine2D_F64;
 import georegression.struct.homography.Homography2D_F64;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.shapes.Quadrilateral_F64;
 import georegression.transform.homography.HomographyPointOps_F64;
-
-import static org.boofcv.android.sfm.StabilizeDisplayActivity.createStabilization;
 
 /**
  * Displays an image mosaic created from the video stream.
@@ -103,7 +104,7 @@ implements CompoundButton.OnCheckedChangeListener
 
 	@Override
 	public void createNewProcessor() {
-		StitchingFromMotion2D<GrayU8,Affine2D_F64> distortAlg =
+		StitchingFromMotion2D<Planar<GrayU8>,Affine2D_F64> distortAlg =
 				createStabilization(spinnerView.getSelectedItemPosition());
 		setProcessing(new PointProcessing(distortAlg));
 	}
@@ -121,8 +122,8 @@ implements CompoundButton.OnCheckedChangeListener
 		showFeatures = b;
 	}
 
-	protected class PointProcessing extends DemoProcessingAbstract<GrayU8> {
-		StitchingFromMotion2D<GrayU8,Affine2D_F64> alg;
+	protected class PointProcessing extends DemoProcessingAbstract<Planar<GrayU8>> {
+		StitchingFromMotion2D<Planar<GrayU8>,Affine2D_F64> alg;
 		Homography2D_F64 imageToDistorted = new Homography2D_F64();
 		Homography2D_F64 distortedToImage = new Homography2D_F64();
 
@@ -134,8 +135,8 @@ implements CompoundButton.OnCheckedChangeListener
 
 		float radius;
 
-		public PointProcessing( StitchingFromMotion2D<GrayU8,Affine2D_F64> alg  ) {
-			super(ImageType.single(GrayU8.class));
+		public PointProcessing( StitchingFromMotion2D<Planar<GrayU8>,Affine2D_F64> alg  ) {
+			super(ImageType.pl(3, GrayU8.class));
 			this.alg = alg;
 		}
 
@@ -195,14 +196,14 @@ implements CompoundButton.OnCheckedChangeListener
 		}
 
 		@Override
-		public void process(GrayU8 gray) {
+		public void process(Planar<GrayU8> gray) {
 			if(paused)
 				return;
 
 			if( !resetRequested && alg.process(gray) ) {
-				GrayU8 stitched = alg.getStitchedImage();
+				Planar<GrayU8> stitched = alg.getStitchedImage();
 
-				ConvertBitmap.grayToBitmap(stitched,bitmap,bitmapTmp);
+				ConvertBitmap.planarToBitmap(stitched, bitmap, bitmapTmp);
 
 				synchronized ( lockGui ) {
 
