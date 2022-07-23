@@ -40,266 +40,270 @@ import georegression.struct.shapes.Quadrilateral_F64;
  * @author Peter Abeles
  */
 public class ObjectTrackerActivity extends DemoCamera2Activity
-		implements AdapterView.OnItemSelectedListener, View.OnTouchListener
-{
+        implements AdapterView.OnItemSelectedListener, View.OnTouchListener {
 
-	Spinner spinnerView;
+    Spinner spinnerView;
 
-	int mode = 0;
+    int mode = 0;
 
-	// size of the minimum square which the user can select
-	final static int MINIMUM_MOTION = 20;
+    // size of the minimum square which the user can select
+    final static int MINIMUM_MOTION = 20;
 
-	Point2D_I32 click0 = new Point2D_I32();
-	Point2D_I32 click1 = new Point2D_I32();
+    Point2D_I32 click0 = new Point2D_I32();
+    Point2D_I32 click1 = new Point2D_I32();
 
-	public ObjectTrackerActivity() {
-		super(Resolution.R640x480);
-	}
+    public ObjectTrackerActivity() {
+        super(Resolution.R640x480);
+    }
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-		LayoutInflater inflater = getLayoutInflater();
-		LinearLayout controls = (LinearLayout)inflater.inflate(R.layout.objecttrack_controls,null);
+        LayoutInflater inflater = getLayoutInflater();
+        LinearLayout controls = (LinearLayout) inflater.inflate(R.layout.objecttrack_controls, null);
 
-		spinnerView = controls.findViewById(R.id.spinner_algs);
-		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-				R.array.tracking_objects, android.R.layout.simple_spinner_item);
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		spinnerView.setAdapter(adapter);
-		spinnerView.setOnItemSelectedListener(this);
+        spinnerView = controls.findViewById(R.id.spinner_algs);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.tracking_objects, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerView.setAdapter(adapter);
+        spinnerView.setOnItemSelectedListener(this);
 
-		setControls(controls);
-		displayView.setOnTouchListener(this);
-	}
+        setControls(controls);
+        displayView.setOnTouchListener(this);
+    }
 
-	@Override
-	public void createNewProcessor() {
-		startObjectTracking(spinnerView.getSelectedItemPosition());
-	}
+    @Override
+    public void createNewProcessor() {
+        startObjectTracking(spinnerView.getSelectedItemPosition());
+    }
 
-	@Override
-	public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id ) {
-		startObjectTracking(pos);
-	}
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int pos, long id) {
+        startObjectTracking(pos);
+    }
 
-	private void startObjectTracking(int pos) {
-		TrackerObjectQuad tracker;
+    private void startObjectTracking(int pos) {
+        TrackerObjectQuad tracker;
 
-		switch (pos) {
-			case 0:
-				tracker = FactoryTrackerObjectQuad.circulant(null,GrayU8.class);
-				break;
+        switch (pos) {
+            case 0:
+                tracker = FactoryTrackerObjectQuad.circulant(null, GrayU8.class);
+                break;
 
-			case 1: {
-				ImageType imageType = ImageType.pl(3, GrayU8.class);
-				tracker = FactoryTrackerObjectQuad.meanShiftComaniciu2003(new ConfigComaniciu2003(false), imageType);
-			}break;
+            case 1: {
+                ImageType imageType = ImageType.pl(3, GrayU8.class);
+                tracker = FactoryTrackerObjectQuad.meanShiftComaniciu2003(new ConfigComaniciu2003(false), imageType);
+            }
+            break;
 
-			case 2: {
-				ImageType imageType = ImageType.pl(3, GrayU8.class);
-				tracker = FactoryTrackerObjectQuad.meanShiftComaniciu2003(new ConfigComaniciu2003(true), imageType);
-			}break;
+            case 2: {
+                ImageType imageType = ImageType.pl(3, GrayU8.class);
+                tracker = FactoryTrackerObjectQuad.meanShiftComaniciu2003(new ConfigComaniciu2003(true), imageType);
+            }
+            break;
 
-			case 3: {
-				ImageType imageType = ImageType.pl(3, GrayU8.class);
-				tracker = FactoryTrackerObjectQuad.meanShiftLikelihood(30, 5, 256, MeanShiftLikelihoodType.HISTOGRAM, imageType);
-			}break;
+            case 3: {
+                ImageType imageType = ImageType.pl(3, GrayU8.class);
+                tracker = FactoryTrackerObjectQuad.meanShiftLikelihood(30, 5, 256, MeanShiftLikelihoodType.HISTOGRAM, imageType);
+            }
+            break;
 
-			case 4:{
-				ConfigSfot config = new ConfigSfot();
-				config.numberOfSamples = 10;
-				config.robustMaxError = 30;
-				tracker = FactoryTrackerObjectQuad.sparseFlow(config,GrayU8.class,null);
-			}break;
+            case 4: {
+                ConfigSfot config = new ConfigSfot();
+                config.numberOfSamples = 10;
+                config.robustMaxError = 30;
+                tracker = FactoryTrackerObjectQuad.sparseFlow(config, GrayU8.class, null);
+            }
+            break;
 
-			case 5:
-				tracker = FactoryTrackerObjectQuad.tld(new ConfigTrackerTld(false),GrayU8.class);
-				break;
+            case 5:
+                tracker = FactoryTrackerObjectQuad.tld(new ConfigTrackerTld(false), GrayU8.class);
+                break;
 
-			default:
-				throw new RuntimeException("Unknown tracker: "+pos);
-		}
-		setProcessing(new TrackingProcessing(tracker) );
-	}
+            default:
+                throw new RuntimeException("Unknown tracker: " + pos);
+        }
+        setProcessing(new TrackingProcessing(tracker));
+    }
 
-	@Override
-	public void onNothingSelected(AdapterView<?> adapterView) {}
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+    }
 
-	@Override
-	public boolean onTouch(View view, MotionEvent motionEvent) {
-		if( mode == 0 ) {
-			if(MotionEvent.ACTION_DOWN == motionEvent.getActionMasked()) {
-				click0.setTo((int) motionEvent.getX(), (int) motionEvent.getY());
-				click1.setTo((int) motionEvent.getX(), (int) motionEvent.getY());
-				mode = 1;
-			}
-		} else if( mode == 1 ) {
-			if(MotionEvent.ACTION_MOVE == motionEvent.getActionMasked()) {
-				click1.setTo((int)motionEvent.getX(),(int)motionEvent.getY());
-			} else if(MotionEvent.ACTION_UP == motionEvent.getActionMasked()) {
-				click1.setTo((int)motionEvent.getX(),(int)motionEvent.getY());
-				mode = 2;
-			}
-		}
-		return true;
-	}
+    @Override
+    public boolean onTouch(View view, MotionEvent motionEvent) {
+        if (mode == 0) {
+            if (MotionEvent.ACTION_DOWN == motionEvent.getActionMasked()) {
+                click0.setTo((int) motionEvent.getX(), (int) motionEvent.getY());
+                click1.setTo((int) motionEvent.getX(), (int) motionEvent.getY());
+                mode = 1;
+            }
+        } else if (mode == 1) {
+            if (MotionEvent.ACTION_MOVE == motionEvent.getActionMasked()) {
+                click1.setTo((int) motionEvent.getX(), (int) motionEvent.getY());
+            } else if (MotionEvent.ACTION_UP == motionEvent.getActionMasked()) {
+                click1.setTo((int) motionEvent.getX(), (int) motionEvent.getY());
+                mode = 2;
+            }
+        }
+        return true;
+    }
 
-	public void resetPressed( View view ) {
-		mode = 0;
-	}
+    public void resetPressed(View view) {
+        mode = 0;
+    }
 
-	protected class TrackingProcessing extends DemoProcessingAbstract {
+    protected class TrackingProcessing extends DemoProcessingAbstract {
 
-		TrackerObjectQuad tracker;
-		boolean visible;
+        TrackerObjectQuad tracker;
+        boolean visible;
 
-		Quadrilateral_F64 location = new Quadrilateral_F64();
-		// Storage for the input image the tracker will process
-		ImageBase inputImage;
+        Quadrilateral_F64 location = new Quadrilateral_F64();
+        // Storage for the input image the tracker will process
+        ImageBase inputImage;
 
-		Paint paintSelected = new Paint();
-		Paint paintLine0 = new Paint();
-		Paint paintLine1 = new Paint();
-		Paint paintLine2 = new Paint();
-		Paint paintLine3 = new Paint();
-		private Paint textPaint = new Paint();
+        Paint paintSelected = new Paint();
+        Paint paintLine0 = new Paint();
+        Paint paintLine1 = new Paint();
+        Paint paintLine2 = new Paint();
+        Paint paintLine3 = new Paint();
+        private Paint textPaint = new Paint();
 
-		int width,height;
+        int width, height;
 
-		public TrackingProcessing(TrackerObjectQuad tracker ) {
-			// display a color image
-			super(ImageType.il(3, ImageDataType.U8));
-			// If the input needs to be a color image and it isn't interleaved, then use a
-			// planar color images to make it run faster
-			if (tracker.getImageType().getFamily() == ImageType.Family.PLANAR) {
-				this.imageType = tracker.getImageType();
-			}
+        public TrackingProcessing(TrackerObjectQuad tracker) {
+            // display a color image
+            super(ImageType.il(3, ImageDataType.U8));
+            // If the input needs to be a color image and it isn't interleaved, then use a
+            // planar color images to make it run faster
+            if (tracker.getImageType().getFamily() == ImageType.Family.PLANAR) {
+                this.imageType = tracker.getImageType();
+            }
 
-			inputImage = tracker.getImageType().createImage(1, 1);
-			mode = 0;
-			this.tracker = tracker;
+            inputImage = tracker.getImageType().createImage(1, 1);
+            mode = 0;
+            this.tracker = tracker;
 
-			paintSelected.setARGB(0xFF/2,0xFF,0,0);
-			paintSelected.setStyle(Paint.Style.FILL_AND_STROKE);
+            paintSelected.setARGB(0xFF / 2, 0xFF, 0, 0);
+            paintSelected.setStyle(Paint.Style.FILL_AND_STROKE);
 
-			paintLine0.setColor(Color.RED);
-			paintLine1.setColor(Color.MAGENTA);
-			paintLine2.setColor(Color.BLUE);
-			paintLine3.setColor(Color.GREEN);
+            paintLine0.setColor(Color.RED);
+            paintLine1.setColor(Color.MAGENTA);
+            paintLine2.setColor(Color.BLUE);
+            paintLine3.setColor(Color.GREEN);
 
-			// Create out paint to use for drawing
-			textPaint.setARGB(255, 200, 0, 0);
-		}
+            // Create out paint to use for drawing
+            textPaint.setARGB(255, 200, 0, 0);
+        }
 
-		private void drawLine( Canvas canvas , Point2D_F64 a , Point2D_F64 b , Paint color ) {
-			canvas.drawLine((float)a.x,(float)a.y,(float)b.x,(float)b.y,color);
-		}
+        private void drawLine(Canvas canvas, Point2D_F64 a, Point2D_F64 b, Paint color) {
+            canvas.drawLine((float) a.x, (float) a.y, (float) b.x, (float) b.y, color);
+        }
 
-		private void makeInBounds( Point2D_F64 p ) {
-			if( p.x < 0 ) p.x = 0;
-			else if( p.x >= width )
-				p.x = width - 1;
+        private void makeInBounds(Point2D_F64 p) {
+            if (p.x < 0) p.x = 0;
+            else if (p.x >= width)
+                p.x = width - 1;
 
-			if( p.y < 0 ) p.y = 0;
-			else if( p.y >= height )
-				p.y = height - 1;
-		}
+            if (p.y < 0) p.y = 0;
+            else if (p.y >= height)
+                p.y = height - 1;
+        }
 
-		private boolean movedSignificantly( Point2D_F64 a , Point2D_F64 b ) {
-			if( Math.abs(a.x-b.x) < MINIMUM_MOTION )
-				return false;
-			if( Math.abs(a.y-b.y) < MINIMUM_MOTION )
-				return false;
+        private boolean movedSignificantly(Point2D_F64 a, Point2D_F64 b) {
+            if (Math.abs(a.x - b.x) < MINIMUM_MOTION)
+                return false;
+            if (Math.abs(a.y - b.y) < MINIMUM_MOTION)
+                return false;
 
-			return true;
-		}
+            return true;
+        }
 
-		@Override
-		public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
-			this.width = imageWidth;
-			this.height = imageHeight;
-			inputImage.reshape(imageWidth, imageHeight);
+        @Override
+        public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
+            this.width = imageWidth;
+            this.height = imageHeight;
+            inputImage.reshape(imageWidth, imageHeight);
 
             Log.i("ASDASD", "tracker.initialize");
 
-			float density = cameraToDisplayDensity;
-			paintSelected.setStrokeWidth(5f*density);
-			paintLine0.setStrokeWidth(5f*density);
-			paintLine1.setStrokeWidth(5f*density);
-			paintLine2.setStrokeWidth(5f*density);
-			paintLine3.setStrokeWidth(5f*density);
-			textPaint.setTextSize(60*density);
-		}
+            float density = cameraToDisplayDensity;
+            paintSelected.setStrokeWidth(5f * density);
+            paintLine0.setStrokeWidth(5f * density);
+            paintLine1.setStrokeWidth(5f * density);
+            paintLine2.setStrokeWidth(5f * density);
+            paintLine3.setStrokeWidth(5f * density);
+            textPaint.setTextSize(60 * density);
+        }
 
-		@Override
-		public void onDraw(Canvas canvas, Matrix imageToView) {
-			canvas.concat(imageToView);
-			if( mode == 1 ) {
-				Point2D_F64 a = new Point2D_F64();
-				Point2D_F64 b = new Point2D_F64();
+        @Override
+        public void onDraw(Canvas canvas, Matrix imageToView) {
+            canvas.concat(imageToView);
+            if (mode == 1) {
+                Point2D_F64 a = new Point2D_F64();
+                Point2D_F64 b = new Point2D_F64();
 
-				applyToPoint(viewToImage, click0.x, click0.y, a);
-				applyToPoint(viewToImage, click1.x, click1.y, b);
+                applyToPoint(viewToImage, click0.x, click0.y, a);
+                applyToPoint(viewToImage, click1.x, click1.y, b);
 
-				double x0 = Math.min(a.x,b.x);
-				double x1 = Math.max(a.x,b.x);
-				double y0 = Math.min(a.y,b.y);
-				double y1 = Math.max(a.y,b.y);
+                double x0 = Math.min(a.x, b.x);
+                double x1 = Math.max(a.x, b.x);
+                double y0 = Math.min(a.y, b.y);
+                double y1 = Math.max(a.y, b.y);
 
-				canvas.drawRect((int) x0, (int) y0, (int) x1, (int) y1, paintSelected);
-			} else if( mode == 2 ) {
-				if (!imageToView.invert(viewToImage)) {
-					return;
-				}
-				applyToPoint(viewToImage,click0.x, click0.y, location.a);
-				applyToPoint(viewToImage,click1.x, click1.y, location.c);
+                canvas.drawRect((int) x0, (int) y0, (int) x1, (int) y1, paintSelected);
+            } else if (mode == 2) {
+                if (!imageToView.invert(viewToImage)) {
+                    return;
+                }
+                applyToPoint(viewToImage, click0.x, click0.y, location.a);
+                applyToPoint(viewToImage, click1.x, click1.y, location.c);
 
-				// make sure the user selected a valid region
-				makeInBounds(location.a);
-				makeInBounds(location.c);
+                // make sure the user selected a valid region
+                makeInBounds(location.a);
+                makeInBounds(location.c);
 
-				if( movedSignificantly(location.a,location.c) ) {
-					// use the selected region and start the tracker
-					location.b.setTo(location.c.x, location.a.y);
-					location.d.setTo( location.a.x, location.c.y );
+                if (movedSignificantly(location.a, location.c)) {
+                    // use the selected region and start the tracker
+                    location.b.setTo(location.c.x, location.a.y);
+                    location.d.setTo(location.a.x, location.c.y);
 
-					visible = true;
-					mode = 3;
-				} else {
-					// the user screw up. Let them know what they did wrong
-					runOnUiThread(() -> Toast.makeText(ObjectTrackerActivity.this,
-							"Drag a larger region", Toast.LENGTH_SHORT).show());
-					mode = 0;
-				}
-			}
+                    visible = true;
+                    mode = 3;
+                } else {
+                    // the user screw up. Let them know what they did wrong
+                    runOnUiThread(() -> Toast.makeText(ObjectTrackerActivity.this,
+                            "Drag a larger region", Toast.LENGTH_SHORT).show());
+                    mode = 0;
+                }
+            }
 
-			if( mode >= 2 ) {
-				if( visible ) {
-					Quadrilateral_F64 q = location;
+            if (mode >= 2) {
+                if (visible) {
+                    Quadrilateral_F64 q = location;
 
-					drawLine(canvas,q.a,q.b,paintLine0);
-					drawLine(canvas,q.b,q.c,paintLine1);
-					drawLine(canvas,q.c,q.d,paintLine2);
-					drawLine(canvas,q.d,q.a,paintLine3);
-				} else {
-					canvas.drawText("?",width/2,height/2,textPaint);
-				}
-			}
-		}
+                    drawLine(canvas, q.a, q.b, paintLine0);
+                    drawLine(canvas, q.b, q.c, paintLine1);
+                    drawLine(canvas, q.c, q.d, paintLine2);
+                    drawLine(canvas, q.d, q.a, paintLine3);
+                } else {
+                    canvas.drawText("?", width / 2, height / 2, textPaint);
+                }
+            }
+        }
 
-		@Override
-		public void process(ImageBase color) {
+        @Override
+        public void process(ImageBase color) {
             GConvertImage.convert(color, inputImage);
-			if( mode == 3 ) {
-				tracker.initialize(inputImage, location);
-				visible = true;
-				mode = 4;
-			} else if( mode == 4 ) {
-				visible = tracker.process(inputImage, location);
-			}
-		}
-	}
+            if (mode == 3) {
+                tracker.initialize(inputImage, location);
+                visible = true;
+                mode = 4;
+            } else if (mode == 4) {
+                visible = tracker.process(inputImage, location);
+            }
+        }
+    }
 }
