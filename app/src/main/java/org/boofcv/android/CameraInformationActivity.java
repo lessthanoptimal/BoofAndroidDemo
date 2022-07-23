@@ -64,7 +64,7 @@ public class CameraInformationActivity extends Activity {
 			Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
 			float[] focalLengths = characteristics.get(CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS);
 
-			write("------ Camera = "+cameraId);
+			write("------ Camera = "+cameraId.id);
 			write("orientation  = " +characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION));
 			write("facing       = " +facing(facing));
 			write("logical      = " + cameraId.isLogical());
