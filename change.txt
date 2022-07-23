@@ -7,7 +7,10 @@ Version 2.13.0
 
 - Updated to BoofCV to 0.41-SNAPSHOT
 - It can now find physical cameras inside a logical camera
+ * Only works correctly with Android 11 due to bugs in older systems
 - Added AztecCode support
+- Display color images for
+  * TODO image stabilization, mosaic, tracking
 
 -------------------------------------------------
 Version 2.12.0

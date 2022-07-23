@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -23,9 +24,11 @@ import boofcv.abst.tracker.ConfigTrackerTld;
 import boofcv.abst.tracker.MeanShiftLikelihoodType;
 import boofcv.abst.tracker.TrackerObjectQuad;
 import boofcv.alg.tracker.sfot.ConfigSfot;
+import boofcv.core.image.GConvertImage;
 import boofcv.factory.tracker.FactoryTrackerObjectQuad;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageBase;
+import boofcv.struct.image.ImageDataType;
 import boofcv.struct.image.ImageType;
 import georegression.struct.point.Point2D_F64;
 import georegression.struct.point.Point2D_I32;
@@ -154,6 +157,8 @@ public class ObjectTrackerActivity extends DemoCamera2Activity
 		boolean visible;
 
 		Quadrilateral_F64 location = new Quadrilateral_F64();
+		// Storage for the input image the tracker will process
+		ImageBase inputImage;
 
 		Paint paintSelected = new Paint();
 		Paint paintLine0 = new Paint();
@@ -165,7 +170,15 @@ public class ObjectTrackerActivity extends DemoCamera2Activity
 		int width,height;
 
 		public TrackingProcessing(TrackerObjectQuad tracker ) {
-			super(tracker.getImageType());
+			// display a color image
+			super(ImageType.il(3, ImageDataType.U8));
+			// If the input needs to be a color image and it isn't interleaved, then use a
+			// planar color images to make it run faster
+			if (tracker.getImageType().getFamily() == ImageType.Family.PLANAR) {
+				this.imageType = tracker.getImageType();
+			}
+
+			inputImage = tracker.getImageType().createImage(1, 1);
 			mode = 0;
 			this.tracker = tracker;
 
@@ -208,6 +221,9 @@ public class ObjectTrackerActivity extends DemoCamera2Activity
 		public void initialize(int imageWidth, int imageHeight, int sensorOrientation) {
 			this.width = imageWidth;
 			this.height = imageHeight;
+			inputImage.reshape(imageWidth, imageHeight);
+
+            Log.i("ASDASD", "tracker.initialize");
 
 			float density = cameraToDisplayDensity;
 			paintSelected.setStrokeWidth(5f*density);
@@ -220,7 +236,6 @@ public class ObjectTrackerActivity extends DemoCamera2Activity
 
 		@Override
 		public void onDraw(Canvas canvas, Matrix imageToView) {
-
 			canvas.concat(imageToView);
 			if( mode == 1 ) {
 				Point2D_F64 a = new Point2D_F64();
@@ -276,13 +291,14 @@ public class ObjectTrackerActivity extends DemoCamera2Activity
 		}
 
 		@Override
-		public void process(ImageBase input) {
+		public void process(ImageBase color) {
+            GConvertImage.convert(color, inputImage);
 			if( mode == 3 ) {
-				tracker.initialize(input, location);
+				tracker.initialize(inputImage, location);
 				visible = true;
 				mode = 4;
 			} else if( mode == 4 ) {
-				visible = tracker.process(input,location);
+				visible = tracker.process(inputImage, location);
 			}
 		}
 	}
