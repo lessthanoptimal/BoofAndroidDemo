@@ -73,8 +73,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import boofcv.android.BoofAndroidUtils;
 import boofcv.android.camera2.CameraID;
-import boofcv.android.camera2.SimpleCamera2Activity;
 import boofcv.io.calibration.CalibrationIO;
 import boofcv.struct.calib.CameraPinholeBrown;
 
@@ -253,7 +253,7 @@ public class DemoMain extends AppCompatActivity implements ExpandableListView.On
             if (manager == null)
                 throw new RuntimeException("No cameras?!");
             try {
-                List<CameraID> cameras = SimpleCamera2Activity.getAllCameras(manager);
+                List<CameraID> cameras = BoofAndroidUtils.getAllCameras(manager);
 
                 for (CameraID cameraId : cameras) {
                     CameraSpecs c = new CameraSpecs();

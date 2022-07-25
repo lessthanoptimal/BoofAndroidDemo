@@ -17,8 +17,8 @@ import android.widget.Spinner;
 
 import java.util.List;
 
+import boofcv.android.BoofAndroidUtils;
 import boofcv.android.camera2.CameraID;
-import boofcv.android.camera2.SimpleCamera2Activity;
 
 /**
  * Lets the user configure the camera size.
@@ -90,7 +90,7 @@ public class PreferenceActivity extends Activity
 		ArrayAdapter<CharSequence> adapter = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_spinner_item);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-		cameras = SimpleCamera2Activity.getAllCameras(manager);
+		cameras = BoofAndroidUtils.getAllCameras(manager);
 		for (int i = 0; i < cameras.size(); i++ ) {
 			CameraID camera = cameras.get(i);
 			CameraCharacteristics characteristics = manager.getCameraCharacteristics(camera.id);

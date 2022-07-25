@@ -16,8 +16,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import boofcv.android.BoofAndroidUtils;
 import boofcv.android.camera2.CameraID;
-import boofcv.android.camera2.SimpleCamera2Activity;
 import boofcv.struct.calib.CameraPinholeBrown;
 
 /**
@@ -51,7 +51,7 @@ public class CameraInformationActivity extends Activity {
 			return;
 		}
 
-		List<CameraID> cameras = SimpleCamera2Activity.getAllCameras(manager);
+		List<CameraID> cameras = BoofAndroidUtils.getAllCameras(manager);
 
 		write("Number of cameras: "+cameras.size());
 		write("-------- Intrinsic --------");

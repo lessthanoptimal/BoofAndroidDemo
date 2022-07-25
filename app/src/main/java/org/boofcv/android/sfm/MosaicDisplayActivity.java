@@ -26,6 +26,7 @@ import org.ddogleg.struct.DogArray;
 import boofcv.abst.sfm.AccessPointTracks;
 import boofcv.abst.sfm.d2.ImageMotion2D;
 import boofcv.alg.sfm.d2.StitchingFromMotion2D;
+import boofcv.android.BoofAndroidUtils;
 import boofcv.android.ConvertBitmap;
 import boofcv.misc.BoofMiscOps;
 import boofcv.struct.image.GrayU8;
@@ -148,7 +149,7 @@ implements CompoundButton.OnCheckedChangeListener
 			bitmap = Bitmap.createBitmap(outputWidth, outputHeight, Bitmap.Config.ARGB_8888);
 
 			int rotation = getWindowManager().getDefaultDisplay().getRotation();
-			videoToDisplayMatrix(outputWidth, outputHeight,sensorOrientation,
+			BoofAndroidUtils.videoToDisplayMatrix(outputWidth, outputHeight,sensorOrientation,
 					viewWidth,viewHeight,rotation*90, stretchToFill,imageToView);
 
 			int tx = outputWidth/2 - imageWidth/4;
