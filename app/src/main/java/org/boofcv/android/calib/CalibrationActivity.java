@@ -67,6 +67,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity {
 
     // Storage for calibration info
     List<CalibrationObservation> shots;
+    int imageWidth, imageHeight;
 
     // user has requested that the next image be processed for the target
     boolean captureRequested = false;
@@ -133,6 +134,8 @@ public class CalibrationActivity extends PointTrackerDisplayActivity {
     @Override
     protected void onCameraResolutionChange(int width, int height, int sensorOrientation) {
         super.onCameraResolutionChange(width, height, sensorOrientation);
+        this.imageWidth = width;
+        this.imageHeight = height;
         if (bitmap.getWidth() != width || bitmap.getHeight() != height)
             bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         if (isCameraCalibrated()) {
@@ -188,6 +191,8 @@ public class CalibrationActivity extends PointTrackerDisplayActivity {
             Toast.makeText(this, "Need at least three images.", Toast.LENGTH_SHORT).show();
         } else {
             CalibrationComputeActivity.images = shots;
+            CalibrationComputeActivity.imageWidth = imageWidth;
+            CalibrationComputeActivity.imageHeight = imageHeight;
             Intent intent = new Intent(this, CalibrationComputeActivity.class);
             startActivity(intent);
         }

@@ -1,5 +1,7 @@
 package org.boofcv.android.calib;
 
+import static org.boofcv.android.DemoMain.getExternalDirectory;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -32,8 +34,6 @@ import boofcv.io.calibration.CalibrationIO;
 import boofcv.struct.calib.CameraPinholeBrown;
 import georegression.struct.point.Point2D_F64;
 
-import static org.boofcv.android.DemoMain.getExternalDirectory;
-
 /**
  * After images have been collected in the {@link CalibrationActivity}, this activity is brought up which computes
  * the calibration parameters and shows the user its progress.  After the parameters have been computed the user
@@ -47,6 +47,7 @@ public class CalibrationComputeActivity extends Activity {
 
 	// image information which is to be processed
 	public static List<CalibrationObservation> images;
+	public static int imageWidth, imageHeight;
 	public static List<Point2D_F64> targetLayout;
 	public static CameraPinholeBrown intrinsic;
 
@@ -76,7 +77,8 @@ public class CalibrationComputeActivity extends Activity {
 		buttonOK = findViewById(R.id.button_accept);
 
 		// start a new process
-		calibrationAlg = new CalibrateMonoPlanar(targetLayout);
+		calibrationAlg = new CalibrateMonoPlanar();
+		calibrationAlg.initialize(imageWidth, imageHeight, targetLayout);
 		calibrationAlg.configurePinhole(true,2,false);
 		intrinsic = null;
 		threadRunning = true;
