@@ -177,7 +177,7 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
     //----------------- BEGIN LOCK
     final ReentrantLock lockCloud = new ReentrantLock();
     final List<String> disparityPaths = new ArrayList<>();
-    Bitmap bitmapDisparity;
+    Bitmap bitmapInverseDepth;
     String textDisparity = "";
     DogArray_I8 workspaceDisparity = new DogArray_I8();
     DenseCloudThread threadCloud = null;
@@ -470,7 +470,7 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
                 buttonOpen.setEnabled(false);
                 buttonConfigure.setEnabled(false);
                 disparityPaths.clear();
-                bitmapDisparity = null;
+                bitmapInverseDepth = null;
                 textDisparity = "Multi-Baseline Stereo";
                 changeDisplay(Display.DISPARITY);
                 threadCloud = new DenseCloudThread();
@@ -1012,18 +1012,17 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
             // This allows us to display intermediate results to the user while they wait for all of this to finish
             mvs.setListener(new MultiViewStereoFromKnownSceneStructure.Listener<GrayU8>() {
                 @Override
-                public void handlePairDisparity(String left, String right, GrayU8 rect0, GrayU8 rect1,
-                                                GrayF32 disparity, GrayU8 mask, DisparityParameters parameters) {
+                public void handlePairDisparity(String left, String right, GrayU8 rectLeft,
+                                                GrayU8 rectRight, GrayF32 disparity, DisparityParameters parameters) {
                 }
 
                 @Override
-                public void handleFusedDisparity(String name,
-                                                 GrayF32 disparity, GrayU8 mask, DisparityParameters parameters) {
+                public void handleFused(String name, GrayF32 inverseDepth) {
                     lockCloud.lock();
                     try {
-                        bitmapDisparity = ConvertBitmap.checkDeclare(disparity, bitmapDisparity);
-                        VisualizeImageData.disparity(disparity, parameters.disparityRange, 0,
-                                bitmapDisparity, workspaceDisparity);
+                        bitmapInverseDepth = ConvertBitmap.checkDeclare(inverseDepth, bitmapInverseDepth);
+                        VisualizeImageData.grayMagnitude(inverseDepth, 0,
+                                bitmapInverseDepth, workspaceDisparity);
                     } finally {
                         lockCloud.unlock();
                     }
@@ -1032,7 +1031,7 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
                     Log.i(TAG, "Saving " + file.getPath());
                     disparityPaths.add(file.getPath());
                     try {
-                        bitmapDisparity.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(file));
+                        bitmapInverseDepth.compress(Bitmap.CompressFormat.PNG, 100, new FileOutputStream(file));
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -1170,7 +1169,7 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
 
         // Save the dense cloud to disk
         try {
-            OutputStream output = new FileOutputStream(new File(workingDir, "sparse_cloud.ply"));
+            var output = new FileOutputStream(new File(workingDir, "sparse_cloud.ply"));
             PointCloudIO.save3D(PointCloudIO.Format.PLY,
                     PointCloudReader.wrap3FRGB(cloudShow.points.data, cloudShow.colors.data, 0, scene.points.size()),
                     true, output);

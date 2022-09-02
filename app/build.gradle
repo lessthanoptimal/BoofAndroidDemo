@@ -8,8 +8,8 @@ android {
         // min SDK version is determined by when Camera2 API becomes functional
         minSdkVersion 22
         targetSdkVersion 30
-        versionCode 42
-        versionName "2.13.0"
+        versionCode 43
+        versionName "2.13.1"
     }
 
     buildTypes {
@@ -63,7 +63,7 @@ def acraVersion = '5.7.0'
 
 dependencies {
     ['boofcv-android', 'boofcv-core'].each {
-        String a -> implementation group: 'org.boofcv', name: a, version: '0.41-SNAPSHOT'
+        String a -> implementation group: 'org.boofcv', name: a, version: '0.41'
     }
 
     implementation 'net.lingala.zip4j:zip4j:2.8.0'
