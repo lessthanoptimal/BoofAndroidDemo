@@ -175,7 +175,9 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 			try {
 				int numRows = Integer.parseInt(textRows.getText().toString());
 				int numCols = Integer.parseInt(textCols.getText().toString());
-				if( numCols > 0 || numRows > 0  )
+
+				// 3x3 is allowed for all targets. Less than this it won't always work
+				if( numCols >= 3 && numRows >= 3 && numCols <= 999 && numRows <= 999 )
 					setRowCol(numRows,numCols);
 
 				vis.invalidate();
@@ -295,8 +297,7 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 		if (Looper.getMainLooper().getThread() != Thread.currentThread())
 			throw new RuntimeException("Egads");
 
-		ArrayAdapter<CharSequence> adapter =
-				new ArrayAdapter<CharSequence>(activity, android.R.layout.simple_spinner_item);
+		var adapter = new ArrayAdapter<CharSequence>(activity, android.R.layout.simple_spinner_item);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		adapter.add("Chessboard");
 		adapter.add("Square Grid");
@@ -314,8 +315,8 @@ public class SelectCalibrationFiducial implements DrawCalibrationFiducial.Owner{
 			case 2: return CalibrationPatterns.CIRCLE_HEXAGONAL;
 			case 3: return CalibrationPatterns.CIRCLE_GRID;
 			case 4: return CalibrationPatterns.ECOCHECK;
+			default: throw new RuntimeException("Egads");
 		}
-		throw new RuntimeException("Egads");
 	}
 
 	@Override
