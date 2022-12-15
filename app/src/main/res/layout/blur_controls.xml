@@ -18,7 +18,7 @@
 			android:layout_weight=".40"
 			android:gravity="center"
 			android:layout_gravity="center"
-			android:max="5"
+			android:max="10"
 			android:progress="2"
 			android:secondaryProgress="0"
 			android:id="@+id/slider_width"/>
