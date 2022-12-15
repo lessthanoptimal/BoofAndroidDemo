@@ -3,6 +3,12 @@ Change Log for BoofCV Demonstration App
 (year)-(month)-(day)
 
 -------------------------------------------------
+Version 2.13.2
+Date: 2022-Dec-15
+
+- Updated targetSdkVersion version to make Google happy
+
+-------------------------------------------------
 Version 2.13.1
 Date: 2022-Sep-2
 

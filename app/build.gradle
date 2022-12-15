@@ -7,9 +7,9 @@ android {
         applicationId "org.boofcv.android"
         // min SDK version is determined by when Camera2 API becomes functional
         minSdkVersion 22
-        targetSdkVersion 30
-        versionCode 43
-        versionName "2.13.1"
+        targetSdkVersion 33
+        versionCode 44
+        versionName "2.13.2"
     }
 
     buildTypes {
