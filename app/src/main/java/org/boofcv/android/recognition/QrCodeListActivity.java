@@ -1,5 +1,8 @@
 package org.boofcv.android.recognition;
 
+import static org.boofcv.android.recognition.MicroQrListActivity.abbreviateText;
+import static org.boofcv.android.recognition.QrCodeDetectActivity.uniqueLock;
+
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -17,10 +20,9 @@ import org.boofcv.android.R;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import boofcv.alg.fiducial.qrcode.QrCode;
-
-import static org.boofcv.android.recognition.QrCodeDetectActivity.uniqueLock;
 
 /**
  * Presents a list of detected QR Codes. Can select each one to get more info and copy the message
@@ -48,8 +50,8 @@ public class QrCodeListActivity extends AppCompatActivity {
                 qrcodes.add(qr);
                 // filter out bad characters and new lines
                 String message = qr.message.replaceAll("\\p{C}", " ");
-                int N = Math.min(25,message.length());
-                listItems.add(String.format("%4d: %25s",qr.message.length(),message.substring(0,N)));
+                listItems.add(String.format(Locale.getDefault(),
+                        "%4d: %25s", qr.message.length(), abbreviateText(message, 25)));
             }
         }
 
@@ -75,6 +77,10 @@ public class QrCodeListActivity extends AppCompatActivity {
 
         if( QrCodeDetectActivity.selectedQR != null ) {
             moveToSelected(QrCodeDetectActivity.selectedQR);
+        } else if (!listItems.isEmpty()) {
+            // Automatically select the first item
+            listView.performItemClick(listView.getChildAt(0), 0,
+                    listView.getItemIdAtPosition(0));
         }
     }
 

@@ -19,6 +19,7 @@ import org.boofcv.android.R;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import boofcv.alg.fiducial.microqr.MicroQrCode;
 
@@ -49,8 +50,8 @@ public class MicroQrListActivity extends AppCompatActivity {
                 qrcodes.add(qr);
                 // filter out bad characters and new lines
                 String message = qr.message.replaceAll("\\p{C}", " ");
-                int N = Math.min(25, message.length());
-                listItems.add(String.format("%4d: %25s", qr.message.length(), message.substring(0, N)));
+                listItems.add(String.format(Locale.getDefault(),
+                        "%4d: %25s", qr.message.length(), abbreviateText(message, 25)));
             }
         }
 
@@ -76,7 +77,21 @@ public class MicroQrListActivity extends AppCompatActivity {
 
         if (MicroQrDetectActivity.selectedQR != null) {
             moveToSelected(MicroQrDetectActivity.selectedQR);
+        } else if (!listItems.isEmpty()) {
+            // Automatically select the first item
+            listView.performItemClick(listView.getChildAt(0), 0,
+                    listView.getItemIdAtPosition(0));
         }
+    }
+
+    /**
+     * Adds "..." dots to the text if it's too long to be displays in the items list. The hope
+     * is that people will realize it has been truncated.
+     */
+    public static String abbreviateText(String text, int maxLength) {
+        if (text.length() <= maxLength)
+            return text;
+        return text.substring(0, maxLength - 3) + "...";
     }
 
     private void moveToSelected(String target) {
