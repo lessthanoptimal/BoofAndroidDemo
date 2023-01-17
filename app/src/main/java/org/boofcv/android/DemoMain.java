@@ -130,6 +130,10 @@ public class DemoMain extends AppCompatActivity implements ExpandableListView.On
         listView.setOnChildClickListener(this);
 
         Toolbar toolbar = findViewById(R.id.my_toolbar);
+        // Programmically clearing the tittle here so that text doesn't show up in the action bar
+        // if you do this for the activity in the manifest it doesn't show any name in the Launcher
+        // in more recent Android versions!
+        toolbar.setTitle("");
         setSupportActionBar(toolbar);
     }
 
