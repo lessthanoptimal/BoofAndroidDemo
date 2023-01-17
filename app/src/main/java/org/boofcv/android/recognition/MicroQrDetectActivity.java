@@ -30,6 +30,7 @@ import java.util.Map;
 import boofcv.abst.fiducial.MicroQrCodeDetectorPnP;
 import boofcv.alg.fiducial.microqr.MicroQrCode;
 import boofcv.alg.fiducial.qrcode.QrCode;
+import boofcv.alg.misc.PixelMath;
 import boofcv.factory.distort.LensDistortionFactory;
 import boofcv.factory.fiducial.ConfigMicroQrCode;
 import boofcv.factory.fiducial.FactoryFiducial;
@@ -49,6 +50,9 @@ public class MicroQrDetectActivity extends DemoCamera2Activity {
     Mode mode = Mode.NORMAL;
     // Does it render failed detections too?
     boolean showFailures = false;
+
+    // Does it invert the input image to detect inverted markers?
+    boolean detectInverted = false;
 
     // Where the number of unique messages are listed
     TextView textUnqiueCount;
@@ -89,9 +93,13 @@ public class MicroQrDetectActivity extends DemoCamera2Activity {
         spinnerDetector.setSelection(detectorType.ordinal());
         spinnerDetector.setOnItemSelectedListener(new SelectedListener());
 
-        final ToggleButton toggle = controls.findViewById(R.id.show_failures);
-        toggle.setChecked(showFailures);
-        toggle.setOnCheckedChangeListener((buttonView, isChecked) -> showFailures = isChecked);
+        final ToggleButton failures = controls.findViewById(R.id.show_failures);
+        failures.setChecked(showFailures);
+        failures.setOnCheckedChangeListener((buttonView, isChecked) -> showFailures = isChecked);
+
+        final ToggleButton inverted = controls.findViewById(R.id.detect_inverted);
+        inverted.setChecked(detectInverted);
+        inverted.setOnCheckedChangeListener((buttonView, isChecked) -> detectInverted = isChecked);
 
         textUnqiueCount = controls.findViewById(R.id.total_unique);
         textUnqiueCount.setText("0");
@@ -165,6 +173,8 @@ public class MicroQrDetectActivity extends DemoCamera2Activity {
         final DogArray<Se3_F64> listPose = new DogArray<>(Se3_F64::new);
         RenderCube3D renderCube = new RenderCube3D();
         CameraPinholeBrown intrinsic;
+
+        GrayU8 inverted = new GrayU8(1, 1);
 
         public QrCodeProcessing() {
             super(GrayU8.class);
@@ -251,7 +261,12 @@ public class MicroQrDetectActivity extends DemoCamera2Activity {
 
         @Override
         public void process(GrayU8 input) {
-            detector.detect(input);
+            if (detectInverted) {
+                PixelMath.minus(255, input, inverted);
+                detector.detect(inverted);
+            } else {
+                detector.detect(input);
+            }
 
             synchronized (uniqueLock) {
                 for (MicroQrCode qr : detector.getDetector().getDetections()) {
