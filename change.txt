@@ -3,6 +3,15 @@ Change Log for BoofCV Demonstration App
 (year)-(month)-(day)
 
 -------------------------------------------------
+Version 2.13.3
+Date: 2022-Jan-17
+
+- Fixed app name not showing up in launcher
+- QR or Micro QR
+  * Made it more clear when the list view truncate the message
+  * Added button to invert the image
+
+-------------------------------------------------
 Version 2.13.2
 Date: 2022-Dec-15
 
