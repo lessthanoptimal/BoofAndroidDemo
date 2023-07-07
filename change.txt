@@ -3,6 +3,14 @@ Change Log for BoofCV Demonstration App
 (year)-(month)-(day)
 
 -------------------------------------------------
+Version 2.13.4
+Date: 2023-XXX
+
+- Updated to latest version of BoofCV
+- TODO fix some issues
+
+
+-------------------------------------------------
 Version 2.13.3
 Date: 2022-Jan-17
 
