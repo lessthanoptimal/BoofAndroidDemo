@@ -163,7 +163,7 @@ public class EquirectangularToViewActivity extends Activity {
                            width / 2, height / 2, width, height);
                    model.fsetMirror(3f);
                    model.fsetRadial(7.308e-1f,1.855e1f);
-                   model.fsetTangental(-1.288e-2f,-1.1342e-2f);
+                   model.fsetTangential(-1.288e-2f,-1.1342e-2f);
                    cameraToEqui.setCameraModel(model);
                    distorter.setModel(cameraToEqui);
                } break;

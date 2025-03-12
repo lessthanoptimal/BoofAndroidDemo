@@ -48,7 +48,7 @@ public class CalibrationComputeActivity extends Activity {
 	// image information which is to be processed
 	public static List<CalibrationObservation> images;
 	public static int imageWidth, imageHeight;
-	public static List<Point2D_F64> targetLayout;
+	public static List<List<Point2D_F64>> targetLayouts;
 	public static CameraPinholeBrown intrinsic;
 
 	TextView text;
@@ -78,7 +78,7 @@ public class CalibrationComputeActivity extends Activity {
 
 		// start a new process
 		calibrationAlg = new CalibrateMonoPlanar();
-		calibrationAlg.initialize(imageWidth, imageHeight, targetLayout);
+		calibrationAlg.initialize(imageWidth, imageHeight, targetLayouts);
 		calibrationAlg.configurePinhole(true,2,false);
 		intrinsic = null;
 		threadRunning = true;

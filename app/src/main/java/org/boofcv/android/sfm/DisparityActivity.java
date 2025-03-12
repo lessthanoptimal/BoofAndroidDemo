@@ -1,5 +1,7 @@
 package org.boofcv.android.sfm;
 
+import static org.boofcv.android.DemoMain.getExternalDirectory;
+
 import android.app.ProgressDialog;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -66,8 +68,6 @@ import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.ImageType;
 import boofcv.struct.image.InterleavedU8;
-
-import static org.boofcv.android.DemoMain.getExternalDirectory;
 
 /**
  * Computes the stereo disparity between two images captured by the camera.  The user selects the images and which
@@ -724,14 +724,32 @@ public class DisparityActivity extends DemoCamera2Activity
 					new FileInputStream(new File(directory, "point_cloud.ply")),
 					new PointCloudWriter() {
 						int total = 0;
+						double px,py,pz;
+						int rgb;
+
 						@Override
 						public void initialize(int size, boolean hasColor) {
 							cloud.declarePoints(size);
 						}
 
 						@Override
-						public void add(double x, double y, double z, int rgb) {
-							cloud.setPoint(total++,x,y,z,rgb);
+						public void startPoint() {}
+
+						@Override
+						public void stopPoint() {
+							cloud.setPoint(total++,px,py,pz,rgb);
+						}
+
+						@Override
+						public void location(double x, double y, double z) {
+							this.px = x;
+							this.py = y;
+							this.pz = z;
+						}
+
+						@Override
+						public void color(int rgb) {
+							this.rgb = rgb;
 						}
 					}
 			);

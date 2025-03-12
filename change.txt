@@ -4,7 +4,14 @@ Change Log for BoofCV Demonstration App
 
 -------------------------------------------------
 Version 2.13.5
-Date: 2025-Aug-08
+Date: 2024-XXX-YY
+
+- Updated to latest BoofCV
+
+
+-------------------------------------------------
+Version 2.13.5
+Date: 2024-Aug-08
 
 - Updated to latest version of BoofCV
 - Made Google happy

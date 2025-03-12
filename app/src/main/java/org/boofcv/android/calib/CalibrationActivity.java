@@ -165,7 +165,7 @@ public class CalibrationActivity extends PointTrackerDisplayActivity {
         } else {
             throw new RuntimeException("Unknown targetType " + cc.targetType);
         }
-        CalibrationComputeActivity.targetLayout = detector.getLayout();
+        CalibrationComputeActivity.targetLayouts = List.of(detector.getLayout());
         setProcessing(new DetectTarget(detector));
     }
 

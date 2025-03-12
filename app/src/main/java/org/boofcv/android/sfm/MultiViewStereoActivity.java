@@ -1069,7 +1069,7 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
             TIntObjectMap<String> viewToId = new TIntObjectHashMap<>();
             BoofMiscOps.forIdx(working.listViews, ( workIdxI, wv ) -> viewToId.put(wv.index, wv.pview.id));
             try {
-                if (!sparseToDense.process(scene, viewToId, imageLookup))
+                if (!sparseToDense.process(scene, null, viewToId, imageLookup))
                     throw new RuntimeException("Dense reconstruction failed!");
             } catch (RuntimeException e) {
                 if (Thread.interrupted()) return;
@@ -1143,7 +1143,7 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
         for (int i = 0; i < scene.points.size(); i++) {
             SceneStructureCommon.Point p = scene.points.get(i);
             double z = p.coordinate[2];
-            double w = scene.isHomogenous() ? p.coordinate[3] : 1.0;
+            double w = scene.isHomogeneous() ? p.coordinate[3] : 1.0;
             z /= w;
             minZ = Math.min(minZ, z);
             maxZ = Math.max(maxZ, z);
@@ -1157,7 +1157,7 @@ public class MultiViewStereoActivity extends DemoCamera2Activity
             double x = p.coordinate[0];
             double y = p.coordinate[1];
             double z = p.coordinate[2];
-            double w = scene.isHomogenous() ? p.coordinate[3] : 1.0;
+            double w = scene.isHomogeneous() ? p.coordinate[3] : 1.0;
 
             // give it some colors to keep things interesting
             int r = ((int) (z * 255.0)) % 0xFF;
