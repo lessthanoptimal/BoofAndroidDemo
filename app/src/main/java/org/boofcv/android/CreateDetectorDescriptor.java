@@ -23,6 +23,7 @@ import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
 import boofcv.factory.feature.detect.interest.FactoryInterestPoint;
 import boofcv.factory.feature.orientation.FactoryOrientation;
 import boofcv.factory.feature.orientation.FactoryOrientationAlgs;
+import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.feature.TupleDesc_F64;
 import boofcv.struct.image.ImageBase;
 import boofcv.struct.image.ImageGray;
@@ -81,6 +82,8 @@ public class CreateDetectorDescriptor {
 
 	public static InterestPointDetector createDetector( int detect , Class imageType ) {
 		Class derivType = GImageDerivativeOps.getDerivativeType(imageType);
+		// wrapPoint() below computes the gradient using Sobel. The detector needs to know the kernel's scale factor
+		int derivDivisor = FactoryDerivative.sobel(imageType, derivType).divisor();
 		GeneralFeatureDetector general;
 
 		switch( detect ) {
@@ -91,11 +94,11 @@ public class CreateDetectorDescriptor {
 				return FactoryInterestPoint.sift(null,confDetectSift(),imageType);
 
 			case DETECT_SHITOMASI:
-				general = FactoryDetectPoint.createShiTomasi(confCorner(),new ConfigShiTomasi(false,3),derivType);
+				general = FactoryDetectPoint.createShiTomasi(confCorner(),new ConfigShiTomasi(false,3),derivType, derivDivisor);
 				break;
 
 			case DETECT_HARRIS:
-				general = FactoryDetectPoint.createHarris(confCorner(), new ConfigHarrisCorner(false,3),derivType);
+				general = FactoryDetectPoint.createHarris(confCorner(), new ConfigHarrisCorner(false,3),derivType, derivDivisor);
 				break;
 
 			case DETECT_FAST:

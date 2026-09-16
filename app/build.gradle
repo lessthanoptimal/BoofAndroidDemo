@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 34
+    compileSdkVersion 36
 
     defaultConfig {
         applicationId "org.boofcv.android"
         // min SDK version is determined by when Camera2 API becomes functional
         minSdkVersion 22
-        targetSdkVersion 34
+        targetSdkVersion 36
         versionCode 48
         versionName "2.13.6-SNAPSHOT"
     }
@@ -59,13 +59,15 @@ configurations {
     all*.exclude group: "xmlpull", module: "xmlpull"
     all*.exclude group: "org.apache.commons", module: "commons-compress"
     all*.exclude group: "com.thoughtworks.xstream", module: "commons-compress"
+    // Declared by deepboof-io but no class references it. Its jars collide on META-INF/sisu when packaged
+    all*.exclude group: "org.codehaus.plexus"
 }
 
 def acraVersion = '5.7.0'
 
 dependencies {
-    ['boofcv-android', 'boofcv-core'].each {
-        String a -> implementation group: 'org.boofcv', name: a, version: '1.1.9-SNAPSHOT'
+    ['boofcv-android', 'boofcv-core', 'boofcv-deepboof'].each {
+        String a -> implementation group: 'org.boofcv', name: a, version: '1.5.0'
     }
 
     implementation 'net.lingala.zip4j:zip4j:2.8.0'

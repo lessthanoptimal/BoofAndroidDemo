@@ -22,10 +22,12 @@ import boofcv.abst.feature.detect.extract.ConfigExtract;
 import boofcv.abst.feature.detect.extract.NonMaxSuppression;
 import boofcv.abst.feature.detect.interest.ConfigPointDetector;
 import boofcv.abst.feature.detect.interest.PointDetectorTypes;
+import boofcv.abst.filter.derivative.ImageGradient;
 import boofcv.alg.feature.detect.interest.EasyGeneralFeatureDetector;
 import boofcv.alg.feature.detect.interest.GeneralFeatureDetector;
 import boofcv.factory.feature.detect.extract.FactoryFeatureExtractor;
 import boofcv.factory.feature.detect.interest.FactoryDetectPoint;
+import boofcv.factory.filter.derivative.FactoryDerivative;
 import boofcv.struct.QueueCorner;
 import boofcv.struct.image.GrayS16;
 import boofcv.struct.image.GrayU8;
@@ -93,9 +95,9 @@ public class PointDisplayActivity extends DemoCamera2Activity
 		ConfigExtract configCorner = new ConfigExtract(2,20,3,true,false,true);
 		ConfigExtract configBlob = new ConfigExtract(2,20,3,true,true,true);
 
-		nonmaxMax = FactoryFeatureExtractor.nonmax(configCorner);
+		nonmaxMax = FactoryFeatureExtractor.nonmax(configCorner, 1);
 		nonmaxCandidate = FactoryFeatureExtractor.nonmaxCandidate(configCorner);
-		nonmaxMinMax = FactoryFeatureExtractor.nonmax(configBlob);
+		nonmaxMinMax = FactoryFeatureExtractor.nonmax(configBlob, 1);
 
 		setControls(controls);
 	}
@@ -163,9 +165,12 @@ public class PointDisplayActivity extends DemoCamera2Activity
 		config.general.radius = featureRadius;
 		checkWeighted.setEnabled(enabledWeighted);
 
-		GeneralFeatureDetector<GrayU8,GrayS16> general = FactoryDetectPoint.create(config,GrayU8.class, GrayS16.class);
+		// Integer gradient kernels are off by a known scale factor. The detector needs to know it so that
+		// the user specified threshold is applied consistently
+		ImageGradient<GrayU8,GrayS16> gradient = FactoryDerivative.sobel(GrayU8.class, GrayS16.class);
+		GeneralFeatureDetector<GrayU8,GrayS16> general = FactoryDetectPoint.create(config,GrayU8.class, GrayS16.class, gradient.divisor());
 
-		EasyGeneralFeatureDetector<GrayU8,GrayS16> easy = new EasyGeneralFeatureDetector<>(general,GrayU8.class, GrayS16.class);
+		EasyGeneralFeatureDetector<GrayU8,GrayS16> easy = new EasyGeneralFeatureDetector<>(general, gradient, GrayU8.class, GrayS16.class);
 
 		setProcessing(new PointProcessing(easy));
 	}

@@ -12,6 +12,7 @@ import org.boofcv.android.R;
 import boofcv.abst.feature.detect.interest.ConfigPointDetector;
 import boofcv.abst.feature.detect.interest.PointDetectorTypes;
 import boofcv.abst.tracker.PointTracker;
+import boofcv.alg.filter.derivative.DerivativeType;
 import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.factory.feature.detect.selector.ConfigSelectLimit;
 import boofcv.factory.tracker.FactoryPointTracker;
@@ -84,7 +85,7 @@ public class KltDisplayActivity extends PointTrackerDisplayActivity {
 		respawnThreshold = Math.max(1,(int)(configKlt.maximumTracks.length/4));
 
 		PointTracker<GrayU8> tracker =
-				FactoryPointTracker.klt(configKlt,configDet,GrayU8.class, GrayS16.class);
+				FactoryPointTracker.klt(configKlt, DerivativeType.SOBEL, configDet,GrayU8.class, GrayS16.class);
 
 		Log.i("KLT","maxFeatures = "+maxFeatures);
 		setProcessing(new PointProcessing(tracker));

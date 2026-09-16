@@ -26,6 +26,7 @@ import boofcv.abst.sfm.d2.ImageMotion2D;
 import boofcv.abst.sfm.d2.PlToGrayMotion2D;
 import boofcv.abst.tracker.PointTracker;
 import boofcv.alg.sfm.d2.StitchingFromMotion2D;
+import boofcv.alg.filter.derivative.DerivativeType;
 import boofcv.alg.tracker.klt.ConfigPKlt;
 import boofcv.factory.sfm.FactoryMotion2D;
 import boofcv.factory.tracker.FactoryPointTracker;
@@ -127,7 +128,7 @@ public class StabilizeDisplayActivity extends DemoBitmapCamera2Activity
 			configKlt.pyramidLevels = ConfigDiscreteLevels.levels(3);
 			configKlt.templateRadius = 3;
 
-			tracker = FactoryPointTracker.klt(configKlt, configDet, GrayU8.class, GrayS16.class);
+			tracker = FactoryPointTracker.klt(configKlt, DerivativeType.SOBEL, configDet, GrayU8.class, GrayS16.class);
 		} else {
 			tracker = FactoryPointTracker.dda_FH_SURF_Fast(null,null,null,GrayU8.class);
 		}

@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Locale;
 
 import boofcv.abst.geo.calibration.CalibrateMonoPlanar;
+import boofcv.abst.geo.calibration.ConfigCalibrateBrown;
 import boofcv.abst.geo.calibration.ImageResults;
 import boofcv.alg.geo.calibration.CalibrationObservation;
 import boofcv.alg.geo.calibration.CalibrationPlanarGridZhang99;
@@ -79,7 +80,7 @@ public class CalibrationComputeActivity extends Activity {
 		// start a new process
 		calibrationAlg = new CalibrateMonoPlanar();
 		calibrationAlg.initialize(imageWidth, imageHeight, targetLayouts);
-		calibrationAlg.configurePinhole(true,2,false);
+		calibrationAlg.configurePinhole(new ConfigCalibrateBrown().zeroSkew(true).numRadial(2).tangential(false));
 		intrinsic = null;
 		threadRunning = true;
 		new CalibrationThread().start();
