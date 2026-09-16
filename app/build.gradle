@@ -8,8 +8,8 @@ android {
         // min SDK version is determined by when Camera2 API becomes functional
         minSdkVersion 22
         targetSdkVersion 36
-        versionCode 48
-        versionName "2.14.0"
+        versionCode 49
+        versionName "2.14.1-SNAPSHOT"
     }
 
     buildTypes {
