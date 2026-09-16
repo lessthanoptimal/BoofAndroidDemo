@@ -1,10 +1,15 @@
 package org.boofcv.android;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.graphics.Insets;
 import android.os.Build;
+import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.view.WindowInsets;
 
 import org.acra.ACRA;
 import org.acra.annotation.AcraCore;
@@ -41,6 +46,36 @@ public class DemoApplication extends Application
     // If another activity modifies the demo preferences this needs to be set to true so that it knows to reload
     // camera parameters.
     public boolean changedPreferences = false;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        // Apps targeting API 35+ are drawn edge-to-edge behind the status and navigation bars.
+        // Activities here have no common base class, so pad every activity's content view by the
+        // system bar insets
+        registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
+            @Override public void onActivityPostCreated(Activity activity, Bundle savedInstanceState) {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R)
+                    return;
+                View content = activity.findViewById(android.R.id.content);
+                content.setOnApplyWindowInsetsListener((v, insets) -> {
+                    Insets bars = insets.getInsets(
+                            WindowInsets.Type.systemBars() | WindowInsets.Type.displayCutout());
+                    v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
+                    return insets;
+                });
+            }
+
+            @Override public void onActivityCreated(Activity activity, Bundle savedInstanceState) {}
+            @Override public void onActivityStarted(Activity activity) {}
+            @Override public void onActivityResumed(Activity activity) {}
+            @Override public void onActivityPaused(Activity activity) {}
+            @Override public void onActivityStopped(Activity activity) {}
+            @Override public void onActivitySaveInstanceState(Activity activity, Bundle outState) {}
+            @Override public void onActivityDestroyed(Activity activity) {}
+        });
+    }
 
     @Override
     protected void attachBaseContext(Context base) {
